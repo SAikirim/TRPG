@@ -56,6 +56,42 @@ python app.py
 - 게임 턴: 0 (아직 플레이 시작 전)
 - 서버 정상 작동 확인됨
 
+## CLI 세션 TRPG 모드 (TODO)
+웹 UI 없이 Claude Code CLI 세션에서 직접 TRPG를 진행하는 방식.
+
+### 개요
+- Claude가 GM 역할을 하며 채팅으로 TRPG 진행
+- 유저가 액션 선언 → Claude가 판정/나레이션 → game_state.json 업데이트
+- Flask 서버 불필요
+
+### 맵 표시 방식
+- **ASCII 맵**: 이모지/텍스트 기반 (모바일 호환)
+- PIL 이미지: 데스크탑 CLI에서는 Read 도구로 이미지 확인 가능, 모바일은 불가
+- 캐릭터 일러스트 생성은 불가 (도형 기반 맵만 가능)
+
+### ASCII 맵 범례
+```
+🔴 전사 아론    🟢 마법사 리나    🔵 도적 카이
+🔺 몬스터       🌲 숲(grass)     ⬜ 던전(dungeon)    🟡 보물실(treasure)
+```
+
+### 진행 방식
+1. 유저가 채팅으로 액션 선언 (예: "아론이 오크를 공격")
+2. Claude(GM)가 rules.json 기반으로 주사위 판정 (Bash에서 $RANDOM 사용)
+3. game_state.json 업데이트 (HP, 위치, 턴 등)
+4. ASCII 맵 + 나레이션 텍스트로 결과 표시
+5. 턴 종료 시 자동 저장
+
+### 필요 파일
+- `game_state.json` - 상태 추적
+- `rules.json` - 전투/판정 규칙
+- `scenario.json` - 시나리오 진행
+
+### 구현 TODO
+- [ ] CLI TRPG 진행용 Python 스크립트 (ascii_map.py) - ASCII 맵 생성기
+- [ ] GM 판정 로직 헬퍼 (dice_roller.py) - 주사위/판정 유틸
+- [ ] 세션 간 이어하기 지원 (game_state.json 기반)
+
 ## 게임 플로우
 웹 UI에서 액션 버튼 클릭 → Flask API로 전송 → game_state.json 업데이트 → 맵 이미지 재생성 → UI 자동 갱신(2초)
 
