@@ -2,63 +2,70 @@
   "game_info": {
     "title": "판타지 TRPG - 잃어버린 보물의 숲 던전",
     "scenario_id": "lost_treasure",
-    "scenario": "3명의 모험가가 숲의 던전에서 잃어버린 보물을 찾는다",
-    "status": "active"
+    "scenario": "가난한 남매와 그들의 동료가 숲의 던전에서 잃어버린 보물을 찾는다",
+    "ruleset": "fantasy_basic",
+    "difficulty": "normal",
+    "stat_pool": 50,
+    "status": "character_creation_complete",
+    "current_chapter": 1
   },
   "players": [
     {
       "id": 1,
-      "name": "아론",
-      "class": "전사",
-      "hp": 30,
-      "max_hp": 30,
-      "mp": 5,
-      "max_mp": 5,
-      "stats": {
-        "STR": 18,
-        "DEX": 10,
-        "INT": 8,
-        "CON": 15
-      },
-      "position": [2, 3],
-      "status_effects": [],
-      "inventory": ["철검", "가죽 방패"]
-    },
-    {
-      "id": 2,
-      "name": "리나",
+      "name": "사이키",
       "class": "마법사",
       "hp": 15,
       "max_hp": 15,
-      "mp": 20,
-      "max_mp": 20,
+      "mp": 30,
+      "max_mp": 30,
       "stats": {
-        "STR": 6,
-        "DEX": 12,
+        "STR": 8,
+        "DEX": 14,
         "INT": 18,
-        "CON": 8
+        "CON": 10
+      },
+      "position": [2, 3],
+      "status_effects": [],
+      "inventory": ["마법 지팡이", "마나 포션"],
+      "controlled_by": "user"
+    },
+    {
+      "id": 2,
+      "name": "루체나",
+      "class": "도적",
+      "hp": 22,
+      "max_hp": 22,
+      "mp": 10,
+      "max_mp": 10,
+      "stats": {
+        "STR": 8,
+        "DEX": 18,
+        "INT": 10,
+        "CON": 14
       },
       "position": [2, 4],
       "status_effects": [],
-      "inventory": ["마법 지팡이", "마나 포션"]
+      "inventory": ["단검 x2", "도둑 도구"],
+      "controlled_by": "agent"
     },
     {
       "id": 3,
-      "name": "카이",
-      "class": "도적",
-      "hp": 20,
-      "max_hp": 20,
-      "mp": 8,
-      "max_mp": 8,
+      "name": "노을",
+      "class": "전사",
+      "hp": 32,
+      "max_hp": 32,
+      "mp": 5,
+      "max_mp": 5,
       "stats": {
-        "STR": 10,
-        "DEX": 18,
-        "INT": 12,
-        "CON": 10
+        "STR": 16,
+        "DEX": 12,
+        "INT": 8,
+        "CON": 14
       },
       "position": [3, 3],
       "status_effects": [],
-      "inventory": ["단검 x2", "도둑 도구"]
+      "inventory": ["철검", "가죽 방패"],
+      "controlled_by": "agent"
     }
   ],
   "npcs": [
@@ -113,8 +120,8 @@
   "events": [
     {
       "turn": 0,
-      "message": "모험이 시작되었다! 세 명의 모험가가 숲의 입구에 도착했다.",
-      "timestamp": "게임 시작"
+      "message": "캐릭터 생성 완료. 사이키(마법사), 루체나(도적), 노을(전사)이 모험을 준비한다.",
+      "timestamp": "게임 준비"
     }
   ]
 }

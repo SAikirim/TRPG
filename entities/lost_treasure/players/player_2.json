@@ -1,25 +1,34 @@
 {
   "id": 2,
-  "name": "리나",
-  "class": "마법사",
+  "name": "루체나",
+  "class": "도적",
+  "background": {
+    "origin": "사이키의 여동생. 오빠가 마법을 배우는 동안 뒷골목에서 생존술을 익힘. 소매치기, 자물쇠 따기가 그녀의 학교였다.",
+    "motivation": "오빠와 함께 보물을 찾아 가난에서 벗어나기. '오빠가 길을 밝히면, 내가 그림자에서 길을 열게.'",
+    "personality": "입은 거칠고 손은 빠르지만, 오빠 앞에서만은 아직도 투정부리는 열다섯 살 — 세상에서 가장 믿음직한 여동생.",
+    "relationships": {
+      "사이키": "오빠. 세상에서 가장 소중한 사람",
+      "노을": "동갑내기 친구. 서로 티격태격하지만 통하는 사이"
+    }
+  },
   "stats": {
-    "hp": 15,
-    "max_hp": 15,
-    "mp": 20,
-    "max_mp": 20,
-    "STR": 6,
-    "DEX": 12,
-    "INT": 18,
-    "CON": 8
+    "hp": 22,
+    "max_hp": 22,
+    "mp": 10,
+    "max_mp": 10,
+    "STR": 8,
+    "DEX": 18,
+    "INT": 10,
+    "CON": 14
   },
   "position": [2, 4],
   "status_effects": [],
-  "inventory": ["마법 지팡이", "마나 포션"],
+  "inventory": ["단검 x2", "도둑 도구"],
   "equipment": {
-    "weapon": "마법 지팡이",
+    "weapon": "단검 x2",
     "armor": null
   },
-  "available_actions": ["파이어볼", "힐"],
+  "available_actions": ["습격", "도주"],
   "combat_state": {
     "is_in_combat": false,
     "defense_bonus": 0,
@@ -37,5 +46,7 @@
     "alive": true,
     "conscious": true,
     "death_save_turns": 0
-  }
+  },
+  "party_role": "중열 (기습/유틸)",
+  "controlled_by": "agent"
 }
