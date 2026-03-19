@@ -1,0 +1,41 @@
+{
+  "id": 3,
+  "name": "카이",
+  "class": "도적",
+  "stats": {
+    "hp": 20,
+    "max_hp": 20,
+    "mp": 8,
+    "max_mp": 8,
+    "STR": 10,
+    "DEX": 18,
+    "INT": 12,
+    "CON": 10
+  },
+  "position": [3, 3],
+  "status_effects": [],
+  "inventory": ["단검 x2", "도둑 도구"],
+  "equipment": {
+    "weapon": "단검 x2",
+    "armor": null
+  },
+  "available_actions": ["습격", "도주"],
+  "combat_state": {
+    "is_in_combat": false,
+    "defense_bonus": 0,
+    "next_turn_penalty": 0
+  },
+  "history": {
+    "actions_taken": [],
+    "damage_dealt_total": 0,
+    "damage_received_total": 0,
+    "kills": [],
+    "items_used": [],
+    "turns_played": 0
+  },
+  "conditions": {
+    "alive": true,
+    "conscious": true,
+    "death_save_turns": 0
+  }
+}

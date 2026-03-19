@@ -1,0 +1,41 @@
+{
+  "id": 2,
+  "name": "리나",
+  "class": "마법사",
+  "stats": {
+    "hp": 15,
+    "max_hp": 15,
+    "mp": 20,
+    "max_mp": 20,
+    "STR": 6,
+    "DEX": 12,
+    "INT": 18,
+    "CON": 8
+  },
+  "position": [2, 4],
+  "status_effects": [],
+  "inventory": ["마법 지팡이", "마나 포션"],
+  "equipment": {
+    "weapon": "마법 지팡이",
+    "armor": null
+  },
+  "available_actions": ["파이어볼", "힐"],
+  "combat_state": {
+    "is_in_combat": false,
+    "defense_bonus": 0,
+    "next_turn_penalty": 0
+  },
+  "history": {
+    "actions_taken": [],
+    "damage_dealt_total": 0,
+    "damage_received_total": 0,
+    "kills": [],
+    "items_used": [],
+    "turns_played": 0
+  },
+  "conditions": {
+    "alive": true,
+    "conscious": true,
+    "death_save_turns": 0
+  }
+}

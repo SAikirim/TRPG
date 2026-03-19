@@ -1,0 +1,41 @@
+{
+  "id": 1,
+  "name": "아론",
+  "class": "전사",
+  "stats": {
+    "hp": 30,
+    "max_hp": 30,
+    "mp": 5,
+    "max_mp": 5,
+    "STR": 18,
+    "DEX": 10,
+    "INT": 8,
+    "CON": 15
+  },
+  "position": [2, 3],
+  "status_effects": [],
+  "inventory": ["철검", "가죽 방패"],
+  "equipment": {
+    "weapon": "철검",
+    "armor": "가죽 방패"
+  },
+  "available_actions": ["공격", "방어"],
+  "combat_state": {
+    "is_in_combat": false,
+    "defense_bonus": 0,
+    "next_turn_penalty": 0
+  },
+  "history": {
+    "actions_taken": [],
+    "damage_dealt_total": 0,
+    "damage_received_total": 0,
+    "kills": [],
+    "items_used": [],
+    "turns_played": 0
+  },
+  "conditions": {
+    "alive": true,
+    "conscious": true,
+    "death_save_turns": 0
+  }
+}

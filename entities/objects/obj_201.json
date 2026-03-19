@@ -1,0 +1,32 @@
+{
+  "id": 201,
+  "name": "고대 비문",
+  "type": "puzzle",
+  "position": [7, 8],
+  "area": "dungeon",
+  "status": "unsolved",
+  "hidden": false,
+  "description": "벽에 새겨진 고대 문자. 해독하면 숨겨진 통로를 발견할 수 있다.",
+  "interaction": {
+    "action": "read_inscription",
+    "check": {
+      "stat": "INT",
+      "dc": 14,
+      "success_text": "숨겨진 통로를 발견했다!",
+      "fail_text": "문자의 의미를 알 수 없다."
+    }
+  },
+  "reward": {
+    "item": "고대 열쇠",
+    "effect": "unlock_treasure_room"
+  },
+  "riddle_text": "힘으로 열 수 없는 문, 지혜로 열 수 없는 문, 오직 용기만이 여는 문.",
+  "memory": {
+    "examined": false,
+    "examined_by": [],
+    "solved": false,
+    "solved_by": null,
+    "attempts": []
+  },
+  "scenario_event_id": "ch2_riddle"
+}

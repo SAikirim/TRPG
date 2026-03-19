@@ -1,0 +1,25 @@
+{
+  "id": 203,
+  "name": "안전한 방",
+  "type": "rest_spot",
+  "position": [8, 8],
+  "area": "dungeon",
+  "status": "available",
+  "hidden": false,
+  "description": "던전 안의 안전한 방. 잠시 쉬어갈 수 있다.",
+  "interaction": {
+    "action": "rest",
+    "effect": {
+      "heal_hp": 5,
+      "heal_mp": 3
+    },
+    "turns_required": 1,
+    "max_uses": 2
+  },
+  "memory": {
+    "discovered": false,
+    "times_used": 0,
+    "used_by": []
+  },
+  "scenario_event_id": "ch2_rest_spot"
+}

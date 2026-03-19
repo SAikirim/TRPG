@@ -1,0 +1,37 @@
+{
+  "id": 200,
+  "name": "덩굴 함정",
+  "type": "trap",
+  "position": [5, 3],
+  "area": "grass",
+  "status": "armed",
+  "hidden": true,
+  "description": "덩굴에 숨겨진 함정. 밟으면 발동한다.",
+  "trigger": {
+    "condition": "player_enters_position",
+    "position": [5, 3]
+  },
+  "effect": {
+    "damage": 3,
+    "target": "trigger_player",
+    "check": {
+      "stat": "DEX",
+      "dc": 12,
+      "success_text": "함정을 재빠르게 피했다!",
+      "fail_text": "함정에 걸려 3의 피해를 입었다!"
+    }
+  },
+  "disarm": {
+    "possible": true,
+    "stat": "DEX",
+    "dc": 14,
+    "tool_bonus": "도둑 도구 사용 시 +4"
+  },
+  "memory": {
+    "triggered": false,
+    "triggered_by": null,
+    "disarmed": false,
+    "disarmed_by": null
+  },
+  "scenario_event_id": "ch1_trap"
+}
