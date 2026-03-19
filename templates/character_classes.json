@@ -1,0 +1,89 @@
+{
+  "description": "캐릭터 클래스 템플릿. 캐릭터 메이킹 시 클래스 선택 후 능력치를 자동 배분하거나 유저가 커스텀할 수 있다.",
+  "stat_pool": {
+    "total_points": 60,
+    "min_stat": 6,
+    "max_stat": 18,
+    "stats": ["STR", "DEX", "INT", "CON"],
+    "description": "총 60포인트를 4개 능력치에 배분. 각 능력치는 최소 6, 최대 18."
+  },
+  "classes": {
+    "전사": {
+      "description": "튼튼한 체력과 강한 힘으로 전선에서 싸우는 근접 전투 전문가.",
+      "role": "탱커/딜러",
+      "recommended_stats": {"STR": 18, "DEX": 10, "INT": 8, "CON": 15},
+      "hp_base": 25,
+      "hp_per_con": 0.5,
+      "mp_base": 5,
+      "mp_per_int": 0,
+      "starting_equipment": ["철검", "가죽 방패"],
+      "available_actions": ["공격", "방어"],
+      "passive": "방어 시 방어력 +4 (1턴)"
+    },
+    "마법사": {
+      "description": "강력한 마법으로 적을 쓸어버리는 원거리 마법 전문가. 체력이 약하다.",
+      "role": "원거리 딜러/힐러",
+      "recommended_stats": {"STR": 6, "DEX": 12, "INT": 18, "CON": 8},
+      "hp_base": 10,
+      "hp_per_con": 0.5,
+      "mp_base": 12,
+      "mp_per_int": 1,
+      "starting_equipment": ["마법 지팡이", "마나 포션"],
+      "available_actions": ["파이어볼", "힐"],
+      "passive": "파이어볼 범위 공격 가능 (같은 위치 적 전체)"
+    },
+    "도적": {
+      "description": "빠른 몸놀림과 은밀한 기습으로 적의 급소를 노리는 전문가.",
+      "role": "딜러/유틸리티",
+      "recommended_stats": {"STR": 10, "DEX": 18, "INT": 12, "CON": 10},
+      "hp_base": 15,
+      "hp_per_con": 0.5,
+      "mp_base": 5,
+      "mp_per_int": 0.5,
+      "starting_equipment": ["단검 x2", "도둑 도구"],
+      "available_actions": ["습격", "도주"],
+      "passive": "은신 성공 시 다음 공격 자동 명중 + 추가 피해 4"
+    },
+    "성직자": {
+      "description": "신의 축복으로 아군을 치유하고 언데드를 물리치는 신앙 전사.",
+      "role": "힐러/서포터",
+      "recommended_stats": {"STR": 12, "DEX": 8, "INT": 16, "CON": 14},
+      "hp_base": 18,
+      "hp_per_con": 0.5,
+      "mp_base": 10,
+      "mp_per_int": 0.8,
+      "starting_equipment": ["철퇴", "성스러운 부적"],
+      "available_actions": ["치유의 빛", "정화"],
+      "passive": "치유 마법 효과 +2"
+    },
+    "궁수": {
+      "description": "먼 거리에서 정확한 화살을 날리는 원거리 물리 전문가.",
+      "role": "원거리 딜러",
+      "recommended_stats": {"STR": 10, "DEX": 18, "INT": 10, "CON": 12},
+      "hp_base": 15,
+      "hp_per_con": 0.5,
+      "mp_base": 3,
+      "mp_per_int": 0.3,
+      "starting_equipment": ["장궁", "화살통 (20발)"],
+      "available_actions": ["정밀 사격", "연속 사격"],
+      "passive": "5칸 이상 거리에서 공격 시 명중 +2"
+    }
+  },
+  "auto_generate": {
+    "description": "유저가 선택하지 않은 항목은 자동 생성된다.",
+    "name_pool": {
+      "전사": ["아론", "발더", "그론", "헥터"],
+      "마법사": ["리나", "엘라라", "모건", "시리우스"],
+      "도적": ["카이", "레인", "제로", "닉스"],
+      "성직자": ["세라", "루미엘", "아이리스", "테오"],
+      "궁수": ["아르테미스", "로빈", "실바", "레인저"]
+    },
+    "party_presets": {
+      "3인_기본": ["전사", "마법사", "도적"],
+      "3인_균형": ["전사", "성직자", "궁수"],
+      "4인_풀파티": ["전사", "마법사", "도적", "성직자"]
+    }
+  },
+  "hp_formula": "hp_base + floor(CON * hp_per_con)",
+  "mp_formula": "mp_base + floor(INT * mp_per_int)"
+}
