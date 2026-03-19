@@ -45,7 +45,7 @@
             image-rendering: pixelated;
         }
         .sidebar {
-            width: 380px;
+            width: 400px;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -75,13 +75,25 @@
             border-radius: 8px;
             padding: 10px;
             margin-bottom: 8px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
         }
-        .player-card .name {
+        .player-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 6px;
+            border: 2px solid #333;
+            image-rendering: pixelated;
+            flex-shrink: 0;
+        }
+        .player-info { flex: 1; }
+        .player-info .name {
             font-weight: bold;
             font-size: 0.95em;
             margin-bottom: 6px;
         }
-        .player-card .name .class-badge {
+        .player-info .name .class-badge {
             font-size: 0.75em;
             padding: 2px 8px;
             border-radius: 10px;
@@ -121,30 +133,78 @@
             color: #aaa;
         }
         .stats span { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; }
-        .actions-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+
+        /* 행동 입력 */
+        .action-input-area {
+            display: flex;
+            flex-direction: column;
             gap: 8px;
         }
-        .action-btn {
-            padding: 10px;
+        .action-select-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .action-select-row select {
+            flex-shrink: 0;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #0f3460;
+            color: #eee;
+            font-size: 0.85em;
+        }
+        .action-input-row {
+            display: flex;
+            gap: 8px;
+        }
+        #action-input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #0f3460;
+            color: #eee;
+            font-size: 0.9em;
+            outline: none;
+        }
+        #action-input:focus { border-color: #e94560; }
+        #action-input::placeholder { color: #666; }
+        #send-btn {
+            padding: 10px 20px;
             border: none;
             border-radius: 8px;
-            font-size: 0.85em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
+            background: linear-gradient(135deg, #e94560, #c0392b);
             color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: transform 0.1s;
         }
-        .action-btn:hover { transform: scale(1.03); }
-        .action-btn:active { transform: scale(0.97); }
-        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-attack { background: linear-gradient(135deg, #e63946, #c0392b); }
-        .btn-defend { background: linear-gradient(135deg, #e67e22, #d35400); }
-        .btn-fireball { background: linear-gradient(135deg, #457be0, #2c3e9e); }
-        .btn-heal { background: linear-gradient(135deg, #2ecc71, #27ae60); }
-        .btn-flee { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
-        .btn-ambush { background: linear-gradient(135deg, #1abc9c, #16a085); }
+        #send-btn:hover { transform: scale(1.03); }
+        #send-btn:active { transform: scale(0.97); }
+        #send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .suggestion-btn {
+            padding: 5px 12px;
+            border: 1px solid #333;
+            border-radius: 16px;
+            background: #0f3460;
+            color: #ccc;
+            font-size: 0.78em;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .suggestion-btn:hover {
+            background: #e94560;
+            color: white;
+            border-color: #e94560;
+        }
+
         .events-list {
             max-height: 200px;
             overflow-y: auto;
@@ -200,6 +260,22 @@
             margin-top: 4px;
         }
         .status-indicator.connected { color: #2ecc71; }
+        .gm-pending {
+            text-align: center;
+            padding: 8px;
+            background: #2c1810;
+            border: 1px solid #e94560;
+            border-radius: 8px;
+            color: #ffd700;
+            font-size: 0.85em;
+            animation: pulse 1.5s infinite;
+            display: none;
+        }
+        .gm-pending.active { display: block; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
 </head>
 <body>
@@ -232,6 +308,7 @@
                     현재 턴: <span id="turn-count">0</span>
                 </div>
                 <div id="connection-status" class="status-indicator">연결 중...</div>
+                <div id="gm-pending" class="gm-pending">GM(Claude)이 판정 중...</div>
             </div>
 
             <div class="panel">
@@ -240,14 +317,20 @@
             </div>
 
             <div class="panel">
-                <h3>행동 선택</h3>
-                <div class="actions-grid">
-                    <button class="action-btn btn-attack" onclick="submitAction(1, '공격')">전사: 공격</button>
-                    <button class="action-btn btn-defend" onclick="submitAction(1, '방어')">전사: 방어</button>
-                    <button class="action-btn btn-fireball" onclick="submitAction(2, '파이어볼')">마법사: 파이어볼</button>
-                    <button class="action-btn btn-heal" onclick="submitAction(2, '힐')">마법사: 힐</button>
-                    <button class="action-btn btn-flee" onclick="submitAction(3, '도주')">도적: 도주</button>
-                    <button class="action-btn btn-ambush" onclick="submitAction(3, '습격')">도적: 습격</button>
+                <h3>행동 입력</h3>
+                <div class="action-input-area">
+                    <div class="action-select-row">
+                        <select id="player-select">
+                            <option value="1">전사 아론</option>
+                            <option value="2">마법사 리나</option>
+                            <option value="3">도적 카이</option>
+                        </select>
+                    </div>
+                    <div id="suggestions" class="suggestions"></div>
+                    <div class="action-input-row">
+                        <input type="text" id="action-input" placeholder="행동을 입력하세요..." autocomplete="off">
+                        <button id="send-btn" onclick="sendAction()">전송</button>
+                    </div>
                 </div>
             </div>
 
@@ -262,6 +345,89 @@
         let gameState = null;
         let actionInProgress = false;
 
+        const playerSuggestions = {
+            '1': [
+                { label: '공격', text: '오크를 검으로 공격한다' },
+                { label: '방어', text: '방패를 들어 방어 태세를 취한다' },
+                { label: '전진', text: '앞으로 전진한다' },
+                { label: '도발', text: '적을 도발하여 주의를 끈다' },
+                { label: '아이템', text: '인벤토리에서 아이템을 사용한다' },
+                { label: '주변 탐색', text: '주변을 살펴본다' },
+            ],
+            '2': [
+                { label: '파이어볼', text: '적에게 파이어볼을 발사한다' },
+                { label: '힐', text: '아군에게 치유 마법을 건다' },
+                { label: '문자 해독', text: '고대 문자를 해독한다' },
+                { label: '마나 포션', text: '마나 포션을 마신다' },
+                { label: '주변 탐색', text: '마법으로 주변을 감지한다' },
+                { label: '전진', text: '조심스럽게 앞으로 이동한다' },
+            ],
+            '3': [
+                { label: '습격', text: '은밀하게 접근해 급소를 노린다' },
+                { label: '도주', text: '재빠르게 도주한다' },
+                { label: '함정 탐지', text: '함정이 있는지 확인한다' },
+                { label: '잠금 해제', text: '도둑 도구로 잠금을 해제한다' },
+                { label: '정찰', text: '앞쪽을 먼저 정찰한다' },
+                { label: '아이템', text: '인벤토리에서 아이템을 사용한다' },
+            ]
+        };
+
+        const avatarMap = {
+            '전사': '/static/warrior_pixel_large.png',
+            '마법사': '/static/mage_pixel_large.png',
+            '도적': '/static/rogue_pixel_large.png',
+        };
+
+        function updateSuggestions() {
+            const playerId = document.getElementById('player-select').value;
+            const container = document.getElementById('suggestions');
+            const suggestions = playerSuggestions[playerId] || [];
+            container.innerHTML = suggestions.map(s =>
+                `<button class="suggestion-btn" onclick="applySuggestion('${s.text}')">${s.label}</button>`
+            ).join('');
+        }
+
+        function applySuggestion(text) {
+            document.getElementById('action-input').value = text;
+            document.getElementById('action-input').focus();
+        }
+
+        document.getElementById('player-select').addEventListener('change', updateSuggestions);
+
+        document.getElementById('action-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.isComposing) {
+                sendAction();
+            }
+        });
+
+        async function sendAction() {
+            const input = document.getElementById('action-input');
+            const action = input.value.trim();
+            if (!action || actionInProgress) return;
+
+            const playerId = parseInt(document.getElementById('player-select').value);
+            actionInProgress = true;
+            document.getElementById('send-btn').disabled = true;
+
+            try {
+                const res = await fetch('/api/player-action', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ player_id: playerId, action: action })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    input.value = '';
+                    await updateGameState();
+                }
+            } catch (e) {
+                console.error('Action failed:', e);
+            }
+
+            actionInProgress = false;
+            document.getElementById('send-btn').disabled = false;
+        }
+
         async function updateGameState() {
             try {
                 const res = await fetch('/api/game-state');
@@ -271,8 +437,17 @@
                 document.getElementById('connection-status').className = 'status-indicator connected';
                 updatePlayersList();
                 updateEventsList();
-                // Refresh map with cache bust
                 document.getElementById('game-map').src = '/static/map.png?t=' + Date.now();
+                // 미처리 액션 확인
+                const pendingRes = await fetch('/api/pending-actions');
+                const pending = await pendingRes.json();
+                const gmEl = document.getElementById('gm-pending');
+                if (pending.length > 0) {
+                    gmEl.textContent = `GM(Claude)이 판정 중... (대기 액션: ${pending.length}개)`;
+                    gmEl.classList.add('active');
+                } else {
+                    gmEl.classList.remove('active');
+                }
             } catch (e) {
                 document.getElementById('connection-status').textContent = '연결 끊김';
                 document.getElementById('connection-status').className = 'status-indicator';
@@ -286,31 +461,35 @@
                 const cls = classMap[p.class] || 'warrior';
                 const hpPct = (p.hp / p.max_hp * 100).toFixed(0);
                 const mpPct = (p.mp / p.max_mp * 100).toFixed(0);
+                const avatar = avatarMap[p.class] || '';
                 const effects = p.status_effects.length > 0
                     ? `<div style="font-size:0.75em;color:#ffd700;margin-top:4px">상태: ${p.status_effects.join(', ')}</div>`
                     : '';
                 return `
                 <div class="player-card">
-                    <div class="name">
-                        ${p.name}
-                        <span class="class-badge class-${cls}">${p.class}</span>
-                        <span style="float:right;font-size:0.75em;color:#aaa">위치: [${p.position}]</span>
+                    <img class="player-avatar" src="${avatar}" alt="${p.class}">
+                    <div class="player-info">
+                        <div class="name">
+                            ${p.name}
+                            <span class="class-badge class-${cls}">${p.class}</span>
+                            <span style="float:right;font-size:0.75em;color:#aaa">[${p.position}]</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar bar-hp" style="width:${hpPct}%"></div>
+                            <div class="bar-label">HP ${p.hp}/${p.max_hp}</div>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar bar-mp" style="width:${mpPct}%"></div>
+                            <div class="bar-label">MP ${p.mp}/${p.max_mp}</div>
+                        </div>
+                        <div class="stats">
+                            <span>STR ${p.stats.STR}</span>
+                            <span>DEX ${p.stats.DEX}</span>
+                            <span>INT ${p.stats.INT}</span>
+                            <span>CON ${p.stats.CON}</span>
+                        </div>
+                        ${effects}
                     </div>
-                    <div class="bar-container">
-                        <div class="bar bar-hp" style="width:${hpPct}%"></div>
-                        <div class="bar-label">HP ${p.hp}/${p.max_hp}</div>
-                    </div>
-                    <div class="bar-container">
-                        <div class="bar bar-mp" style="width:${mpPct}%"></div>
-                        <div class="bar-label">MP ${p.mp}/${p.max_mp}</div>
-                    </div>
-                    <div class="stats">
-                        <span>STR ${p.stats.STR}</span>
-                        <span>DEX ${p.stats.DEX}</span>
-                        <span>INT ${p.stats.INT}</span>
-                        <span>CON ${p.stats.CON}</span>
-                    </div>
-                    ${effects}
                 </div>`;
             }).join('');
         }
@@ -329,32 +508,8 @@
             }).join('');
         }
 
-        async function submitAction(playerId, action) {
-            if (actionInProgress) return;
-            actionInProgress = true;
-
-            // Disable buttons
-            document.querySelectorAll('.action-btn').forEach(b => b.disabled = true);
-
-            try {
-                const res = await fetch('/api/player-action', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ player_id: playerId, action: action })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    await updateGameState();
-                }
-            } catch (e) {
-                console.error('Action failed:', e);
-            }
-
-            actionInProgress = false;
-            document.querySelectorAll('.action-btn').forEach(b => b.disabled = false);
-        }
-
-        // Initial load and periodic refresh
+        // Init
+        updateSuggestions();
         updateGameState();
         setInterval(updateGameState, 2000);
     </script>

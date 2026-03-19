@@ -10,6 +10,19 @@ from save_manager import SaveManager
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 GAME_STATE_PATH = os.path.join(BASE_DIR, "game_state.json")
+PENDING_ACTIONS_PATH = os.path.join(BASE_DIR, "pending_actions.json")
+
+
+def load_pending_actions():
+    if os.path.exists(PENDING_ACTIONS_PATH):
+        with open(PENDING_ACTIONS_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
+
+
+def save_pending_actions(actions):
+    with open(PENDING_ACTIONS_PATH, "w", encoding="utf-8") as f:
+        json.dump(actions, f, ensure_ascii=False, indent=2)
 
 
 def load_game_state():
@@ -69,11 +82,25 @@ def player_action():
     if not player:
         return jsonify({"error": "Player not found"}), 404
 
+    # 미처리 액션 큐에 추가 (Claude GM이 처리)
+    pending = load_pending_actions()
+    pending_action = {
+        "player_id": player_id,
+        "player_name": player["name"],
+        "player_class": player["class"],
+        "action": action,
+        "timestamp": datetime.now().strftime("%H:%M:%S"),
+        "turn": state["turn_count"] + 1,
+    }
+    pending.append(pending_action)
+    save_pending_actions(pending)
+
     state["turn_count"] += 1
     event = {
         "turn": state["turn_count"],
         "message": f"{player['name']}({player['class']})이(가) '{action}' 행동을 선택했다!",
         "timestamp": datetime.now().strftime("%H:%M:%S"),
+        "status": "pending",
     }
     state["events"].append(event)
 
@@ -216,6 +243,20 @@ def get_progress(scenario_id):
     if progress is None:
         return jsonify({"error": "No progress found"}), 404
     return jsonify(progress)
+
+
+@app.route("/api/pending-actions", methods=["GET"])
+def get_pending_actions():
+    """Claude GM이 폴링: 미처리 플레이어 액션 목록"""
+    pending = load_pending_actions()
+    return jsonify(pending)
+
+
+@app.route("/api/pending-actions/clear", methods=["POST"])
+def clear_pending_actions():
+    """Claude GM이 처리 완료 후 큐 비우기"""
+    save_pending_actions([])
+    return jsonify({"success": True})
 
 
 if __name__ == "__main__":

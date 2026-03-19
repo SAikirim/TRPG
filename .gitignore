@@ -3,3 +3,4 @@ __pycache__/
 .env
 static/map.png
 saves/
+pending_actions.json
