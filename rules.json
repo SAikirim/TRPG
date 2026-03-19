@@ -1,0 +1,158 @@
+{
+  "game_rules": {
+    "version": "1.0",
+    "description": "판타지 TRPG 기본 룰셋"
+  },
+  "dice": {
+    "default": "1d20",
+    "damage": "1d6",
+    "heal": "1d8",
+    "description": "판정은 1d20, 피해는 1d6, 회복은 1d8 기본"
+  },
+  "turn_order": {
+    "method": "dex_based",
+    "description": "DEX가 높은 순서대로 행동. 동률이면 플레이어 우선.",
+    "surprise_round": "습격 성공 시 선제 행동 1회 추가"
+  },
+  "combat": {
+    "attack_roll": {
+      "formula": "1d20 + STR_modifier",
+      "description": "공격 판정 = 1d20 + 능력치 보정값. 상대 방어력 이상이면 명중.",
+      "critical": {
+        "threshold": 20,
+        "effect": "데미지 2배"
+      },
+      "fumble": {
+        "threshold": 1,
+        "effect": "자동 실패 + 다음 턴 불이익 (-2 판정)"
+      }
+    },
+    "damage": {
+      "melee": "1d6 + STR_modifier",
+      "magic": "1d8 + INT_modifier",
+      "ranged": "1d6 + DEX_modifier"
+    },
+    "defense": {
+      "formula": "10 + DEX_modifier + armor_bonus",
+      "description": "방어력 = 기본 10 + DEX 보정 + 장비 보너스"
+    },
+    "flee": {
+      "formula": "1d20 + DEX_modifier >= flee_dc",
+      "description": "도주 판정. 실패 시 도주 불가 + 적에게 기회 공격 허용."
+    }
+  },
+  "stat_modifiers": {
+    "description": "능력치 보정값 = (능력치 - 10) / 2 (내림)",
+    "table": {
+      "6": -2,
+      "8": -1,
+      "10": 0,
+      "12": 1,
+      "14": 2,
+      "15": 2,
+      "16": 3,
+      "18": 4,
+      "20": 5
+    }
+  },
+  "actions": {
+    "공격": {
+      "type": "combat",
+      "class": "전사",
+      "description": "근접 무기로 적을 공격한다.",
+      "roll": "1d20 + STR_modifier",
+      "damage": "1d6 + STR_modifier",
+      "cost": {"mp": 0}
+    },
+    "방어": {
+      "type": "defense",
+      "class": "전사",
+      "description": "방패를 들어 방어 태세를 취한다. 다음 턴까지 방어력 +4.",
+      "effect": {"defense_bonus": 4, "duration": 1},
+      "cost": {"mp": 0}
+    },
+    "파이어볼": {
+      "type": "magic_attack",
+      "class": "마법사",
+      "description": "화염 구체를 날려 적에게 마법 피해를 입힌다.",
+      "roll": "1d20 + INT_modifier",
+      "damage": "1d8 + INT_modifier",
+      "cost": {"mp": 4},
+      "special": "범위 공격 가능 (같은 위치의 적 전체)"
+    },
+    "힐": {
+      "type": "heal",
+      "class": "마법사",
+      "description": "치유 마법으로 아군 한 명의 HP를 회복한다.",
+      "roll": "1d8 + INT_modifier",
+      "target": "ally",
+      "cost": {"mp": 3}
+    },
+    "도주": {
+      "type": "utility",
+      "class": "도적",
+      "description": "전투에서 도주를 시도한다. 파티 전체가 후퇴.",
+      "roll": "1d20 + DEX_modifier",
+      "cost": {"mp": 0},
+      "fail_penalty": "적의 기회 공격 (피해 1d6)"
+    },
+    "습격": {
+      "type": "combat",
+      "class": "도적",
+      "description": "은밀하게 접근하여 급소를 노린다. 성공 시 추가 피해.",
+      "roll": "1d20 + DEX_modifier",
+      "damage": "2d6 + DEX_modifier",
+      "cost": {"mp": 2},
+      "check": {"stat": "DEX", "dc": 13, "fail": "발각되어 일반 공격으로 전환 (1d6)"}
+    }
+  },
+  "status_effects": {
+    "중독": {
+      "description": "턴마다 2 피해. 3턴 지속.",
+      "damage_per_turn": 2,
+      "duration": 3
+    },
+    "방어 강화": {
+      "description": "방어력 +4. 1턴 지속.",
+      "defense_bonus": 4,
+      "duration": 1
+    },
+    "기절": {
+      "description": "행동 불가. 1턴 지속.",
+      "skip_turn": true,
+      "duration": 1
+    },
+    "은신": {
+      "description": "다음 공격 시 자동 명중 + 추가 피해. 공격하면 해제.",
+      "next_attack_auto_hit": true,
+      "bonus_damage": 4
+    }
+  },
+  "rest": {
+    "short_rest": {
+      "description": "안전 지역에서 짧은 휴식. HP 5, MP 3 회복.",
+      "heal_hp": 5,
+      "heal_mp": 3,
+      "turns_required": 1
+    },
+    "use_item": {
+      "치유 약초": {"heal_hp": 5, "description": "HP 5 회복"},
+      "마나 포션": {"heal_mp": 8, "description": "MP 8 회복"}
+    }
+  },
+  "level_up": {
+    "enabled": false,
+    "description": "현재 시나리오에서는 레벨업 없음. 향후 확장 예정."
+  },
+  "death_rules": {
+    "player_death": "HP가 0이 되면 기절. 다음 턴에 힐을 받지 못하면 사망.",
+    "monster_death": "HP가 0이 되면 즉시 사망.",
+    "revival": "현재 시나리오에서 부활 수단 없음."
+  },
+  "gm_guidelines": {
+    "role": "GM(Claude)은 공정한 판정과 몰입감 있는 나레이션을 제공한다.",
+    "dice_rolling": "GM이 주사위를 대신 굴리고 결과를 서술한다.",
+    "flexibility": "룰에 명시되지 않은 상황은 GM이 판단하여 적절한 DC와 효과를 결정한다.",
+    "narrative_style": "한국어로 서술. 분위기 있는 묘사와 대화를 포함한다."
+  }
+}

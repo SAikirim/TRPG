@@ -5,6 +5,7 @@ from datetime import datetime
 from flask import Flask, jsonify, render_template, request
 
 from map_generator import MapGenerator
+from save_manager import SaveManager
 
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -16,9 +17,16 @@ def load_game_state():
         return json.load(f)
 
 
+save_manager = SaveManager()
+
+
 def save_game_state(state):
     with open(GAME_STATE_PATH, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
+    # 자동 저장: 시나리오 ID 기반으로 슬롯 1에 항상 저장
+    scenario_id = state.get("game_info", {}).get("scenario_id", "default")
+    turn = state.get("turn_count", 0)
+    save_manager.save_game(scenario_id, slot=1, description=f"자동 저장 (턴 {turn})")
 
 
 def update_map_image():
@@ -181,6 +189,33 @@ def reset_game():
     save_game_state(state)
     update_map_image()
     return jsonify({"success": True, "message": "Game reset"})
+
+
+@app.route("/api/load", methods=["POST"])
+def load_game():
+    data = request.get_json() or {}
+    scenario_id = data.get("scenario_id", "default")
+    slot = data.get("slot", 1)
+    info = save_manager.load_game(scenario_id, slot)
+    if info is None:
+        return jsonify({"error": "Save not found"}), 404
+    update_map_image()
+    return jsonify({"success": True, "save_info": info})
+
+
+@app.route("/api/saves", methods=["GET"])
+def list_saves():
+    scenario_id = request.args.get("scenario_id")
+    saves = save_manager.list_saves(scenario_id)
+    return jsonify(saves)
+
+
+@app.route("/api/progress/<scenario_id>", methods=["GET"])
+def get_progress(scenario_id):
+    progress = save_manager.get_progress(scenario_id)
+    if progress is None:
+        return jsonify({"error": "No progress found"}), 404
+    return jsonify(progress)
 
 
 if __name__ == "__main__":

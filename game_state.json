@@ -1,6 +1,7 @@
 {
   "game_info": {
     "title": "판타지 TRPG - 잃어버린 보물의 숲 던전",
+    "scenario_id": "lost_treasure",
     "scenario": "3명의 모험가가 숲의 던전에서 잃어버린 보물을 찾는다",
     "status": "active"
   },

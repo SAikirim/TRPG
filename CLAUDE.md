@@ -14,6 +14,10 @@
 app.py              - Flask 웹 서버 (포트 5000, 7개 API 엔드포인트)
 map_generator.py    - PIL 맵 이미지 생성기 (20x15 타일, 40px/타일)
 game_state.json     - 게임 상태 (플레이어, NPC, 맵, 턴, 이벤트)
+scenario.json       - 시나리오 (3챕터 구성, 이벤트/트리거/엔딩 분기)
+rules.json          - 룰셋 (전투/주사위/액션/상태이상/사망 규칙)
+save_manager.py     - 세이브/로드 매니저 (시나리오별 슬롯 저장)
+saves/              - 저장 데이터 디렉토리 (.gitignore 처리됨)
 templates/index.html - 게임 UI (맵 표시, 플레이어 정보, 액션 버튼, 이벤트 로그)
 static/map.png      - 생성된 맵 이미지 (.gitignore 처리됨)
 ```
@@ -28,6 +32,11 @@ static/map.png      - 생성된 맵 이미지 (.gitignore 처리됨)
 | `/api/events` | GET | 최근 20개 이벤트 |
 | `/api/gm-update` | POST | GM이 게임 상태 업데이트 |
 | `/api/reset-game` | POST | 게임 초기화 |
+| `/api/load` | POST | 저장된 게임 불러오기 (scenario_id, slot) |
+| `/api/saves` | GET | 저장 목록 조회 (?scenario_id=) |
+| `/api/progress/<id>` | GET | 시나리오별 진행 상황 조회 |
+
+자동 저장: 턴이 변경될 때마다 (player-action, gm-update, reset) 시나리오별 슬롯 1에 자동 저장됨.
 
 ## 게임 설정
 - **플레이어 3명**: 전사 아론(HP:30), 마법사 리나(HP:15, MP:20), 도적 카이(HP:20, DEX:18)
