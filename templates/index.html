@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>판타지 TRPG - 잃어버린 보물의 숲 던전</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        header {
+            background: linear-gradient(135deg, #16213e, #0f3460);
+            padding: 12px 24px;
+            text-align: center;
+            border-bottom: 2px solid #e94560;
+        }
+        header h1 { font-size: 1.4em; color: #e94560; }
+        header p { font-size: 0.85em; color: #aaa; margin-top: 4px; }
+        .container {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            max-width: 1400px;
+            margin: 0 auto;
+            height: calc(100vh - 80px);
+        }
+        .map-panel {
+            flex: 1;
+            background: #16213e;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        .map-panel h2 { font-size: 1em; margin-bottom: 8px; color: #e94560; }
+        .map-panel img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 2px solid #333;
+            image-rendering: pixelated;
+        }
+        .sidebar {
+            width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+        }
+        .panel {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 14px;
+        }
+        .panel h3 {
+            font-size: 0.95em;
+            color: #e94560;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 6px;
+        }
+        .turn-info {
+            text-align: center;
+            font-size: 1.3em;
+            color: #ffd700;
+            padding: 10px;
+        }
+        .turn-info span { font-size: 2em; font-weight: bold; }
+        .player-card {
+            background: #0f3460;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+        .player-card .name {
+            font-weight: bold;
+            font-size: 0.95em;
+            margin-bottom: 6px;
+        }
+        .player-card .name .class-badge {
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
+        .class-warrior { background: #e63946; }
+        .class-mage { background: #457be0; }
+        .class-rogue { background: #2ecc71; }
+        .bar-container {
+            background: #1a1a2e;
+            border-radius: 4px;
+            height: 16px;
+            margin: 3px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        .bar-hp { background: linear-gradient(90deg, #e63946, #ff6b6b); }
+        .bar-mp { background: linear-gradient(90deg, #457be0, #74b9ff); }
+        .bar-label {
+            position: absolute;
+            top: 0; left: 8px;
+            font-size: 0.7em;
+            line-height: 16px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+        .stats {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+            font-size: 0.75em;
+            color: #aaa;
+        }
+        .stats span { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; }
+        .actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .action-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            color: white;
+        }
+        .action-btn:hover { transform: scale(1.03); }
+        .action-btn:active { transform: scale(0.97); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-attack { background: linear-gradient(135deg, #e63946, #c0392b); }
+        .btn-defend { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .btn-fireball { background: linear-gradient(135deg, #457be0, #2c3e9e); }
+        .btn-heal { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .btn-flee { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .btn-ambush { background: linear-gradient(135deg, #1abc9c, #16a085); }
+        .events-list {
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.8em;
+        }
+        .event-item {
+            padding: 6px 8px;
+            border-bottom: 1px solid #1a1a2e;
+            line-height: 1.4;
+        }
+        .event-item .turn-badge {
+            display: inline-block;
+            background: #e94560;
+            color: white;
+            font-size: 0.7em;
+            padding: 1px 6px;
+            border-radius: 8px;
+            margin-right: 6px;
+        }
+        .event-item .narrative {
+            display: block;
+            color: #ffd700;
+            font-style: italic;
+            margin-top: 3px;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.78em;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid white;
+        }
+        .legend-tri {
+            width: 0; height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-bottom: 12px solid #9b30ff;
+        }
+        .status-indicator {
+            font-size: 0.75em;
+            color: #aaa;
+            text-align: center;
+            margin-top: 4px;
+        }
+        .status-indicator.connected { color: #2ecc71; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>판타지 TRPG - 잃어버린 보물의 숲 던전</h1>
+        <p>3명의 모험가가 숲의 던전에서 잃어버린 보물을 찾는다</p>
+    </header>
+
+    <div class="container">
+        <div class="map-panel">
+            <h2>게임 맵</h2>
+            <img id="game-map" src="/static/map.png" alt="Game Map">
+            <div class="panel" style="margin-top:12px">
+                <h3>범례</h3>
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-dot" style="background:#e63946"></div> 전사 (아론)</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#457be0"></div> 마법사 (리나)</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> 도적 (카이)</div>
+                    <div class="legend-item"><div class="legend-tri"></div> 몬스터</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#4a8c2a"></div> 숲</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#6b6b6b"></div> 던전</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#c8a82a"></div> 보물실</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="panel">
+                <div class="turn-info">
+                    현재 턴: <span id="turn-count">0</span>
+                </div>
+                <div id="connection-status" class="status-indicator">연결 중...</div>
+            </div>
+
+            <div class="panel">
+                <h3>플레이어 정보</h3>
+                <div id="players-list"></div>
+            </div>
+
+            <div class="panel">
+                <h3>행동 선택</h3>
+                <div class="actions-grid">
+                    <button class="action-btn btn-attack" onclick="submitAction(1, '공격')">전사: 공격</button>
+                    <button class="action-btn btn-defend" onclick="submitAction(1, '방어')">전사: 방어</button>
+                    <button class="action-btn btn-fireball" onclick="submitAction(2, '파이어볼')">마법사: 파이어볼</button>
+                    <button class="action-btn btn-heal" onclick="submitAction(2, '힐')">마법사: 힐</button>
+                    <button class="action-btn btn-flee" onclick="submitAction(3, '도주')">도적: 도주</button>
+                    <button class="action-btn btn-ambush" onclick="submitAction(3, '습격')">도적: 습격</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>이벤트 로그</h3>
+                <div id="events-list" class="events-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameState = null;
+        let actionInProgress = false;
+
+        async function updateGameState() {
+            try {
+                const res = await fetch('/api/game-state');
+                gameState = await res.json();
+                document.getElementById('turn-count').textContent = gameState.turn_count;
+                document.getElementById('connection-status').textContent = '연결됨';
+                document.getElementById('connection-status').className = 'status-indicator connected';
+                updatePlayersList();
+                updateEventsList();
+                // Refresh map with cache bust
+                document.getElementById('game-map').src = '/static/map.png?t=' + Date.now();
+            } catch (e) {
+                document.getElementById('connection-status').textContent = '연결 끊김';
+                document.getElementById('connection-status').className = 'status-indicator';
+            }
+        }
+
+        function updatePlayersList() {
+            const container = document.getElementById('players-list');
+            const classMap = { '전사': 'warrior', '마법사': 'mage', '도적': 'rogue' };
+            container.innerHTML = gameState.players.map(p => {
+                const cls = classMap[p.class] || 'warrior';
+                const hpPct = (p.hp / p.max_hp * 100).toFixed(0);
+                const mpPct = (p.mp / p.max_mp * 100).toFixed(0);
+                const effects = p.status_effects.length > 0
+                    ? `<div style="font-size:0.75em;color:#ffd700;margin-top:4px">상태: ${p.status_effects.join(', ')}</div>`
+                    : '';
+                return `
+                <div class="player-card">
+                    <div class="name">
+                        ${p.name}
+                        <span class="class-badge class-${cls}">${p.class}</span>
+                        <span style="float:right;font-size:0.75em;color:#aaa">위치: [${p.position}]</span>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar bar-hp" style="width:${hpPct}%"></div>
+                        <div class="bar-label">HP ${p.hp}/${p.max_hp}</div>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar bar-mp" style="width:${mpPct}%"></div>
+                        <div class="bar-label">MP ${p.mp}/${p.max_mp}</div>
+                    </div>
+                    <div class="stats">
+                        <span>STR ${p.stats.STR}</span>
+                        <span>DEX ${p.stats.DEX}</span>
+                        <span>INT ${p.stats.INT}</span>
+                        <span>CON ${p.stats.CON}</span>
+                    </div>
+                    ${effects}
+                </div>`;
+            }).join('');
+        }
+
+        function updateEventsList() {
+            const container = document.getElementById('events-list');
+            const events = gameState.events.slice(-10).reverse();
+            container.innerHTML = events.map(e => {
+                const narrative = e.narrative ? `<span class="narrative">${e.narrative}</span>` : '';
+                return `
+                <div class="event-item">
+                    <span class="turn-badge">T${e.turn}</span>
+                    ${e.message}
+                    ${narrative}
+                </div>`;
+            }).join('');
+        }
+
+        async function submitAction(playerId, action) {
+            if (actionInProgress) return;
+            actionInProgress = true;
+
+            // Disable buttons
+            document.querySelectorAll('.action-btn').forEach(b => b.disabled = true);
+
+            try {
+                const res = await fetch('/api/player-action', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ player_id: playerId, action: action })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    await updateGameState();
+                }
+            } catch (e) {
+                console.error('Action failed:', e);
+            }
+
+            actionInProgress = false;
+            document.querySelectorAll('.action-btn').forEach(b => b.disabled = false);
+        }
+
+        // Initial load and periodic refresh
+        updateGameState();
+        setInterval(updateGameState, 2000);
+    </script>
+</body>
+</html>
