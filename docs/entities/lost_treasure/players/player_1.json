@@ -21,7 +21,7 @@
     "INT": 18,
     "CON": 10
   },
-  "position": [14, 12],
+  "position": [11, 5],
   "status_effects": [],
   "inventory": ["마법 지팡이", "마나 포션", "마나 결정", "슬라임 젤리", "약초", "고대 열쇠", "전설의 보물"],
   "equipment": {

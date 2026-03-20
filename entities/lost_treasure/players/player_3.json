@@ -21,7 +21,7 @@
     "INT": 8,
     "CON": 14
   },
-  "position": [14, 11],
+  "position": [11, 6],
   "status_effects": [],
   "inventory": ["가죽 방패", "오크의 도끼", "황금 100개"],
   "equipment": {

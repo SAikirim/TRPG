@@ -1,8 +1,8 @@
 {
   "game_info": {
-    "title": "판타지 TRPG - 잃어버린 보물의 숲 던전",
+    "title": "판타지 TRPG - 보물을 찾은 모험가들",
     "scenario_id": "lost_treasure",
-    "scenario": "가난한 남매와 그들의 동료가 숲의 던전에서 잃어버린 보물을 찾는다",
+    "scenario": "전설의 보물을 손에 넣은 세 모험가가 하룬 마을로 돌아왔다",
     "ruleset": "fantasy_basic",
     "difficulty": "normal",
     "stat_pool": 50,
@@ -26,8 +26,8 @@
         "CON": 10
       },
       "position": [
-        0,
-        0
+        11,
+        5
       ],
       "status_effects": [],
       "inventory": [
@@ -56,8 +56,8 @@
         "CON": 14
       },
       "position": [
-        1,
-        0
+        12,
+        5
       ],
       "status_effects": [],
       "inventory": [
@@ -82,8 +82,8 @@
         "CON": 14
       },
       "position": [
-        0,
-        1
+        11,
+        6
       ],
       "status_effects": [],
       "inventory": [
@@ -132,33 +132,53 @@
     "tile_size": 40,
     "locations": [
       {
-        "name": "숲의 입구",
-        "type": "grass",
+        "name": "마을 입구",
+        "type": "road",
         "area": {
           "x1": 0,
+          "y1": 5,
+          "x2": 4,
+          "y2": 9
+        }
+      },
+      {
+        "name": "마을 광장",
+        "type": "village",
+        "area": {
+          "x1": 5,
+          "y1": 3,
+          "x2": 14,
+          "y2": 11
+        }
+      },
+      {
+        "name": "사이키네 집",
+        "type": "house",
+        "area": {
+          "x1": 10,
+          "y1": 4,
+          "x2": 13,
+          "y2": 6
+        }
+      },
+      {
+        "name": "촌장의 집",
+        "type": "house",
+        "area": {
+          "x1": 6,
+          "y1": 4,
+          "x2": 8,
+          "y2": 6
+        }
+      },
+      {
+        "name": "숲길 (카렌델 방면)",
+        "type": "grass",
+        "area": {
+          "x1": 15,
           "y1": 0,
-          "x2": 6,
-          "y2": 5
-        }
-      },
-      {
-        "name": "고대 던전",
-        "type": "dungeon",
-        "area": {
-          "x1": 3,
-          "y1": 6,
-          "x2": 12,
-          "y2": 12
-        }
-      },
-      {
-        "name": "보물실",
-        "type": "treasure",
-        "area": {
-          "x1": 14,
-          "y1": 10,
           "x2": 19,
-          "y2": 14
+          "y2": 5
         }
       }
     ]

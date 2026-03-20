@@ -330,14 +330,7 @@
             <div class="panel sidebar-map">
                 <h3>게임 맵</h3>
                 <img id="game-map" src="static/map.png" alt="Game Map">
-                <div class="legend">
-                    <div class="legend-item"><div class="legend-dot" style="background:#457be0"></div> 사이키</div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> 루체나</div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#e63946"></div> 노을</div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#4a8c2a"></div> 숲</div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#6b6b6b"></div> 던전</div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#c8a82a"></div> 보물실</div>
-                </div>
+                <div id="map-legend" class="legend"></div>
             </div>
             <div class="panel">
                 <h3>플레이어 정보</h3>
@@ -377,6 +370,7 @@
             renderPlayers(state.players, info.scenario_id || 'lost_treasure');
             renderEvents(state.events);
             renderIllustration(info.current_chapter);
+            renderLegend(state);
         }
 
         const itemInfo = {
@@ -523,6 +517,25 @@
                     ${narrative}
                 </div>`;
             }).join('');
+        }
+
+        function renderLegend(state) {
+            const container = document.getElementById('map-legend');
+            const playerColors = { '전사': '#e63946', '마법사': '#457be0', '도적': '#2ecc71' };
+            const locColors = { 'grass': '#4a8c2a', 'dungeon': '#6b6b6b', 'treasure': '#c8a82a', 'village': '#8B7355', 'road': '#A0926B', 'house': '#6B4226' };
+            let html = '';
+            state.players.forEach(p => {
+                html += `<div class="legend-item"><div class="legend-dot" style="background:${playerColors[p.class] || '#fff'}"></div> ${p.name}</div>`;
+            });
+            const seen = new Set();
+            (state.map?.locations || []).forEach(loc => {
+                if (!seen.has(loc.type)) {
+                    seen.add(loc.type);
+                    const color = locColors[loc.type] || '#888';
+                    html += `<div class="legend-item"><div class="legend-dot" style="background:${color}"></div> ${loc.name.split(' ')[0]}</div>`;
+                }
+            });
+            container.innerHTML = html;
         }
 
         function renderIllustration(chapter) {

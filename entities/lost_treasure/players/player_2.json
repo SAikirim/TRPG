@@ -21,7 +21,7 @@
     "INT": 10,
     "CON": 14
   },
-  "position": [15, 11],
+  "position": [12, 5],
   "status_effects": [],
   "inventory": ["단검 x2", "도둑 도구", "밧줄"],
   "equipment": {

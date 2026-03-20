@@ -406,15 +406,7 @@
             <div class="panel sidebar-map">
                 <h3>게임 맵</h3>
                 <img id="game-map" src="/static/map.png" alt="Game Map">
-                <div class="legend">
-                    <div class="legend-item"><div class="legend-dot" style="background:#e63946"></div> 전사 (아론)</div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#457be0"></div> 마법사 (리나)</div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> 도적 (카이)</div>
-                    <div class="legend-item"><div class="legend-tri"></div> 몬스터</div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#4a8c2a"></div> 숲</div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#6b6b6b"></div> 던전</div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#c8a82a"></div> 보물실</div>
-                </div>
+                <div id="map-legend" class="legend"></div>
             </div>
 
             <div class="panel">
@@ -471,6 +463,7 @@
 
                 updatePlayersList();
                 updateEventsList();
+                updateLegend();
                 document.getElementById('game-map').src = '/static/map.png?t=' + Date.now();
             } catch (e) {
                 const connEl = document.getElementById('connection-status');
@@ -634,6 +627,30 @@
                     ${narrative}
                 </div>`;
             }).join('');
+        }
+
+        function updateLegend() {
+            const container = document.getElementById('map-legend');
+            if (!container || !gameState) return;
+            const playerColors = { '전사': '#e63946', '마법사': '#457be0', '도적': '#2ecc71' };
+            const locColors = { 'grass': '#4a8c2a', 'dungeon': '#6b6b6b', 'treasure': '#c8a82a', 'village': '#8B7355', 'road': '#A0926B', 'house': '#6B4226' };
+            let html = '';
+            gameState.players.forEach(p => {
+                html += `<div class="legend-item"><div class="legend-dot" style="background:${playerColors[p.class] || '#fff'}"></div> ${p.name}</div>`;
+            });
+            const seen = new Set();
+            (gameState.map?.locations || []).forEach(loc => {
+                if (!seen.has(loc.type)) {
+                    seen.add(loc.type);
+                    const color = locColors[loc.type] || '#888';
+                    html += `<div class="legend-item"><div class="legend-dot" style="background:${color}"></div> ${loc.name.split(' ')[0]}</div>`;
+                }
+            });
+            // Add monster legend if any alive NPCs
+            if (gameState.npcs?.some(n => n.status !== 'dead')) {
+                html += '<div class="legend-item"><div class="legend-tri"></div> 몬스터</div>';
+            }
+            container.innerHTML = html;
         }
 
         let lastSceneHash = '';

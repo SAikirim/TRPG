@@ -29,6 +29,9 @@ class MapGenerator:
             "grass": "#4a8c2a",
             "dungeon": "#6b6b6b",
             "treasure": "#c8a82a",
+            "village": "#8B7355",
+            "road": "#A0926B",
+            "house": "#6B4226",
         }
         for loc in state["map"]["locations"]:
             area = loc["area"]
