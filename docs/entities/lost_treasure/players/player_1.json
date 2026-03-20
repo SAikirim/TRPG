@@ -1,0 +1,57 @@
+{
+  "id": 1,
+  "name": "사이키",
+  "class": "마법사",
+  "background": {
+    "origin": "가난한 집안 출신. 어린 시절 마을에 찾아온 떠돌이 마법사에게 마법을 배운 독학 마법사.",
+    "motivation": "가족의 생계를 위해 보물을 찾으러 모험을 떠남",
+    "personality": "조용하고 신중하지만, 가족을 위해서라면 위험도 감수하는 책임감 강한 오빠",
+    "relationships": {
+      "루체나": "여동생. 서로를 지키며 자란 남매",
+      "노을": "마을 이웃의 고아. 밥을 나눠주던 인연"
+    }
+  },
+  "stats": {
+    "hp": 15,
+    "max_hp": 15,
+    "mp": 24,
+    "max_mp": 30,
+    "STR": 8,
+    "DEX": 14,
+    "INT": 18,
+    "CON": 10
+  },
+  "position": [14, 12],
+  "status_effects": [],
+  "inventory": ["마법 지팡이", "마나 포션", "마나 결정", "슬라임 젤리", "약초", "고대 열쇠", "전설의 보물"],
+  "equipment": {
+    "weapon": "마법 지팡이",
+    "armor": null
+  },
+  "available_actions": ["파이어볼", "힐"],
+  "combat_state": {
+    "is_in_combat": false,
+    "defense_bonus": 0,
+    "next_turn_penalty": 0
+  },
+  "history": {
+    "actions_taken": [
+      {"turn": 3, "action": "파이어볼", "target": "어두운 오크", "roll": "nat20 크리티컬", "damage": 14, "result": "명중"},
+      {"turn": 6, "action": "고대 열쇠 사용", "target": "철문", "roll": "자동 성공", "damage": 0, "result": "챕터3 진입"},
+      {"turn": 7, "action": "마력 분석", "target": "수호 마법", "roll": "실패", "damage": 0, "result": "해체 실패, 열쇠 반응 발견"},
+      {"turn": 7, "action": "고대 열쇠 사용", "target": "보물 상자", "roll": "자동 성공", "damage": 0, "result": "보물 획득"}
+    ],
+    "damage_dealt_total": 14,
+    "damage_received_total": 0,
+    "kills": [],
+    "items_used": [],
+    "turns_played": 3
+  },
+  "conditions": {
+    "alive": true,
+    "conscious": true,
+    "death_save_turns": 0
+  },
+  "party_role": "후열 (원거리 딜/힐)",
+  "controlled_by": "user"
+}
