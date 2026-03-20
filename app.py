@@ -203,6 +203,7 @@ def get_illustration():
         1: {"sd": "/static/illustrations/sd/ch1_forest.png", "pixel": "/static/illustrations/pixel/forest.png"},
         2: {"sd": "/static/illustrations/sd/ch2_dungeon.png", "pixel": "/static/illustrations/pixel/dungeon.png"},
         3: {"sd": "/static/illustrations/sd/ch3_treasure.png", "pixel": "/static/illustrations/pixel/treasure.png"},
+        4: {"sd": "/static/illustrations/sd/background_village_night.webp", "pixel": "/static/illustrations/pixel/forest.png"},
     }
     state["default_bg"] = chapter_bg_map.get(chapter, chapter_bg_map[1])
     state["current_chapter"] = chapter

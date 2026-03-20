@@ -13,7 +13,33 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - **터미널(Claude GM)**: 액션 선언 수신 → 판정 → 나레이션 → 상태 업데이트
 - **웹 UI** (`http://localhost:5000`): 표시 전용 — 맵/스탯/인벤토리/배경/초상화 실시간 표시. 행동 버튼 없음.
 
+### GM 웹 반영 필수 규칙
+- **GM이 나레이션할 때 반드시 gm-update API를 호출하여 웹 UI에 자동 반영해야 한다**
+- 터미널에 텍스트만 쓰고 API를 호출하지 않는 것은 금지
+- 나레이션 시 Agent로 백그라운드 gm-update 호출과 터미널 응답을 동시에 진행
+- 장면 전환, 캐릭터 등장, 배경 변화 시 적절한 illustration 요청도 함께 포함
+- HP/MP 변동, 위치 이동, 아이템 변화가 있으면 player_updates/npc_updates도 포함
+- 흐름: 유저 액션 → GM이 Agent로 gm-update 전송(백그라운드) → 동시에 터미널에 나레이션 출력
+- **배경 일러스트는 반드시 가로형(896x512)**으로 생성 — 웹 일러스트 패널이 가로형이므로 세로 이미지 금지
+- 프롬프트에 `landscape orientation, wide angle` 포함 권장
+
+### GM 자동 반영 원칙
+- **유저가 지적하기 전에 시스템이 자동으로 처리해야 한다**
+- 장소 이동 시 → 일러스트 자동 교체, 맵 갱신, 챕터/상태 업데이트
+- 게임 로드/재개 시 → 현재 상황에 맞는 배경/인물/오브젝트 자동 표시
+- NPC 등장/퇴장 시 → 레이어 자동 추가/제거
+- 전투 시작/종료 시 → 배경 전환, NPC 상태 반영
+- 챕터 전환 시 → default_bg 매핑 확인, 없으면 생성 또는 Cairo 폴백
+- game_state 변경은 반드시 웹 UI에 즉시 반영 (gm-update API 호출)
+- **"나중에 하겠습니다", "TODO" 금지** — 발견 즉시 처리하거나, 최소한 폴백으로 동작하게 해야 한다
+
 ### GM 나레이션 원칙
+- **유저 캐릭터(controlled_by: "user")의 대사, 감정, 판단을 GM이 만들지 않는다**
+  - 유저가 선언한 행동과 대사만 반영
+  - 유저 캐릭터의 성격, 반응, 내면 묘사 금지
+  - 나쁜 예: `사이키가 어깨를 으쓱했다. "언제는 안 먹었냐."` (GM이 대사를 만듦)
+  - 좋은 예: `노을이 머뭇거렸다. 루체나가 "같이 가"라고 말했다.` (NPC만 묘사)
+- **agent 캐릭터(controlled_by: "agent")만 GM이 대사와 행동을 만든다**
 - **캐릭터 시점으로만 묘사** — 캐릭터가 보고, 듣고, 느끼는 것만 전달
 - **사전 스포일 금지** — 행동 선언 전에 DC, 보상, 함정 유무를 알려주지 않음
   - 나쁜 예: `"비문 조사 (INT DC 14 — 성공 시 고대 열쇠 획득)"`
@@ -96,6 +122,7 @@ current_session.json      - 현재 활성 세션 요약 (시나리오/세이브/
 pending_actions.json      - 미처리 액션 대기열
 rules.json                - 현재 활성 룰셋 (심볼릭 또는 복사본)
 scenario.json             - 현재 활성 시나리오 (심볼릭 또는 복사본)
+worldbuilding.json        - 세계관 설정 (지명, 화폐, 세력 — 시나리오 독립)
 
 rulesets/                 - 룰셋 카탈로그
   index.json              - 룰셋 목록 및 메타데이터
@@ -269,15 +296,32 @@ saves/                    - 세이브 데이터
 
 ### 시나리오 사전 생성 이미지
 
-시나리오 시작 전 주요 장면의 이미지를 SD로 미리 생성하여 `static/illustrations/sd/`에 저장한다.
-게임 중 실시간 생성 대기 없이 즉시 표시 가능.
+시나리오 Agent가 시나리오를 생성하면, 전체 스토리를 기반으로 필요한 모든 이미지를 사전 생성한다.
+게임 중 실시간 생성 대기 없이 즉시 표시 가능. 포맷은 WebP.
 
 #### 사전 생성 대상
-| 분류 | 파일명 규칙 | 크기 | 예시 |
-|------|-----------|------|------|
-| 챕터 배경 | `ch{N}_{type}.png` | 768x512 | `ch1_forest.png`, `ch2_dungeon.png` |
-| NPC/몬스터 | `npc_{name}.png` | 384x512 | `npc_orc.png`, `npc_slime.png` |
-| 오브젝트 | `obj_{name}.png` | 256x256 | `obj_treasure_chest.png` |
+| 분류 | 파일명 규칙 | 크기 | 배경 | 예시 |
+|------|-----------|------|------|------|
+| 챕터 배경 | `background_{name}.webp` | 896x512 | 있음 | `background_forest.webp` |
+| 장소/이벤트 배경 | `background_{name}.webp` | 896x512 | 있음 | `background_village_night.webp` |
+| NPC/몬스터 | `portrait_{name}.webp` | 384x512 | **투명** | `portrait_dark_orc.webp` |
+| 플레이어 캐릭터 | `portrait_{name}.webp` | 384x512 | **투명** | `portrait_saiki.webp` |
+| 오브젝트 | `object_{name}.webp` | 256x256 | **투명** | `object_treasure_chest.webp` |
+
+#### 인물/오브젝트 투명 배경 규칙
+- 인물과 오브젝트는 **배경 없이(투명)** 생성한다 → 어떤 배경 위에든 합성 가능
+- SD 생성 후 `transparent-background` 라이브러리로 자동 배경 제거
+- negative prompt에 자동으로 "detailed background, scenery, landscape" 추가됨
+- 프롬프트에 "simple background, solid color background" 포함 권장
+
+#### 시나리오 이미지 생성 절차
+1. 시나리오 Agent가 scenario.json 생성 시 전체 스토리 파악
+2. 필요한 이미지 목록 추출: 모든 챕터 배경, 등장 NPC, 주요 오브젝트, 주요 장소
+3. 각 항목에 대한 영문 프롬프트 작성
+4. SD API로 순차 생성 (VRAM 제약으로 동시 생성 금지)
+5. 품질 확인 → 문제 시 프롬프트 개선 후 재생성
+6. `static/illustrations/sd/` 및 `static/portraits/sd/`에 저장
+7. git commit + push (docs/ 자동 동기화)
 
 #### 기본 배경 자동 표시
 - 웹 UI는 현재 챕터에 맞는 배경을 자동 표시한다
@@ -293,14 +337,6 @@ saves/                    - 세이브 데이터
   - 손/신체 왜곡 → negative에 "bad hands, bad anatomy, deformed, extra fingers" 추가
   - 초점 안 맞음 → prompt에 "sharp focus, 4k" 추가
   - 배경에 인물 포함됨 → negative에 "people, characters, person" 추가
-
-#### 새 시나리오 이미지 생성 절차
-1. scenario.json에서 챕터, NPC, 오브젝트 목록 추출
-2. 각 항목에 대한 영문 프롬프트 작성
-3. SD API로 순차 생성 (VRAM 제약으로 동시 생성 금지)
-4. 품질 확인 → 문제 시 프롬프트 개선 후 재생성
-5. `static/illustrations/sd/`에 저장
-6. git commit + push
 
 ---
 

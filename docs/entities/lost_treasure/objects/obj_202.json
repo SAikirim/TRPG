@@ -1,0 +1,49 @@
+{
+  "id": 202,
+  "name": "전설의 보물 상자",
+  "type": "treasure_chest",
+  "position": [16, 12],
+  "area": "treasure",
+  "status": "opened",
+  "hidden": false,
+  "description": "황금빛으로 빛나는 거대한 보물 상자. 열면 무언가 일어날 것 같다.",
+  "interaction": {
+    "action": "open_chest",
+    "requires": "고대 열쇠 OR 전투 승리",
+    "trap_check": {
+      "stat": "DEX",
+      "dc": 15,
+      "success_text": "함정을 해제하고 안전하게 접근할 수 있다!",
+      "fail_text": "함정을 건드려 독 가스가 퍼졌다!",
+      "fail_effect": {
+        "target": "all_players",
+        "damage": 4,
+        "status_effect": "중독"
+      }
+    }
+  },
+  "guardian": {
+    "name": "보물 수호자 골렘",
+    "triggers_on": "open_without_key",
+    "npc_id": null,
+    "stats": {
+      "hp": 40,
+      "max_hp": 40,
+      "attack": 10,
+      "defense": 6,
+      "special": "돌 주먹 - 전체 공격 (데미지 6)"
+    }
+  },
+  "contents": ["전설의 보물", "황금 100개"],
+  "memory": {
+    "discovered": false,
+    "trap_checked": true,
+    "trap_disarmed": true,
+    "disarmed_by": "루체나",
+    "opened": true,
+    "opened_by": "사이키",
+    "guardian_spawned": false,
+    "guardian_defeated": false
+  },
+  "scenario_event_id": "ch3_guardian"
+}

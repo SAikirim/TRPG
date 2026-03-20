@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import glob
 from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -47,6 +48,9 @@ class SaveManager:
 
         # current_session.json 갱신
         self._update_current_session(scenario_id, slot, game_state)
+
+        # docs/ 동기화 (GitHub Pages용)
+        self._sync_docs(game_state)
 
         return save_data["save_info"]
 
@@ -213,3 +217,43 @@ class SaveManager:
         elif py >= 6:
             return 2  # 고대 던전
         return 1  # 숲의 입구
+
+    def _sync_docs(self, game_state):
+        """docs/ 폴더를 최신 상태로 동기화 (GitHub Pages용)"""
+        docs_dir = os.path.join(BASE_DIR, "docs")
+        if not os.path.exists(docs_dir):
+            return
+
+        # game_state.json 동기화
+        docs_state = os.path.join(docs_dir, "game_state.json")
+        with open(docs_state, "w", encoding="utf-8") as f:
+            json.dump(game_state, f, ensure_ascii=False, indent=2)
+
+        # static 파일 동기화 (illustrations, portraits)
+        sync_dirs = [
+            ("static/illustrations/sd", "static/illustrations/sd"),
+            ("static/illustrations/pixel", "static/illustrations/pixel"),
+            ("static/portraits/pixel", "static/portraits/pixel"),
+            ("static/map.png", "static/map.png"),
+        ]
+        for src_rel, dst_rel in sync_dirs:
+            src = os.path.join(BASE_DIR, src_rel)
+            dst = os.path.join(docs_dir, dst_rel)
+            if os.path.isdir(src):
+                os.makedirs(dst, exist_ok=True)
+                for f in os.listdir(src):
+                    src_file = os.path.join(src, f)
+                    dst_file = os.path.join(dst, f)
+                    if os.path.isfile(src_file):
+                        shutil.copy2(src_file, dst_file)
+            elif os.path.isfile(src):
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+                shutil.copy2(src, dst)
+
+        # entities 동기화
+        src_entities = os.path.join(BASE_DIR, "entities")
+        dst_entities = os.path.join(docs_dir, "entities")
+        if os.path.exists(src_entities):
+            if os.path.exists(dst_entities):
+                shutil.rmtree(dst_entities)
+            shutil.copytree(src_entities, dst_entities)

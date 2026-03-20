@@ -59,15 +59,20 @@ def remove_layer(name):
 def _build_payload(illustration_type, prompt, negative_prompt):
     sizes = {
         "portrait": (384, 512),
-        "background": (768, 512),
-        "scene": (768, 512),
+        "background": (896, 512),
+        "scene": (896, 512),
         "object": (256, 256),
     }
     w, h = sizes.get(illustration_type, (512, 512))
 
+    default_neg = "lowres, bad anatomy, bad hands, text, watermark, worst quality, low quality"
+    if illustration_type in ("portrait", "object"):
+        default_neg += ", detailed background, scenery, landscape"
+    neg_prompt = negative_prompt or default_neg
+
     return {
         "prompt": prompt,
-        "negative_prompt": negative_prompt or "lowres, bad anatomy, bad hands, text, watermark, worst quality, low quality",
+        "negative_prompt": neg_prompt,
         "steps": 20,
         "sampler_name": "DPM++ 2M Karras",
         "width": w,
@@ -75,6 +80,9 @@ def _build_payload(illustration_type, prompt, negative_prompt):
         "cfg_scale": 7,
         "batch_size": 1,
         "n_iter": 1,
+        "alwayson_scripts": {
+            "random": {"args": [False]}
+        },
     }
 
 
@@ -110,11 +118,29 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
             else:
                 save_dir = SD_ILLUSTRATIONS_DIR
             os.makedirs(save_dir, exist_ok=True)
-            timestamp = datetime.now().strftime("%H%M%S")
-            filename = f"{illustration_type}_t{turn_count}_{timestamp}.png"
+
+            # Reusable naming: use name if provided, otherwise timestamp
+            safe_name = name.replace(" ", "_") if name else datetime.now().strftime("%H%M%S")
+            filename = f"{illustration_type}_{safe_name}.webp"
             filepath = os.path.join(save_dir, filename)
-            with open(filepath, "wb") as f:
-                f.write(img_data)
+
+            # Convert to WebP, remove background for portraits/objects
+            from PIL import Image
+            import io
+            img = Image.open(io.BytesIO(img_data)).convert("RGB")
+
+            if illustration_type in ("portrait", "object"):
+                # Remove background for compositing on any scene
+                try:
+                    from transparent_background import Remover
+                    remover = Remover(mode="fast")
+                    img = remover.process(img, type="rgba")
+                except Exception as e:
+                    logger.warning(f"Background removal failed, saving as-is: {e}")
+                    img = img.convert("RGBA")
+                img.save(filepath, "WEBP", quality=90)
+            else:
+                img.save(filepath, "WEBP", quality=90)
 
             if illustration_type == "portrait":
                 image_url = f"/static/portraits/sd/{filename}"
