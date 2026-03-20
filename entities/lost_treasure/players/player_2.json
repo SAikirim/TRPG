@@ -23,7 +23,7 @@
   },
   "position": [4, 10],
   "status_effects": [],
-  "inventory": ["단검 x2", "도둑 도구"],
+  "inventory": ["단검 x2", "도둑 도구", "밧줄"],
   "equipment": {
     "weapon": "단검 x2",
     "armor": null

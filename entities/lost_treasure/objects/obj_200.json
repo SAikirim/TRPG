@@ -4,7 +4,7 @@
   "type": "trap",
   "position": [5, 3],
   "area": "grass",
-  "status": "armed",
+  "status": "disarmed",
   "hidden": true,
   "description": "덩굴에 숨겨진 함정. 밟으면 발동한다.",
   "trigger": {
@@ -30,8 +30,8 @@
   "memory": {
     "triggered": false,
     "triggered_by": null,
-    "disarmed": false,
-    "disarmed_by": null
+    "disarmed": true,
+    "disarmed_by": "루체나"
   },
   "scenario_event_id": "ch1_trap"
 }

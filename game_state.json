@@ -26,7 +26,7 @@
       },
       "position": [3, 9],
       "status_effects": [],
-      "inventory": ["마법 지팡이", "마나 포션", "마나 결정", "슬라임 젤리"],
+      "inventory": ["마법 지팡이", "마나 포션", "마나 결정", "슬라임 젤리", "약초"],
       "controlled_by": "user"
     },
     {
@@ -45,7 +45,7 @@
       },
       "position": [4, 10],
       "status_effects": [],
-      "inventory": ["단검 x2", "도둑 도구"],
+      "inventory": ["단검 x2", "도둑 도구", "밧줄"],
       "controlled_by": "agent"
     },
     {
@@ -148,6 +148,11 @@
       "turn": 4,
       "message": "아이템 분배: 노을(오크의 도끼 장착, 철검 반납) · 사이키(마나 결정, 슬라임 젤리 보관)",
       "timestamp": "아이템 분배"
+    },
+    {
+      "turn": 1,
+      "message": "[복원] 챕터1 탐색: 사이키 약초 습득 · 루체나 덩굴 함정 해제 후 밧줄 획득",
+      "timestamp": "챕터1 복원"
     }
   ]
 }
