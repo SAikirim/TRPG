@@ -46,12 +46,20 @@ class MapGenerator:
             draw.line([(0, y), (self.img_width, y)], fill="#1a1a1a", width=1)
 
         # Draw location labels
-        try:
-            font = ImageFont.truetype("arial.ttf", 14)
-            font_small = ImageFont.truetype("arial.ttf", 11)
-        except (OSError, IOError):
-            font = ImageFont.load_default()
-            font_small = font
+        # CJK 지원 폰트 탐색
+        font_paths = [
+            "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
+            "/usr/share/fonts/opentype/unifont/unifont.otf",
+            "arial.ttf",
+        ]
+        font = font_small = ImageFont.load_default()
+        for fp in font_paths:
+            try:
+                font = ImageFont.truetype(fp, 14)
+                font_small = ImageFont.truetype(fp, 11)
+                break
+            except (OSError, IOError):
+                continue
 
         for loc in state["map"]["locations"]:
             area = loc["area"]
