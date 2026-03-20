@@ -25,9 +25,20 @@
         "INT": 18,
         "CON": 10
       },
-      "position": [2, 2],
+      "position": [
+        2,
+        2
+      ],
       "status_effects": [],
-      "inventory": ["마법 지팡이", "마나 포션", "마나 결정", "슬라임 젤리", "약초", "고대 열쇠", "전설의 보물"],
+      "inventory": [
+        "마법 지팡이",
+        "마나 포션",
+        "마나 결정",
+        "슬라임 젤리",
+        "약초",
+        "고대 열쇠",
+        "전설의 보물"
+      ],
       "controlled_by": "user"
     },
     {
@@ -44,9 +55,16 @@
         "INT": 10,
         "CON": 14
       },
-      "position": [3, 2],
+      "position": [
+        3,
+        2
+      ],
       "status_effects": [],
-      "inventory": ["단검 x2", "도둑 도구", "밧줄"],
+      "inventory": [
+        "단검 x2",
+        "도둑 도구",
+        "밧줄"
+      ],
       "controlled_by": "agent"
     },
     {
@@ -63,9 +81,16 @@
         "INT": 8,
         "CON": 14
       },
-      "position": [2, 3],
+      "position": [
+        2,
+        3
+      ],
       "status_effects": [],
-      "inventory": ["가죽 방패", "오크의 도끼", "황금 100개"],
+      "inventory": [
+        "가죽 방패",
+        "오크의 도끼",
+        "황금 100개"
+      ],
       "controlled_by": "agent"
     }
   ],
@@ -78,7 +103,10 @@
       "max_hp": 25,
       "attack": 8,
       "defense": 4,
-      "position": [5, 10],
+      "position": [
+        5,
+        10
+      ],
       "threat_level": "high",
       "status": "dead"
     },
@@ -90,7 +118,10 @@
       "max_hp": 15,
       "attack": 5,
       "defense": 2,
-      "position": [10, 10],
+      "position": [
+        10,
+        10
+      ],
       "threat_level": "medium",
       "status": "dead"
     }
@@ -103,21 +134,36 @@
       {
         "name": "숲의 입구",
         "type": "grass",
-        "area": {"x1": 0, "y1": 0, "x2": 6, "y2": 5}
+        "area": {
+          "x1": 0,
+          "y1": 0,
+          "x2": 6,
+          "y2": 5
+        }
       },
       {
         "name": "고대 던전",
         "type": "dungeon",
-        "area": {"x1": 3, "y1": 6, "x2": 12, "y2": 12}
+        "area": {
+          "x1": 3,
+          "y1": 6,
+          "x2": 12,
+          "y2": 12
+        }
       },
       {
         "name": "보물실",
         "type": "treasure",
-        "area": {"x1": 14, "y1": 10, "x2": 19, "y2": 14}
+        "area": {
+          "x1": 14,
+          "y1": 10,
+          "x2": 19,
+          "y2": 14
+        }
       }
     ]
   },
-  "turn_count": 8,
+  "turn_count": 11,
   "events": [
     {
       "turn": 0,
@@ -188,6 +234,24 @@
       "turn": 8,
       "message": "🏆 엔딩: 완벽한 승리 — 세 명의 모험가 모두 살아서 전설의 보물을 가지고 마을로 돌아왔다.",
       "timestamp": "게임 완료"
+    },
+    {
+      "turn": 9,
+      "message": "[GM] The party arrived at the dungeon entrance.",
+      "narrative": "Dark stone walls covered in moss. Torch light flickering.",
+      "timestamp": "22:23:54"
+    },
+    {
+      "turn": 10,
+      "message": "[GM] Entered the ancient dungeon.",
+      "narrative": "Torches flicker along moss-covered stone walls.",
+      "timestamp": "22:31:41"
+    },
+    {
+      "turn": 11,
+      "message": "[GM] A dark orc appeared from the shadows.",
+      "narrative": "The orc growls menacingly, gripping a rusty axe.",
+      "timestamp": "22:31:58"
     }
   ]
 }

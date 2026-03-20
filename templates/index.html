@@ -26,30 +26,23 @@
             padding: 16px;
             max-width: 1400px;
             margin: 0 auto;
-            height: calc(100vh - 80px);
+            min-height: calc(100vh - 80px);
         }
-        .map-panel {
-            flex: 1;
-            background: #16213e;
-            border-radius: 12px;
-            padding: 12px;
+        .main-panel {
+            flex: 2;
             display: flex;
             flex-direction: column;
-        }
-        .map-panel h2 { font-size: 1em; margin-bottom: 8px; color: #e94560; }
-        .map-panel img {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            border: 2px solid #333;
-            image-rendering: pixelated;
+            gap: 16px;
+            min-width: 0;
         }
         .sidebar {
             width: 380px;
+            flex-shrink: 0;
             display: flex;
             flex-direction: column;
             gap: 12px;
             overflow-y: auto;
+            max-height: calc(100vh - 96px);
         }
         .panel {
             background: #16213e;
@@ -62,20 +55,20 @@
             margin-bottom: 10px;
             border-bottom: 1px solid #333;
             padding-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        .turn-info {
-            text-align: center;
-            font-size: 1.3em;
-            color: #ffd700;
-            padding: 10px;
-        }
-        .turn-info span { font-size: 2em; font-weight: bold; }
+        /* Player cards */
         .player-card {
             background: #0f3460;
             border-radius: 8px;
             padding: 10px;
             margin-bottom: 8px;
+            display: flex;
+            gap: 10px;
         }
+        .player-card:last-child { margin-bottom: 0; }
         .player-card .name {
             font-weight: bold;
             font-size: 0.95em;
@@ -121,34 +114,128 @@
             color: #aaa;
         }
         .stats span { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; }
-        .actions-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        .action-btn {
-            padding: 10px;
-            border: none;
+        .player-portrait {
+            width: 140px;
+            height: 140px;
             border-radius: 8px;
-            font-size: 0.85em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
-            color: white;
+            border: 2px solid #333;
+            object-fit: cover;
+            flex-shrink: 0;
         }
-        .action-btn:hover { transform: scale(1.03); }
-        .action-btn:active { transform: scale(0.97); }
-        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-attack { background: linear-gradient(135deg, #e63946, #c0392b); }
-        .btn-defend { background: linear-gradient(135deg, #e67e22, #d35400); }
-        .btn-fireball { background: linear-gradient(135deg, #457be0, #2c3e9e); }
-        .btn-heal { background: linear-gradient(135deg, #2ecc71, #27ae60); }
-        .btn-flee { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
-        .btn-ambush { background: linear-gradient(135deg, #1abc9c, #16a085); }
-        .events-list {
-            max-height: 200px;
-            overflow-y: auto;
+        .player-info {
+            flex: 1;
+            min-width: 0;
+        }
+        /* Illustration */
+        .illustration-section .illustration-panel {
+            position: relative;
+            min-height: 400px;
+            background: #0d1b2a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .illustration-panel .bg-layer {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+        .illustration-panel .layer-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .illustration-panel .portrait-layer {
+            position: absolute;
+            bottom: 0;
+            max-height: 90%;
+            max-width: 40%;
+            object-fit: contain;
+            filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.7));
+        }
+        .portrait-layer.pos-left { left: 5%; }
+        .portrait-layer.pos-center { left: 50%; transform: translateX(-50%); }
+        .portrait-layer.pos-right { right: 5%; }
+        .illustration-panel .object-layer {
+            position: absolute;
+            max-height: 30%;
+            max-width: 25%;
+            object-fit: contain;
+            filter: drop-shadow(2px 2px 6px rgba(0,0,0,0.6));
+        }
+        .object-layer.pos-center { bottom: 10%; left: 50%; transform: translateX(-50%); }
+        .object-layer.pos-center-bottom { bottom: 5%; left: 50%; transform: translateX(-50%); }
+        .object-layer.pos-left { bottom: 10%; left: 10%; }
+        .object-layer.pos-right { bottom: 10%; right: 10%; }
+        .illustration-panel .generating-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            color: #ffd700;
             font-size: 0.8em;
+            font-style: italic;
+        }
+        .generating-overlay .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #333;
+            border-top: 2px solid #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 6px;
+        }
+        .illustration-placeholder {
+            color: #444;
+            font-size: 1.1em;
+            font-style: italic;
+        }
+        .illustration-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffd700;
+            font-style: italic;
+        }
+        .illustration-loading .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #333;
+            border-top: 3px solid #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .sd-toggle {
+            font-size: 0.75em;
+            cursor: pointer;
+            padding: 2px 10px;
+            border-radius: 8px;
+            border: 1px solid #555;
+            background: #1a1a2e;
+            color: #aaa;
+            flex-shrink: 0;
+        }
+        .sd-toggle.active {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+        /* Events */
+        .events-list {
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 0.85em;
         }
         .event-item {
             padding: 6px 8px;
@@ -170,11 +257,21 @@
             font-style: italic;
             margin-top: 3px;
         }
+        /* Map in sidebar */
+        .sidebar-map img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 2px solid #333;
+            image-rendering: pixelated;
+        }
+        /* Legend */
         .legend {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             font-size: 0.78em;
+            margin-top: 10px;
         }
         .legend-item {
             display: flex;
@@ -193,13 +290,6 @@
             border-right: 7px solid transparent;
             border-bottom: 12px solid #9b30ff;
         }
-        .status-indicator {
-            font-size: 0.75em;
-            color: #aaa;
-            text-align: center;
-            margin-top: 4px;
-        }
-        .status-indicator.connected { color: #2ecc71; }
     </style>
 </head>
 <body>
@@ -209,11 +299,26 @@
     </header>
 
     <div class="container">
-        <div class="map-panel">
-            <h2>게임 맵</h2>
-            <img id="game-map" src="/static/map.png" alt="Game Map">
-            <div class="panel" style="margin-top:12px">
-                <h3>범례</h3>
+        <div class="main-panel">
+            <div class="panel illustration-section">
+                <h3>
+                    일러스트
+                    <button id="sd-toggle" class="sd-toggle" onclick="toggleSD()">SD OFF</button>
+                </h3>
+                <div id="illustration-panel" class="illustration-panel">
+                    <div class="illustration-placeholder">대기 중...</div>
+                </div>
+            </div>
+            <div class="panel">
+                <h3>이벤트 로그</h3>
+                <div id="events-list" class="events-list"></div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="panel sidebar-map">
+                <h3>게임 맵</h3>
+                <img id="game-map" src="/static/map.png" alt="Game Map">
                 <div class="legend">
                     <div class="legend-item"><div class="legend-dot" style="background:#e63946"></div> 전사 (아론)</div>
                     <div class="legend-item"><div class="legend-dot" style="background:#457be0"></div> 마법사 (리나)</div>
@@ -224,58 +329,32 @@
                     <div class="legend-item"><div class="legend-dot" style="background:#c8a82a"></div> 보물실</div>
                 </div>
             </div>
-        </div>
-
-        <div class="sidebar">
-            <div class="panel">
-                <div class="turn-info">
-                    현재 턴: <span id="turn-count">0</span>
-                </div>
-                <div id="connection-status" class="status-indicator">연결 중...</div>
-            </div>
 
             <div class="panel">
                 <h3>플레이어 정보</h3>
                 <div id="players-list"></div>
-            </div>
-
-            <div class="panel">
-                <h3>행동 선택</h3>
-                <div class="actions-grid">
-                    <button class="action-btn btn-attack" onclick="submitAction(1, '공격')">전사: 공격</button>
-                    <button class="action-btn btn-defend" onclick="submitAction(1, '방어')">전사: 방어</button>
-                    <button class="action-btn btn-fireball" onclick="submitAction(2, '파이어볼')">마법사: 파이어볼</button>
-                    <button class="action-btn btn-heal" onclick="submitAction(2, '힐')">마법사: 힐</button>
-                    <button class="action-btn btn-flee" onclick="submitAction(3, '도주')">도적: 도주</button>
-                    <button class="action-btn btn-ambush" onclick="submitAction(3, '습격')">도적: 습격</button>
-                </div>
-            </div>
-
-            <div class="panel">
-                <h3>이벤트 로그</h3>
-                <div id="events-list" class="events-list"></div>
             </div>
         </div>
     </div>
 
     <script>
         let gameState = null;
-        let actionInProgress = false;
 
         async function updateGameState() {
             try {
                 const res = await fetch('/api/game-state');
                 gameState = await res.json();
-                document.getElementById('turn-count').textContent = gameState.turn_count;
-                document.getElementById('connection-status').textContent = '연결됨';
-                document.getElementById('connection-status').className = 'status-indicator connected';
+                const turnEl = document.getElementById('turn-count');
+                if (turnEl) turnEl.textContent = gameState.turn_count;
+                const connEl = document.getElementById('connection-status');
+                if (connEl) { connEl.textContent = '연결됨'; connEl.className = 'status-indicator connected'; }
                 updatePlayersList();
                 updateEventsList();
-                // Refresh map with cache bust
                 document.getElementById('game-map').src = '/static/map.png?t=' + Date.now();
+                updateIllustration();
             } catch (e) {
-                document.getElementById('connection-status').textContent = '연결 끊김';
-                document.getElementById('connection-status').className = 'status-indicator';
+                const connEl = document.getElementById('connection-status');
+                if (connEl) { connEl.textContent = '연결 끊김'; connEl.className = 'status-indicator'; }
             }
         }
 
@@ -291,7 +370,9 @@
                     : '';
                 return `
                 <div class="player-card">
-                    <div class="name">
+                    <img class="player-portrait" src="/static/portraits/pixel/player_${p.id}.png" alt="${p.name}" onerror="this.src='/static/portraits/pixel/player_${p.id}.png'">
+                    <div class="player-info">
+                        <div class="name">
                         ${p.name}
                         <span class="class-badge class-${cls}">${p.class}</span>
                         <span style="float:right;font-size:0.75em;color:#aaa">위치: [${p.position}]</span>
@@ -311,6 +392,7 @@
                         <span>CON ${p.stats.CON}</span>
                     </div>
                     ${effects}
+                    </div>
                 </div>`;
             }).join('');
         }
@@ -329,32 +411,96 @@
             }).join('');
         }
 
-        async function submitAction(playerId, action) {
-            if (actionInProgress) return;
-            actionInProgress = true;
+        let lastSceneHash = '';
 
-            // Disable buttons
-            document.querySelectorAll('.action-btn').forEach(b => b.disabled = true);
-
+        async function updateIllustration() {
             try {
-                const res = await fetch('/api/player-action', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ player_id: playerId, action: action })
-                });
+                const res = await fetch('/api/illustration');
                 const data = await res.json();
-                if (data.success) {
-                    await updateGameState();
-                }
-            } catch (e) {
-                console.error('Action failed:', e);
-            }
+                const panel = document.getElementById('illustration-panel');
+                const toggleBtn = document.getElementById('sd-toggle');
 
-            actionInProgress = false;
-            document.querySelectorAll('.action-btn').forEach(b => b.disabled = false);
+                if (data.enabled) {
+                    toggleBtn.textContent = 'SD ON';
+                    toggleBtn.className = 'sd-toggle active';
+                } else {
+                    toggleBtn.textContent = 'SD OFF';
+                    toggleBtn.className = 'sd-toggle';
+                }
+
+                // Build a hash to detect changes
+                const sceneHash = JSON.stringify({
+                    bg: data.background,
+                    layers: data.layers,
+                    status: data.generating?.status
+                });
+
+                if (sceneHash === lastSceneHash) return;
+                lastSceneHash = sceneHash;
+
+                const generating = data.generating || {};
+                const hasContent = data.background || (data.layers && data.layers.length > 0);
+
+                if (!data.enabled) {
+                    panel.innerHTML = '<div class="illustration-placeholder">SD 비활성</div>';
+                    return;
+                }
+
+                if (!hasContent && generating.status !== 'generating') {
+                    if (generating.status === 'error' && generating.error) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.style.cssText = 'color:#e63946;font-size:0.9em;padding:20px;text-align:center';
+                        errorDiv.textContent = '오류: ' + generating.error;
+                        panel.innerHTML = '';
+                        panel.appendChild(errorDiv);
+                    } else {
+                        panel.innerHTML = '<div class="illustration-placeholder">대기 중...</div>';
+                    }
+                    return;
+                }
+
+                // Build scene with layers
+                let html = '';
+
+                if (data.background) {
+                    html += '<img class="bg-layer" src="' + data.background + '?t=' + Date.now() + '" alt="Background">';
+                }
+
+                if (data.layers && data.layers.length > 0) {
+                    html += '<div class="layer-container">';
+                    data.layers.forEach(layer => {
+                        const posClass = 'pos-' + (layer.position || 'center');
+                        if (layer.type === 'portrait') {
+                            html += '<img class="portrait-layer ' + posClass + '" src="' + layer.image + '?t=' + Date.now() + '" alt="' + (layer.name || '') + '" title="' + (layer.name || '') + '">';
+                        } else if (layer.type === 'object') {
+                            html += '<img class="object-layer ' + posClass + '" src="' + layer.image + '?t=' + Date.now() + '" alt="' + (layer.name || '') + '" title="' + (layer.name || '') + '">';
+                        }
+                    });
+                    html += '</div>';
+                }
+
+                // Show generating overlay if something is being generated while scene is visible
+                if (generating.status === 'generating') {
+                    if (hasContent) {
+                        html += '<div class="generating-overlay"><div class="spinner"></div>생성 중...</div>';
+                    } else {
+                        html = '<div class="illustration-loading"><div class="spinner"></div>생성 중...</div>';
+                    }
+                }
+
+                panel.innerHTML = html;
+            } catch (e) {}
         }
 
-        // Initial load and periodic refresh
+        async function toggleSD() {
+            try {
+                await fetch('/api/illustration/toggle', { method: 'POST' });
+                await updateIllustration();
+            } catch (e) {
+                console.error('Toggle failed:', e);
+            }
+        }
+
         updateGameState();
         setInterval(updateGameState, 2000);
     </script>

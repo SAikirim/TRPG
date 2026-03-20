@@ -6,6 +6,7 @@ from flask import Flask, jsonify, render_template, request
 
 from map_generator import MapGenerator
 from save_manager import SaveManager
+from sd_generator import request_illustration, get_scene_state, is_sd_enabled, clear_scene, remove_layer
 
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -159,7 +160,51 @@ def gm_update():
     save_game_state(state)
     update_map_image()
 
-    return jsonify({"success": True, "event": event, "turn": state["turn_count"]})
+    # Handle illustration request
+    illustration_req = data.get("illustration")
+    ill_result = None
+    if illustration_req:
+        ill_result = request_illustration(
+            illustration_type=illustration_req.get("type", "scene"),
+            prompt=illustration_req.get("prompt", ""),
+            negative_prompt=illustration_req.get("negative_prompt", ""),
+            turn_count=state["turn_count"],
+            position=illustration_req.get("position", "center"),
+            name=illustration_req.get("name", ""),
+        )
+
+    # Handle scene management commands
+    if data.get("clear_scene"):
+        clear_scene()
+    if data.get("remove_layer"):
+        remove_layer(data["remove_layer"])
+
+    return jsonify({"success": True, "event": event, "turn": state["turn_count"], "illustration": ill_result})
+
+
+@app.route("/api/illustration", methods=["GET"])
+def get_illustration():
+    state = get_scene_state()
+    state["enabled"] = is_sd_enabled()
+    return jsonify(state)
+
+
+@app.route("/api/illustration/clear", methods=["POST"])
+def clear_illustration():
+    clear_scene()
+    return jsonify({"success": True})
+
+
+@app.route("/api/illustration/toggle", methods=["POST"])
+def toggle_illustration():
+    session_path = os.path.join(BASE_DIR, "current_session.json")
+    with open(session_path, "r", encoding="utf-8") as f:
+        session = json.load(f)
+    current = session.get("sd_illustration", False)
+    session["sd_illustration"] = not current
+    with open(session_path, "w", encoding="utf-8") as f:
+        json.dump(session, f, ensure_ascii=False, indent=2)
+    return jsonify({"sd_illustration": session["sd_illustration"]})
 
 
 @app.route("/api/reset-game", methods=["POST"])

@@ -2,44 +2,63 @@
   "active_scenario": "lost_treasure",
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
-  "branch": "claude/clarify-task-xApb3",
-  "turn": 8,
+  "turn": 11,
   "chapter": 3,
-  "chapter_name": "보물실",
-  "status": "completed",
-  "ending": "perfect",
+  "chapter_name": "숲의 입구",
   "party_summary": [
     {
       "name": "사이키",
       "class": "마법사",
       "hp": "15/15",
       "mp": "24/30",
-      "key_items": ["마법 지팡이", "마나 포션", "마나 결정", "슬라임 젤리", "약초", "고대 열쇠", "전설의 보물"]
+      "key_items": [
+        "마법 지팡이",
+        "마나 포션",
+        "마나 결정",
+        "슬라임 젤리",
+        "약초",
+        "고대 열쇠",
+        "전설의 보물"
+      ]
     },
     {
       "name": "루체나",
       "class": "도적",
       "hp": "22/22",
       "mp": "8/10",
-      "key_items": ["단검 x2", "도둑 도구", "밧줄"]
+      "key_items": [
+        "단검 x2",
+        "도둑 도구",
+        "밧줄"
+      ]
     },
     {
       "name": "노을",
       "class": "전사",
       "hp": "32/32",
       "mp": "5/5",
-      "key_items": ["오크의 도끼", "가죽 방패", "황금 100개"]
+      "key_items": [
+        "가죽 방패",
+        "오크의 도끼",
+        "황금 100개"
+      ]
     }
   ],
   "progress_notes": [
-    "어두운 오크 처치 (턴 3), 마법사 슬라임 처치 (턴 4) — 던전 2구역 전멸",
-    "고대 비문 [7,8] 해독 완료 (턴 5) → 고대 열쇠 획득",
-    "보물 상자 함정 해제 + 보물 획득 (턴 7) — 골렘 미소환",
-    "던전 탈출 성공 (턴 8) — 전원 생존",
-    "🏆 엔딩: 완벽한 승리"
+    "[복원] 챕터1 탐색: 사이키 약초 습득 · 루체나 덩굴 함정 해제 후 밧줄 획득",
+    "사이키가 고대 비문을 해독했다. 비문 뒤 숨겨진 공간에서 고대 열쇠 획득.",
+    "사이키가 고대 열쇠로 철문을 열었다. 파티가 보물실(챕터 3)에 진입했다.",
+    "루체나가 보물 상자의 독 가스 함정을 해제했다.",
+    "사이키가 고대 열쇠로 보물 상자를 열었다. 수호자 골렘은 깨어나지 않았다. 전설의 보물과 황금 100개를 획득!",
+    "던전이 붕괴하기 시작했다. 파티가 전력 질주하여 숲의 입구로 탈출에 성공했다.",
+    "🏆 엔딩: 완벽한 승리 — 세 명의 모험가 모두 살아서 전설의 보물을 가지고 마을로 돌아왔다.",
+    "[GM] The party arrived at the dungeon entrance.",
+    "[GM] Entered the ancient dungeon.",
+    "[GM] A dark orc appeared from the shadows."
   ],
-  "next_objective": "게임 완료",
+  "next_objective": "",
   "display_mode": "mobile",
   "show_dice_result": false,
+  "sd_illustration": true,
   "last_updated": "2026-03-20"
 }
