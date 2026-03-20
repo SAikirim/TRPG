@@ -178,9 +178,44 @@
         }
         .detail-content li:last-child { border-bottom: none; }
         .detail-content .skill-item { color: #74b9ff; }
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            cursor: default;
+        }
+        .detail-item:last-child { border-bottom: none; }
+        .detail-item:hover { background: rgba(255,255,255,0.05); }
+        .detail-item .item-name { flex: 1; }
+        .detail-item .item-stat {
+            font-size: 0.75em;
+            color: #ffd700;
+            margin-left: 8px;
+            white-space: nowrap;
+        }
+        .detail-item .tooltip {
+            display: none;
+            position: fixed;
+            background: #0a0a1a;
+            border: 1px solid #e94560;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.8em;
+            color: #ddd;
+            z-index: 9999;
+            pointer-events: none;
+            max-width: 300px;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            line-height: 1.5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+        }
         .player-portrait {
-            width: 100px;
-            height: 100px;
+            width: 125px;
+            height: 125px;
             border-radius: 8px;
             border: 2px solid #333;
             object-fit: cover;
@@ -344,6 +379,24 @@
             renderIllustration(info.current_chapter);
         }
 
+        const itemInfo = {
+            '철검': { desc: '기본 근접 무기', stat: 'DMG 1d6' },
+            '가죽 방패': { desc: '기본 방어 장비', stat: 'DEF +2' },
+            '마법 지팡이': { desc: '마법사의 기본 무기', stat: 'DMG 1d8' },
+            '마나 포션': { desc: 'MP 8 회복', stat: 'MP +8' },
+            '단검 x2': { desc: '도적의 이중 무기', stat: 'DMG 2d6' },
+            '도둑 도구': { desc: '함정 해제, 자물쇠 따기', stat: 'DEX +2' },
+            '치유 약초': { desc: '자연의 치유력', stat: 'HP +5' },
+            '마나 결정': { desc: '응축된 마력의 결정', stat: 'MP +5' },
+            '슬라임 젤리': { desc: '슬라임에서 추출한 젤리', stat: '소재' },
+            '약초': { desc: '상처를 치유하는 약초', stat: 'HP +5' },
+            '고대 열쇠': { desc: '보물실의 문을 여는 열쇠', stat: '열쇠' },
+            '전설의 보물': { desc: '던전의 최종 보물', stat: '보물' },
+            '밧줄': { desc: '등반, 묶기에 사용', stat: '도구' },
+            '오크의 도끼': { desc: '오크에게서 획득한 무기', stat: 'DMG 1d8+2' },
+            '황금 100개': { desc: '반짝이는 금화', stat: '100G' },
+        };
+
         const playerDetailCache = {};
 
         function renderPlayers(players, scenarioId) {
@@ -353,7 +406,10 @@
                 const cls = classMap[p.class] || 'warrior';
                 const hpPct = (p.hp / p.max_hp * 100).toFixed(0);
                 const mpPct = (p.mp / p.max_mp * 100).toFixed(0);
-                const invItems = (p.inventory || []).map(i => `<li>${i}</li>`).join('') || '<li style="color:#666">없음</li>';
+                const invItems = (p.inventory || []).map(item => {
+                    const info = itemInfo[item] || { desc: item, stat: '' };
+                    return `<div class="detail-item"><span class="item-name">${item}</span>${info.stat ? '<span class="item-stat">' + info.stat + '</span>' : ''}<div class="tooltip">${info.desc}</div></div>`;
+                }).join('');
                 return `
                 <div class="player-card">
                     <img class="player-portrait" src="static/portraits/pixel/player_${p.id}.png" alt="${p.name}">
@@ -382,7 +438,7 @@
                             <button onclick="toggleDetail(${p.id}, 'equip', this, '${scenarioId}')">장비</button>
                         </div>
                         <div id="detail-inv-${p.id}" class="detail-content">
-                            <ul>${invItems}</ul>
+                            ${invItems || '<div class="detail-item" style="color:#666">없음</div>'}
                         </div>
                         <div id="detail-skill-${p.id}" class="detail-content">
                             <ul><li style="color:#666">...</li></ul>
@@ -425,19 +481,34 @@
             }
 
             if (type === 'skill' && playerDetailCache[playerId]) {
-                const skills = playerDetailCache[playerId].available_actions || [];
-                el.innerHTML = skills.length
-                    ? '<ul>' + skills.map(s => `<li class="skill-item">${s}</li>`).join('') + '</ul>'
-                    : '<ul><li style="color:#666">없음</li></ul>';
+                const actions = playerDetailCache[playerId].available_actions || [];
+                const skillDescs = {
+                    '공격': { desc: '근접 무기로 적을 공격한다.', stat: 'MP 0 / 1d6' },
+                    '방어': { desc: '방패를 들어 방어 태세. 방어력 +4 (1턴)', stat: 'MP 0 / DEF+4' },
+                    '파이어볼': { desc: '화염 구체로 마법 피해. 범위 공격 가능.', stat: 'MP 4 / 1d8' },
+                    '힐': { desc: '치유 마법으로 아군 HP 회복.', stat: 'MP 3 / 1d8' },
+                    '도주': { desc: '전투에서 도주 시도. 실패 시 기회 공격.', stat: 'MP 0' },
+                    '습격': { desc: '은밀 접근 후 급소 공격. 성공 시 추가 피해.', stat: 'MP 2 / 2d6' },
+                };
+                el.innerHTML = actions.length
+                    ? actions.map(s => {
+                        const info = skillDescs[s] || { desc: s, stat: '' };
+                        return `<div class="detail-item"><span class="item-name">${s}</span><span class="item-stat">${info.stat}</span><div class="tooltip">${info.desc}</div></div>`;
+                    }).join('')
+                    : '<div class="detail-item" style="color:#666">없음</div>';
             }
             if (type === 'equip' && playerDetailCache[playerId]) {
                 const eq = playerDetailCache[playerId].equipment || {};
                 const items = Object.entries(eq)
                     .filter(([k,v]) => v)
-                    .map(([k,v]) => `<li>${k === 'weapon' ? '무기' : k === 'armor' ? '방어구' : k}: ${v}</li>`);
+                    .map(([k,v]) => {
+                        const slotName = k === 'weapon' ? '무기' : k === 'armor' ? '방어구' : k;
+                        const info = itemInfo[v] || { desc: v, stat: '' };
+                        return `<div class="detail-item"><span class="item-name">${slotName}: ${v}</span>${info.stat ? '<span class="item-stat">' + info.stat + '</span>' : ''}<div class="tooltip">${info.desc}</div></div>`;
+                    });
                 el.innerHTML = items.length
-                    ? '<ul>' + items.join('') + '</ul>'
-                    : '<ul><li style="color:#666">없음</li></ul>';
+                    ? items.join('')
+                    : '<div class="detail-item" style="color:#666">없음</div>';
             }
         }
 
@@ -468,6 +539,36 @@
                 panel.innerHTML = '<div class="illustration-placeholder">일러스트 없음</div>';
             }
         }
+
+        document.addEventListener('mouseover', function(e) {
+            const item = e.target.closest('.detail-item');
+            if (!item) return;
+            const tip = item.querySelector('.tooltip');
+            if (tip) tip.style.display = 'block';
+        });
+        document.addEventListener('mouseout', function(e) {
+            const item = e.target.closest('.detail-item');
+            if (!item) return;
+            const tip = item.querySelector('.tooltip');
+            if (tip) tip.style.display = 'none';
+        });
+        document.addEventListener('mousemove', function(e) {
+            const item = e.target.closest('.detail-item');
+            if (!item) return;
+            const tip = item.querySelector('.tooltip');
+            if (!tip || tip.style.display !== 'block') return;
+            const tipRect = tip.getBoundingClientRect();
+            const tipW = tipRect.width || 200;
+            const tipH = tipRect.height || 40;
+            let x = e.clientX + 15;
+            let y = e.clientY + 15;
+            if (x + tipW > window.innerWidth - 5) x = e.clientX - tipW - 10;
+            if (y + tipH > window.innerHeight - 5) y = e.clientY - tipH - 10;
+            if (y < 5) y = 5;
+            if (x < 5) x = 5;
+            tip.style.left = x + 'px';
+            tip.style.top = y + 'px';
+        });
 
         loadGame();
     </script>

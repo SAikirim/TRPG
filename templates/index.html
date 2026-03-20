@@ -166,6 +166,41 @@
         .detail-content .skill-item {
             color: #74b9ff;
         }
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            cursor: default;
+        }
+        .detail-item:last-child { border-bottom: none; }
+        .detail-item:hover { background: rgba(255,255,255,0.05); }
+        .detail-item .item-name { flex: 1; }
+        .detail-item .item-stat {
+            font-size: 0.75em;
+            color: #ffd700;
+            margin-left: 8px;
+            white-space: nowrap;
+        }
+        .detail-item .tooltip {
+            display: none;
+            position: fixed;
+            background: #0a0a1a;
+            border: 1px solid #e94560;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.8em;
+            color: #ddd;
+            z-index: 9999;
+            pointer-events: none;
+            max-width: 300px;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            line-height: 1.5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+        }
         .player-portrait {
             width: 125px;
             height: 125px;
@@ -391,19 +426,52 @@
 
     <script>
         let gameState = null;
+        let lastGameStateHash = '';
+        let lastMapTime = 0;
+        let rulesData = null;
+
+        const itemInfo = {
+            '철검': { desc: '기본 근접 무기', stat: 'DMG 1d6' },
+            '가죽 방패': { desc: '기본 방어 장비', stat: 'DEF +2' },
+            '마법 지팡이': { desc: '마법사의 기본 무기', stat: 'DMG 1d8' },
+            '마나 포션': { desc: 'MP 8 회복', stat: 'MP +8' },
+            '단검 x2': { desc: '도적의 이중 무기', stat: 'DMG 2d6' },
+            '도둑 도구': { desc: '함정 해제, 자물쇠 따기', stat: 'DEX +2' },
+            '치유 약초': { desc: '자연의 치유력', stat: 'HP +5' },
+            '마나 결정': { desc: '응축된 마력의 결정', stat: 'MP +5' },
+            '슬라임 젤리': { desc: '슬라임에서 추출한 젤리', stat: '소재' },
+            '약초': { desc: '상처를 치유하는 약초', stat: 'HP +5' },
+            '고대 열쇠': { desc: '보물실의 문을 여는 열쇠', stat: '열쇠' },
+            '전설의 보물': { desc: '던전의 최종 보물', stat: '보물' },
+            '밧줄': { desc: '등반, 묶기에 사용', stat: '도구' },
+            '오크의 도끼': { desc: '오크에게서 획득한 무기', stat: 'DMG 1d8+2' },
+            '황금 100개': { desc: '반짝이는 금화', stat: '100G' },
+        };
+
+        async function loadRules() {
+            try {
+                const res = await fetch('/api/rules');
+                rulesData = await res.json();
+            } catch(e) {}
+        }
 
         async function updateGameState() {
             try {
                 const res = await fetch('/api/game-state');
-                gameState = await res.json();
-                const turnEl = document.getElementById('turn-count');
-                if (turnEl) turnEl.textContent = gameState.turn_count;
-                const connEl = document.getElementById('connection-status');
-                if (connEl) { connEl.textContent = '연결됨'; connEl.className = 'status-indicator connected'; }
+                const newState = await res.json();
+                const hash = JSON.stringify(newState);
+
+                // Always update illustration (has its own change detection)
+                gameState = newState;
+                updateIllustration();
+
+                // Only re-render if game state actually changed
+                if (hash === lastGameStateHash) return;
+                lastGameStateHash = hash;
+
                 updatePlayersList();
                 updateEventsList();
                 document.getElementById('game-map').src = '/static/map.png?t=' + Date.now();
-                updateIllustration();
             } catch (e) {
                 const connEl = document.getElementById('connection-status');
                 if (connEl) { connEl.textContent = '연결 끊김'; connEl.className = 'status-indicator'; }
@@ -413,9 +481,18 @@
         // Cache for player detail data (from entity files)
         const playerDetailCache = {};
 
+        // Track which detail panels are open
+        const openDetails = {};
+
         function updatePlayersList() {
             const container = document.getElementById('players-list');
             const classMap = { '전사': 'warrior', '마법사': 'mage', '도적': 'rogue' };
+
+            // Save open state before re-render
+            container.querySelectorAll('.detail-content.open').forEach(el => {
+                openDetails[el.id] = true;
+            });
+
             container.innerHTML = gameState.players.map(p => {
                 const cls = classMap[p.class] || 'warrior';
                 const hpPct = (p.hp / p.max_hp * 100).toFixed(0);
@@ -423,7 +500,10 @@
                 const effects = p.status_effects.length > 0
                     ? `<div style="font-size:0.75em;color:#ffd700;margin-top:4px">상태: ${p.status_effects.join(', ')}</div>`
                     : '';
-                const invItems = (p.inventory || []).map(item => `<li>${item}</li>`).join('');
+                const invItems = (p.inventory || []).map(item => {
+                    const info = itemInfo[item] || { desc: item, stat: '' };
+                    return `<div class="detail-item"><span class="item-name">${item}</span>${info.stat ? '<span class="item-stat">' + info.stat + '</span>' : ''}<div class="tooltip">${info.desc}</div></div>`;
+                }).join('');
                 return `
                 <div class="player-card">
                     <img class="player-portrait" src="/static/portraits/pixel/player_${p.id}.png" alt="${p.name}" onerror="this.src='/static/portraits/pixel/player_${p.id}.png'">
@@ -454,7 +534,7 @@
                         <button onclick="toggleDetail(${p.id}, 'equip', this)">장비</button>
                     </div>
                     <div id="detail-inv-${p.id}" class="detail-content">
-                        <ul>${invItems || '<li style="color:#666">없음</li>'}</ul>
+                        ${invItems || '<div class="detail-item" style="color:#666">없음</div>'}
                     </div>
                     <div id="detail-skill-${p.id}" class="detail-content">
                         <ul><li style="color:#666">로딩 중...</li></ul>
@@ -465,6 +545,22 @@
                     </div>
                 </div>`;
             }).join('');
+
+            // Restore open state after re-render
+            Object.keys(openDetails).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('open');
+                    // Also activate the corresponding button
+                    const type = id.split('-')[1];
+                    const playerId = id.split('-')[2];
+                    const card = el.closest('.player-card');
+                    if (card) {
+                        const btn = card.querySelector(`button[onclick*="'${type}'"]`);
+                        if (btn) btn.classList.add('active');
+                    }
+                }
+            });
         }
 
         async function toggleDetail(playerId, type, btn) {
@@ -475,6 +571,7 @@
             ['inv', 'skill', 'equip'].forEach(t => {
                 const d = document.getElementById(`detail-${t}-${playerId}`);
                 if (d) d.classList.remove('open');
+                delete openDetails[`detail-${t}-${playerId}`];
             });
             // Deactivate all buttons in same toggle group
             btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
@@ -483,6 +580,7 @@
 
             el.classList.add('open');
             btn.classList.add('active');
+            openDetails[`detail-${type}-${playerId}`] = true;
 
             // Lazy load skill/equip from entity API
             if ((type === 'skill' || type === 'equip') && !playerDetailCache[playerId]) {
@@ -494,20 +592,33 @@
                 }
             }
 
-            if (type === 'skill' && playerDetailCache[playerId]) {
-                const skills = playerDetailCache[playerId].available_actions || [];
-                el.innerHTML = skills.length
-                    ? '<ul>' + skills.map(s => `<li class="skill-item">${s}</li>`).join('') + '</ul>'
-                    : '<ul><li style="color:#666">없음</li></ul>';
+            if (type === 'skill') {
+                const actions = rulesData ? rulesData.actions || {} : {};
+                const playerClass = gameState.players.find(p => p.id === playerId);
+                const className = playerClass ? playerClass.class : '';
+                const classSkills = Object.entries(actions).filter(([k,v]) => v.class === className);
+                if (classSkills.length) {
+                    el.innerHTML = classSkills.map(([name, info]) => {
+                        const cost = info.cost && info.cost.mp ? 'MP ' + info.cost.mp : 'MP 0';
+                        const dmg = info.damage || info.roll || '';
+                        const stat = dmg ? dmg.split(' + ')[0] : cost;
+                        return `<div class="detail-item"><span class="item-name">${name}</span><span class="item-stat">${cost}${dmg ? ' / ' + dmg.split(' + ')[0] : ''}</span><div class="tooltip">${info.description || name}</div></div>`;
+                    }).join('');
+                } else {
+                    el.innerHTML = '<div class="detail-item" style="color:#666">없음</div>';
+                }
             }
-            if (type === 'equip' && playerDetailCache[playerId]) {
-                const eq = playerDetailCache[playerId].equipment || {};
-                const items = Object.entries(eq)
-                    .filter(([k,v]) => v)
-                    .map(([k,v]) => `<li>${k === 'weapon' ? '무기' : k === 'armor' ? '방어구' : k}: ${v}</li>`);
-                el.innerHTML = items.length
-                    ? '<ul>' + items.join('') + '</ul>'
-                    : '<ul><li style="color:#666">없음</li></ul>';
+            if (type === 'equip') {
+                const inv = gameState.players.find(p => p.id === playerId)?.inventory || [];
+                const equipSlots = {
+                    '무기': inv.find(i => ['철검','마법 지팡이','단검 x2','오크의 도끼'].includes(i)) || '-',
+                    '보조': inv.find(i => ['가죽 방패','도둑 도구'].includes(i)) || '-',
+                    '소모품': inv.filter(i => ['마나 포션','치유 약초','마나 결정','약초'].includes(i)).join(', ') || '-',
+                };
+                el.innerHTML = Object.entries(equipSlots).map(([slot, item]) => {
+                    const info = itemInfo[item] || { desc: item, stat: '' };
+                    return `<div class="detail-item"><span class="item-name">${slot}: ${item}</span>${info.stat ? '<span class="item-stat">' + info.stat + '</span>' : ''}<div class="tooltip">${info.desc || item}</div></div>`;
+                }).join('');
             }
         }
 
@@ -626,6 +737,41 @@
             }
         }
 
+        // Tooltip: show/hide on mouse move using event delegation
+        document.addEventListener('mouseover', function(e) {
+            const item = e.target.closest('.detail-item');
+            if (!item) return;
+            const tip = item.querySelector('.tooltip');
+            if (tip) tip.style.display = 'block';
+        });
+        document.addEventListener('mouseout', function(e) {
+            const item = e.target.closest('.detail-item');
+            if (!item) return;
+            const tip = item.querySelector('.tooltip');
+            if (tip) tip.style.display = 'none';
+        });
+        document.addEventListener('mousemove', function(e) {
+            const item = e.target.closest('.detail-item');
+            if (!item) return;
+            const tip = item.querySelector('.tooltip');
+            if (!tip || tip.style.display !== 'block') return;
+            const tipRect = tip.getBoundingClientRect();
+            const tipW = tipRect.width || 200;
+            const tipH = tipRect.height || 40;
+            let x = e.clientX + 15;
+            let y = e.clientY + 15;
+            // Prevent overflow right
+            if (x + tipW > window.innerWidth - 5) x = e.clientX - tipW - 10;
+            // Prevent overflow bottom
+            if (y + tipH > window.innerHeight - 5) y = e.clientY - tipH - 10;
+            // Prevent overflow top/left
+            if (y < 5) y = 5;
+            if (x < 5) x = 5;
+            tip.style.left = x + 'px';
+            tip.style.top = y + 'px';
+        });
+
+        loadRules();
         updateGameState();
         setInterval(updateGameState, 2000);
     </script>

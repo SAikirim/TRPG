@@ -228,6 +228,14 @@ def toggle_illustration():
     return jsonify({"sd_illustration": session["sd_illustration"]})
 
 
+@app.route("/api/rules", methods=["GET"])
+def get_rules():
+    rules_path = os.path.join(BASE_DIR, "rules.json")
+    with open(rules_path, "r", encoding="utf-8") as f:
+        rules = json.load(f)
+    return jsonify(rules)
+
+
 @app.route("/api/reset-game", methods=["POST"])
 def reset_game():
     initial_path = os.path.join(BASE_DIR, "game_state_initial.json")

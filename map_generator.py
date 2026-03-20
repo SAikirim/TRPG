@@ -121,8 +121,8 @@ class MapGenerator:
         self.generate_pixel_backgrounds()
         return out_path
 
-    def generate_portraits(self):
-        """Generate high-quality Cairo portraits for all players."""
+    def generate_portraits(self, force=False):
+        """Generate high-quality Cairo portraits for all players. Skip if file already exists (e.g. Gemini crop)."""
         state = self.load_game_state()
         portrait_dir = os.path.join(self.base_dir, "static", "portraits", "pixel")
         os.makedirs(portrait_dir, exist_ok=True)
@@ -153,6 +153,10 @@ class MapGenerator:
 
         SIZE = 200
         for player in state.get("players", []):
+            filepath = os.path.join(portrait_dir, f"player_{player['id']}.png")
+            if not force and os.path.exists(filepath):
+                continue  # Skip if portrait already exists (e.g. Gemini crop)
+
             config = class_configs.get(player["class"], class_configs["전사"])
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, SIZE, SIZE)
             ctx = cairo.Context(surface)
