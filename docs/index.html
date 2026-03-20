@@ -530,11 +530,12 @@
             const chapterBgs = {
                 1: 'static/illustrations/sd/ch1_forest.png',
                 2: 'static/illustrations/sd/ch2_dungeon.png',
-                3: 'static/illustrations/sd/ch3_treasure.png'
+                3: 'static/illustrations/sd/ch3_treasure.png',
+                4: 'static/illustrations/sd/background_village_night.webp'
             };
             const bg = chapterBgs[chapter];
             if (bg) {
-                panel.innerHTML = `<img class="bg-layer" src="${bg}" alt="Chapter ${chapter}">`;
+                panel.innerHTML = `<img class="bg-layer" src="${bg}" alt="Chapter ${chapter}" onerror="this.parentElement.innerHTML='<div class=\\'illustration-placeholder\\'>이미지 로드 실패</div>'">`;
             } else {
                 panel.innerHTML = '<div class="illustration-placeholder">일러스트 없음</div>';
             }
