@@ -36,13 +36,14 @@
   },
   "history": {
     "actions_taken": [
-      {"turn": 3, "action": "습격", "target": "어두운 오크", "roll": "자동명중(은신)", "damage": 14, "result": "처치"}
+      {"turn": 3, "action": "습격", "target": "어두운 오크", "roll": "자동명중(은신)", "damage": 14, "result": "처치"},
+      {"turn": 7, "action": "함정 해제", "target": "보물 상자 독 가스 함정", "roll": "성공", "damage": 0, "result": "함정 해제 완료"}
     ],
     "damage_dealt_total": 14,
     "damage_received_total": 0,
     "kills": ["어두운 오크"],
     "items_used": [],
-    "turns_played": 1
+    "turns_played": 2
   },
   "conditions": {
     "alive": true,

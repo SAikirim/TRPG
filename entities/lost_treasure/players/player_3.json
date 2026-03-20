@@ -23,7 +23,7 @@
   },
   "position": [14, 11],
   "status_effects": [],
-  "inventory": ["가죽 방패", "오크의 도끼"],
+  "inventory": ["가죽 방패", "오크의 도끼", "황금 100개"],
   "equipment": {
     "weapon": "오크의 도끼",
     "armor": "가죽 방패"

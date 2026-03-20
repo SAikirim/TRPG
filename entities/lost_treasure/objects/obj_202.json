@@ -4,7 +4,7 @@
   "type": "treasure_chest",
   "position": [16, 12],
   "area": "treasure",
-  "status": "locked",
+  "status": "opened",
   "hidden": false,
   "description": "황금빛으로 빛나는 거대한 보물 상자. 열면 무언가 일어날 것 같다.",
   "interaction": {
@@ -37,10 +37,11 @@
   "contents": ["전설의 보물", "황금 100개"],
   "memory": {
     "discovered": false,
-    "trap_checked": false,
-    "trap_disarmed": false,
-    "opened": false,
-    "opened_by": null,
+    "trap_checked": true,
+    "trap_disarmed": true,
+    "disarmed_by": "루체나",
+    "opened": true,
+    "opened_by": "사이키",
     "guardian_spawned": false,
     "guardian_defeated": false
   },
