@@ -4,7 +4,7 @@
   "type": "puzzle",
   "position": [7, 8],
   "area": "dungeon",
-  "status": "unsolved",
+  "status": "solved",
   "hidden": false,
   "description": "벽에 새겨진 고대 문자. 해독하면 숨겨진 통로를 발견할 수 있다.",
   "interaction": {
@@ -22,11 +22,13 @@
   },
   "riddle_text": "힘으로 열 수 없는 문, 지혜로 열 수 없는 문, 오직 용기만이 여는 문.",
   "memory": {
-    "examined": false,
-    "examined_by": [],
-    "solved": false,
-    "solved_by": null,
-    "attempts": []
+    "examined": true,
+    "examined_by": ["사이키"],
+    "solved": true,
+    "solved_by": "사이키",
+    "attempts": [
+      {"turn": 5, "player": "사이키", "roll": 23, "dc": 14, "result": "success"}
+    ]
   },
   "scenario_event_id": "ch2_riddle"
 }
