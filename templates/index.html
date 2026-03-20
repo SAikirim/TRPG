@@ -114,6 +114,58 @@
             color: #aaa;
         }
         .stats span { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; }
+        /* Collapsible details */
+        .detail-toggle {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .detail-toggle button {
+            flex: 1;
+            background: #1a1a2e;
+            border: 1px solid #333;
+            color: #aaa;
+            font-size: 0.7em;
+            padding: 3px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .detail-toggle button:hover,
+        .detail-toggle button.active {
+            background: #0f3460;
+            color: #ffd700;
+            border-color: #ffd700;
+        }
+        .detail-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-top: 0;
+        }
+        .detail-content.open {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 6px;
+        }
+        .detail-content ul {
+            list-style: none;
+            font-size: 0.75em;
+            color: #ccc;
+        }
+        .detail-content li {
+            padding: 2px 6px;
+            border-bottom: 1px solid #1a1a2e;
+        }
+        .detail-content li:last-child { border-bottom: none; }
+        .detail-content .equip-tag {
+            color: #ffd700;
+            font-size: 0.9em;
+            margin-left: 4px;
+        }
+        .detail-content .skill-item {
+            color: #74b9ff;
+        }
         .player-portrait {
             width: 125px;
             height: 125px;
@@ -358,6 +410,9 @@
             }
         }
 
+        // Cache for player detail data (from entity files)
+        const playerDetailCache = {};
+
         function updatePlayersList() {
             const container = document.getElementById('players-list');
             const classMap = { '전사': 'warrior', '마법사': 'mage', '도적': 'rogue' };
@@ -368,6 +423,7 @@
                 const effects = p.status_effects.length > 0
                     ? `<div style="font-size:0.75em;color:#ffd700;margin-top:4px">상태: ${p.status_effects.join(', ')}</div>`
                     : '';
+                const invItems = (p.inventory || []).map(item => `<li>${item}</li>`).join('');
                 return `
                 <div class="player-card">
                     <img class="player-portrait" src="/static/portraits/pixel/player_${p.id}.png" alt="${p.name}" onerror="this.src='/static/portraits/pixel/player_${p.id}.png'">
@@ -392,9 +448,67 @@
                         <span>CON ${p.stats.CON}</span>
                     </div>
                     ${effects}
+                    <div class="detail-toggle">
+                        <button onclick="toggleDetail(${p.id}, 'inv', this)">소지품 (${(p.inventory||[]).length})</button>
+                        <button onclick="toggleDetail(${p.id}, 'skill', this)">스킬</button>
+                        <button onclick="toggleDetail(${p.id}, 'equip', this)">장비</button>
+                    </div>
+                    <div id="detail-inv-${p.id}" class="detail-content">
+                        <ul>${invItems || '<li style="color:#666">없음</li>'}</ul>
+                    </div>
+                    <div id="detail-skill-${p.id}" class="detail-content">
+                        <ul><li style="color:#666">로딩 중...</li></ul>
+                    </div>
+                    <div id="detail-equip-${p.id}" class="detail-content">
+                        <ul><li style="color:#666">로딩 중...</li></ul>
+                    </div>
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        async function toggleDetail(playerId, type, btn) {
+            const el = document.getElementById(`detail-${type}-${playerId}`);
+            const isOpen = el.classList.contains('open');
+
+            // Close all details for this player
+            ['inv', 'skill', 'equip'].forEach(t => {
+                const d = document.getElementById(`detail-${t}-${playerId}`);
+                if (d) d.classList.remove('open');
+            });
+            // Deactivate all buttons in same toggle group
+            btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+
+            if (isOpen) return; // Was open, now closed
+
+            el.classList.add('open');
+            btn.classList.add('active');
+
+            // Lazy load skill/equip from entity API
+            if ((type === 'skill' || type === 'equip') && !playerDetailCache[playerId]) {
+                try {
+                    const res = await fetch(`/api/player-stats/${playerId}`);
+                    playerDetailCache[playerId] = await res.json();
+                } catch(e) {
+                    playerDetailCache[playerId] = {};
+                }
+            }
+
+            if (type === 'skill' && playerDetailCache[playerId]) {
+                const skills = playerDetailCache[playerId].available_actions || [];
+                el.innerHTML = skills.length
+                    ? '<ul>' + skills.map(s => `<li class="skill-item">${s}</li>`).join('') + '</ul>'
+                    : '<ul><li style="color:#666">없음</li></ul>';
+            }
+            if (type === 'equip' && playerDetailCache[playerId]) {
+                const eq = playerDetailCache[playerId].equipment || {};
+                const items = Object.entries(eq)
+                    .filter(([k,v]) => v)
+                    .map(([k,v]) => `<li>${k === 'weapon' ? '무기' : k === 'armor' ? '방어구' : k}: ${v}</li>`);
+                el.innerHTML = items.length
+                    ? '<ul>' + items.join('') + '</ul>'
+                    : '<ul><li style="color:#666">없음</li></ul>';
+            }
         }
 
         function updateEventsList() {

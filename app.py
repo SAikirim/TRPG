@@ -89,7 +89,16 @@ def player_stats(player_id):
     state = load_game_state()
     for p in state["players"]:
         if p["id"] == player_id:
-            return jsonify(p)
+            result = dict(p)
+            # Merge entity file data (equipment, available_actions)
+            scenario_id = state.get("game_info", {}).get("scenario_id", "")
+            entity_path = os.path.join(BASE_DIR, "entities", scenario_id, "players", f"player_{player_id}.json")
+            if os.path.exists(entity_path):
+                with open(entity_path, "r", encoding="utf-8") as f:
+                    entity = json.load(f)
+                result.setdefault("equipment", entity.get("equipment"))
+                result.setdefault("available_actions", entity.get("available_actions"))
+            return jsonify(result)
     return jsonify({"error": "Player not found"}), 404
 
 
