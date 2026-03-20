@@ -267,6 +267,41 @@ saves/                    - 세이브 데이터
 - WebP 직접 출력 지원: `format: ["WEBP"]`
 - 8GB VRAM에서 8~12프레임 생성 가능
 
+### 시나리오 사전 생성 이미지
+
+시나리오 시작 전 주요 장면의 이미지를 SD로 미리 생성하여 `static/illustrations/sd/`에 저장한다.
+게임 중 실시간 생성 대기 없이 즉시 표시 가능.
+
+#### 사전 생성 대상
+| 분류 | 파일명 규칙 | 크기 | 예시 |
+|------|-----------|------|------|
+| 챕터 배경 | `ch{N}_{type}.png` | 768x512 | `ch1_forest.png`, `ch2_dungeon.png` |
+| NPC/몬스터 | `npc_{name}.png` | 384x512 | `npc_orc.png`, `npc_slime.png` |
+| 오브젝트 | `obj_{name}.png` | 256x256 | `obj_treasure_chest.png` |
+
+#### 기본 배경 자동 표시
+- 웹 UI는 현재 챕터에 맞는 배경을 자동 표시한다
+- 우선순위: GM 요청 장면 > SD 사전 생성 배경 > Cairo 폴백 배경
+- SD OFF 시에도 Cairo 배경이 항상 표시된다 (빈 화면 없음)
+- `app.py`의 `/api/illustration` 엔드포인트가 `default_bg` (sd/pixel 경로)를 제공
+
+#### 이미지 품질 관리
+- 생성 후 품질 확인 필수: 흐릿함(blurry), 초점 이탈(out of focus), 왜곡(deformed) 체크
+- 문제 있는 이미지는 프롬프트 개선 후 재생성
+- 프롬프트 개선 팁:
+  - 흐릿한 결과 → negative에 "blurry, out of focus, bokeh, depth of field" 추가
+  - 손/신체 왜곡 → negative에 "bad hands, bad anatomy, deformed, extra fingers" 추가
+  - 초점 안 맞음 → prompt에 "sharp focus, 4k" 추가
+  - 배경에 인물 포함됨 → negative에 "people, characters, person" 추가
+
+#### 새 시나리오 이미지 생성 절차
+1. scenario.json에서 챕터, NPC, 오브젝트 목록 추출
+2. 각 항목에 대한 영문 프롬프트 작성
+3. SD API로 순차 생성 (VRAM 제약으로 동시 생성 금지)
+4. 품질 확인 → 문제 시 프롬프트 개선 후 재생성
+5. `static/illustrations/sd/`에 저장
+6. git commit + push
+
 ---
 
 ## SD WebUI 환경

@@ -186,6 +186,18 @@ def gm_update():
 def get_illustration():
     state = get_scene_state()
     state["enabled"] = is_sd_enabled()
+
+    # Add default background based on current chapter
+    game = load_game_state()
+    chapter = game.get("game_info", {}).get("current_chapter", 1)
+    chapter_bg_map = {
+        1: {"sd": "/static/illustrations/sd/ch1_forest.png", "pixel": "/static/illustrations/pixel/forest.png"},
+        2: {"sd": "/static/illustrations/sd/ch2_dungeon.png", "pixel": "/static/illustrations/pixel/dungeon.png"},
+        3: {"sd": "/static/illustrations/sd/ch3_treasure.png", "pixel": "/static/illustrations/pixel/treasure.png"},
+    }
+    state["default_bg"] = chapter_bg_map.get(chapter, chapter_bg_map[1])
+    state["current_chapter"] = chapter
+
     return jsonify(state)
 
 

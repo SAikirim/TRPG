@@ -115,8 +115,8 @@
         }
         .stats span { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; }
         .player-portrait {
-            width: 140px;
-            height: 140px;
+            width: 125px;
+            height: 125px;
             border-radius: 8px;
             border: 2px solid #333;
             object-fit: cover;
@@ -432,7 +432,9 @@
                 const sceneHash = JSON.stringify({
                     bg: data.background,
                     layers: data.layers,
-                    status: data.generating?.status
+                    status: data.generating?.status,
+                    default_bg: data.default_bg,
+                    enabled: data.enabled
                 });
 
                 if (sceneHash === lastSceneHash) return;
@@ -442,7 +444,11 @@
                 const hasContent = data.background || (data.layers && data.layers.length > 0);
 
                 if (!data.enabled) {
-                    panel.innerHTML = '<div class="illustration-placeholder">SD 비활성</div>';
+                    if (data.default_bg) {
+                        panel.innerHTML = '<img class="bg-layer" src="' + data.default_bg.pixel + '?t=default" alt="Background">';
+                    } else {
+                        panel.innerHTML = '<div class="illustration-placeholder">SD 비활성</div>';
+                    }
                     return;
                 }
 
@@ -453,6 +459,11 @@
                         errorDiv.textContent = '오류: ' + generating.error;
                         panel.innerHTML = '';
                         panel.appendChild(errorDiv);
+                    } else if (data.default_bg) {
+                        // Show default chapter background
+                        const bgSrc = data.enabled ? data.default_bg.sd : data.default_bg.pixel;
+                        const fallbackSrc = data.default_bg.pixel;
+                        panel.innerHTML = '<img class="bg-layer" src="' + bgSrc + '?t=default" alt="Background" onerror="this.src=\'' + fallbackSrc + '?t=default\'">';
                     } else {
                         panel.innerHTML = '<div class="illustration-placeholder">대기 중...</div>';
                     }
