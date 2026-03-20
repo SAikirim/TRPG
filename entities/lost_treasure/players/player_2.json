@@ -14,14 +14,14 @@
   "stats": {
     "hp": 22,
     "max_hp": 22,
-    "mp": 10,
+    "mp": 8,
     "max_mp": 10,
     "STR": 8,
     "DEX": 18,
     "INT": 10,
     "CON": 14
   },
-  "position": [2, 4],
+  "position": [4, 10],
   "status_effects": [],
   "inventory": ["단검 x2", "도둑 도구"],
   "equipment": {
@@ -35,12 +35,14 @@
     "next_turn_penalty": 0
   },
   "history": {
-    "actions_taken": [],
-    "damage_dealt_total": 0,
+    "actions_taken": [
+      {"turn": 3, "action": "습격", "target": "어두운 오크", "roll": "자동명중(은신)", "damage": 14, "result": "처치"}
+    ],
+    "damage_dealt_total": 14,
     "damage_received_total": 0,
-    "kills": [],
+    "kills": ["어두운 오크"],
     "items_used": [],
-    "turns_played": 0
+    "turns_played": 1
   },
   "conditions": {
     "alive": true,

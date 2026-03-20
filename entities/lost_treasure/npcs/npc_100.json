@@ -10,14 +10,14 @@
     "motivation": "던전 영역 수호"
   },
   "stats": {
-    "hp": 25,
+    "hp": 0,
     "max_hp": 25,
     "attack": 8,
     "defense": 4,
     "speed": 6
   },
   "position": [5, 10],
-  "status": "idle",
+  "status": "dead",
   "status_effects": [],
   "threat_level": "high",
   "combat": {
@@ -38,13 +38,14 @@
     "flee_behavior": "HP가 5 이하이면 도주 시도"
   },
   "memory": {
-    "encountered_players": [],
+    "encountered_players": ["사이키", "루체나", "노을"],
     "last_action": null,
-    "damage_taken_from": {},
+    "damage_taken_from": {"사이키": 14, "루체나": 14},
     "turns_in_combat": 0,
+    "cause_of_death": "기습 라운드에서 사이키 파이어볼(크리티컬 14뎀) + 루체나 습격(14뎀)으로 행동 전 사망",
     "dialogue_history": []
   },
-  "current_goal": "던전 통로를 지키며 대기 중",
+  "current_goal": "사망",
   "area": "dungeon",
   "loot": ["오크의 도끼", "낡은 동전 주머니"]
 }

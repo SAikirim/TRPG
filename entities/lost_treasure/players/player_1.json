@@ -14,14 +14,14 @@
   "stats": {
     "hp": 15,
     "max_hp": 15,
-    "mp": 30,
+    "mp": 26,
     "max_mp": 30,
     "STR": 8,
     "DEX": 14,
     "INT": 18,
     "CON": 10
   },
-  "position": [2, 3],
+  "position": [3, 9],
   "status_effects": [],
   "inventory": ["마법 지팡이", "마나 포션"],
   "equipment": {
@@ -35,12 +35,14 @@
     "next_turn_penalty": 0
   },
   "history": {
-    "actions_taken": [],
-    "damage_dealt_total": 0,
+    "actions_taken": [
+      {"turn": 3, "action": "파이어볼", "target": "어두운 오크", "roll": "nat20 크리티컬", "damage": 14, "result": "명중"}
+    ],
+    "damage_dealt_total": 14,
     "damage_received_total": 0,
     "kills": [],
     "items_used": [],
-    "turns_played": 0
+    "turns_played": 1
   },
   "conditions": {
     "alive": true,

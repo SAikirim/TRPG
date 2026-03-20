@@ -6,8 +6,8 @@
     "ruleset": "fantasy_basic",
     "difficulty": "normal",
     "stat_pool": 50,
-    "status": "character_creation_complete",
-    "current_chapter": 1
+    "status": "in_progress",
+    "current_chapter": 2
   },
   "players": [
     {
@@ -16,7 +16,7 @@
       "class": "마법사",
       "hp": 15,
       "max_hp": 15,
-      "mp": 30,
+      "mp": 26,
       "max_mp": 30,
       "stats": {
         "STR": 8,
@@ -24,7 +24,7 @@
         "INT": 18,
         "CON": 10
       },
-      "position": [2, 3],
+      "position": [3, 9],
       "status_effects": [],
       "inventory": ["마법 지팡이", "마나 포션"],
       "controlled_by": "user"
@@ -35,7 +35,7 @@
       "class": "도적",
       "hp": 22,
       "max_hp": 22,
-      "mp": 10,
+      "mp": 8,
       "max_mp": 10,
       "stats": {
         "STR": 8,
@@ -43,7 +43,7 @@
         "INT": 10,
         "CON": 14
       },
-      "position": [2, 4],
+      "position": [4, 10],
       "status_effects": [],
       "inventory": ["단검 x2", "도둑 도구"],
       "controlled_by": "agent"
@@ -62,7 +62,7 @@
         "INT": 8,
         "CON": 14
       },
-      "position": [3, 3],
+      "position": [6, 10],
       "status_effects": [],
       "inventory": ["철검", "가죽 방패"],
       "controlled_by": "agent"
@@ -73,13 +73,13 @@
       "id": 100,
       "name": "어두운 오크",
       "type": "monster",
-      "hp": 25,
+      "hp": 0,
       "max_hp": 25,
       "attack": 8,
       "defense": 4,
       "position": [5, 10],
       "threat_level": "high",
-      "status": "idle"
+      "status": "dead"
     },
     {
       "id": 101,
@@ -116,12 +116,27 @@
       }
     ]
   },
-  "turn_count": 0,
+  "turn_count": 3,
   "events": [
     {
       "turn": 0,
       "message": "캐릭터 생성 완료. 사이키(마법사), 루체나(도적), 노을(전사)이 모험을 준비한다.",
       "timestamp": "게임 준비"
+    },
+    {
+      "turn": 1,
+      "message": "챕터 1 완료. 숲의 입구를 지나 고대 던전에 진입했다.",
+      "timestamp": "챕터 전환"
+    },
+    {
+      "turn": 2,
+      "message": "어두운 오크 발견. 루체나가 은신 성공. 사이키가 파이어볼 기습 선언.",
+      "timestamp": "전투 준비"
+    },
+    {
+      "turn": 3,
+      "message": "기습 라운드: 사이키 파이어볼 크리티컬(14뎀) → 루체나 습격(14뎀) → 어두운 오크 처치! 노을은 헛스윙. 슬라임은 인지 실패(1)로 비활성 유지.",
+      "timestamp": "오크전 종료"
     }
   ]
 }
