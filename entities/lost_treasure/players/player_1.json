@@ -23,7 +23,7 @@
   },
   "position": [3, 9],
   "status_effects": [],
-  "inventory": ["마법 지팡이", "마나 포션"],
+  "inventory": ["마법 지팡이", "마나 포션", "마나 결정", "슬라임 젤리"],
   "equipment": {
     "weapon": "마법 지팡이",
     "armor": null

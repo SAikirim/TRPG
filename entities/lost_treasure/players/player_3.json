@@ -23,9 +23,9 @@
   },
   "position": [6, 10],
   "status_effects": [],
-  "inventory": ["철검", "가죽 방패"],
+  "inventory": ["가죽 방패", "오크의 도끼"],
   "equipment": {
-    "weapon": "철검",
+    "weapon": "오크의 도끼",
     "armor": "가죽 방패"
   },
   "available_actions": ["공격", "방어"],
