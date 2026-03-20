@@ -85,13 +85,13 @@
       "id": 101,
       "name": "마법사 슬라임",
       "type": "monster",
-      "hp": 15,
+      "hp": 0,
       "max_hp": 15,
       "attack": 5,
       "defense": 2,
       "position": [10, 10],
       "threat_level": "medium",
-      "status": "idle"
+      "status": "dead"
     }
   ],
   "map": {
@@ -116,7 +116,7 @@
       }
     ]
   },
-  "turn_count": 3,
+  "turn_count": 4,
   "events": [
     {
       "turn": 0,
@@ -137,6 +137,12 @@
       "turn": 3,
       "message": "기습 라운드: 사이키 파이어볼 크리티컬(14뎀) → 루체나 습격(14뎀) → 어두운 오크 처치! 노을은 헛스윙. 슬라임은 인지 실패(1)로 비활성 유지.",
       "timestamp": "오크전 종료"
+    },
+    {
+      "turn": 4,
+      "message": "루체나 습격(15 vs AC12) 12뎀 + 노을 공격(13 vs AC12) 8뎀 → 마법사 슬라임 처치! 완전 기습 성공.",
+      "narrative": "사이키의 빛이 슬라임을 드러내고, 루체나의 단검과 노을의 철검이 동시에 꽂혔다. 슬라임은 한 번의 반격도 없이 녹아내렸다.",
+      "timestamp": "턴4"
     }
   ]
 }

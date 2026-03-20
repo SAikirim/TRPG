@@ -10,7 +10,7 @@
     "motivation": "마나가 풍부한 장소에서 서식"
   },
   "stats": {
-    "hp": 15,
+    "hp": 0,
     "max_hp": 15,
     "attack": 5,
     "defense": 2,
@@ -19,7 +19,7 @@
     "max_mp": 12
   },
   "position": [10, 10],
-  "status": "idle",
+  "status": "dead",
   "status_effects": [],
   "threat_level": "medium",
   "combat": {
