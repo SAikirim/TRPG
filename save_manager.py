@@ -168,6 +168,13 @@ class SaveManager:
         events = game_state.get("events", [])
         progress_notes = [e["message"] for e in events[-10:]]
 
+        # 기존 current_session.json에서 display_mode 보존
+        existing_display_mode = "mobile"
+        if os.path.exists(CURRENT_SESSION_PATH):
+            with open(CURRENT_SESSION_PATH, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+                existing_display_mode = existing.get("display_mode", "mobile")
+
         session = {
             "active_scenario": scenario_id,
             "active_save_slot": slot,
@@ -178,6 +185,7 @@ class SaveManager:
             "party_summary": party_summary,
             "progress_notes": progress_notes,
             "next_objective": "",
+            "display_mode": existing_display_mode,
             "last_updated": datetime.now().strftime("%Y-%m-%d"),
         }
 
