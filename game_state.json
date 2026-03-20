@@ -7,7 +7,7 @@
     "difficulty": "normal",
     "stat_pool": 50,
     "status": "in_progress",
-    "current_chapter": 2
+    "current_chapter": 3
   },
   "players": [
     {
@@ -24,7 +24,7 @@
         "INT": 18,
         "CON": 10
       },
-      "position": [3, 9],
+      "position": [14, 12],
       "status_effects": [],
       "inventory": ["마법 지팡이", "마나 포션", "마나 결정", "슬라임 젤리", "약초", "고대 열쇠"],
       "controlled_by": "user"
@@ -43,7 +43,7 @@
         "INT": 10,
         "CON": 14
       },
-      "position": [4, 10],
+      "position": [15, 11],
       "status_effects": [],
       "inventory": ["단검 x2", "도둑 도구", "밧줄"],
       "controlled_by": "agent"
@@ -62,7 +62,7 @@
         "INT": 8,
         "CON": 14
       },
-      "position": [6, 10],
+      "position": [14, 11],
       "status_effects": [],
       "inventory": ["가죽 방패", "오크의 도끼"],
       "controlled_by": "agent"
@@ -116,7 +116,7 @@
       }
     ]
   },
-  "turn_count": 5,
+  "turn_count": 6,
   "events": [
     {
       "turn": 0,
@@ -159,6 +159,12 @@
       "message": "사이키가 고대 비문을 해독했다. 비문 뒤 숨겨진 공간에서 고대 열쇠 획득.",
       "narrative": "사이키가 마지막 문자 아래 돌출부에 손을 얹자 딸깍 소리와 함께 비밀 공간이 열렸다. 먼지 쌓인 고대 열쇠가 모습을 드러낸다.",
       "timestamp": "턴5"
+    },
+    {
+      "turn": 6,
+      "message": "사이키가 고대 열쇠로 철문을 열었다. 파티가 보물실(챕터 3)에 진입했다.",
+      "narrative": "눈이 먼저 아팠다. 금빛이 쏟아졌다. 벽면 전체가 황금 장식으로 뒤덮인 거대한 방. 천장의 마법석들이 자체적으로 빛을 뿜고 있었다. 방 한가운데, 다른 무엇보다 강하게 빛나는 거대한 상자가 하나.",
+      "timestamp": "챕터3 진입"
     }
   ]
 }
