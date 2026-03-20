@@ -6,7 +6,8 @@
     "ruleset": "fantasy_basic",
     "difficulty": "normal",
     "stat_pool": 50,
-    "status": "in_progress",
+    "status": "completed",
+    "ending": "perfect",
     "current_chapter": 3
   },
   "players": [
@@ -24,7 +25,7 @@
         "INT": 18,
         "CON": 10
       },
-      "position": [14, 12],
+      "position": [2, 2],
       "status_effects": [],
       "inventory": ["마법 지팡이", "마나 포션", "마나 결정", "슬라임 젤리", "약초", "고대 열쇠", "전설의 보물"],
       "controlled_by": "user"
@@ -43,7 +44,7 @@
         "INT": 10,
         "CON": 14
       },
-      "position": [15, 11],
+      "position": [3, 2],
       "status_effects": [],
       "inventory": ["단검 x2", "도둑 도구", "밧줄"],
       "controlled_by": "agent"
@@ -62,7 +63,7 @@
         "INT": 8,
         "CON": 14
       },
-      "position": [14, 11],
+      "position": [2, 3],
       "status_effects": [],
       "inventory": ["가죽 방패", "오크의 도끼", "황금 100개"],
       "controlled_by": "agent"
@@ -116,7 +117,7 @@
       }
     ]
   },
-  "turn_count": 7,
+  "turn_count": 8,
   "events": [
     {
       "turn": 0,
@@ -176,6 +177,17 @@
       "message": "사이키가 고대 열쇠로 보물 상자를 열었다. 수호자 골렘은 깨어나지 않았다. 전설의 보물과 황금 100개를 획득!",
       "narrative": "뚜껑이 열리자 세 사람의 눈에 빛이 쏟아졌다. 황금 왕관, 금화 더미, 비단에 싸인 두루마리. 전설의 보물이 눈앞에 있었다.",
       "timestamp": "보물 획득"
+    },
+    {
+      "turn": 8,
+      "message": "던전이 붕괴하기 시작했다. 파티가 전력 질주하여 숲의 입구로 탈출에 성공했다.",
+      "narrative": "벽이 좁아지고 천장이 무너지는 와중에 세 사람은 서로를 잡아끌며 빛을 향해 달렸다. 돌문이 닫히기 직전, 숲의 햇살 속으로 뛰쳐나왔다.",
+      "timestamp": "던전 탈출"
+    },
+    {
+      "turn": 8,
+      "message": "🏆 엔딩: 완벽한 승리 — 세 명의 모험가 모두 살아서 전설의 보물을 가지고 마을로 돌아왔다.",
+      "timestamp": "게임 완료"
     }
   ]
 }

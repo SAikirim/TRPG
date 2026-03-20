@@ -3,16 +3,18 @@
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
   "branch": "claude/clarify-task-xApb3",
-  "turn": 6,
+  "turn": 8,
   "chapter": 3,
   "chapter_name": "보물실",
+  "status": "completed",
+  "ending": "perfect",
   "party_summary": [
     {
       "name": "사이키",
       "class": "마법사",
       "hp": "15/15",
-      "mp": "26/30",
-      "key_items": ["마법 지팡이", "마나 포션", "마나 결정", "슬라임 젤리", "약초", "고대 열쇠"]
+      "mp": "24/30",
+      "key_items": ["마법 지팡이", "마나 포션", "마나 결정", "슬라임 젤리", "약초", "고대 열쇠", "전설의 보물"]
     },
     {
       "name": "루체나",
@@ -26,17 +28,17 @@
       "class": "전사",
       "hp": "32/32",
       "mp": "5/5",
-      "key_items": ["오크의 도끼", "가죽 방패"]
+      "key_items": ["오크의 도끼", "가죽 방패", "황금 100개"]
     }
   ],
   "progress_notes": [
     "어두운 오크 처치 (턴 3), 마법사 슬라임 처치 (턴 4) — 던전 2구역 전멸",
     "고대 비문 [7,8] 해독 완료 (턴 5) → 고대 열쇠 획득",
-    "안전한 방 [8,8] 미사용 / 덩굴 함정 [5,3] 해제됨",
-    "보물 상자 [16,12] 잠김 — 고대 열쇠 보유 (골렘 미처치)",
-    "챕터 3 진입 (턴 6) — 고대 열쇠로 철문 개방"
+    "보물 상자 함정 해제 + 보물 획득 (턴 7) — 골렘 미소환",
+    "던전 탈출 성공 (턴 8) — 전원 생존",
+    "🏆 엔딩: 완벽한 승리"
   ],
-  "next_objective": "보물 상자 조사 — 함정 확인 필요",
+  "next_objective": "게임 완료",
   "display_mode": "mobile",
   "show_dice_result": false,
   "last_updated": "2026-03-20"
