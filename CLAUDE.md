@@ -391,13 +391,38 @@ python ascii_map.py    # 맵 + 파티 상태 + 이벤트 로그 출력
   ├── Agent [룰 심판]   → rulesets/{id}.json 판정, 주사위($RANDOM), 이니셔티브
   ├── Agent [시나리오]  → scenarios/{id}.json 챕터/이벤트/엔딩 분기
   ├── Agent [세계관]    → worldbuilding.json 지명/화폐/세력/NPC 관리
-  ├── Agent [NPC]       → entities/{scenario_id}/npcs/npc_{id}.json
+  ├── Agent [NPC:{name}] → entities/{scenario_id}/npcs/npc_{id}.json (NPC 1명당 Agent 1개)
   ├── Agent [플레이어]  → entities/{scenario_id}/players/player_{id}.json
   ├── Agent [오브젝트]  → entities/{scenario_id}/objects/obj_{id}.json
   └── Agent [웹 반영]   → gm-update API 호출 + 일러스트 생성
   ↓
 결과 종합 → 나레이션 + 맵 출력 + game_state.json 업데이트 + 저장(git push)
 ```
+
+### Agent 상태 표시 규칙
+
+**게임 외적 작업** (시스템 수정, 파일 편집 등):
+```
+[에이전트 ID: xxxxx]
+- 작업:
+- 대상:
+- 목적:
+```
+
+**게임 진행 중**:
+```
+[룰 심판] 🎲 판정 중...
+[시나리오] 📖 이벤트 확인 중...
+[세계관] 🌍 새 지명 등록 중...
+[NPC:루체나] 💬 대사 생성 중...
+[NPC:노을] 💬 대사 생성 중...
+[웹 반영] 🖼️ gm-update + 일러스트 생성 중...
+
+→ GM 나레이션 출력
+```
+- NPC는 1명당 Agent 1개 (예: `[NPC:루체나]`, `[NPC:노을]`, `[NPC:에르네스]`)
+- 각 Agent는 해당 NPC의 성격/기억/관계를 기반으로 독립적으로 대사/행동 결정
+- 동시에 여러 NPC Agent 병렬 실행 가능
 
 ### Agent [세계관] 상세
 - **관리 파일**: `worldbuilding.json`
