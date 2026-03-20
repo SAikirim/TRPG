@@ -390,17 +390,39 @@ python ascii_map.py    # 맵 + 파티 상태 + 이벤트 로그 출력
 메인 Claude = GM (나레이션/진행/유저 상호작용)
   ├── Agent [룰 심판]   → rulesets/{id}.json 판정, 주사위($RANDOM), 이니셔티브
   ├── Agent [시나리오]  → scenarios/{id}.json 챕터/이벤트/엔딩 분기
+  ├── Agent [세계관]    → worldbuilding.json 지명/화폐/세력/NPC 관리
   ├── Agent [NPC]       → entities/{scenario_id}/npcs/npc_{id}.json
   ├── Agent [플레이어]  → entities/{scenario_id}/players/player_{id}.json
-  └── Agent [오브젝트]  → entities/{scenario_id}/objects/obj_{id}.json
+  ├── Agent [오브젝트]  → entities/{scenario_id}/objects/obj_{id}.json
+  └── Agent [웹 반영]   → gm-update API 호출 + 일러스트 생성
   ↓
 결과 종합 → 나레이션 + 맵 출력 + game_state.json 업데이트 + 저장(git push)
 ```
+
+### Agent [세계관] 상세
+- **관리 파일**: `worldbuilding.json`
+- **자동 등록**: GM/시나리오 Agent가 새 지명, NPC, 세력, 아이템, 설정을 언급하면 worldbuilding.json에 자동 추가
+- **충돌 체크**: 기존 설정과 모순되는 내용이 나오면 GM에게 경고 (예: "카렌델은 북쪽"인데 "남쪽"이라고 하면 차단)
+- **조회 제공**: GM이 특정 지역/NPC 정보 필요 시 worldbuilding.json에서 조회하여 제공
+- **연결 관리**: 지역 간 거리, 세력 관계, NPC 소속 등 관계 데이터 자동 매핑
+- **시나리오 독립**: 시나리오가 바뀌어도 세계관 데이터는 유지됨
+- **호출 시점**:
+  - 시나리오 생성 시: 새 지명/NPC/세력 등록
+  - GM 나레이션 시: 새 설정이 언급되면 자동 감지 → 등록
+  - 세션 시작 시: worldbuilding.json 읽어 세계관 컨텍스트 복원
+
+### Agent [웹 반영] 상세
+- GM 나레이션 시 자동으로 gm-update API 호출 (백그라운드)
+- 장면에 맞는 illustration 요청 포함
+- HP/MP, 위치, 인벤토리 변경 사항 player_updates/npc_updates 포함
+- 장소 이동 시 배경 자동 교체
+- NPC 등장/퇴장 시 레이어 자동 추가/제거
 
 ### Agent 연속성 (파일 기반 메모리)
 Agent 툴은 일회성이므로 연속성은 JSON 파일로 유지:
 - 호출 시: JSON 읽어 컨텍스트 복원 → 판단/행동 → JSON 저장 → 결과 리턴
 - 시나리오별 격리: `entities/{scenario_id}/` 하위 관리
+- 세계관은 시나리오 독립: `worldbuilding.json`
 
 ---
 
@@ -409,11 +431,12 @@ Agent 툴은 일회성이므로 연속성은 JSON 파일로 유지:
 
 1. `CLAUDE.md` — 프로젝트 구조·규칙 확인
 2. `current_session.json` — 현재 활성 시나리오/세이브/진행 요약 (빠른 컨텍스트 복원)
-3. `game_state.json` — 턴/챕터/파티 HP·MP·위치·인벤토리·이벤트 로그
-4. `entities/{scenario_id}/players/` — 각 플레이어 상세 (히스토리, 장비, 컨디션)
-5. `entities/{scenario_id}/npcs/` — 생존/사망 NPC 상태
-6. `entities/{scenario_id}/objects/` — 퍼즐/함정/오브젝트 해결 여부
-7. `scenario.json` + `rules.json` — 현재 시나리오 챕터 구조 및 룰셋 확인
+3. `worldbuilding.json` — 세계관 설정 (지명, 화폐, 세력 — 시나리오 독립)
+4. `game_state.json` — 턴/챕터/파티 HP·MP·위치·인벤토리·이벤트 로그
+5. `entities/{scenario_id}/players/` — 각 플레이어 상세 (히스토리, 장비, 컨디션)
+6. `entities/{scenario_id}/npcs/` — 생존/사망 NPC 상태
+7. `entities/{scenario_id}/objects/` — 퍼즐/함정/오브젝트 해결 여부
+8. `scenario.json` + `rules.json` — 현재 시나리오 챕터 구조 및 룰셋 확인
 
 위 파일을 **모두 확인한 후** 유저에게 현재 상황 요약을 제시하고 게임을 이어간다.
 
