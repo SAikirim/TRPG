@@ -6,6 +6,7 @@ from datetime import datetime
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SAVES_DIR = os.path.join(BASE_DIR, "saves")
 GAME_STATE_PATH = os.path.join(BASE_DIR, "game_state.json")
+CURRENT_SESSION_PATH = os.path.join(BASE_DIR, "current_session.json")
 
 
 class SaveManager:
@@ -44,6 +45,9 @@ class SaveManager:
         # 진행 상황 요약도 별도 저장
         self._update_progress(scenario_id, save_data["save_info"])
 
+        # current_session.json 갱신
+        self._update_current_session(scenario_id, slot, game_state)
+
         return save_data["save_info"]
 
     def load_game(self, scenario_id, slot=1):
@@ -57,6 +61,9 @@ class SaveManager:
 
         with open(GAME_STATE_PATH, "w", encoding="utf-8") as f:
             json.dump(save_data["game_state"], f, ensure_ascii=False, indent=2)
+
+        # current_session.json도 로드한 게임에 맞게 갱신
+        self._update_current_session(scenario_id, slot, save_data["game_state"])
 
         return save_data["save_info"]
 
@@ -129,6 +136,53 @@ class SaveManager:
 
         with open(progress_file, "w", encoding="utf-8") as f:
             json.dump(progress, f, ensure_ascii=False, indent=2)
+
+    def _update_current_session(self, scenario_id, slot, game_state):
+        """current_session.json 갱신 — 현재 활성 게임의 빠른 컨텍스트 복원용"""
+        game_info = game_state.get("game_info", {})
+        chapter = game_info.get("current_chapter", self._detect_chapter(game_state))
+
+        # 챕터 이름 추정 (scenario.json이 있으면 거기서, 아니면 맵 locations에서)
+        chapter_name = ""
+        locations = game_state.get("map", {}).get("locations", [])
+        for loc in locations:
+            area = loc.get("area", {})
+            players = game_state.get("players", [])
+            if players:
+                px, py = players[0].get("position", [0, 0])
+                if area.get("x1", 0) <= px <= area.get("x2", 0) and area.get("y1", 0) <= py <= area.get("y2", 0):
+                    chapter_name = loc.get("name", "")
+                    break
+
+        party_summary = []
+        for p in game_state.get("players", []):
+            party_summary.append({
+                "name": p["name"],
+                "class": p["class"],
+                "hp": f"{p['hp']}/{p['max_hp']}",
+                "mp": f"{p['mp']}/{p['max_mp']}",
+                "key_items": p.get("inventory", []),
+            })
+
+        # 최근 이벤트에서 진행 노트 추출 (최근 10개)
+        events = game_state.get("events", [])
+        progress_notes = [e["message"] for e in events[-10:]]
+
+        session = {
+            "active_scenario": scenario_id,
+            "active_save_slot": slot,
+            "ruleset": game_info.get("ruleset", ""),
+            "turn": game_state.get("turn_count", 0),
+            "chapter": chapter,
+            "chapter_name": chapter_name,
+            "party_summary": party_summary,
+            "progress_notes": progress_notes,
+            "next_objective": "",
+            "last_updated": datetime.now().strftime("%Y-%m-%d"),
+        }
+
+        with open(CURRENT_SESSION_PATH, "w", encoding="utf-8") as f:
+            json.dump(session, f, ensure_ascii=False, indent=2)
 
     def _detect_chapter(self, game_state):
         """플레이어 위치 기반으로 현재 챕터 추정"""

@@ -35,12 +35,12 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 #### 저장 트리거 (아래 상황에서 반드시 즉시 저장)
 | 상황 | 저장 대상 파일 |
 |------|--------------|
-| 전투 종료 | game_state.json, entities/{id}/npcs/ |
-| 아이템 획득/분배/사용 | game_state.json, entities/{id}/players/ |
-| 함정/오브젝트 상호작용 | game_state.json, entities/{id}/objects/ |
-| 챕터 전환 | game_state.json 전체 |
-| 캐릭터 HP/MP 변동 | game_state.json, entities/{id}/players/ |
-| 퍼즐/이벤트 해결 | game_state.json, entities/{id}/objects/ |
+| 전투 종료 | game_state.json, current_session.json, entities/{id}/npcs/ |
+| 아이템 획득/분배/사용 | game_state.json, current_session.json, entities/{id}/players/ |
+| 함정/오브젝트 상호작용 | game_state.json, current_session.json, entities/{id}/objects/ |
+| 챕터 전환 | game_state.json, current_session.json 전체 |
+| 캐릭터 HP/MP 변동 | game_state.json, current_session.json, entities/{id}/players/ |
+| 퍼즐/이벤트 해결 | game_state.json, current_session.json, entities/{id}/objects/ |
 
 #### 이벤트 로그 기록 원칙
 - **모든 의미 있는 행동을 개별 이벤트로 기록** (여러 행동을 한 줄로 압축 금지)
@@ -66,6 +66,7 @@ app.py                    - Flask 웹 서버 (포트 5000)
 map_generator.py          - PIL 이미지 생성 (맵 + 배경 + 초상화)
 ascii_map.py              - CLI 터미널용 이모지 ASCII 맵 출력
 game_state.json           - 현재 게임 상태 (플레이어/NPC/맵/턴/이벤트)
+current_session.json      - 현재 활성 세션 요약 (시나리오/세이브/진행상황 — 세션 복원용)
 save_manager.py           - 세이브/로드 매니저
 rules.json                - 현재 활성 룰셋 (심볼릭 또는 복사본)
 scenario.json             - 현재 활성 시나리오 (심볼릭 또는 복사본)
@@ -201,14 +202,20 @@ Agent 툴은 일회성이므로 연속성은 JSON 파일로 유지:
 ## 세션 시작 시 필수 확인 (로드 절차)
 > **세션이 바뀔 때마다 반드시 아래 파일을 순서대로 읽고 컨텍스트를 복원한다.**
 
-1. `CLAUDE.md` — "현재 진행 중인 게임" 섹션으로 전체 상황 파악
-2. `game_state.json` — 턴/챕터/파티 HP·MP·위치·인벤토리·이벤트 로그
-3. `entities/{scenario_id}/players/` — 각 플레이어 상세 (히스토리, 장비, 컨디션)
-4. `entities/{scenario_id}/npcs/` — 생존/사망 NPC 상태
-5. `entities/{scenario_id}/objects/` — 퍼즐/함정/오브젝트 해결 여부
-6. `scenario.json` + `rules.json` — 현재 시나리오 챕터 구조 및 룰셋 확인
+1. `CLAUDE.md` — 프로젝트 구조·규칙 확인
+2. `current_session.json` — 현재 활성 시나리오/세이브/진행 요약 (빠른 컨텍스트 복원)
+3. `game_state.json` — 턴/챕터/파티 HP·MP·위치·인벤토리·이벤트 로그
+4. `entities/{scenario_id}/players/` — 각 플레이어 상세 (히스토리, 장비, 컨디션)
+5. `entities/{scenario_id}/npcs/` — 생존/사망 NPC 상태
+6. `entities/{scenario_id}/objects/` — 퍼즐/함정/오브젝트 해결 여부
+7. `scenario.json` + `rules.json` — 현재 시나리오 챕터 구조 및 룰셋 확인
 
 위 파일을 **모두 확인한 후** 유저에게 현재 상황 요약을 제시하고 게임을 이어간다.
+
+### current_session.json 갱신 규칙
+- **저장 트리거 발생 시** (전투 종료, 아이템 변동, 챕터 전환 등) `current_session.json`도 함께 갱신
+- 시나리오를 전환하면 `active_scenario`와 관련 필드를 모두 교체
+- 이 파일은 CLAUDE.md와 달리 **게임별 상태**만 담는다 (프로젝트 구조 정보 X)
 
 ---
 
@@ -231,20 +238,3 @@ python app.py          # 웹 UI: http://localhost:5000
 python ascii_map.py    # 터미널 맵 확인
 ```
 
----
-
-## 현재 진행 중인 게임
-> 세션이 바뀔 때마다 이 섹션을 업데이트한다.
-
-- **시나리오**: 잃어버린 보물의 숲 던전 (`lost_treasure`) — `fantasy_basic` 룰셋
-- **브랜치**: `claude/clarify-task-xApb3`
-- **턴 / 챕터**: 턴 5 / 챕터 2 (고대 던전)
-- **파티**:
-  - 사이키 (마법사, HP 15/15, MP 26/30) — 마법 지팡이·마나 포션·마나 결정·슬라임 젤리·약초·**고대 열쇠**
-  - 루체나 (도적, HP 22/22, MP 8/10) — 단검x2·도둑 도구·밧줄
-  - 노을 (전사, HP 32/32, MP 5/5) — 오크의 도끼·가죽 방패
-- **진행 상황**:
-  - 어두운 오크 처치 (턴 3), 마법사 슬라임 처치 (턴 4) — 던전 2구역 전멸
-  - 고대 비문 [7,8] **해독 완료** (턴 5) → 고대 열쇠 획득 / 안전한 방 [8,8] 미사용 / 덩굴 함정 [5,3] 해제됨
-  - 보물 상자 [16,12] 잠김 — **고대 열쇠 보유** (골렘 미처치)
-- **다음 목표**: 보물실(챕터 3) 진입 — 고대 열쇠로 철문 개방

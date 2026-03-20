@@ -1,0 +1,40 @@
+{
+  "active_scenario": "lost_treasure",
+  "active_save_slot": 1,
+  "ruleset": "fantasy_basic",
+  "branch": "claude/clarify-task-xApb3",
+  "turn": 5,
+  "chapter": 2,
+  "chapter_name": "고대 던전",
+  "party_summary": [
+    {
+      "name": "사이키",
+      "class": "마법사",
+      "hp": "15/15",
+      "mp": "26/30",
+      "key_items": ["마법 지팡이", "마나 포션", "마나 결정", "슬라임 젤리", "약초", "고대 열쇠"]
+    },
+    {
+      "name": "루체나",
+      "class": "도적",
+      "hp": "22/22",
+      "mp": "8/10",
+      "key_items": ["단검 x2", "도둑 도구", "밧줄"]
+    },
+    {
+      "name": "노을",
+      "class": "전사",
+      "hp": "32/32",
+      "mp": "5/5",
+      "key_items": ["오크의 도끼", "가죽 방패"]
+    }
+  ],
+  "progress_notes": [
+    "어두운 오크 처치 (턴 3), 마법사 슬라임 처치 (턴 4) — 던전 2구역 전멸",
+    "고대 비문 [7,8] 해독 완료 (턴 5) → 고대 열쇠 획득",
+    "안전한 방 [8,8] 미사용 / 덩굴 함정 [5,3] 해제됨",
+    "보물 상자 [16,12] 잠김 — 고대 열쇠 보유 (골렘 미처치)"
+  ],
+  "next_objective": "보물실(챕터 3) 진입 — 고대 열쇠로 철문 개방",
+  "last_updated": "2026-03-20"
+}
