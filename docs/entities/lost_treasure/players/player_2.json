@@ -17,7 +17,7 @@
     "mp": 12,
     "max_mp": 14,
     "STR": 8,
-    "DEX": 19,
+    "DEX": 20,
     "INT": 10,
     "CON": 15
   },
@@ -87,7 +87,7 @@
     "level": 3,
     "xp": 315,
     "xp_to_next": 600,
-    "stat_points_available": 1,
+    "stat_points_available": 0,
     "learned_skills": [
       "독 바르기"
     ],

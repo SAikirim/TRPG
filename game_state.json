@@ -19,12 +19,12 @@
       "xp": 315,
       "hp": 21,
       "max_hp": 21,
-      "mp": 36,
-      "max_mp": 40,
+      "mp": 37,
+      "max_mp": 41,
       "stats": {
         "STR": 8,
         "DEX": 16,
-        "INT": 18,
+        "INT": 19,
         "CON": 10
       },
       "position": [
@@ -59,7 +59,7 @@
       "max_mp": 14,
       "stats": {
         "STR": 8,
-        "DEX": 19,
+        "DEX": 20,
         "INT": 10,
         "CON": 15
       },
@@ -89,7 +89,7 @@
         "STR": 16,
         "DEX": 12,
         "INT": 8,
-        "CON": 16
+        "CON": 17
       },
       "position": [
         5,
