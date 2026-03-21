@@ -5,6 +5,16 @@ import cairo
 import math
 
 
+font_paths_global = [
+    "C:/Windows/Fonts/malgun.ttf",
+    "C:/Windows/Fonts/gulim.ttc",
+    "C:/Windows/Fonts/batang.ttc",
+    "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+    "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
+    "arial.ttf",
+]
+
+
 class MapGenerator:
     def __init__(self):
         self.tile_size = 40
@@ -44,10 +54,23 @@ class MapGenerator:
             map_h = state["map"]["height"]
             locations = state["map"]["locations"]
 
-        img_w = map_w * self.tile_size
-        img_h = map_h * self.tile_size
-        img = Image.new("RGB", (img_w, img_h), "#2d5a1e")
+        margin_left = 24   # 세로 좌표 표시 여백
+        margin_top = 18    # 가로 좌표 표시 여백
+        grid_w = map_w * self.tile_size
+        grid_h = map_h * self.tile_size
+        img_w = grid_w + margin_left
+        img_h = grid_h + margin_top
+        img = Image.new("RGB", (img_w, img_h), "#1a1a1a")
         draw = ImageDraw.Draw(img)
+
+        # 좌표 표시용 작은 폰트
+        coord_font = ImageFont.load_default()
+        for fp in font_paths_global:
+            try:
+                coord_font = ImageFont.truetype(fp, 10)
+                break
+            except (OSError, IOError):
+                continue
 
         # Draw location areas
         location_colors = {
@@ -58,33 +81,39 @@ class MapGenerator:
             "road": "#A0926B",
             "house": "#6B4226",
         }
+        # 배경 채우기 (그리드 영역)
+        draw.rectangle([margin_left, margin_top, img_w, img_h], fill="#2d5a1e")
+
         for loc in locations:
             area = loc["area"]
-            x1 = area["x1"] * self.tile_size
-            y1 = area["y1"] * self.tile_size
-            x2 = (area["x2"] + 1) * self.tile_size
-            y2 = (area["y2"] + 1) * self.tile_size
+            x1 = area["x1"] * self.tile_size + margin_left
+            y1 = area["y1"] * self.tile_size + margin_top
+            x2 = (area["x2"] + 1) * self.tile_size + margin_left
+            y2 = (area["y2"] + 1) * self.tile_size + margin_top
             color = location_colors.get(loc["type"], "#4a8c2a")
             draw.rectangle([x1, y1, x2, y2], fill=color)
 
-        # Draw grid
-        for x in range(0, img_w + 1, self.tile_size):
-            draw.line([(x, 0), (x, img_h)], fill="#1a1a1a", width=1)
-        for y in range(0, img_h + 1, self.tile_size):
-            draw.line([(0, y), (img_w, y)], fill="#1a1a1a", width=1)
+        # Draw grid + 좌표
+        for i in range(map_w + 1):
+            x = i * self.tile_size + margin_left
+            draw.line([(x, margin_top), (x, img_h)], fill="#1a1a1a", width=1)
+        for i in range(map_h + 1):
+            y = i * self.tile_size + margin_top
+            draw.line([(margin_left, y), (img_w, y)], fill="#1a1a1a", width=1)
+
+        # 가로 좌표 (상단)
+        for i in range(map_w):
+            x = i * self.tile_size + margin_left + self.tile_size // 2 - 4
+            draw.text((x, 2), str(i), fill="#888888", font=coord_font)
+
+        # 세로 좌표 (좌측)
+        for i in range(map_h):
+            y = i * self.tile_size + margin_top + self.tile_size // 2 - 6
+            draw.text((2, y), str(i), fill="#888888", font=coord_font)
 
         # Draw location labels
-        # CJK 지원 폰트 탐색
-        font_paths = [
-            "C:/Windows/Fonts/malgun.ttf",
-            "C:/Windows/Fonts/gulim.ttc",
-            "C:/Windows/Fonts/batang.ttc",
-            "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
-            "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
-            "arial.ttf",
-        ]
         font = font_small = ImageFont.load_default()
-        for fp in font_paths:
+        for fp in font_paths_global:
             try:
                 font = ImageFont.truetype(fp, 14)
                 font_small = ImageFont.truetype(fp, 11)
@@ -94,8 +123,8 @@ class MapGenerator:
 
         for loc in locations:
             area = loc["area"]
-            cx = ((area["x1"] + area["x2"]) / 2) * self.tile_size
-            cy = area["y1"] * self.tile_size + 5
+            cx = ((area["x1"] + area["x2"]) / 2) * self.tile_size + margin_left
+            cy = area["y1"] * self.tile_size + margin_top + 5
             draw.text((cx - 20, cy), loc["name"], fill="white", font=font_small)
 
         # Draw NPCs — different styles by type
@@ -111,8 +140,8 @@ class MapGenerator:
             if current_loc and npc_location and npc_location != current_loc:
                 continue
 
-            cx = px * self.tile_size + self.tile_size // 2
-            cy = py * self.tile_size + self.tile_size // 2
+            cx = px * self.tile_size + self.tile_size // 2 + margin_left
+            cy = py * self.tile_size + self.tile_size // 2 + margin_top
             npc_type = npc.get("type", "neutral")
 
             if npc_type == "monster":
@@ -148,8 +177,8 @@ class MapGenerator:
         }
         for player in state["players"]:
             px, py = player["position"]
-            cx = px * self.tile_size + self.tile_size // 2
-            cy = py * self.tile_size + self.tile_size // 2
+            cx = px * self.tile_size + self.tile_size // 2 + margin_left
+            cy = py * self.tile_size + self.tile_size // 2 + margin_top
             color = player_colors.get(player["class"], "white")
             r = 12
             draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
