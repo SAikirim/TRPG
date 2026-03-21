@@ -17,7 +17,7 @@ font_paths_global = [
 
 class MapGenerator:
     def __init__(self):
-        self.tile_size = 40
+        self.tile_size = 80
         self.map_width = 20
         self.map_height = 15
         self.img_width = self.map_width * self.tile_size
@@ -54,8 +54,8 @@ class MapGenerator:
             map_h = state["map"]["height"]
             locations = state["map"]["locations"]
 
-        margin_left = 24   # 세로 좌표 표시 여백
-        margin_top = 18    # 가로 좌표 표시 여백
+        margin_left = 36   # 세로 좌표 표시 여백
+        margin_top = 28    # 가로 좌표 표시 여백
         grid_w = map_w * self.tile_size
         grid_h = map_h * self.tile_size
         img_w = grid_w + margin_left
@@ -67,7 +67,7 @@ class MapGenerator:
         coord_font = ImageFont.load_default()
         for fp in font_paths_global:
             try:
-                coord_font = ImageFont.truetype(fp, 10)
+                coord_font = ImageFont.truetype(fp, 16)
                 break
             except (OSError, IOError):
                 continue
@@ -103,20 +103,20 @@ class MapGenerator:
 
         # 가로 좌표 (상단)
         for i in range(map_w):
-            x = i * self.tile_size + margin_left + self.tile_size // 2 - 4
-            draw.text((x, 2), str(i), fill="#888888", font=coord_font)
+            x = i * self.tile_size + margin_left + self.tile_size // 2 - 6
+            draw.text((x, 4), str(i), fill="#888888", font=coord_font)
 
         # 세로 좌표 (좌측)
         for i in range(map_h):
-            y = i * self.tile_size + margin_top + self.tile_size // 2 - 6
-            draw.text((2, y), str(i), fill="#888888", font=coord_font)
+            y = i * self.tile_size + margin_top + self.tile_size // 2 - 8
+            draw.text((4, y), str(i), fill="#888888", font=coord_font)
 
         # Draw location labels
         font = font_small = ImageFont.load_default()
         for fp in font_paths_global:
             try:
-                font = ImageFont.truetype(fp, 14)
-                font_small = ImageFont.truetype(fp, 11)
+                font = ImageFont.truetype(fp, 22)
+                font_small = ImageFont.truetype(fp, 16)
                 break
             except (OSError, IOError):
                 continue
@@ -145,28 +145,25 @@ class MapGenerator:
             npc_type = npc.get("type", "neutral")
 
             if npc_type == "monster":
-                # Purple triangle (existing style)
-                size = 14
+                size = 22
                 triangle = [
                     (cx, cy - size),
                     (cx - size, cy + size),
                     (cx + size, cy + size),
                 ]
-                draw.polygon(triangle, fill="#9b30ff", outline="white")
+                draw.polygon(triangle, fill="#9b30ff", outline="white", width=2)
                 label_color = "white"
             elif npc_type == "friendly":
-                # Yellow circle
-                r = 10
+                r = 18
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill="#f1c40f", outline="white", width=2)
                 label_color = "#f1c40f"
             else:
-                # Neutral — gray circle
-                r = 10
+                r = 18
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill="#95a5a6", outline="white", width=2)
                 label_color = "#95a5a6"
 
             draw.text(
-                (cx - 15, cy + 16), npc["name"][:4], fill=label_color, font=font_small
+                (cx - 20, cy + 24), npc["name"][:4], fill=label_color, font=font_small
             )
 
         # Draw players as circles
@@ -180,10 +177,10 @@ class MapGenerator:
             cx = px * self.tile_size + self.tile_size // 2 + margin_left
             cy = py * self.tile_size + self.tile_size // 2 + margin_top
             color = player_colors.get(player["class"], "white")
-            r = 12
-            draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
+            r = 22
+            draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=3)
             draw.text(
-                (cx - 8, cy + r + 2),
+                (cx - 16, cy + r + 4),
                 player["name"][:3],
                 fill="white",
                 font=font_small,
@@ -200,8 +197,8 @@ class MapGenerator:
         info_text = f"Turn: {turn}"
         if loc_name:
             info_text += f"  |  {loc_name}"
-        draw.rectangle([0, 0, max(250, len(info_text) * 10), 25], fill="#00000088")
-        draw.text((5, 5), info_text, fill="yellow", font=font)
+        draw.rectangle([0, 0, max(400, len(info_text) * 14), 35], fill="#00000088")
+        draw.text((8, 6), info_text, fill="yellow", font=font)
 
         return img
 
