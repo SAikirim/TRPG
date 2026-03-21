@@ -96,10 +96,10 @@ class MapGenerator:
         # Draw grid + 좌표
         for i in range(map_w + 1):
             x = i * self.tile_size + margin_left
-            draw.line([(x, margin_top), (x, img_h)], fill="#1a1a1a", width=1)
+            draw.line([(x, margin_top), (x, img_h)], fill="#1a1a1a", width=2)
         for i in range(map_h + 1):
             y = i * self.tile_size + margin_top
-            draw.line([(margin_left, y), (img_w, y)], fill="#1a1a1a", width=1)
+            draw.line([(margin_left, y), (img_w, y)], fill="#1a1a1a", width=2)
 
         # 가로 좌표 (상단)
         for i in range(map_w):
