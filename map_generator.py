@@ -115,8 +115,8 @@ class MapGenerator:
         font = font_small = ImageFont.load_default()
         for fp in font_paths_global:
             try:
-                font = ImageFont.truetype(fp, 22)
-                font_small = ImageFont.truetype(fp, 16)
+                font = ImageFont.truetype(fp, 24)
+                font_small = ImageFont.truetype(fp, 18)
                 break
             except (OSError, IOError):
                 continue
@@ -244,12 +244,86 @@ class MapGenerator:
 
     def save_map(self):
         img = self.generate_map()
-        out_path = os.path.join(self.base_dir, "static", "map.png")
-        os.makedirs(os.path.dirname(out_path), exist_ok=True)
-        img.save(out_path, "PNG")
+        out_dir = os.path.join(self.base_dir, "static")
+        os.makedirs(out_dir, exist_ok=True)
+
+        # 전체 맵 (확대용)
+        full_path = os.path.join(out_dir, "map.png")
+        img.save(full_path, "PNG")
+
+        # 플레이어 주변 크롭 (사이드바용)
+        self._save_mini_map(img)
+
         self.generate_portraits()
         self.generate_pixel_backgrounds()
-        return out_path
+        return full_path
+
+    def _save_mini_map(self, full_img):
+        """플레이어 중심으로 크롭한 미니맵 생성."""
+        state = self.load_game_state()
+        players = state.get("players", [])
+        if not players:
+            return
+
+        # 플레이어 중심 좌표 계산
+        positions = [p.get("position", [0, 0]) for p in players]
+        avg_x = sum(p[0] for p in positions) / len(positions)
+        avg_y = sum(p[1] for p in positions) / len(positions)
+
+        # 주변 반경 (타일 단위)
+        radius = 4
+        margin_left = 36
+        margin_top = 28
+
+        # 픽셀 좌표로 변환 (margin 포함)
+        center_px = int(avg_x * self.tile_size + self.tile_size // 2 + margin_left)
+        center_py = int(avg_y * self.tile_size + self.tile_size // 2 + margin_top)
+        crop_size = radius * self.tile_size * 2
+
+        left = max(0, center_px - crop_size // 2)
+        top = max(0, center_py - crop_size // 2)
+        right = min(full_img.width, left + crop_size)
+        bottom = min(full_img.height, top + crop_size)
+
+        # 크롭이 너무 작으면 조정
+        if right - left < crop_size:
+            left = max(0, right - crop_size)
+        if bottom - top < crop_size:
+            top = max(0, bottom - crop_size)
+
+        cropped = full_img.crop((left, top, right, bottom))
+
+        # 미니맵에 좌표 오버레이 추가
+        from PIL import ImageDraw, ImageFont
+        draw_mini = ImageDraw.Draw(cropped)
+        coord_font = ImageFont.load_default()
+        for fp in font_paths_global:
+            try:
+                coord_font = ImageFont.truetype(fp, 14)
+                break
+            except (OSError, IOError):
+                continue
+
+        # 크롭 영역의 타일 범위 계산
+        tile_start_x = max(0, int((left - margin_left) / self.tile_size))
+        tile_start_y = max(0, int((top - margin_top) / self.tile_size))
+        tile_end_x = min(15, tile_start_x + int(crop_size / self.tile_size) + 1)
+        tile_end_y = min(12, tile_start_y + int(crop_size / self.tile_size) + 1)
+
+        # 가로 좌표 (상단)
+        for i in range(tile_start_x, tile_end_x):
+            px = (i * self.tile_size + margin_left + self.tile_size // 2) - left - 4
+            if 0 <= px < cropped.width:
+                draw_mini.text((px, 2), str(i), fill="#cccccc", font=coord_font)
+
+        # 세로 좌표 (좌측)
+        for i in range(tile_start_y, tile_end_y):
+            py = (i * self.tile_size + margin_top + self.tile_size // 2) - top - 6
+            if 0 <= py < cropped.height:
+                draw_mini.text((2, py), str(i), fill="#cccccc", font=coord_font)
+
+        mini_path = os.path.join(self.base_dir, "static", "map_mini.png")
+        cropped.save(mini_path, "PNG")
 
     def generate_portraits(self, force=False):
         """Generate high-quality Cairo portraits for all players. Skip if file already exists (e.g. Gemini crop)."""

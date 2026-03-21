@@ -457,7 +457,7 @@
         <div class="sidebar">
             <div class="panel sidebar-map">
                 <h3>게임 맵</h3>
-                <img id="game-map" src="/static/map.png" alt="Game Map" onclick="openMapZoom()">
+                <img id="game-map" src="/static/map_mini.png" alt="Game Map" onclick="openMapZoom()">
                 <div id="map-legend" class="legend"></div>
             </div>
 
@@ -565,7 +565,7 @@
                 updatePlayersList();
                 updateEventsList();
                 updateLegend();
-                document.getElementById('game-map').src = '/static/map.png?t=' + Date.now();
+                document.getElementById('game-map').src = '/static/map_mini.png?t=' + Date.now();
             } catch (e) {
                 const connEl = document.getElementById('connection-status');
                 if (connEl) { connEl.textContent = '연결 끊김'; connEl.className = 'status-indicator'; }
