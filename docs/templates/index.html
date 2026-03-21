@@ -424,6 +424,65 @@
             border-right: 7px solid transparent;
             border-bottom: 12px solid #9b30ff;
         }
+        /* Settings panel */
+        .settings-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .settings-panel.open {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 8px;
+        }
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #1a1a2e;
+            font-size: 0.85em;
+        }
+        .settings-row:last-child { border-bottom: none; }
+        .settings-label { color: #ccc; }
+        .settings-toggle {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .settings-toggle.active {
+            background: #2ecc71;
+        }
+        .settings-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: left 0.2s;
+        }
+        .settings-toggle.active::after {
+            left: 22px;
+        }
+        .settings-select {
+            background: #1a1a2e;
+            color: #ccc;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.85em;
+        }
+        .settings-value {
+            color: #ffd700;
+            font-size: 0.85em;
+        }
     </style>
 </head>
 <body>
@@ -459,6 +518,33 @@
                 <h3>게임 맵</h3>
                 <img id="game-map" src="/static/map_mini.png" alt="Game Map" onclick="openMapZoom()">
                 <div id="map-legend" class="legend"></div>
+            </div>
+
+            <div class="panel">
+                <h3>
+                    <span onclick="toggleSettings()" style="cursor:pointer">&#9881;&#65039; 설정</span>
+                </h3>
+                <div id="settings-panel" class="settings-panel">
+                    <div class="settings-row">
+                        <span class="settings-label">SD 일러스트</span>
+                        <div id="setting-sd" class="settings-toggle" onclick="toggleSetting('sd_illustration')"></div>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">주사위 결과 공개</span>
+                        <div id="setting-dice" class="settings-toggle" onclick="toggleSetting('show_dice_result')"></div>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">표시 모드</span>
+                        <select id="setting-display" class="settings-select" onchange="changeSetting('display_mode', this.value)">
+                            <option value="mobile">Mobile</option>
+                            <option value="terminal">Terminal</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">난이도</span>
+                        <span id="setting-difficulty" class="settings-value">normal</span>
+                    </div>
+                </div>
             </div>
 
             <div class="panel">
@@ -789,12 +875,15 @@
                     html += `<div class="legend-item"><div class="legend-dot" style="background:${color}"></div> ${loc.name.split(' ')[0]}</div>`;
                 }
             });
-            // NPC type별 범례 (alive만)
-            const aliveNpcs = (gameState.npcs || []).filter(n => n.status !== 'dead' && n.status !== 'fled');
+            // NPC type별 범례 (fled 제외)
+            const visibleNpcs = (gameState.npcs || []).filter(n => n.status !== 'fled');
+            const aliveNpcs = visibleNpcs.filter(n => n.status !== 'dead');
+            const deadNpcs = visibleNpcs.filter(n => n.status === 'dead');
             const npcTypes = new Set(aliveNpcs.map(n => n.type));
             if (npcTypes.has('monster')) html += '<div class="legend-item"><div class="legend-dot" style="background:#9b30ff"></div> 몬스터</div>';
             if (npcTypes.has('friendly')) html += '<div class="legend-item"><div class="legend-dot" style="background:#f1c40f"></div> NPC</div>';
             if (npcTypes.has('neutral')) html += '<div class="legend-item"><div class="legend-dot" style="background:#95a5a6"></div> 중립</div>';
+            if (deadNpcs.length > 0) html += '<div class="legend-item"><div class="legend-dot" style="background:#555"></div> 시체</div>';
             container.innerHTML = html;
         }
 
@@ -933,7 +1022,57 @@
             tip.style.top = y + 'px';
         });
 
+        function toggleSettings() {
+            document.getElementById('settings-panel').classList.toggle('open');
+        }
+
+        async function loadSettings() {
+            try {
+                const res = await fetch('/api/settings');
+                const data = await res.json();
+                document.getElementById('setting-sd').className = 'settings-toggle' + (data.sd_illustration ? ' active' : '');
+                document.getElementById('setting-dice').className = 'settings-toggle' + (data.show_dice_result ? ' active' : '');
+                document.getElementById('setting-display').value = data.display_mode;
+                document.getElementById('setting-difficulty').textContent = data.difficulty;
+
+                // Also update SD toggle in illustration panel if exists
+                const sdToggle = document.getElementById('sd-toggle');
+                if (sdToggle) {
+                    sdToggle.textContent = data.sd_illustration ? 'SD ON' : 'SD OFF';
+                    sdToggle.className = 'sd-toggle' + (data.sd_illustration ? ' active' : '');
+                }
+            } catch(e) {}
+        }
+
+        async function toggleSetting(key) {
+            try {
+                const el = document.getElementById(key === 'sd_illustration' ? 'setting-sd' : 'setting-dice');
+                const current = el.classList.contains('active');
+                const body = {};
+                body[key] = !current;
+                await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(body)
+                });
+                await loadSettings();
+            } catch(e) {}
+        }
+
+        async function changeSetting(key, value) {
+            try {
+                const body = {};
+                body[key] = value;
+                await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(body)
+                });
+            } catch(e) {}
+        }
+
         loadRules();
+        loadSettings();
         updateGameState();
         setInterval(updateGameState, 2000);
         function openMapZoom() {

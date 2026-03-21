@@ -329,6 +329,39 @@ def toggle_illustration():
     return jsonify({"sd_illustration": session["sd_illustration"]})
 
 
+@app.route("/api/settings", methods=["GET"])
+def get_settings():
+    session_path = os.path.join(BASE_DIR, "current_session.json")
+    with open(session_path, "r", encoding="utf-8") as f:
+        session = json.load(f)
+    state = load_game_state()
+    return jsonify({
+        "sd_illustration": session.get("sd_illustration", False),
+        "show_dice_result": session.get("show_dice_result", False),
+        "display_mode": session.get("display_mode", "mobile"),
+        "difficulty": state.get("game_info", {}).get("difficulty", "normal"),
+    })
+
+
+@app.route("/api/settings", methods=["POST"])
+def update_settings():
+    data = request.get_json()
+    session_path = os.path.join(BASE_DIR, "current_session.json")
+    with open(session_path, "r", encoding="utf-8") as f:
+        session = json.load(f)
+
+    if "sd_illustration" in data:
+        session["sd_illustration"] = bool(data["sd_illustration"])
+    if "show_dice_result" in data:
+        session["show_dice_result"] = bool(data["show_dice_result"])
+    if "display_mode" in data and data["display_mode"] in ("mobile", "terminal"):
+        session["display_mode"] = data["display_mode"]
+
+    with open(session_path, "w", encoding="utf-8") as f:
+        json.dump(session, f, ensure_ascii=False, indent=2)
+    return jsonify({"success": True})
+
+
 @app.route("/api/rules", methods=["GET"])
 def get_rules():
     rules_path = os.path.join(BASE_DIR, "rules.json")
