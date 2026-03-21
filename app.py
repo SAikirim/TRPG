@@ -80,6 +80,11 @@ def restore_scene():
     )
 
     # 현재 위치의 alive NPC를 일러스트 레이어에 추가 (초상화 있는 NPC만)
+    # Player 1 위치 기준으로 NPC 일러스트 위치 결정
+    player1 = next((p for p in state.get("players", []) if p.get("id") == 1), None)
+    p1_x = player1["position"][0] if player1 else 0
+    p1_y = player1["position"][1] if player1 else 0
+
     # Calculate player center position for distance-based portrait sizing
     player_positions = [p.get("position", [0, 0]) for p in state.get("players", [])]
     if player_positions:
@@ -89,8 +94,9 @@ def restore_scene():
         player_cx, player_cy = 0, 0
 
     current_loc = state.get("current_location", "")
-    positions = ["left", "center", "right"]
-    pos_idx = 0
+
+    # Collect NPCs with their relative position to player 1
+    npcs_to_add = []
     for npc in state.get("npcs", []):
         if npc.get("status") not in ("alive", "idle", "active"):
             continue
@@ -123,16 +129,26 @@ def restore_scene():
         else:
             size_class = "far"
 
+        # Sort key: relative x position to player 1 (left < center < right)
+        sort_key = npc_pos[0] - p1_x
+        npcs_to_add.append((sort_key, npc_name, distance, size_class))
+
+    # Sort: leftmost first, then center, then rightmost
+    npcs_to_add.sort(key=lambda x: x[0])
+
+    # Add to illustration layers with numbered positions
+    for idx, (sort_key, npc_name, distance, size_class) in enumerate(npcs_to_add):
+        if idx > 3:
+            break  # max 4
         request_illustration(
             illustration_type="portrait",
             prompt="",
             turn_count=state.get("turn_count", 0),
-            position=positions[pos_idx % len(positions)],
+            position=str(idx),
             name=npc_name,
             distance=distance,
             size_class=size_class,
         )
-        pos_idx += 1
 
     # docs/ 동기화 (정적 웹 반영)
     try:
@@ -342,6 +358,11 @@ def gm_update():
         remove_layer(data["remove_layer"])
 
     # 현재 위치의 alive NPC를 자동으로 레이어에 추가 (초상화 있는 NPC만)
+    # Player 1 위치 기준으로 NPC 일러스트 위치 결정
+    player1 = next((p for p in state.get("players", []) if p.get("id") == 1), None)
+    p1_x = player1["position"][0] if player1 else 0
+    p1_y = player1["position"][1] if player1 else 0
+
     # Calculate player center position for distance-based portrait sizing
     player_positions = [p.get("position", [0, 0]) for p in state.get("players", [])]
     if player_positions:
@@ -351,8 +372,10 @@ def gm_update():
         player_cx, player_cy = 0, 0
 
     current_loc = state.get("current_location", "")
-    positions = ["left", "center", "right"]
-    pos_idx = 0
+
+    # Collect NPCs with their relative position to player 1
+    npcs_to_add = []
+    scene = get_scene_state()
     for npc in state.get("npcs", []):
         if npc.get("status") not in ("alive", "idle", "active"):
             continue
@@ -373,6 +396,10 @@ def gm_update():
         if not portrait_exists:
             continue
 
+        # 이미 레이어에 있으면 스킵
+        if any(l.get("name") == npc_name for l in scene.get("layers", [])):
+            continue
+
         # Calculate distance from player center
         npc_pos = npc.get("position", [0, 0])
         distance = abs(npc_pos[0] - player_cx) + abs(npc_pos[1] - player_cy)
@@ -385,20 +412,26 @@ def gm_update():
         else:
             size_class = "far"      # 50%
 
-        # 이미 레이어에 있으면 스킵
-        scene = get_scene_state()
-        already = any(l.get("name") == npc_name for l in scene.get("layers", []))
-        if not already:
-            request_illustration(
-                illustration_type="portrait",
-                prompt="",
-                turn_count=state["turn_count"],
-                position=positions[pos_idx % len(positions)],
-                name=npc_name,
-                distance=distance,
-                size_class=size_class,
-            )
-            pos_idx += 1
+        # Sort key: relative x position to player 1 (left < center < right)
+        sort_key = npc_pos[0] - p1_x
+        npcs_to_add.append((sort_key, npc_name, distance, size_class))
+
+    # Sort: leftmost first, then center, then rightmost
+    npcs_to_add.sort(key=lambda x: x[0])
+
+    # Add to illustration layers with numbered positions
+    for idx, (sort_key, npc_name, distance, size_class) in enumerate(npcs_to_add):
+        if idx > 3:
+            break  # max 4
+        request_illustration(
+            illustration_type="portrait",
+            prompt="",
+            turn_count=state["turn_count"],
+            position=str(idx),
+            name=npc_name,
+            distance=distance,
+            size_class=size_class,
+        )
 
     return jsonify({"success": True, "event": event, "turn": state["turn_count"],
                      "illustration": ill_result, "mechanics": mechanics_results})

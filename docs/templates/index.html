@@ -279,6 +279,27 @@
         .portrait-wrapper.pos-left { left: 2%; }
         .portrait-wrapper.pos-center { left: 38%; }
         .portrait-wrapper.pos-right { left: 72%; }
+        /* Distance-based portrait sizing */
+        .portrait-wrapper.size-close {
+            max-height: 85%;
+            max-width: 24%;
+            bottom: 5px;
+            z-index: 3;
+        }
+        .portrait-wrapper.size-medium {
+            max-height: 60%;
+            max-width: 18%;
+            bottom: 20px;
+            z-index: 2;
+            opacity: 0.95;
+        }
+        .portrait-wrapper.size-far {
+            max-height: 40%;
+            max-width: 14%;
+            bottom: 35px;
+            z-index: 1;
+            opacity: 0.85;
+        }
         .portrait-wrapper .portrait-layer {
             max-height: 100%;
             max-width: 100%;
@@ -1001,9 +1022,10 @@
                     html += '<div class="layer-container">';
                     data.layers.forEach((layer, idx) => {
                         const posClass = 'pos-' + Math.min(idx, 3);
+                        const sizeClass = 'size-' + (layer.size_class || 'close');
                         const displayName = gameState?.npcs?.find(n => n.name === layer.name)?.known === false ? '???' : (layer.name || '');
                         if (layer.type === 'portrait') {
-                            html += '<div class="portrait-wrapper ' + posClass + '">';
+                            html += '<div class="portrait-wrapper ' + posClass + ' ' + sizeClass + '">';
                             html += '<span class="layer-name">' + displayName + '</span>';
                             html += '<img class="portrait-layer" src="' + layer.image + '?t=' + Date.now() + '" alt="' + displayName + '">';
                             html += '</div>';
