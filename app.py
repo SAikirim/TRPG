@@ -51,9 +51,9 @@ def _add_npc_layers(state):
         sort_key = -(npc_pos[0] - p1_x)
         distance = abs(npc_pos[0] - p1_x) + abs(npc_pos[1] - p1_y)
         if distance <= 1:
-            size_class = "near"
-        elif distance <= 2:
             size_class = "close"
+        elif distance <= 2:
+            size_class = "near"
         elif distance <= 4:
             size_class = "medium"
         else:
