@@ -4,7 +4,7 @@
   "ruleset": "fantasy_basic",
   "turn": 25,
   "chapter": 4,
-  "chapter_name": "마을 광장",
+  "chapter_name": "카렌델로 가는 길",
   "party_summary": [
     {
       "name": "사이키",
@@ -59,7 +59,7 @@
     "사이키가 촌장 에르네스에게 작별 인사를 했다.",
     "파티가 하룬 마을을 떠나 카렌델을 향해 북쪽 길로 출발했다. 도보 2일 여정."
   ],
-  "next_objective": "",
+  "next_objective": "카렌델 도착 (도보 2일). 붉은 굴뚝 여관(볼프) 방문, 멜로스 골동품점에서 보물 감정.",
   "display_mode": "mobile",
   "show_dice_result": false,
   "sd_illustration": true,
