@@ -34,6 +34,7 @@
       "ranged": "무기 다이스 + DEX_modifier"
     },
     "weapons": {
+      "맨손": {"dice": "1d2", "type": "melee", "stat": "STR", "description": "주먹과 발. 무기 없이 싸울 때 사용."},
       "마법 지팡이": {"dice": "1d4", "type": "melee", "stat": "STR", "description": "근접 타격용"},
       "단검": {"dice": "1d6", "type": "melee", "stat": "DEX", "description": "가볍고 빠른 단검"},
       "단검 x2": {"dice": "2d6", "type": "melee", "stat": "DEX", "description": "쌍단검 이도류"},
@@ -243,8 +244,9 @@
       "roleplay": 15
     },
     "per_level": {
-      "stat_points": 2,
-      "description": "레벨업마다 능력치 포인트 2점 자유 배분 (유저 선택)"
+      "stat_points": 1,
+      "stat_cap": 20,
+      "description": "레벨업마다 능력치 포인트 1점 자유 배분. 개별 능력치 상한 20."
     },
     "class_growth": {
       "마법사": {

@@ -69,6 +69,155 @@ def sync_all_players(state):
         sync_player_to_entity(state, p)
 
 
+# ─── NPC 엔티티 자동 생성/관리 ───
+
+def _npc_dir(state):
+    sid = state.get("game_info", {}).get("scenario_id", "default")
+    return os.path.join(BASE_DIR, "entities", sid, "npcs")
+
+
+def npc_entity_exists(state, npc_id):
+    """NPC 엔티티 파일 존재 여부"""
+    path = os.path.join(_npc_dir(state), f"npc_{npc_id}.json")
+    return os.path.exists(path)
+
+
+def create_npc_entity(npc_data, state=None):
+    """
+    NPC 엔티티 파일 자동 생성.
+    npc_data: game_state의 NPC 객체 또는 new_npc 데이터.
+    최소 필요: id, name. 나머지는 기본값 자동 채움.
+    """
+    if state is None:
+        state = load_game_state()
+
+    npc_id = npc_data.get("id")
+    if not npc_id:
+        return {"error": "NPC id 필수"}
+
+    ndir = _npc_dir(state)
+    os.makedirs(ndir, exist_ok=True)
+    path = os.path.join(ndir, f"npc_{npc_id}.json")
+
+    # 이미 있으면 스킵
+    if os.path.exists(path):
+        return {"status": "exists", "id": npc_id}
+
+    # NPC 유형 추정
+    npc_type = npc_data.get("type", "unknown")
+    if npc_type == "unknown":
+        if npc_data.get("attack") or npc_data.get("threat_level"):
+            npc_type = "monster"
+        else:
+            npc_type = "friendly"
+
+    entity = {
+        "id": npc_id,
+        "name": npc_data.get("name", f"NPC_{npc_id}"),
+        "type": npc_type,
+        "status": npc_data.get("status", "active"),
+        "location": npc_data.get("location", ""),
+        "personality": npc_data.get("personality", {
+            "temperament": "neutral",
+            "intelligence": "medium",
+            "behavior_pattern": "",
+            "speech_style": "",
+            "motivation": ""
+        }),
+        "relationships": npc_data.get("relationships", {}),
+        "memory": npc_data.get("memory", {
+            "dialogue_history": [],
+            "key_events": []
+        }),
+    }
+
+    # 몬스터면 전투 스탯 포함
+    if npc_type == "monster":
+        entity["stats"] = {
+            "hp": npc_data.get("hp", npc_data.get("max_hp", 10)),
+            "max_hp": npc_data.get("max_hp", 10),
+            "attack": npc_data.get("attack", 5),
+            "defense": npc_data.get("defense", 2),
+        }
+        entity["threat_level"] = npc_data.get("threat_level", "medium")
+        entity["position"] = npc_data.get("position", [0, 0])
+
+    # friendly NPC면 HP만
+    if npc_type == "friendly":
+        if npc_data.get("hp") or npc_data.get("max_hp"):
+            entity["stats"] = {
+                "hp": npc_data.get("hp", 10),
+                "max_hp": npc_data.get("max_hp", 10),
+            }
+
+    # 추가 필드 병합 (personality 등 커스텀 데이터)
+    for key in ("conditions", "equipment", "inventory"):
+        if key in npc_data:
+            entity[key] = npc_data[key]
+
+    _save_json(path, entity)
+    return {"status": "created", "id": npc_id, "name": entity["name"], "path": path}
+
+
+def ensure_all_npc_entities(state=None):
+    """
+    game_state의 모든 NPC에 대해 엔티티 파일 존재 확인.
+    없으면 자동 생성. 세션 시작 시 호출 권장.
+    반환: 생성된 NPC 목록.
+    """
+    if state is None:
+        state = load_game_state()
+    created = []
+    for npc in state.get("npcs", []):
+        if not npc_entity_exists(state, npc["id"]):
+            result = create_npc_entity(npc, state)
+            if result.get("status") == "created":
+                created.append(result)
+    return created
+
+
+def update_npc_entity(npc_id, updates, state=None):
+    """기존 NPC 엔티티 부분 업데이트 (memory, status, relationships 등)"""
+    if state is None:
+        state = load_game_state()
+    path = os.path.join(_npc_dir(state), f"npc_{npc_id}.json")
+    if not os.path.exists(path):
+        return {"error": f"NPC {npc_id} 엔티티 없음"}
+    entity = _load_json(path)
+    for key, val in updates.items():
+        if key == "memory" and isinstance(val, dict):
+            entity.setdefault("memory", {}).update(val)
+        elif key == "relationships" and isinstance(val, dict):
+            entity.setdefault("relationships", {}).update(val)
+        elif key == "personality" and isinstance(val, dict):
+            entity.setdefault("personality", {}).update(val)
+        else:
+            entity[key] = val
+    _save_json(path, entity)
+    return {"status": "updated", "id": npc_id}
+
+
+def list_npc_entities(state=None):
+    """현재 시나리오의 모든 NPC 엔티티 요약"""
+    if state is None:
+        state = load_game_state()
+    ndir = _npc_dir(state)
+    if not os.path.exists(ndir):
+        return []
+    result = []
+    for f in sorted(os.listdir(ndir)):
+        if f.endswith(".json"):
+            entity = _load_json(os.path.join(ndir, f))
+            result.append({
+                "id": entity.get("id"),
+                "name": entity.get("name"),
+                "type": entity.get("type"),
+                "status": entity.get("status"),
+                "location": entity.get("location", ""),
+            })
+    return result
+
+
 # ─── 주사위 ───
 
 def roll_dice(dice_str):
@@ -1069,6 +1218,10 @@ def main():
         print("  tick                   상태이상 턴 처리")
         print()
         print()
+        print("  [NPC]")
+        print("  npcs                   NPC 엔티티 목록")
+        print("  check_npcs             누락 엔티티 검증 + 자동 생성")
+        print()
         print("  [장비]")
         print("  equip                  파티 장비 상태")
         print()
@@ -1119,6 +1272,19 @@ def main():
 
     elif cmd == "tick":
         _print_result(tick_status_effects())
+
+    elif cmd == "npcs":
+        for n in list_npc_entities():
+            status_icon = {"alive": "🟢", "dead": "💀", "fled": "🏃", "active": "⚔️"}.get(n["status"], "❓")
+            print(f"  {status_icon} [{n['id']}] {n['name']} ({n['type']}) — {n['status']} {n.get('location','')}")
+
+    elif cmd == "check_npcs":
+        created = ensure_all_npc_entities()
+        if created:
+            for c in created:
+                print(f"  ✅ 생성: npc_{c['id']}.json — {c['name']}")
+        else:
+            print("  모든 NPC 엔티티 정상")
 
     elif cmd == "equip":
         state = load_game_state()

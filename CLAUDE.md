@@ -472,6 +472,48 @@ Agent 툴은 일회성이므로 연속성은 JSON 파일로 유지:
 - 시나리오별 격리: `entities/{scenario_id}/` 하위 관리
 - 세계관은 시나리오 독립: `worldbuilding.json`
 
+### NPC 엔티티 필수 규칙
+> **새 NPC 등장 시 반드시 엔티티 파일을 생성해야 한다. 예외 없음.**
+
+#### 자동 생성 시스템
+- `gm-update` API의 `new_npcs`로 추가된 NPC → **자동으로 엔티티 생성** (app.py 후크)
+- `python game_mechanics.py check_npcs` → game_state의 NPC 중 엔티티 없는 것 자동 생성
+- 세션 시작 시 `ensure_all_npc_entities()` 호출 → 누락 엔티티 자동 보충
+
+#### 수동 생성이 필요한 경우
+- GM 나레이션에서 이름 있는 NPC가 새로 등장할 때
+- `game_mechanics.create_npc_entity()` 호출 또는 직접 JSON 작성
+- **최소 필수 필드**: id, name, type, status, personality, memory
+
+#### NPC 엔티티 구조
+```json
+{
+  "id": 300,
+  "name": "할란",
+  "type": "friendly",        // friendly | monster | neutral
+  "status": "alive",          // alive | dead | fled | unconscious
+  "location": "교역로",
+  "personality": {
+    "temperament": "gruff",   // 성격 기질
+    "intelligence": "high",   // 지능 수준
+    "behavior_pattern": "",   // 행동 패턴 설명
+    "speech_style": "",       // 말투
+    "motivation": ""          // 동기/목적
+  },
+  "relationships": {},        // 다른 캐릭터와의 관계
+  "memory": {
+    "dialogue_history": [],   // 주요 대화 기록
+    "key_events": []          // 핵심 이벤트 기억
+  }
+}
+```
+
+#### CLI 명령어
+```bash
+python game_mechanics.py npcs          # NPC 엔티티 목록
+python game_mechanics.py check_npcs    # 누락 검증 + 자동 생성
+```
+
 ---
 
 ## 세션 시작 시 필수 확인 (로드 절차)
@@ -485,6 +527,7 @@ Agent 툴은 일회성이므로 연속성은 JSON 파일로 유지:
 6. `entities/{scenario_id}/npcs/` — 생존/사망 NPC 상태
 7. `entities/{scenario_id}/objects/` — 퍼즐/함정/오브젝트 해결 여부
 8. `scenario.json` + `rules.json` — 현재 시나리오 챕터 구조 및 룰셋 확인
+9. `python game_mechanics.py check_npcs` — NPC 엔티티 누락 검증 + 자동 생성
 
 위 파일을 **모두 확인한 후** 유저에게 현재 상황 요약을 제시하고 게임을 이어간다.
 

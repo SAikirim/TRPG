@@ -150,9 +150,10 @@ def gm_update():
                             n["status"] = val
                 break
 
-    # Add new NPCs if provided
+    # Add new NPCs if provided + auto-create entity files
     for new_npc in data.get("new_npcs", []):
         state["npcs"].append(new_npc)
+        gm.create_npc_entity(new_npc, state)
 
     state["turn_count"] += 1
     event = {
