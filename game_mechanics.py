@@ -786,11 +786,15 @@ def allocate_stats(player_id, stat_increases, state=None):
     if total_spend <= 0:
         return {"error": "배분할 포인트 없음"}
 
-    # 적용
+    # 적용 (상한 20 체크)
+    rules = load_rules()
+    stat_cap = rules.get("level_up", {}).get("per_level", {}).get("stat_cap", 20)
     old_stats = {}
     for stat, inc in stat_increases.items():
         if stat not in ("STR", "DEX", "INT", "CON"):
             return {"error": f"잘못된 능력치: {stat}"}
+        if entity["stats"][stat] + inc > stat_cap:
+            return {"error": f"{stat} 상한 초과 (현재 {entity['stats'][stat]}, +{inc} → {entity['stats'][stat]+inc} > 상한 {stat_cap})"}
         old_stats[stat] = entity["stats"][stat]
         entity["stats"][stat] += inc
 

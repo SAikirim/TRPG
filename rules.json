@@ -244,8 +244,9 @@
       "roleplay": 15
     },
     "per_level": {
-      "stat_points": 2,
-      "description": "레벨업마다 능력치 포인트 2점 자유 배분 (유저 선택)"
+      "stat_points": 1,
+      "stat_cap": 20,
+      "description": "레벨업마다 능력치 포인트 1점 자유 배분. 개별 능력치 상한 20."
     },
     "class_growth": {
       "마법사": {
