@@ -29,8 +29,8 @@
         "CON": 10
       },
       "position": [
-        8,
-        4
+        12,
+        12
       ],
       "status_effects": [],
       "inventory": [
@@ -65,8 +65,8 @@
         "CON": 15
       },
       "position": [
-        9,
-        4
+        14,
+        12
       ],
       "status_effects": [],
       "inventory": [
@@ -93,8 +93,8 @@
         "CON": 17
       },
       "position": [
-        7,
-        4
+        10,
+        12
       ],
       "status_effects": [],
       "inventory": [
@@ -122,8 +122,8 @@
       "attack": 3,
       "defense": 2,
       "position": [
-        9,
-        5
+        12,
+        13
       ],
       "threat_level": "none",
       "status": "alive",
@@ -146,8 +146,8 @@
       "attack": 2,
       "defense": 2,
       "position": [
-        10,
-        5
+        14,
+        13
       ],
       "threat_level": "none",
       "status": "alive",
@@ -155,43 +155,53 @@
     }
   ],
   "map": {
-    "width": 20,
-    "height": 15,
+    "width": 25,
+    "height": 25,
     "tile_size": 40,
     "locations": [
       {
-        "name": "교역로 남쪽",
-        "type": "road",
+        "name": "숲 (북쪽)",
+        "type": "grass",
         "area": {
           "x1": 0,
           "y1": 0,
-          "x2": 19,
-          "y2": 5
+          "x2": 24,
+          "y2": 7
         }
       },
       {
-        "name": "교역로 북쪽",
+        "name": "교역로",
         "type": "road",
         "area": {
           "x1": 0,
-          "y1": 6,
-          "x2": 19,
-          "y2": 10
+          "y1": 8,
+          "x2": 24,
+          "y2": 16
         }
       },
       {
-        "name": "카렌델 입구",
-        "type": "city",
+        "name": "수레 정차 지점",
+        "type": "village",
         "area": {
-          "x1": 5,
-          "y1": 11,
+          "x1": 10,
+          "y1": 12,
           "x2": 14,
-          "y2": 14
+          "y2": 13
+        }
+      },
+      {
+        "name": "숲 (남쪽)",
+        "type": "grass",
+        "area": {
+          "x1": 0,
+          "y1": 17,
+          "x2": 24,
+          "y2": 24
         }
       }
     ]
   },
-  "turn_count": 2,
+  "turn_count": 3,
   "events": [
     {
       "turn": 0,
@@ -203,6 +213,12 @@
       "message": "[GM] [로드] 카렌델로 가는 길 — 챕터 1: 교역로. 상인 할란, 미라와 동행 중.",
       "narrative": "",
       "timestamp": "19:07:38"
+    },
+    {
+      "turn": 3,
+      "message": "[GM] [로드] 카렌델로 가는 길 — 교역로, 상인 할란/미라와 동행 중.",
+      "narrative": "",
+      "timestamp": "21:31:11"
     }
   ]
 }

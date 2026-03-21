@@ -376,11 +376,10 @@
             height: auto;
             border-radius: 8px;
             border: 2px solid #333;
-            image-rendering: pixelated;
             cursor: pointer;
         }
         .sidebar-map img:hover { border-color: #e94560; }
-        /* Map zoom overlay */
+        /* Map zoom overlay — 적당한 크기 */
         .map-overlay {
             display: none;
             position: fixed;
@@ -394,10 +393,9 @@
         }
         .map-overlay.active { display: flex; }
         .map-overlay img {
-            max-width: 90vw;
-            max-height: 90vh;
+            max-width: 95vw;
+            max-height: 95vh;
             object-fit: contain;
-            image-rendering: pixelated;
             border: 3px solid #e94560;
             border-radius: 12px;
         }
@@ -459,7 +457,7 @@
         <div class="sidebar">
             <div class="panel sidebar-map">
                 <h3>게임 맵</h3>
-                <img id="game-map" src="/static/map.png" alt="Game Map" onclick="openMapZoom()">
+                <img id="game-map" src="/static/map_mini.png" alt="Game Map" onclick="openMapZoom()">
                 <div id="map-legend" class="legend"></div>
             </div>
 
@@ -567,7 +565,7 @@
                 updatePlayersList();
                 updateEventsList();
                 updateLegend();
-                document.getElementById('game-map').src = '/static/map.png?t=' + Date.now();
+                document.getElementById('game-map').src = '/static/map_mini.png?t=' + Date.now();
             } catch (e) {
                 const connEl = document.getElementById('connection-status');
                 if (connEl) { connEl.textContent = '연결 끊김'; connEl.className = 'status-indicator'; }

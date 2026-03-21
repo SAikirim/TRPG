@@ -82,6 +82,12 @@ def restore_scene():
     # NPC 레이어는 자동 추가하지 않음 — GM이 나레이션 시 명시적으로 추가
     # 배경만 복원하고, NPC/오브젝트 레이어는 게임 진행 중 GM이 관리
 
+    # docs/ 동기화 (정적 웹 반영)
+    try:
+        save_manager._sync_docs(state)
+    except Exception:
+        pass
+
 
 # Generate initial map and restore scene on startup
 update_map_image()

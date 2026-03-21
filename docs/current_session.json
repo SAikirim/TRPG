@@ -2,9 +2,9 @@
   "active_scenario": "karendel_journey",
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
-  "turn": 2,
+  "turn": 3,
   "chapter": 1,
-  "chapter_name": "교역로 남쪽",
+  "chapter_name": "교역로",
   "party_summary": [
     {
       "name": "사이키",
@@ -49,7 +49,8 @@
   ],
   "progress_notes": [
     "새 시나리오: 카렌델로 가는 길. 교역로에서 상인 할란, 미라와 동행 중.",
-    "[GM] [로드] 카렌델로 가는 길 — 챕터 1: 교역로. 상인 할란, 미라와 동행 중."
+    "[GM] [로드] 카렌델로 가는 길 — 챕터 1: 교역로. 상인 할란, 미라와 동행 중.",
+    "[GM] [로드] 카렌델로 가는 길 — 교역로, 상인 할란/미라와 동행 중."
   ],
   "next_objective": "",
   "display_mode": "mobile",
