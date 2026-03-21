@@ -271,7 +271,7 @@ class MapGenerator:
         avg_y = sum(p[1] for p in positions) / len(positions)
 
         # 주변 반경 (타일 단위)
-        radius = 4
+        radius = 3
         margin_left = 36
         margin_top = 28
 
