@@ -465,22 +465,19 @@ class SaveManager:
                 json.dump(merged, f, ensure_ascii=False, indent=2)
 
     def _build_static_settings(self, game_state, docs_dir):
-        """정적 웹용 settings JSON 빌드.
-        동적 API(/api/settings)는 current_session + game_state.difficulty를 합산."""
-        session_path = os.path.join(BASE_DIR, "data", "current_session.json")
-        if not os.path.isfile(session_path):
+        """정적 웹용 current_session.json 보강.
+        동적 API(/api/settings)가 game_state.difficulty를 합산하므로,
+        이미 복사된 current_session.json에 difficulty를 추가한다."""
+        dst = os.path.join(docs_dir, "current_session.json")
+        if not os.path.isfile(dst):
             return
 
-        with open(session_path, "r", encoding="utf-8") as f:
+        with open(dst, "r", encoding="utf-8") as f:
             session = json.load(f)
 
-        settings = {
-            "sd_illustration": session.get("sd_illustration", False),
-            "show_dice_result": session.get("show_dice_result", False),
-            "display_mode": session.get("display_mode", "mobile"),
-            "difficulty": game_state.get("game_info", {}).get("difficulty", "normal"),
-        }
+        # 동적 API가 합산하는 필드 보강
+        session["difficulty"] = game_state.get(
+            "game_info", {}).get("difficulty", "normal")
 
-        dst = os.path.join(docs_dir, "current_session.json")
         with open(dst, "w", encoding="utf-8") as f:
-            json.dump(settings, f, ensure_ascii=False, indent=2)
+            json.dump(session, f, ensure_ascii=False, indent=2)
