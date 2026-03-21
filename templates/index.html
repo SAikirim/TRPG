@@ -83,6 +83,22 @@
         .class-warrior { background: #e63946; }
         .class-mage { background: #457be0; }
         .class-rogue { background: #2ecc71; }
+        .level-badge {
+            font-size: 0.7em;
+            padding: 1px 6px;
+            border-radius: 8px;
+            background: #ffd700;
+            color: #1a1a2e;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+        .bar-xp { background: linear-gradient(90deg, #ffd700, #f0c040); }
+        .stat-mod { color: #ffd700; font-size: 0.85em; }
+        .rarity-common { color: #aaa; }
+        .rarity-uncommon { color: #2ecc71; }
+        .rarity-rare { color: #3498db; }
+        .rarity-epic { color: #9b59b6; }
+        .rarity-legendary { color: #e67e22; }
         .bar-container {
             background: #1a1a2e;
             border-radius: 4px;
@@ -422,23 +438,39 @@
         let lastMapTime = 0;
         let rulesData = null;
 
-        const itemInfo = {
-            '철검': { desc: '기본 근접 무기', stat: 'DMG 1d6' },
-            '가죽 방패': { desc: '기본 방어 장비', stat: 'DEF +2' },
-            '마법 지팡이': { desc: '마법사의 기본 무기', stat: 'DMG 1d8' },
-            '마나 포션': { desc: 'MP 8 회복', stat: 'MP +8' },
-            '단검 x2': { desc: '도적의 이중 무기', stat: 'DMG 2d6' },
-            '도둑 도구': { desc: '함정 해제, 자물쇠 따기', stat: 'DEX +2' },
-            '치유 약초': { desc: '자연의 치유력', stat: 'HP +5' },
-            '마나 결정': { desc: '응축된 마력의 결정', stat: 'MP +5' },
-            '슬라임 젤리': { desc: '슬라임에서 추출한 젤리', stat: '소재' },
-            '약초': { desc: '상처를 치유하는 약초', stat: 'HP +5' },
-            '고대 열쇠': { desc: '보물실의 문을 여는 열쇠', stat: '열쇠' },
-            '전설의 보물': { desc: '던전의 최종 보물', stat: '보물' },
-            '밧줄': { desc: '등반, 묶기에 사용', stat: '도구' },
-            '오크의 도끼': { desc: '오크에게서 획득한 무기', stat: 'DMG 1d8+2' },
-            '황금 100개': { desc: '반짝이는 금화', stat: '100G' },
-        };
+        // 아이템 정보를 rules.json에서 동적으로 가져옴
+        function getItemInfo(name) {
+            // 무기 테이블에서 조회
+            if (rulesData?.combat?.weapons?.[name]) {
+                const w = rulesData.combat.weapons[name];
+                return { desc: w.description, stat: 'DMG ' + w.dice };
+            }
+            // 방어구 테이블에서 조회
+            if (rulesData?.combat?.armor?.[name]) {
+                const a = rulesData.combat.armor[name];
+                return { desc: a.description || name, stat: a.bonus ? 'DEF +' + a.bonus : '' };
+            }
+            // 소모품
+            if (rulesData?.rest?.use_item?.[name]) {
+                const u = rulesData.rest.use_item[name];
+                return { desc: u.description, stat: u.heal_hp ? 'HP +' + u.heal_hp : u.heal_mp ? 'MP +' + u.heal_mp : '' };
+            }
+            // 폴백 (알려진 기타 아이템)
+            const fallback = {
+                '도둑 도구': { desc: '함정 해제, 자물쇠 따기', stat: 'DEX +2' },
+                '마나 결정': { desc: '응축된 마력의 결정', stat: 'MP +5' },
+                '슬라임 젤리': { desc: '슬라임에서 추출한 젤리', stat: '소재' },
+                '고대 열쇠': { desc: '보물실의 문을 여는 열쇠', stat: '열쇠' },
+                '전설의 보물': { desc: '던전의 최종 보물', stat: '보물' },
+                '밧줄': { desc: '등반, 묶기에 사용', stat: '도구' },
+            };
+            return fallback[name] || { desc: name, stat: '' };
+        }
+        function statMod(val) {
+            const m = Math.floor((val - 10) / 2);
+            return m >= 0 ? '+' + m : '' + m;
+        }
+        const rarityEmoji = { common: '⬜', uncommon: '🟩', rare: '🟦', epic: '🟪', legendary: '🟧' };
 
         async function loadRules() {
             try {
@@ -490,11 +522,17 @@
                 const cls = classMap[p.class] || 'warrior';
                 const hpPct = (p.hp / p.max_hp * 100).toFixed(0);
                 const mpPct = (p.mp / p.max_mp * 100).toFixed(0);
+                const lv = p.level || 1;
+                const xp = p.xp || 0;
+                const xpTable = rulesData?.level_up?.xp_table || {};
+                const xpNext = xpTable[String(lv + 1)] || 100;
+                const xpPrev = xpTable[String(lv)] || 0;
+                const xpPct = xpNext > xpPrev ? ((xp - xpPrev) / (xpNext - xpPrev) * 100).toFixed(0) : 100;
                 const effects = p.status_effects.length > 0
-                    ? `<div style="font-size:0.75em;color:#ffd700;margin-top:4px">상태: ${p.status_effects.join(', ')}</div>`
+                    ? `<div style="font-size:0.75em;color:#ffd700;margin-top:4px">상태: ${p.status_effects.map(e => typeof e === 'string' ? e : e.name).join(', ')}</div>`
                     : '';
                 const invItems = (p.inventory || []).map(item => {
-                    const info = itemInfo[item] || { desc: item, stat: '' };
+                    const info = getItemInfo(item);
                     return `<div class="detail-item"><span class="item-name">${item}</span>${info.stat ? '<span class="item-stat">' + info.stat + '</span>' : ''}<div class="tooltip">${info.desc}</div></div>`;
                 }).join('');
                 return `
@@ -504,6 +542,7 @@
                         <div class="name">
                         ${p.name}
                         <span class="class-badge class-${cls}">${p.class}</span>
+                        <span class="level-badge">LV ${lv}</span>
                         <span style="float:right;font-size:0.75em;color:#aaa">위치: [${p.position}]</span>
                     </div>
                     <div class="bar-container">
@@ -514,11 +553,15 @@
                         <div class="bar bar-mp" style="width:${mpPct}%"></div>
                         <div class="bar-label">MP ${p.mp}/${p.max_mp}</div>
                     </div>
+                    <div class="bar-container" style="height:10px">
+                        <div class="bar bar-xp" style="width:${xpPct}%"></div>
+                        <div class="bar-label" style="font-size:0.6em;line-height:10px">XP ${xp}/${xpNext}</div>
+                    </div>
                     <div class="stats">
-                        <span>STR ${p.stats.STR}</span>
-                        <span>DEX ${p.stats.DEX}</span>
-                        <span>INT ${p.stats.INT}</span>
-                        <span>CON ${p.stats.CON}</span>
+                        <span>STR ${p.stats.STR}<span class="stat-mod">(${statMod(p.stats.STR)})</span></span>
+                        <span>DEX ${p.stats.DEX}<span class="stat-mod">(${statMod(p.stats.DEX)})</span></span>
+                        <span>INT ${p.stats.INT}<span class="stat-mod">(${statMod(p.stats.INT)})</span></span>
+                        <span>CON ${p.stats.CON}<span class="stat-mod">(${statMod(p.stats.CON)})</span></span>
                     </div>
                     ${effects}
                     <div class="detail-toggle">
@@ -589,28 +632,59 @@
                 const actions = rulesData ? rulesData.actions || {} : {};
                 const playerClass = gameState.players.find(p => p.id === playerId);
                 const className = playerClass ? playerClass.class : '';
-                const classSkills = Object.entries(actions).filter(([k,v]) => v.class === className);
+                // "all" 클래스 + 자기 클래스 액션 모두 표시
+                const classSkills = Object.entries(actions).filter(([k,v]) =>
+                    k !== '_설명' && (v.class === className || v.class === 'all'));
                 if (classSkills.length) {
                     el.innerHTML = classSkills.map(([name, info]) => {
                         const cost = info.cost && info.cost.mp ? 'MP ' + info.cost.mp : 'MP 0';
-                        const dmg = info.damage || info.roll || '';
-                        const stat = dmg ? dmg.split(' + ')[0] : cost;
-                        return `<div class="detail-item"><span class="item-name">${name}</span><span class="item-stat">${cost}${dmg ? ' / ' + dmg.split(' + ')[0] : ''}</span><div class="tooltip">${info.description || name}</div></div>`;
+                        let dmgStr = '';
+                        if (info.damage) {
+                            // "weapon_dice" → 실제 무기 다이스로 치환
+                            let dmg = info.damage.split(' + ')[0];
+                            if (dmg.includes('weapon')) {
+                                const weaponName = playerDetailCache[playerId]?.equipment?.weapon;
+                                const wn = typeof weaponName === 'object' ? weaponName?.name : weaponName;
+                                const wDef = rulesData?.combat?.weapons?.[wn];
+                                dmg = wDef ? wDef.dice : '1d2';
+                            }
+                            dmgStr = ' / ' + dmg;
+                        }
+                        return `<div class="detail-item"><span class="item-name">${name}</span><span class="item-stat">${cost}${dmgStr}</span><div class="tooltip">${info.description || name}</div></div>`;
                     }).join('');
                 } else {
                     el.innerHTML = '<div class="detail-item" style="color:#666">없음</div>';
                 }
             }
             if (type === 'equip') {
-                const inv = gameState.players.find(p => p.id === playerId)?.inventory || [];
-                const equipSlots = {
-                    '무기': inv.find(i => ['철검','마법 지팡이','단검 x2','오크의 도끼'].includes(i)) || '-',
-                    '보조': inv.find(i => ['가죽 방패','도둑 도구'].includes(i)) || '-',
-                    '소모품': inv.filter(i => ['마나 포션','치유 약초','마나 결정','약초'].includes(i)).join(', ') || '-',
-                };
-                el.innerHTML = Object.entries(equipSlots).map(([slot, item]) => {
-                    const info = itemInfo[item] || { desc: item, stat: '' };
-                    return `<div class="detail-item"><span class="item-name">${slot}: ${item}</span>${info.stat ? '<span class="item-stat">' + info.stat + '</span>' : ''}<div class="tooltip">${info.desc || item}</div></div>`;
+                const detail = playerDetailCache[playerId] || {};
+                const equip = detail.equipment || {};
+                const slots = ['weapon', 'armor', 'accessory'];
+                const slotNames = { weapon: '무기', armor: '방어구', accessory: '장신구' };
+                el.innerHTML = slots.map(slot => {
+                    const item = equip[slot];
+                    if (!item) return `<div class="detail-item"><span class="item-name">${slotNames[slot]}: —</span></div>`;
+                    if (typeof item === 'string') {
+                        const info = getItemInfo(item);
+                        return `<div class="detail-item"><span class="item-name">${slotNames[slot]}: ⬜ ${item}</span><span class="item-stat">${info.stat}</span><div class="tooltip">${info.desc}</div></div>`;
+                    }
+                    const rarity = item.rarity || 'common';
+                    const emoji = rarityEmoji[rarity] || '⬜';
+                    const props = item.properties || {};
+                    const wDef = rulesData?.combat?.weapons?.[item.name];
+                    let statStr = wDef ? 'DMG ' + wDef.dice : '';
+                    const aDef = rulesData?.combat?.armor?.[item.name];
+                    if (aDef) statStr = 'DEF +' + aDef.bonus;
+                    // 마법 속성 표시
+                    let propParts = [];
+                    if (props.attack_bonus) propParts.push('명중+' + props.attack_bonus);
+                    if (props.damage_bonus) propParts.push('데미지+' + props.damage_bonus);
+                    if (props.defense_bonus) propParts.push('방어+' + props.defense_bonus);
+                    if (props.element) propParts.push('🔮' + props.element);
+                    if (props.on_hit) propParts.push('⚡' + (props.on_hit.type || ''));
+                    const propStr = propParts.length ? ' [' + propParts.join(', ') + ']' : '';
+                    const desc = (wDef?.description || aDef?.description || item.name) + propStr;
+                    return `<div class="detail-item"><span class="item-name rarity-${rarity}">${slotNames[slot]}: ${emoji} ${item.name}</span><span class="item-stat">${statStr}${propStr}</span><div class="tooltip">${desc}</div></div>`;
                 }).join('');
             }
         }

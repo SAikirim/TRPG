@@ -1024,7 +1024,8 @@ def _get_weapon_dice(entity, state=None):
                 break
     if weapon_name and weapon_name in weapons:
         return weapons[weapon_name]["dice"]
-    return None
+    # 맨손 폴백
+    return weapons.get("맨손", {}).get("dice", "1d2")
 
 
 def _npc_ac(npc):
