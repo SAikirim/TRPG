@@ -268,7 +268,7 @@ class MapGenerator:
 
         # 주변 반경 (타일 단위) — 가로세로 다르게
         radius_x = 8
-        radius_y = 7  # 정사각형에 가깝게
+        radius_y = 5  # 세로 2칸 축소
         margin_left = 22
         margin_top = 16
 
