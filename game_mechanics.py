@@ -599,6 +599,10 @@ def skill_check(player_id, stat_name, dc, state=None):
     if not player:
         return {"error": f"플레이어 {player_id} 없음"}
 
+    valid_stats = ("STR", "DEX", "INT", "CON")
+    if stat_name not in valid_stats:
+        return {"error": f"잘못된 능력치: {stat_name} (유효: {', '.join(valid_stats)})"}
+
     d20 = roll("1d20")
     mod = get_player_modifier(player, stat_name)
     total = d20 + mod
