@@ -84,6 +84,8 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 ## 파일 구조 (주요)
 ```
 app.py                    - Flask 웹 서버, API 엔드포인트, gm-update 처리
+game_start.py             - 게임 시작 자동화 CLI (새 게임/이어하기/세이브 로드)
+session_validator.py      - 세션 검증 자동화 (상태 일관성 검사 + 자동 수정)
 sd_generator.py           - SD WebUI API 래퍼, 레이어 시스템
 map_generator.py          - Cairo/PIL 이미지 생성, SD OFF 시 폴백
 ascii_map.py              - CLI 터미널용 이모지 ASCII 맵 출력
@@ -105,22 +107,30 @@ guides/                   - 상세 규칙 참조 파일
 
 ## 세션 시작 체크리스트
 1. CLAUDE.md 읽기 (이 파일)
-2. `current_session.json` → `worldbuilding.json` → `game_state.json` 읽기
-3. `entities/` 확인 (players, npcs, objects)
-4. Flask 서버 확인 → 웹 UI 장면 복원 확인
+2. `python session_validator.py` 실행 — 상태 검증 + 자동 수정
+3. `current_session.json` → `worldbuilding.json` → `game_state.json` 읽기
+4. Flask 서버 확인 → 웹 UI 장면 복원 (자동: `restore_scene`)
 5. 유저에게 현재 상황 요약 → 게임 이어가기
 
 > 상세 로드 절차: 아래 "세션 로드 상세" 참조
 
 ### 세션 로드 상세
-1. `CLAUDE.md` → 2. `current_session.json` → 3. `worldbuilding.json` → 4. `game_state.json`
-5. `entities/{scenario_id}/` (players, npcs, objects)
-6. `scenario.json` + `rules.json`
-7. `python game_mechanics.py check_npcs` (NPC 엔티티 누락 검증)
+1. `CLAUDE.md` → 2. `python session_validator.py` (상태 검증 + 엔티티 누락 자동 생성)
+3. `current_session.json` → 4. `worldbuilding.json` → 5. `game_state.json`
+6. `entities/{scenario_id}/` (players, npcs, objects)
+7. `scenario.json` + `rules.json`
 8. Flask 서버 확인 → gm-update로 현재 장면 복원 (배경+NPC 레이어)
 9. 유저에게 현재 상황 요약 제시
 
 > 세션 로드 시 웹 UI가 빈 화면이거나 이전 장면을 보여주는 것은 금지.
+
+### 새 게임 시작
+```bash
+python game_start.py                    # 대화형: 시나리오 선택
+python game_start.py new lost_treasure  # 특정 시나리오 새 게임
+python game_start.py continue karendel_journey --from lost_treasure  # 이어하기
+python game_start.py load               # 세이브 로드
+```
 
 ---
 
