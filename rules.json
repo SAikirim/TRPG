@@ -135,6 +135,12 @@
       "heal_mp": 3,
       "turns_required": 1
     },
+    "long_rest": {
+      "description": "안전한 장소에서 하룻밤 수면. HP/MP 전부 회복.",
+      "heal_hp": "full",
+      "heal_mp": "full",
+      "condition": "안전한 장소 (마을, 여관, 야영지 등)"
+    },
     "use_item": {
       "치유 약초": {"heal_hp": 5, "description": "HP 5 회복"},
       "마나 포션": {"heal_mp": 8, "description": "MP 8 회복"}

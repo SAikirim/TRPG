@@ -17,7 +17,7 @@
       "class": "마법사",
       "hp": 15,
       "max_hp": 15,
-      "mp": 24,
+      "mp": 30,
       "max_mp": 30,
       "stats": {
         "STR": 8,
@@ -51,7 +51,7 @@
       "class": "도적",
       "hp": 22,
       "max_hp": 22,
-      "mp": 8,
+      "mp": 10,
       "max_mp": 10,
       "stats": {
         "STR": 8,
