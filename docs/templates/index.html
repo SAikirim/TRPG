@@ -262,17 +262,34 @@
             height: 100%;
             pointer-events: none;
         }
-        .illustration-panel .portrait-layer {
+        .illustration-panel .portrait-wrapper {
             position: absolute;
             bottom: 0;
             max-height: 90%;
             max-width: 40%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .portrait-wrapper.pos-left { left: 5%; }
+        .portrait-wrapper.pos-center { left: 50%; transform: translateX(-50%); }
+        .portrait-wrapper.pos-right { right: 5%; }
+        .portrait-wrapper .portrait-layer {
+            max-height: 100%;
+            max-width: 100%;
             object-fit: contain;
             filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.7));
         }
-        .portrait-layer.pos-left { left: 5%; }
-        .portrait-layer.pos-center { left: 50%; transform: translateX(-50%); }
-        .portrait-layer.pos-right { right: 5%; }
+        .portrait-wrapper .layer-name {
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            font-size: 0.8em;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+        }
         .illustration-panel .object-layer {
             position: absolute;
             max-height: 30%;
@@ -967,7 +984,10 @@
                         const posClass = 'pos-' + (layer.position || 'center');
                         const displayName = gameState?.npcs?.find(n => n.name === layer.name)?.known === false ? '???' : (layer.name || '');
                         if (layer.type === 'portrait') {
-                            html += '<img class="portrait-layer ' + posClass + '" src="' + layer.image + '?t=' + Date.now() + '" alt="' + displayName + '" title="' + displayName + '">';
+                            html += '<div class="portrait-wrapper ' + posClass + '">';
+                            html += '<span class="layer-name">' + displayName + '</span>';
+                            html += '<img class="portrait-layer" src="' + layer.image + '?t=' + Date.now() + '" alt="' + displayName + '">';
+                            html += '</div>';
                         } else if (layer.type === 'object') {
                             html += '<img class="object-layer ' + posClass + '" src="' + layer.image + '?t=' + Date.now() + '" alt="' + displayName + '" title="' + displayName + '">';
                         }

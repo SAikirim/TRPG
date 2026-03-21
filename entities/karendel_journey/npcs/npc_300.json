@@ -39,6 +39,10 @@
   "conditions": {
     "wounded": "왼쪽 종아리 늑대 물림"
   },
+  "possessions": {
+    "마차": "말(짐말)이 끄는 상인용 마차. 수레 바퀴 수리 완료.",
+    "상품": "카렌델에서 팔 약초, 직물, 잡화 등. 일부 늑대에 의해 파손."
+  },
   "memory": {
     "dialogue_history": [],
     "key_events": [
