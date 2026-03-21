@@ -2,9 +2,19 @@
   "id": 301,
   "name": "미라",
   "type": "friendly",
+  "race": "인간",
   "known": true,
   "status": "alive",
   "location": "교역로 (수레 파손 현장)",
+  "appearance": {
+    "age": "20대",
+    "build": "날씬하고 민첩한 체형",
+    "skin": "밝은 피부",
+    "hair": "아버지를 닮은 갈색 머리, 하나로 묶어 올림",
+    "face": "밝은 갈색 눈, 호기심 많고 생기 있는 얼굴",
+    "outfit": "실용적인 여행복 — 짧은 외투, 긴 치마, 부츠",
+    "notable": "어깨에 가죽 가방 (약초 다발과 장부)"
+  },
   "personality": {
     "temperament": "cheerful",
     "intelligence": "medium",

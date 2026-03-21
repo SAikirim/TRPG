@@ -2,7 +2,7 @@
   "active_scenario": "karendel_journey",
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
-  "turn": 4,
+  "turn": 5,
   "chapter": 1,
   "chapter_name": "교역로",
   "party_summary": [
@@ -51,7 +51,8 @@
     "새 시나리오: 카렌델로 가는 길. 교역로에서 상인 할란, 미라와 동행 중.",
     "[GM] [로드] 카렌델로 가는 길 — 챕터 1: 교역로. 상인 할란, 미라와 동행 중.",
     "[GM] [로드] 카렌델로 가는 길 — 교역로, 상인 할란/미라와 동행 중.",
-    "[GM] [로드] 카렌델로 가는 길 — 교역로, 상인 할란/미라와 동행 중."
+    "[GM] [로드] 카렌델로 가는 길 — 교역로, 상인 할란/미라와 동행 중.",
+    "[GM] 출발 준비 완료. 수레 수리됨. 할란의 다리 부상으로 이동 속도 느림."
   ],
   "next_objective": "",
   "display_mode": "mobile",
