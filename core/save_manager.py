@@ -298,13 +298,13 @@ class SaveManager:
                 sort_key = -(npc_pos[0] - p1_x)
                 distance = abs(npc_pos[0] - p1_x) + abs(npc_pos[1] - p1_y)
                 if distance <= 1:
-                    size_class = "close"
+                    size_class = "d1"
                 elif distance <= 2:
-                    size_class = "near"
+                    size_class = "d2"
                 elif distance <= 4:
-                    size_class = "medium"
+                    size_class = "d3"
                 else:
-                    size_class = "far"
+                    size_class = "d4"
                 npcs_to_add.append((sort_key, npc_name, portrait_path, distance, size_class))
 
             npcs_to_add.sort(key=lambda x: x[0])
