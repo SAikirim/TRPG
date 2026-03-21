@@ -121,16 +121,18 @@ def restore_scene():
         npc_pos = npc.get("position", [0, 0])
         distance = abs(npc_pos[0] - player_cx) + abs(npc_pos[1] - player_cy)
 
-        # Determine size class based on Manhattan distance
-        if distance <= 2:
-            size_class = "close"
-        elif distance <= 5:
-            size_class = "medium"
+        # Determine size class based on Manhattan distance (4 tiers, max 6 tiles)
+        if distance <= 1:
+            size_class = "near"      # 바로 옆
+        elif distance <= 2:
+            size_class = "close"     # 가까움
+        elif distance <= 4:
+            size_class = "medium"    # 중간
         else:
-            size_class = "far"
+            size_class = "far"       # 멀리 (5~6칸)
 
-        # Sort key: relative x position to player 1 (left < center < right)
-        sort_key = npc_pos[0] - p1_x
+        # Sort key: relative x position to player 1 (미러링: 맵 동쪽(+X) → 일러스트 왼쪽)
+        sort_key = -(npc_pos[0] - p1_x)  # 미러링: 맵 동쪽(+X) → 일러스트 왼쪽
         npcs_to_add.append((sort_key, npc_name, distance, size_class))
 
     # Sort: leftmost first, then center, then rightmost
@@ -404,16 +406,18 @@ def gm_update():
         npc_pos = npc.get("position", [0, 0])
         distance = abs(npc_pos[0] - player_cx) + abs(npc_pos[1] - player_cy)
 
-        # Determine size class based on Manhattan distance
-        if distance <= 2:
-            size_class = "close"    # 100%
-        elif distance <= 5:
-            size_class = "medium"   # 70%
+        # Determine size class based on Manhattan distance (4 tiers, max 6 tiles)
+        if distance <= 1:
+            size_class = "near"      # 바로 옆
+        elif distance <= 2:
+            size_class = "close"     # 가까움
+        elif distance <= 4:
+            size_class = "medium"    # 중간
         else:
-            size_class = "far"      # 50%
+            size_class = "far"       # 멀리 (5~6칸)
 
-        # Sort key: relative x position to player 1 (left < center < right)
-        sort_key = npc_pos[0] - p1_x
+        # Sort key: relative x position to player 1 (미러링: 맵 동쪽(+X) → 일러스트 왼쪽)
+        sort_key = -(npc_pos[0] - p1_x)  # 미러링: 맵 동쪽(+X) → 일러스트 왼쪽
         npcs_to_add.append((sort_key, npc_name, distance, size_class))
 
     # Sort: leftmost first, then center, then rightmost
