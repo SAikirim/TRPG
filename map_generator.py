@@ -191,7 +191,7 @@ class MapGenerator:
                     draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
 
             draw.text(
-                (cx - 14, cy - r - 16), npc["name"][:4], fill=label_color, font=font_name
+                (cx - 14, cy + r + 2), npc["name"][:4], fill=label_color, font=font_name
             )
 
         # Draw players with emoji icons
@@ -220,7 +220,7 @@ class MapGenerator:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=3)
 
             draw.text(
-                (cx - 14, cy - r - 16),
+                (cx - 14, cy + r + 2),
                 player["name"][:3],
                 fill="white",
                 font=font_name,
