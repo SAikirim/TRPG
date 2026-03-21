@@ -539,14 +539,13 @@
             color: #ffd700;
             font-size: 0.85em;
         }
-        .settings-note {
-            font-size: 0.75em;
-            color: #666;
-            text-align: center;
-            padding: 4px 0;
-        }
     </style>
-</head>
+
+    <script>
+    // Static mode: illustration fallback
+    window._staticIllustrationFallback = true;
+    </script>
+    </head>
 <body>
     <header>
         <h1 id="game-title">TRPG</h1>
@@ -560,41 +559,37 @@
         <div id="settings-panel" class="settings-dropdown">
             <div class="settings-row">
                 <span class="settings-label">SD 일러스트</span>
-                <div id="setting-sd" class="settings-toggle"></div>
+                <div id="setting-sd" class="settings-toggle" onclick="toggleSetting('sd_illustration')"></div>
             </div>
             <div class="settings-row">
                 <span class="settings-label">주사위 결과 공개</span>
-                <div id="setting-dice" class="settings-toggle"></div>
+                <div id="setting-dice" class="settings-toggle" onclick="toggleSetting('show_dice_result')"></div>
             </div>
             <div class="settings-row">
                 <span class="settings-label">표시 모드</span>
-                <select id="setting-display" class="settings-select" disabled>
+                <select id="setting-display" class="settings-select" onchange="changeSetting('display_mode', this.value)">
                     <option value="mobile">Mobile</option>
                     <option value="terminal">Terminal</option>
                 </select>
             </div>
             <div class="settings-row">
                 <span class="settings-label">난이도</span>
-                <select id="setting-difficulty" class="settings-select" disabled>
+                <select id="setting-difficulty" class="settings-select" onchange="changeSetting('difficulty', this.value)">
                     <option value="easy">Easy</option>
                     <option value="normal">Normal</option>
                     <option value="hard">Hard</option>
                     <option value="nightmare">Nightmare</option>
                 </select>
             </div>
-            <div class="settings-note">설정 변경은 동적 웹에서만 가능합니다</div>
         </div>
     </header>
 
     <div class="container">
         <div class="main-panel">
             <div class="panel illustration-section">
-                <h3>
-                    일러스트
-                    <span id="sd-badge" class="sd-toggle">SD OFF</span>
-                </h3>
+                <h3>일러스트</h3>
                 <div id="illustration-panel" class="illustration-panel">
-                    <div class="illustration-placeholder">로딩 중...</div>
+                    <div class="illustration-placeholder">대기 중...</div>
                 </div>
             </div>
             <div class="panel">
@@ -617,104 +612,11 @@
         </div>
     </div>
 
-    <div id="map-overlay" class="map-overlay" onclick="this.classList.remove('active')">
-        <img id="map-zoom-img" src="" alt="Map Zoom">
-    </div>
-
     <script>
         let gameState = null;
-        let rulesData = null;
-        let itemsData = {};
-        let skillsData = {};
-        const playerDetailCache = {};
-        const rarityEmoji = { common: '⬜', uncommon: '🟩', rare: '🟦', epic: '🟪', legendary: '🟧' };
+        let lastGameStateHash = '';
 
-        function statMod(val) {
-            const m = Math.floor((val - 10) / 2);
-            return m >= 0 ? '+' + m : '' + m;
-        }
-
-        // 아이템 정보를 items.json → rules.json 순으로 조회
-        function getItemInfo(name) {
-            if (itemsData[name]) {
-                const info = itemsData[name];
-                return { desc: info.desc || name, stat: info.stat || '', rarity: info.rarity || 'common' };
-            }
-            if (rulesData?.combat?.weapons?.[name]) {
-                const w = rulesData.combat.weapons[name];
-                return { desc: w.description, stat: 'DMG ' + w.dice, rarity: 'common' };
-            }
-            if (rulesData?.combat?.armor?.[name]) {
-                const a = rulesData.combat.armor[name];
-                return { desc: a.description || name, stat: a.bonus ? 'DEF +' + a.bonus : '', rarity: 'common' };
-            }
-            if (rulesData?.rest?.use_item?.[name]) {
-                const u = rulesData.rest.use_item[name];
-                return { desc: u.description, stat: u.heal_hp ? 'HP +' + u.heal_hp : u.heal_mp ? 'MP +' + u.heal_mp : '', rarity: 'common' };
-            }
-            return { desc: name, stat: '', rarity: 'common' };
-        }
-
-        async function loadScenarioTitle() {
-            try {
-                const res = await fetch('scenario.json');
-                const data = await res.json();
-                const title = data.scenario_info?.title || 'TRPG';
-                document.getElementById('game-title').textContent = title;
-                document.title = title + ' (Static)';
-            } catch(e) {
-                if (gameState?.game_info?.title) {
-                    document.getElementById('game-title').textContent = gameState.game_info.title;
-                }
-            }
-        }
-
-        async function loadGame() {
-            try {
-                const [stateRes, rulesRes, itemsRes, skillsRes] = await Promise.all([
-                    fetch('game_state.json'),
-                    fetch('rules.json'),
-                    fetch('items.json').catch(() => ({ json: () => ({}) })),
-                    fetch('skills.json').catch(() => ({ json: () => ({}) }))
-                ]);
-                gameState = await stateRes.json();
-                rulesData = await rulesRes.json();
-                try { const d = await itemsRes.json(); itemsData = d.items || d; } catch(e) {}
-                try { const d = await skillsRes.json(); skillsData = d.skills || d; } catch(e) {}
-
-                loadScenarioTitle();
-                renderGame();
-                loadSettings();
-            } catch (e) {
-                document.getElementById('game-title').textContent = 'TRPG - 로딩 실패';
-                console.error(e);
-            }
-        }
-
-        function renderGame() {
-            const info = gameState.game_info || {};
-
-            document.getElementById('game-desc').textContent = info.scenario || '';
-            document.getElementById('turn-count').textContent = gameState.turn_count || 0;
-            document.getElementById('chapter-info').textContent = info.current_chapter || '-';
-
-            const endingEl = document.getElementById('ending-info');
-            if (info.ending) {
-                const endings = { perfect: '완벽한 승리', bittersweet: '쓰라린 승리', retreat: '전략적 후퇴', defeat: '어둠 속으로' };
-                endingEl.textContent = endings[info.ending] || info.ending;
-                endingEl.style.display = 'inline';
-            } else {
-                endingEl.style.display = 'none';
-            }
-
-            buildOriginalImageMap();
-            renderPlayers();
-            renderEvents();
-            renderIllustration(info.current_chapter);
-            renderLegend();
-        }
-
-        // 플레이어 원본 이미지 매핑
+        // 플레이어 원본 이미지 매핑 (엔티티 original_image 필드 또는 폴백)
         const playerOriginalImages = {};
         function buildOriginalImageMap() {
             if (!gameState) return;
@@ -724,25 +626,131 @@
                 }
             });
         }
+        let lastMapTime = 0;
+        let rulesData = null;
+        let itemsData = {};
+        let skillsData = {};
 
-        function filterNpcNames(text) {
-            if (!gameState || !gameState.npcs) return text;
-            gameState.npcs.forEach(npc => {
-                if (!npc.known && npc.name) {
-                    const regex = new RegExp(npc.name, 'g');
-                    text = text.replace(regex, '???');
-                }
-            });
-            return text;
+        async function loadItems() {
+            try {
+                const res = await fetch('items.json');
+                const data = await res.json();
+                itemsData = data.items || {};
+            } catch(e) {}
         }
+
+        async function loadSkills() {
+            try {
+                const res = await fetch('skills.json');
+                const data = await res.json();
+                skillsData = data.skills || {};
+            } catch(e) {}
+        }
+
+        // 아이템 정보를 items.json에서 조회, 없으면 rules.json 폴백
+        function getItemInfo(name) {
+            // items.json 우선 조회
+            if (itemsData[name]) {
+                const info = itemsData[name];
+                return { desc: info.desc || name, stat: info.stat || '', rarity: info.rarity || 'common' };
+            }
+            // rules.json 무기 테이블 폴백
+            if (rulesData?.combat?.weapons?.[name]) {
+                const w = rulesData.combat.weapons[name];
+                return { desc: w.description, stat: 'DMG ' + w.dice, rarity: 'common' };
+            }
+            // rules.json 방어구 테이블 폴백
+            if (rulesData?.combat?.armor?.[name]) {
+                const a = rulesData.combat.armor[name];
+                return { desc: a.description || name, stat: a.bonus ? 'DEF +' + a.bonus : '', rarity: 'common' };
+            }
+            // rules.json 소모품 폴백
+            if (rulesData?.rest?.use_item?.[name]) {
+                const u = rulesData.rest.use_item[name];
+                return { desc: u.description, stat: u.heal_hp ? 'HP +' + u.heal_hp : u.heal_mp ? 'MP +' + u.heal_mp : '', rarity: 'common' };
+            }
+            return { desc: name, stat: '', rarity: 'common' };
+        }
+        function statMod(val) {
+            const m = Math.floor((val - 10) / 2);
+            return m >= 0 ? '+' + m : '' + m;
+        }
+        const rarityEmoji = { common: '⬜', uncommon: '🟩', rare: '🟦', epic: '🟪', legendary: '🟧' };
+
+        async function loadRules() {
+            try {
+                const res = await fetch('rules.json');
+                rulesData = await res.json();
+            } catch(e) {}
+        }
+
+        async function loadScenarioTitle() {
+            try {
+                const res = await fetch('scenario.json');
+                const data = await res.json();
+                const title = data.scenario_info?.title || 'TRPG';
+                document.getElementById('game-title').textContent = title;
+                document.getElementById('game-title').dataset.loaded = 'true';
+                document.title = title;
+            } catch(e) {
+                // Fallback to game_state title
+                if (gameState?.game_info?.title) {
+                    document.getElementById('game-title').textContent = gameState.game_info.title;
+                }
+            }
+        }
+
+        async function updateGameState() {
+            try {
+                const res = await fetch('game_state.json');
+                const newState = await res.json();
+                const hash = JSON.stringify(newState);
+
+                // Always update illustration (has its own change detection)
+                gameState = newState;
+                updateIllustration();
+
+                // Only re-render if game state actually changed
+                if (hash === lastGameStateHash) return;
+                lastGameStateHash = hash;
+
+                // Update header info
+                const info = gameState.game_info || {};
+                if (!document.getElementById('game-title').dataset.loaded) {
+                    loadScenarioTitle();
+                }
+                document.getElementById('game-desc').textContent = info.scenario || '';
+                document.getElementById('turn-count').textContent = gameState.turn_count || 0;
+                document.getElementById('chapter-info').textContent = info.current_chapter || '-';
+                const endingEl = document.getElementById('ending-info');
+                if (info.ending) {
+                    const endings = { perfect: '완벽한 승리', bittersweet: '쓰라린 승리', retreat: '전략적 후퇴', defeat: '어둠 속으로' };
+                    endingEl.textContent = endings[info.ending] || info.ending;
+                    endingEl.style.display = 'inline';
+                } else {
+                    endingEl.style.display = 'none';
+                }
+
+                buildOriginalImageMap();
+                updatePlayersList();
+                updateEventsList();
+                updateLegend();
+                document.getElementById('game-map').src = 'static/map_mini.png?t=' + Date.now();
+            } catch (e) {
+                const connEl = document.getElementById('connection-status');
+                if (connEl) { connEl.textContent = '연결 끊김'; connEl.className = 'status-indicator'; }
+            }
+        }
+
+        // Cache for player detail data (from entity files)
+        const playerDetailCache = {};
 
         // Track which detail panels are open
         const openDetails = {};
 
-        function renderPlayers() {
+        function updatePlayersList() {
             const container = document.getElementById('players-list');
             const classMap = { '전사': 'warrior', '마법사': 'mage', '도적': 'rogue' };
-            const scenarioId = gameState.game_info?.scenario_id || 'lost_treasure';
 
             // Save open state before re-render
             container.querySelectorAll('.detail-content.open').forEach(el => {
@@ -759,7 +767,7 @@
                 const xpNext = xpTable[String(lv + 1)] || 100;
                 const xpPrev = xpTable[String(lv)] || 0;
                 const xpPct = xpNext > xpPrev ? ((xp - xpPrev) / (xpNext - xpPrev) * 100).toFixed(0) : 100;
-                const effects = (p.status_effects || []).length > 0
+                const effects = p.status_effects.length > 0
                     ? `<div style="font-size:0.75em;color:#ffd700;margin-top:4px">상태: ${p.status_effects.map(e => typeof e === 'string' ? e : e.name).join(', ')}</div>`
                     : '';
                 const invItems = (p.inventory || []).map(item => {
@@ -769,7 +777,7 @@
                 }).join('');
                 return `
                 <div class="player-card">
-                    <img class="player-portrait" src="static/portraits/pixel/player_${p.id}.png" alt="${p.name}" onclick="openPortraitZoom('${p.original_image ? p.original_image.replace('/static/', 'static/') : 'static/portraits/pixel/player_' + p.id + '.png'}')" style="cursor:pointer">
+                    <img class="player-portrait" src="static/portraits/pixel/player_${p.id}.png" alt="${p.name}" onerror="this.src='static/portraits/pixel/player_${p.id}.png'" onclick="openPortraitZoom('${p.original_image || 'static/portraits/pixel/player_' + p.id + '.png'}')" style="cursor:pointer">
                     <div class="player-info">
                         <div class="name">
                         ${p.name}
@@ -797,18 +805,18 @@
                     </div>
                     ${effects}
                     <div class="detail-toggle">
-                        <button onclick="toggleDetail(${p.id}, 'inv', this, '${scenarioId}')">소지품 (${(p.inventory||[]).length})</button>
-                        <button onclick="toggleDetail(${p.id}, 'skill', this, '${scenarioId}')">스킬</button>
-                        <button onclick="toggleDetail(${p.id}, 'equip', this, '${scenarioId}')">장비</button>
+                        <button onclick="toggleDetail(${p.id}, 'inv', this)">소지품 (${(p.inventory||[]).length})</button>
+                        <button onclick="toggleDetail(${p.id}, 'skill', this)">스킬</button>
+                        <button onclick="toggleDetail(${p.id}, 'equip', this)">장비</button>
                     </div>
                     <div id="detail-inv-${p.id}" class="detail-content">
                         ${invItems || '<div class="detail-item" style="color:#666">없음</div>'}
                     </div>
                     <div id="detail-skill-${p.id}" class="detail-content">
-                        <div class="detail-item" style="color:#666">...</div>
+                        <ul><li style="color:#666">로딩 중...</li></ul>
                     </div>
                     <div id="detail-equip-${p.id}" class="detail-content">
-                        <div class="detail-item" style="color:#666">...</div>
+                        <ul><li style="color:#666">로딩 중...</li></ul>
                     </div>
                     </div>
                 </div>`;
@@ -819,7 +827,9 @@
                 const el = document.getElementById(id);
                 if (el) {
                     el.classList.add('open');
+                    // Also activate the corresponding button
                     const type = id.split('-')[1];
+                    const playerId = id.split('-')[2];
                     const card = el.closest('.player-card');
                     if (card) {
                         const btn = card.querySelector(`button[onclick*="'${type}'"]`);
@@ -829,7 +839,7 @@
             });
         }
 
-        async function toggleDetail(playerId, type, btn, scenarioId) {
+        async function toggleDetail(playerId, type, btn) {
             const el = document.getElementById(`detail-${type}-${playerId}`);
             const isOpen = el.classList.contains('open');
 
@@ -839,18 +849,19 @@
                 if (d) d.classList.remove('open');
                 delete openDetails[`detail-${t}-${playerId}`];
             });
+            // Deactivate all buttons in same toggle group
             btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
 
-            if (isOpen) return;
+            if (isOpen) return; // Was open, now closed
 
             el.classList.add('open');
             btn.classList.add('active');
             openDetails[`detail-${type}-${playerId}`] = true;
 
-            // Lazy load from entity file
+            // Lazy load skill/equip from entity API
             if ((type === 'skill' || type === 'equip') && !playerDetailCache[playerId]) {
                 try {
-                    const res = await fetch(`entities/${scenarioId}/players/player_${playerId}.json`);
+                    const res = await fetch(`entities/${(gameState?.game_info?.scenario_id || 'karendel_journey')}/players/player_${playerId}.json`);
                     playerDetailCache[playerId] = await res.json();
                 } catch(e) {
                     playerDetailCache[playerId] = {};
@@ -858,57 +869,20 @@
             }
 
             if (type === 'skill') {
-                const detail = playerDetailCache[playerId] || {};
-                const available = detail.available_actions || [];
-                let skills;
-                if (available.length > 0) {
-                    skills = available.map(name => {
+                const playerObj = gameState.players.find(p => p.id === playerId);
+                const actions = playerDetailCache[playerId]?.available_actions || [];
+                if (actions.length) {
+                    el.innerHTML = actions.map(name => {
                         const info = skillsData[name] || {};
                         const stat = info.stat || '';
                         const desc = info.desc || name;
                         const lvl = info.level_req ? 'Lv.' + info.level_req : '';
-                        // rules.json 폴백
-                        const rAction = rulesData?.actions?.[name];
-                        const cost = rAction?.cost?.mp ? 'MP ' + rAction.cost.mp : (info.cost || '');
-                        let dmgStr = '';
-                        if (rAction?.damage) {
-                            let dice = rAction.damage.split(' + ')[0];
-                            if (dice.includes('weapon')) {
-                                const wep = detail.equipment?.weapon;
-                                const wName = typeof wep === 'object' ? wep?.name : wep;
-                                const wDef = rulesData?.combat?.weapons?.[wName];
-                                dice = wDef ? wDef.dice : '1d2';
-                            }
-                            dmgStr = ' / ' + dice;
-                        }
-                        return `<div class="detail-item"><span class="item-name">${name}</span><span class="item-stat">${cost || stat}${dmgStr}</span><div class="tooltip">${rAction?.description || desc}${lvl ? ' (' + lvl + ')' : ''}</div></div>`;
-                    });
+                        return `<div class="detail-item"><span class="item-name">${name}</span><span class="item-stat">${stat}</span><div class="tooltip">${desc}${lvl ? ' (' + lvl + ')' : ''}</div></div>`;
+                    }).join('');
                 } else {
-                    // 클래스 기반 필터 폴백
-                    const actions = rulesData?.actions || {};
-                    const playerClass = gameState.players.find(p => p.id === playerId);
-                    const className = playerClass ? playerClass.class : '';
-                    const classSkills = Object.entries(actions).filter(([k,v]) =>
-                        k !== '_설명' && (v.class === className || v.class === 'all'));
-                    skills = classSkills.map(([name, info]) => {
-                        const cost = info.cost?.mp ? 'MP ' + info.cost.mp : 'MP 0';
-                        let dmgStr = '';
-                        if (info.damage) {
-                            let dmg = info.damage.split(' + ')[0];
-                            if (dmg.includes('weapon')) {
-                                const weaponName = playerDetailCache[playerId]?.equipment?.weapon;
-                                const wn = typeof weaponName === 'object' ? weaponName?.name : weaponName;
-                                const wDef = rulesData?.combat?.weapons?.[wn];
-                                dmg = wDef ? wDef.dice : '1d2';
-                            }
-                            dmgStr = ' / ' + dmg;
-                        }
-                        return `<div class="detail-item"><span class="item-name">${name}</span><span class="item-stat">${cost}${dmgStr}</span><div class="tooltip">${info.description || name}</div></div>`;
-                    });
+                    el.innerHTML = '<div class="detail-item" style="color:#666">없음</div>';
                 }
-                el.innerHTML = skills.length ? skills.join('') : '<div class="detail-item" style="color:#666">없음</div>';
             }
-
             if (type === 'equip') {
                 const detail = playerDetailCache[playerId] || {};
                 const equip = detail.equipment || {};
@@ -928,6 +902,7 @@
                     let statStr = wDef ? 'DMG ' + wDef.dice : '';
                     const aDef = rulesData?.combat?.armor?.[item.name];
                     if (aDef) statStr = 'DEF +' + aDef.bonus;
+                    // 마법 속성 표시
                     let propParts = [];
                     if (props.attack_bonus) propParts.push('명중+' + props.attack_bonus);
                     if (props.damage_bonus) propParts.push('데미지+' + props.damage_bonus);
@@ -941,7 +916,18 @@
             }
         }
 
-        function renderEvents() {
+        function filterNpcNames(text) {
+            if (!gameState || !gameState.npcs) return text;
+            gameState.npcs.forEach(npc => {
+                if (!npc.known && npc.name) {
+                    const regex = new RegExp(npc.name, 'g');
+                    text = text.replace(regex, '???');
+                }
+            });
+            return text;
+        }
+
+        function updateEventsList() {
             const container = document.getElementById('events-list');
             const events = gameState.events.slice(-10).reverse();
             container.innerHTML = events.map(e => {
@@ -956,7 +942,7 @@
             }).join('');
         }
 
-        function renderLegend() {
+        function updateLegend() {
             const container = document.getElementById('map-legend');
             if (!container || !gameState) return;
             const playerColors = { '전사': '#e63946', '마법사': '#457be0', '도적': '#2ecc71' };
@@ -985,37 +971,102 @@
             container.innerHTML = html;
         }
 
-        function renderIllustration(chapter) {
-            const panel = document.getElementById('illustration-panel');
-            const chapterBgs = {
-                1: 'static/illustrations/sd/ch1_forest.png',
-                2: 'static/illustrations/sd/ch2_dungeon.png',
-                3: 'static/illustrations/sd/ch3_treasure.png',
-                4: 'static/illustrations/sd/background_village_night.webp'
-            };
-            const pixelBgs = {
-                1: 'static/illustrations/pixel/forest.png',
-                2: 'static/illustrations/pixel/dungeon.png',
-                3: 'static/illustrations/pixel/treasure.png',
-                4: 'static/illustrations/pixel/forest.png'
-            };
-            const bg = chapterBgs[chapter];
-            const fallback = pixelBgs[chapter] || pixelBgs[1];
-            if (bg) {
-                panel.innerHTML = `<img class="bg-layer" src="${bg}" alt="Chapter ${chapter}" onerror="this.src='${fallback}'">`;
-            } else {
-                panel.innerHTML = '<div class="illustration-placeholder">일러스트 없음</div>';
+        let lastSceneHash = '';
+
+        async function updateIllustration() {
+            try {
+                const res = await fetch('illustration_state.json');
+                const data = await res.json();
+                const panel = document.getElementById('illustration-panel');
+                // SD 상태는 설정 패널에서 표시
+
+                // Build a hash to detect changes
+                const sceneHash = JSON.stringify({
+                    bg: data.background,
+                    layers: data.layers,
+                    status: data.generating?.status,
+                    default_bg: data.default_bg,
+                    enabled: data.enabled
+                });
+
+                if (sceneHash === lastSceneHash) return;
+                lastSceneHash = sceneHash;
+
+                const generating = data.generating || {};
+                const hasContent = data.background || (data.layers && data.layers.length > 0);
+
+                if (!data.enabled) {
+                    if (data.default_bg) {
+                        panel.innerHTML = '<img class="bg-layer" src="' + data.default_bg.pixel + '?t=default" alt="Background">';
+                    } else {
+                        panel.innerHTML = '<div class="illustration-placeholder">SD 비활성</div>';
+                    }
+                    return;
+                }
+
+                if (!hasContent && generating.status !== 'generating') {
+                    if (generating.status === 'error' && generating.error) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.style.cssText = 'color:#e63946;font-size:0.9em;padding:20px;text-align:center';
+                        errorDiv.textContent = '오류: ' + generating.error;
+                        panel.innerHTML = '';
+                        panel.appendChild(errorDiv);
+                    } else if (data.default_bg) {
+                        // Show default chapter background
+                        const bgSrc = data.enabled ? data.default_bg.sd : data.default_bg.pixel;
+                        const fallbackSrc = data.default_bg.pixel;
+                        panel.innerHTML = '<img class="bg-layer" src="' + bgSrc + '?t=default" alt="Background" onerror="this.src=\'' + fallbackSrc + '?t=default\'">';
+                    } else {
+                        panel.innerHTML = '<div class="illustration-placeholder">대기 중...</div>';
+                    }
+                    return;
+                }
+
+                // Build scene with layers
+                let html = '';
+
+                if (data.background) {
+                    html += '<img class="bg-layer" src="' + data.background + '?t=' + Date.now() + '" alt="Background">';
+                }
+
+                if (data.layers && data.layers.length > 0) {
+                    html += '<div class="layer-container">';
+                    data.layers.forEach((layer, idx) => {
+                        const posClass = 'pos-' + Math.min(idx, 3);
+                        const sizeClass = 'size-' + (layer.size_class || 'close');
+                        const displayName = gameState?.npcs?.find(n => n.name === layer.name)?.known === false ? '???' : (layer.name || '');
+                        if (layer.type === 'portrait') {
+                            html += '<div class="portrait-wrapper ' + posClass + ' ' + sizeClass + '">';
+                            html += '<span class="layer-name">' + displayName + '</span>';
+                            html += '<img class="portrait-layer" src="' + layer.image + '?t=' + Date.now() + '" alt="' + displayName + '">';
+                            html += '</div>';
+                        } else if (layer.type === 'object') {
+                            html += '<img class="object-layer ' + posClass + '" src="' + layer.image + '?t=' + Date.now() + '" alt="' + displayName + '" title="' + displayName + '">';
+                        }
+                    });
+                    html += '</div>';
+                }
+
+                // Show generating overlay if something is being generated while scene is visible
+                if (generating.status === 'generating') {
+                    if (hasContent) {
+                        html += '<div class="generating-overlay"><div class="spinner"></div>생성 중...</div>';
+                    } else {
+                        html = '<div class="illustration-loading"><div class="spinner"></div>생성 중...</div>';
+                    }
+                }
+
+                panel.innerHTML = html;
+            } catch (e) {}
+        }
+
+        async function toggleSD() {
+            try {
+                await /* static: disabled */ false && fetch('/api/illustration/toggle', { method: 'POST' });
+                await updateIllustration();
+            } catch (e) {
+                console.error('Toggle failed:', e);
             }
-        }
-
-        function openMapZoom() {
-            document.getElementById('map-overlay').classList.add('active');
-            document.getElementById('map-zoom-img').src = 'static/map.png';
-        }
-
-        function openPortraitZoom(src) {
-            document.getElementById('map-overlay').classList.add('active');
-            document.getElementById('map-zoom-img').src = src;
         }
 
         // Tooltip: show/hide on mouse move using event delegation
@@ -1041,8 +1092,11 @@
             const tipH = tipRect.height || 40;
             let x = e.clientX + 15;
             let y = e.clientY + 15;
+            // Prevent overflow right
             if (x + tipW > window.innerWidth - 5) x = e.clientX - tipW - 10;
+            // Prevent overflow bottom
             if (y + tipH > window.innerHeight - 5) y = e.clientY - tipH - 10;
+            // Prevent overflow top/left
             if (y < 5) y = 5;
             if (x < 5) x = 5;
             tip.style.left = x + 'px';
@@ -1056,31 +1110,67 @@
         async function loadSettings() {
             try {
                 const res = await fetch('current_session.json');
-                const session = await res.json();
-                const sdEl = document.getElementById('setting-sd');
-                if (sdEl) sdEl.className = 'settings-toggle' + (session.sd_illustration ? ' active' : '');
-                const diceEl = document.getElementById('setting-dice');
-                if (diceEl) diceEl.className = 'settings-toggle' + (session.show_dice_result ? ' active' : '');
-                const dispEl = document.getElementById('setting-display');
-                if (dispEl) dispEl.value = session.display_mode || 'mobile';
-                // SD badge in illustration header
-                const sdBadge = document.getElementById('sd-badge');
-                if (sdBadge) {
-                    sdBadge.textContent = session.sd_illustration ? 'SD ON' : 'SD OFF';
-                    sdBadge.style.color = session.sd_illustration ? '#2ecc71' : '#666';
-                    sdBadge.style.borderColor = session.sd_illustration ? '#2ecc71' : '#555';
-                }
-            } catch(e) {}
-            // difficulty from game_state
-            try {
-                if (gameState?.game_info?.difficulty) {
-                    const diffEl = document.getElementById('setting-difficulty');
-                    if (diffEl) diffEl.value = gameState.game_info.difficulty;
+                const data = await res.json();
+                document.getElementById('setting-sd').className = 'settings-toggle' + (data.sd_illustration ? ' active' : '');
+                document.getElementById('setting-dice').className = 'settings-toggle' + (data.show_dice_result ? ' active' : '');
+                document.getElementById('setting-display').value = data.display_mode;
+                document.getElementById('setting-difficulty').value = data.difficulty;
+
+                // Also update SD toggle in illustration panel if exists
+                const sdToggle = document.getElementById('sd-toggle');
+                if (sdToggle) {
+                    sdToggle.textContent = data.sd_illustration ? 'SD ON' : 'SD OFF';
+                    sdToggle.className = 'sd-toggle' + (data.sd_illustration ? ' active' : '');
                 }
             } catch(e) {}
         }
 
-        loadGame();
+        async function toggleSetting(key) {
+            try {
+                const el = document.getElementById(key === 'sd_illustration' ? 'setting-sd' : 'setting-dice');
+                const current = el.classList.contains('active');
+                const body = {};
+                body[key] = !current;
+                await fetch('current_session.json', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(body)
+                });
+                await loadSettings();
+            } catch(e) {}
+        }
+
+        async function changeSetting(key, value) {
+            try {
+                const body = {};
+                body[key] = value;
+                await fetch('current_session.json', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(body)
+                });
+            } catch(e) {}
+        }
+
+        loadRules();
+        loadItems();
+        loadSkills();
+        loadSettings();
+        updateGameState();
+        // setInterval disabled in static mode
+        function openMapZoom() {
+            document.getElementById('map-overlay').classList.add('active');
+            document.getElementById('map-zoom-img').src = 'static/map.png?t=' + Date.now();
+        }
+
+        function openPortraitZoom(src) {
+            document.getElementById('map-overlay').classList.add('active');
+            document.getElementById('map-zoom-img').src = src + '?t=' + Date.now();
+        }
     </script>
+
+    <div id="map-overlay" class="map-overlay" onclick="this.classList.remove('active')">
+        <img id="map-zoom-img" src="" alt="Map Zoom">
+    </div>
 </body>
 </html>

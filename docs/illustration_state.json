@@ -1,0 +1,17 @@
+{
+  "background": "static/illustrations/sd/background_trade_road_afternoon.webp",
+  "layers": [],
+  "generating": {
+    "status": "idle",
+    "type": null,
+    "prompt": null,
+    "error": null,
+    "started_at": null
+  },
+  "enabled": false,
+  "default_bg": {
+    "sd": "static/illustrations/sd/ch1_forest.png",
+    "pixel": "static/illustrations/pixel/forest.png"
+  },
+  "current_chapter": 1
+}
