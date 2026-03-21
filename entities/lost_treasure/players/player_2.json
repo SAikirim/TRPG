@@ -14,7 +14,7 @@
   "stats": {
     "hp": 26,
     "max_hp": 26,
-    "mp": 12,
+    "mp": 10,
     "max_mp": 12,
     "STR": 8,
     "DEX": 19,
@@ -22,8 +22,8 @@
     "CON": 15
   },
   "position": [
-    7,
-    5
+    4,
+    7
   ],
   "status_effects": [],
   "inventory": [

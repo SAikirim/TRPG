@@ -245,6 +245,13 @@ def attack_roll(attacker_id, target_id, action_name="공격", state=None):
     # 대상 AC
     ac = calculate_ac(target) if _is_player(state, target_id) else _npc_ac(target)
 
+    # MP 소모 (시전 시 즉시 차감, 명중 여부 무관)
+    mp_cost = action_def.get("cost", {}).get("mp", 0)
+    if mp_cost > 0 and _is_player(state, attacker_id):
+        if attacker["mp"] < mp_cost:
+            return {"error": f"MP 부족 ({attacker['mp']}/{mp_cost})"}
+        attacker["mp"] = max(0, attacker["mp"] - mp_cost)
+
     result = {
         "action": action_name,
         "attacker": attacker.get("name", str(attacker_id)),
@@ -252,16 +259,15 @@ def attack_roll(attacker_id, target_id, action_name="공격", state=None):
         "d20": d20, "modifier": atk_mod, "attack_total": attack_total,
         "ac": ac, "critical": critical, "fumble": fumble,
         "hit": False, "damage": 0, "damage_rolls": [],
+        "mp_cost": mp_cost,
     }
 
     if fumble:
         result["hit"] = False
         result["note"] = "펌블! 자동 실패 + 다음 턴 -2"
-        # 펌블 패널티 적용
         _apply_status(attacker, "펌블", 1)
     elif critical or attack_total >= ac:
         result["hit"] = True
-        # 데미지 굴림
         dmg_dice = _damage_dice(action_def)
         dmg_rolls = roll_dice(dmg_dice)
         dmg_mod = atk_mod
@@ -272,12 +278,6 @@ def attack_roll(attacker_id, target_id, action_name="공격", state=None):
         damage = max(1, damage)
         result["damage"] = damage
         result["damage_rolls"] = dmg_rolls
-
-        # MP 소모
-        mp_cost = action_def.get("cost", {}).get("mp", 0)
-        if mp_cost > 0 and _is_player(state, attacker_id):
-            attacker["mp"] = max(0, attacker["mp"] - mp_cost)
-            result["mp_cost"] = mp_cost
 
         # 데미지 적용
         target["hp"] = max(0, target.get("hp", 0) - damage)
