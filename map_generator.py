@@ -17,7 +17,7 @@ font_paths_global = [
 
 class MapGenerator:
     def __init__(self):
-        self.tile_size = 38
+        self.tile_size = 40
         self.map_width = 20
         self.map_height = 15
         self.img_width = self.map_width * self.tile_size
@@ -266,26 +266,27 @@ class MapGenerator:
         avg_x = sum(p[0] for p in positions) / len(positions)
         avg_y = sum(p[1] for p in positions) / len(positions)
 
-        # 주변 반경 (타일 단위)
-        radius = 4
-        margin_left = 36
-        margin_top = 28
+        # 주변 반경 (타일 단위) — 가로세로 다르게
+        radius_x = 6
+        radius_y = 5  # 세로 한 칸 더
+        margin_left = 22
+        margin_top = 16
 
         # 픽셀 좌표로 변환 (margin 포함)
         center_px = int(avg_x * self.tile_size + self.tile_size // 2 + margin_left)
         center_py = int(avg_y * self.tile_size + self.tile_size // 2 + margin_top)
-        crop_size = radius * self.tile_size * 2
+        crop_w = radius_x * self.tile_size * 2
+        crop_h = radius_y * self.tile_size * 2
 
-        left = max(0, center_px - crop_size // 2)
-        top = max(0, center_py - crop_size // 2)
-        right = min(full_img.width, left + crop_size)
-        bottom = min(full_img.height, top + crop_size)
+        left = max(0, center_px - crop_w // 2)
+        top = max(0, center_py - crop_h // 2)
+        right = min(full_img.width, left + crop_w)
+        bottom = min(full_img.height, top + crop_h)
 
-        # 크롭이 너무 작으면 조정
-        if right - left < crop_size:
-            left = max(0, right - crop_size)
-        if bottom - top < crop_size:
-            top = max(0, bottom - crop_size)
+        if right - left < crop_w:
+            left = max(0, right - crop_w)
+        if bottom - top < crop_h:
+            top = max(0, bottom - crop_h)
 
         cropped = full_img.crop((left, top, right, bottom))
 
@@ -295,7 +296,7 @@ class MapGenerator:
         coord_font = ImageFont.load_default()
         for fp in font_paths_global:
             try:
-                coord_font = ImageFont.truetype(fp, 14)
+                coord_font = ImageFont.truetype(fp, 11)
                 break
             except (OSError, IOError):
                 continue
@@ -303,8 +304,8 @@ class MapGenerator:
         # 크롭 영역의 타일 범위 계산
         tile_start_x = max(0, int((left - margin_left) / self.tile_size))
         tile_start_y = max(0, int((top - margin_top) / self.tile_size))
-        tile_end_x = min(15, tile_start_x + int(crop_size / self.tile_size) + 1)
-        tile_end_y = min(12, tile_start_y + int(crop_size / self.tile_size) + 1)
+        tile_end_x = tile_start_x + int(crop_w / self.tile_size) + 1
+        tile_end_y = tile_start_y + int(crop_h / self.tile_size) + 1
 
         # 가로 좌표 (상단)
         for i in range(tile_start_x, tile_end_x):
