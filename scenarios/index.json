@@ -13,7 +13,22 @@
       "setting": "중세 판타지 숲 던전",
       "estimated_turns": "20~40",
       "tags": ["던전 탐험", "보물 사냥", "몬스터 전투"]
+    },
+    {
+      "id": "karendel_journey",
+      "title": "카렌델로 가는 길",
+      "description": "전설의 보물을 손에 넣은 세 모험가가 감정을 위해 교역도시 카렌델로 향한다.",
+      "genre": "판타지",
+      "difficulty": "normal",
+      "recommended_players": 3,
+      "ruleset": "fantasy_basic",
+      "scenario_file": "karendel_journey.json",
+      "available_classes": ["전사", "마법사", "도적", "성직자", "궁수"],
+      "setting": "중세 판타지 교역로/도시",
+      "estimated_turns": "20~40",
+      "tags": ["여행", "교역도시", "보물 감정", "NPC 교류"],
+      "prerequisite": "lost_treasure"
     }
   ],
-  "default_scenario": "lost_treasure"
+  "default_scenario": "karendel_journey"
 }
