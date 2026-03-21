@@ -7,6 +7,42 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 
 ---
 
+## ⚠️ 핵심 규칙 요약 (모든 세션 필독)
+
+> **이 섹션은 모든 세션에서 가장 먼저 읽고 준수해야 한다.**
+
+### 절대 금지
+- ❌ 유저 캐릭터(controlled_by: "user")의 대사/감정/판단을 GM이 만들지 않는다
+- ❌ 터미널에만 나레이션 쓰고 웹 반영(gm-update) 안 하는 것
+- ❌ "나중에 하겠습니다", "TODO" — 발견 즉시 처리 또는 폴백
+- ❌ 나레이션과 시스템 로그가 섞이는 것 (Phase 분리 필수)
+- ❌ 배경 위 인물 레이어에 불투명 배경 사용
+- ❌ 동일 인물의 외형이 장면마다 바뀌는 것
+
+### 필수 자동화 (코드로 동작)
+- ✅ Flask 시작/로드 시 `restore_scene()` → 배경 자동 복원
+- ✅ SD 실패 시 Cairo 폴백 (빈 화면 없음)
+- ✅ 이미지 재활용 (이름 매칭 → 기존 고퀄 우선)
+- ✅ 초상화 배경 자동 제거 (transparent-background)
+- ✅ 저장 시 docs/ 자동 동기화 (GitHub Pages)
+- ✅ NPC 엔티티 자동 생성 (check_npcs)
+- ✅ 맵 장소별 자동 전환 (current_location → worldbuilding.json)
+
+### GM 턴 처리 (매 턴 반드시 준수)
+```
+1. [Phase 1] Agent 호출 + 판정 + game_state 업데이트 + gm-update API (웹 반영)
+2. [Phase 2] 나레이션 출력 (모든 시스템 작업 완료 후)
+```
+
+### 세션 시작 체크리스트
+1. CLAUDE.md 읽기 (이 파일)
+2. current_session.json → worldbuilding.json → game_state.json 읽기
+3. entities/ 확인 (players, npcs, objects)
+4. Flask 서버 확인 → 웹 UI 장면 복원 확인
+5. 유저에게 현재 상황 요약 → 게임 이어가기
+
+---
+
 ## 게임 진행 방식
 
 ### 역할 분담
