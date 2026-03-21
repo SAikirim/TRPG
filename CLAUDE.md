@@ -98,6 +98,8 @@ rules.json / scenario.json - 현재 활성 룰셋 / 시나리오
 entities/{scenario_id}/   - npcs/ players/ objects/ 엔티티 파일
 rulesets/ / scenarios/    - 룰셋/시나리오 카탈로그
 static/                   - 맵, 초상화, 일러스트 이미지
+  map.png                 - 전체 맵 (클릭 확대용, ~1000x1000px)
+  map_mini.png            - 미니맵 (플레이어 중심 크롭, 사이드바용)
 templates/                - 웹 UI + 캐릭터 클래스 템플릿
 saves/                    - 세이브 데이터
 guides/                   - 상세 규칙 참조 파일
