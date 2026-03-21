@@ -79,16 +79,8 @@ def restore_scene():
         name=scene_name,
     )
 
-    # Restore NPC layers for alive NPCs in current scene
-    for npc in state.get("npcs", []):
-        if npc.get("status") in ("alive", "idle", "active"):
-            request_illustration(
-                illustration_type="portrait",
-                prompt="",
-                turn_count=state.get("turn_count", 0),
-                position="center",
-                name=npc.get("name", ""),
-            )
+    # NPC 레이어는 자동 추가하지 않음 — GM이 나레이션 시 명시적으로 추가
+    # 배경만 복원하고, NPC/오브젝트 레이어는 게임 진행 중 GM이 관리
 
 
 # Generate initial map and restore scene on startup
