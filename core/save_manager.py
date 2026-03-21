@@ -322,7 +322,12 @@ class SaveManager:
                 os.path.join(BASE_DIR, src_rel),
                 os.path.join(docs_dir, src_rel))
 
-        # 5. HTML 복사
+        # 5. 정적 빌드 전용 데이터 생성
+        #    동적 API가 계산해서 내려주는 값들을 정적 JSON으로 미리 빌드
+        self._build_static_player_stats(game_state, docs_dir)
+        self._build_static_settings(game_state, docs_dir)
+
+        # 6. HTML 복사
         self._copy_if_changed(
             os.path.join(BASE_DIR, "templates", "index.html"),
             os.path.join(docs_dir, "index.html"))
@@ -423,3 +428,59 @@ class SaveManager:
                 json.dump(ill_state, f, ensure_ascii=False, indent=2)
         except Exception:
             pass
+
+    def _build_static_player_stats(self, game_state, docs_dir):
+        """정적 웹용 플레이어 상세 파일 빌드.
+        동적 API(/api/player-stats/<id>)는 game_state + entity를 머지해서 반환하므로,
+        정적에서도 동일한 머지 결과를 entities/ 안에 덮어쓴다."""
+        scenario_id = game_state.get("game_info", {}).get("scenario_id", "")
+        if not scenario_id:
+            return
+        players_dir = os.path.join(docs_dir, "entities", scenario_id, "players")
+        if not os.path.isdir(players_dir):
+            return
+
+        for p in game_state.get("players", []):
+            pid = p.get("id")
+            entity_path = os.path.join(
+                BASE_DIR, "entities", scenario_id, "players", f"player_{pid}.json")
+            if not os.path.isfile(entity_path):
+                continue
+
+            with open(entity_path, "r", encoding="utf-8") as f:
+                entity = json.load(f)
+
+            # 동적 API와 동일한 머지: game_state 기본 + entity의 equipment/actions
+            merged = dict(p)
+            merged.setdefault("equipment", entity.get("equipment"))
+            merged.setdefault("available_actions", entity.get("available_actions"))
+            # entity 고유 필드도 포함 (growth, skills, history 등)
+            for key in ("growth", "skills", "history", "personality",
+                        "relationships", "class_features", "original_image"):
+                if key in entity and key not in merged:
+                    merged[key] = entity[key]
+
+            dst = os.path.join(players_dir, f"player_{pid}.json")
+            with open(dst, "w", encoding="utf-8") as f:
+                json.dump(merged, f, ensure_ascii=False, indent=2)
+
+    def _build_static_settings(self, game_state, docs_dir):
+        """정적 웹용 settings JSON 빌드.
+        동적 API(/api/settings)는 current_session + game_state.difficulty를 합산."""
+        session_path = os.path.join(BASE_DIR, "data", "current_session.json")
+        if not os.path.isfile(session_path):
+            return
+
+        with open(session_path, "r", encoding="utf-8") as f:
+            session = json.load(f)
+
+        settings = {
+            "sd_illustration": session.get("sd_illustration", False),
+            "show_dice_result": session.get("show_dice_result", False),
+            "display_mode": session.get("display_mode", "mobile"),
+            "difficulty": game_state.get("game_info", {}).get("difficulty", "normal"),
+        }
+
+        dst = os.path.join(docs_dir, "current_session.json")
+        with open(dst, "w", encoding="utf-8") as f:
+            json.dump(settings, f, ensure_ascii=False, indent=2)

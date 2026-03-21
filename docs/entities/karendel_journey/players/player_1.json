@@ -2,20 +2,13 @@
   "id": 1,
   "name": "사이키",
   "class": "마법사",
-  "background": {
-    "origin": "가난한 집안 출신. 어린 시절 마을에 찾아온 떠돌이 마법사에게 마법을 배운 독학 마법사.",
-    "motivation": "가족의 생계를 위해 보물을 찾으러 모험을 떠남",
-    "personality": "조용하고 신중하지만, 가족을 위해서라면 위험도 감수하는 책임감 강한 오빠",
-    "relationships": {
-      "루체나": "여동생. 서로를 지키며 자란 남매",
-      "노을": "마을 이웃의 고아. 밥을 나눠주던 인연"
-    }
-  },
+  "level": 3,
+  "xp": 315,
+  "hp": 21,
+  "max_hp": 21,
+  "mp": 37,
+  "max_mp": 41,
   "stats": {
-    "hp": 21,
-    "max_hp": 21,
-    "mp": 37,
-    "max_mp": 41,
     "STR": 8,
     "DEX": 16,
     "INT": 19,
@@ -41,6 +34,8 @@
     "밧줄",
     "부싯돌"
   ],
+  "controlled_by": "user",
+  "original_image": "/static/portraits/original/player_1_saiki.png",
   "equipment": {
     "weapon": {
       "name": "마법 지팡이",
@@ -57,10 +52,40 @@
     "힐",
     "마나 쉴드"
   ],
-  "combat_state": {
-    "is_in_combat": false,
-    "defense_bonus": 0,
-    "next_turn_penalty": 0
+  "growth": {
+    "level": 3,
+    "xp": 315,
+    "xp_to_next": 600,
+    "stat_points_available": 0,
+    "learned_skills": [
+      "마나 쉴드"
+    ],
+    "xp_log": [
+      {
+        "source": "오크 처치 (high)",
+        "amount": 60
+      },
+      {
+        "source": "챕터1 완료",
+        "amount": 100
+      },
+      {
+        "source": "함정 해제 (퍼즐)",
+        "amount": 25
+      },
+      {
+        "source": "보물 상자 획득 (퀘스트)",
+        "amount": 50
+      },
+      {
+        "source": "탐색/RP (숲, 던전, 비문)",
+        "amount": 50
+      },
+      {
+        "source": "늑대 처치 (medium)",
+        "amount": 30
+      }
+    ]
   },
   "history": {
     "actions_taken": [
@@ -102,47 +127,5 @@
     "kills": [],
     "items_used": [],
     "turns_played": 3
-  },
-  "conditions": {
-    "alive": true,
-    "conscious": true,
-    "death_save_turns": 0
-  },
-  "growth": {
-    "level": 3,
-    "xp": 315,
-    "xp_to_next": 600,
-    "stat_points_available": 0,
-    "learned_skills": [
-      "마나 쉴드"
-    ],
-    "xp_log": [
-      {
-        "source": "오크 처치 (high)",
-        "amount": 60
-      },
-      {
-        "source": "챕터1 완료",
-        "amount": 100
-      },
-      {
-        "source": "함정 해제 (퍼즐)",
-        "amount": 25
-      },
-      {
-        "source": "보물 상자 획득 (퀘스트)",
-        "amount": 50
-      },
-      {
-        "source": "탐색/RP (숲, 던전, 비문)",
-        "amount": 50
-      },
-      {
-        "source": "늑대 처치 (medium)",
-        "amount": 30
-      }
-    ]
-  },
-  "party_role": "후열 (원거리 딜/힐)",
-  "controlled_by": "user"
+  }
 }

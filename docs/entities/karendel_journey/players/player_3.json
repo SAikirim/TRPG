@@ -2,20 +2,13 @@
   "id": 3,
   "name": "노을",
   "class": "전사",
-  "background": {
-    "origin": "마을 외곽에서 혼자 살던 고아. 정식 훈련 받은 기사가 아니라 거리에서 몸으로 배운 싸움꾼.",
-    "motivation": "사이키네 집에서 밥을 얻어먹던 은혜를 갚겠다는 마음 반, 보물로 인생을 바꾸고 싶다는 욕심 반. '이번엔 내가 앞에 서서 지켜줄게.'",
-    "personality": "입은 거칠지만 뒤에서 남몰래 챙겨주는 겉바속촉 의리파. 위험한 일은 자기가 먼저 뛰어드는 무모한 면이 있다.",
-    "relationships": {
-      "사이키": "형이라 부르며 따르는 이웃집 은인",
-      "루체나": "동갑내기 친구. 서로 티격태격하지만 통하는 사이"
-    }
-  },
+  "level": 3,
+  "xp": 315,
+  "hp": 45,
+  "max_hp": 45,
+  "mp": 7,
+  "max_mp": 7,
   "stats": {
-    "hp": 45,
-    "max_hp": 45,
-    "mp": 7,
-    "max_mp": 7,
     "STR": 16,
     "DEX": 12,
     "INT": 8,
@@ -31,6 +24,8 @@
     "오크의 도끼",
     "상처 치료 약병"
   ],
+  "controlled_by": "agent",
+  "original_image": "/static/portraits/original/player_3_noeul.png",
   "equipment": {
     "weapon": {
       "name": "오크의 도끼",
@@ -52,33 +47,6 @@
     "도주",
     "강타"
   ],
-  "combat_state": {
-    "is_in_combat": false,
-    "defense_bonus": 0,
-    "next_turn_penalty": 0
-  },
-  "history": {
-    "actions_taken": [
-      {
-        "turn": 3,
-        "action": "공격",
-        "target": "어두운 오크",
-        "roll": "18+3=21 명중",
-        "damage": 0,
-        "result": "대상 이미 사망"
-      }
-    ],
-    "damage_dealt_total": 0,
-    "damage_received_total": 0,
-    "kills": [],
-    "items_used": [],
-    "turns_played": 1
-  },
-  "conditions": {
-    "alive": true,
-    "conscious": true,
-    "death_save_turns": 0
-  },
   "growth": {
     "level": 3,
     "xp": 315,
@@ -114,6 +82,21 @@
       }
     ]
   },
-  "party_role": "전열 (탱커/근접딜)",
-  "controlled_by": "agent"
+  "history": {
+    "actions_taken": [
+      {
+        "turn": 3,
+        "action": "공격",
+        "target": "어두운 오크",
+        "roll": "18+3=21 명중",
+        "damage": 0,
+        "result": "대상 이미 사망"
+      }
+    ],
+    "damage_dealt_total": 0,
+    "damage_received_total": 0,
+    "kills": [],
+    "items_used": [],
+    "turns_played": 1
+  }
 }
