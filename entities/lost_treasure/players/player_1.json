@@ -12,10 +12,10 @@
     }
   },
   "stats": {
-    "hp": 18,
-    "max_hp": 18,
-    "mp": 31,
-    "max_mp": 35,
+    "hp": 21,
+    "max_hp": 21,
+    "mp": 36,
+    "max_mp": 40,
     "STR": 8,
     "DEX": 16,
     "INT": 18,
@@ -52,7 +52,8 @@
     "공격",
     "마법탄",
     "파이어볼",
-    "힐"
+    "힐",
+    "마나 쉴드"
   ],
   "combat_state": {
     "is_in_combat": false,
@@ -106,11 +107,13 @@
     "death_save_turns": 0
   },
   "growth": {
-    "level": 2,
-    "xp": 285,
-    "xp_to_next": 300,
-    "stat_points_available": 0,
-    "learned_skills": [],
+    "level": 3,
+    "xp": 315,
+    "xp_to_next": 600,
+    "stat_points_available": 2,
+    "learned_skills": [
+      "마나 쉴드"
+    ],
     "xp_log": [
       {
         "source": "오크 처치 (high)",
@@ -131,6 +134,10 @@
       {
         "source": "탐색/RP (숲, 던전, 비문)",
         "amount": 50
+      },
+      {
+        "source": "늑대 처치 (medium)",
+        "amount": 30
       }
     ]
   },

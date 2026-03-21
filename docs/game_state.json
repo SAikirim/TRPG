@@ -15,12 +15,12 @@
       "id": 1,
       "name": "사이키",
       "class": "마법사",
-      "level": 2,
-      "xp": 285,
-      "hp": 18,
-      "max_hp": 18,
-      "mp": 31,
-      "max_mp": 35,
+      "level": 3,
+      "xp": 315,
+      "hp": 21,
+      "max_hp": 21,
+      "mp": 36,
+      "max_mp": 40,
       "stats": {
         "STR": 8,
         "DEX": 16,
@@ -51,12 +51,12 @@
       "id": 2,
       "name": "루체나",
       "class": "도적",
-      "level": 2,
-      "xp": 285,
-      "hp": 26,
-      "max_hp": 26,
-      "mp": 10,
-      "max_mp": 12,
+      "level": 3,
+      "xp": 315,
+      "hp": 30,
+      "max_hp": 30,
+      "mp": 12,
+      "max_mp": 14,
       "stats": {
         "STR": 8,
         "DEX": 19,
@@ -79,12 +79,12 @@
       "id": 3,
       "name": "노을",
       "class": "전사",
-      "level": 2,
-      "xp": 285,
-      "hp": 39,
-      "max_hp": 39,
-      "mp": 6,
-      "max_mp": 6,
+      "level": 3,
+      "xp": 315,
+      "hp": 45,
+      "max_hp": 45,
+      "mp": 7,
+      "max_mp": 7,
       "stats": {
         "STR": 16,
         "DEX": 12,
@@ -138,7 +138,7 @@
       "id": 201,
       "name": "늑대A",
       "type": "monster",
-      "hp": 14,
+      "hp": 0,
       "max_hp": 14,
       "attack": 6,
       "defense": 2,
@@ -147,7 +147,7 @@
         2
       ],
       "threat_level": "medium",
-      "status": "active"
+      "status": "dead"
     },
     {
       "id": 202,
@@ -460,6 +460,16 @@
       "turn": 26,
       "message": "늑대B, C 사기 붕괴 — 숲으로 도주. 늑대A(무상) 1마리 남음.",
       "timestamp": "전투"
+    },
+    {
+      "turn": 26,
+      "message": "노을이 늑대A를 도끼로 마무리했다. 전투 종료.",
+      "timestamp": "전투"
+    },
+    {
+      "turn": 26,
+      "message": "파티 전원 레벨 3 달성! 신규 스킬: 마나 쉴드(사이키), 독 바르기(루체나), 강타(노을)",
+      "timestamp": "레벨업"
     }
   ]
 }
