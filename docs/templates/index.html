@@ -539,6 +539,13 @@
             color: #ffd700;
             font-size: 0.85em;
         }
+        .settings-note {
+            color: #888;
+            font-size: 0.75em;
+            text-align: center;
+            padding: 6px 0 2px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -552,24 +559,25 @@
             <span class="settings-btn" onclick="toggleSettings()">⚙️</span>
         </div>
         <div id="settings-panel" class="settings-dropdown">
+            <div id="settings-note" class="settings-note" style="display:none">설정 변경은 동적 웹에서만 가능합니다</div>
             <div class="settings-row">
                 <span class="settings-label">SD 일러스트</span>
-                <div id="setting-sd" class="settings-toggle" onclick="toggleSetting('sd_illustration')"></div>
+                <div id="setting-sd" class="settings-toggle"></div>
             </div>
             <div class="settings-row">
                 <span class="settings-label">주사위 결과 공개</span>
-                <div id="setting-dice" class="settings-toggle" onclick="toggleSetting('show_dice_result')"></div>
+                <div id="setting-dice" class="settings-toggle"></div>
             </div>
             <div class="settings-row">
                 <span class="settings-label">표시 모드</span>
-                <select id="setting-display" class="settings-select" onchange="changeSetting('display_mode', this.value)">
+                <select id="setting-display" class="settings-select">
                     <option value="mobile">Mobile</option>
                     <option value="terminal">Terminal</option>
                 </select>
             </div>
             <div class="settings-row">
                 <span class="settings-label">난이도</span>
-                <select id="setting-difficulty" class="settings-select" onchange="changeSetting('difficulty', this.value)">
+                <select id="setting-difficulty" class="settings-select">
                     <option value="easy">Easy</option>
                     <option value="normal">Normal</option>
                     <option value="hard">Hard</option>
@@ -596,7 +604,7 @@
         <div class="sidebar">
             <div class="panel sidebar-map">
                 <h3>게임 맵</h3>
-                <img id="game-map" src="/static/map_mini.png" alt="Game Map" onclick="openMapZoom()">
+                <img id="game-map" src="" alt="Game Map" onclick="openMapZoom()">
                 <div id="map-legend" class="legend"></div>
             </div>
 
@@ -608,6 +616,58 @@
     </div>
 
     <script>
+        // ─── 환경 자동 감지 ───
+        const isStatic = !location.port || location.hostname.includes('github.io');
+        const STATIC_PREFIX = isStatic ? 'static/' : '/static/';
+
+        function apiUrl(endpoint) {
+            if (isStatic) {
+                const map = {
+                    'game-state': 'game_state.json',
+                    'rules': 'rules.json',
+                    'items': 'items.json',
+                    'skills': 'skills.json',
+                    'scenario': 'scenario.json',
+                    'settings': 'current_session.json',
+                    'illustration': 'illustration_state.json',
+                    'status-effects': 'status_effects.json',
+                    'creatures': 'creature_templates.json',
+                    'shops': 'shops.json',
+                    'quests': 'quests.json',
+                };
+                return map[endpoint] || endpoint + '.json';
+            }
+            return '/api/' + endpoint;
+        }
+
+        function playerStatsUrl(playerId) {
+            if (isStatic) {
+                const sid = gameState?.game_info?.scenario_id || 'karendel_journey';
+                return `entities/${sid}/players/player_${playerId}.json`;
+            }
+            return `/api/player-stats/${playerId}`;
+        }
+
+        function staticPath(path) {
+            if (isStatic && path.startsWith('/static/')) {
+                return path.substring(1);
+            }
+            return path;
+        }
+
+        // POST operations disabled in static mode
+        async function apiPost(endpoint, body) {
+            if (isStatic) {
+                console.log('Static mode: POST disabled for', endpoint);
+                return { ok: false };
+            }
+            return fetch('/api/' + endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+        }
+
         let gameState = null;
         let lastGameStateHash = '';
 
@@ -628,7 +688,7 @@
 
         async function loadItems() {
             try {
-                const res = await fetch('/api/items');
+                const res = await fetch(apiUrl('items'));
                 const data = await res.json();
                 itemsData = data.items || {};
             } catch(e) {}
@@ -636,7 +696,7 @@
 
         async function loadSkills() {
             try {
-                const res = await fetch('/api/skills');
+                const res = await fetch(apiUrl('skills'));
                 const data = await res.json();
                 skillsData = data.skills || {};
             } catch(e) {}
@@ -674,14 +734,14 @@
 
         async function loadRules() {
             try {
-                const res = await fetch('/api/rules');
+                const res = await fetch(apiUrl('rules'));
                 rulesData = await res.json();
             } catch(e) {}
         }
 
         async function loadScenarioTitle() {
             try {
-                const res = await fetch('/api/scenario');
+                const res = await fetch(apiUrl('scenario'));
                 const data = await res.json();
                 const title = data.scenario_info?.title || 'TRPG';
                 document.getElementById('game-title').textContent = title;
@@ -697,7 +757,7 @@
 
         async function updateGameState() {
             try {
-                const res = await fetch('/api/game-state');
+                const res = await fetch(apiUrl('game-state'));
                 const newState = await res.json();
                 const hash = JSON.stringify(newState);
 
@@ -730,10 +790,14 @@
                 updatePlayersList();
                 updateEventsList();
                 updateLegend();
-                document.getElementById('game-map').src = '/static/map_mini.png?t=' + Date.now();
+                document.getElementById('game-map').src = STATIC_PREFIX + 'map_mini.png?t=' + Date.now();
             } catch (e) {
-                const connEl = document.getElementById('connection-status');
-                if (connEl) { connEl.textContent = '연결 끊김'; connEl.className = 'status-indicator'; }
+                if (!isStatic) {
+                    const connEl = document.getElementById('connection-status');
+                    if (connEl) { connEl.textContent = '연결 끊김'; connEl.className = 'status-indicator'; }
+                } else {
+                    console.log('Static mode: game_state load failed', e);
+                }
             }
         }
 
@@ -772,7 +836,7 @@
                 }).join('');
                 return `
                 <div class="player-card">
-                    <img class="player-portrait" src="/static/portraits/pixel/player_${p.id}.png" alt="${p.name}" onerror="this.src='/static/portraits/pixel/player_${p.id}.png'" onclick="openPortraitZoom('${p.original_image || '/static/portraits/pixel/player_' + p.id + '.png'}')" style="cursor:pointer">
+                    <img class="player-portrait" src="${STATIC_PREFIX}portraits/pixel/player_${p.id}.png" alt="${p.name}" onerror="this.src='${STATIC_PREFIX}portraits/pixel/player_${p.id}.png'" onclick="openPortraitZoom('${p.original_image || STATIC_PREFIX + 'portraits/pixel/player_' + p.id + '.png'}')" style="cursor:pointer">
                     <div class="player-info">
                         <div class="name">
                         ${p.name}
@@ -856,7 +920,7 @@
             // Lazy load skill/equip from entity API
             if ((type === 'skill' || type === 'equip') && !playerDetailCache[playerId]) {
                 try {
-                    const res = await fetch(`/api/player-stats/${playerId}`);
+                    const res = await fetch(playerStatsUrl(playerId));
                     playerDetailCache[playerId] = await res.json();
                 } catch(e) {
                     playerDetailCache[playerId] = {};
@@ -970,7 +1034,7 @@
 
         async function updateIllustration() {
             try {
-                const res = await fetch('/api/illustration');
+                const res = await fetch(apiUrl('illustration'));
                 const data = await res.json();
                 const panel = document.getElementById('illustration-panel');
                 // SD 상태는 설정 패널에서 표시
@@ -990,11 +1054,13 @@
                 const generating = data.generating || {};
                 const hasContent = data.background || (data.layers && data.layers.length > 0);
 
-                if (!data.enabled) {
+                if (!hasContent && !data.enabled) {
                     if (data.default_bg) {
-                        panel.innerHTML = '<img class="bg-layer" src="' + data.default_bg.pixel + '?t=default" alt="Background">';
+                        const bgSrc = data.default_bg.sd || data.default_bg.pixel;
+                        const fallbackSrc = data.default_bg.pixel;
+                        panel.innerHTML = '<img class="bg-layer" src="' + bgSrc + '?t=default" alt="Background" onerror="this.src=\'' + fallbackSrc + '?t=default\'">';
                     } else {
-                        panel.innerHTML = '<div class="illustration-placeholder">SD 비활성</div>';
+                        panel.innerHTML = '<div class="illustration-placeholder">' + (isStatic ? '일러스트 없음' : 'SD 비활성') + '</div>';
                     }
                     return;
                 }
@@ -1095,12 +1161,17 @@
 
         async function loadSettings() {
             try {
-                const res = await fetch('/api/settings');
+                const res = await fetch(apiUrl('settings'));
                 const data = await res.json();
                 document.getElementById('setting-sd').className = 'settings-toggle' + (data.sd_illustration ? ' active' : '');
                 document.getElementById('setting-dice').className = 'settings-toggle' + (data.show_dice_result ? ' active' : '');
-                document.getElementById('setting-display').value = data.display_mode;
-                document.getElementById('setting-difficulty').value = data.difficulty;
+                document.getElementById('setting-display').value = data.display_mode || 'mobile';
+
+                // Difficulty: from settings API in dynamic, from gameState in static
+                const difficulty = isStatic
+                    ? (gameState?.game_info?.difficulty || data.difficulty || 'normal')
+                    : data.difficulty;
+                document.getElementById('setting-difficulty').value = difficulty;
 
                 // Also update SD toggle in illustration panel if exists
                 const sdToggle = document.getElementById('sd-toggle');
@@ -1112,41 +1183,52 @@
         }
 
         async function toggleSetting(key) {
+            if (isStatic) return;
             try {
                 const el = document.getElementById(key === 'sd_illustration' ? 'setting-sd' : 'setting-dice');
                 const current = el.classList.contains('active');
                 const body = {};
                 body[key] = !current;
-                await fetch('/api/settings', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(body)
-                });
+                await apiPost('settings', body);
                 await loadSettings();
             } catch(e) {}
         }
 
         async function changeSetting(key, value) {
+            if (isStatic) return;
             try {
                 const body = {};
                 body[key] = value;
-                await fetch('/api/settings', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(body)
-                });
+                await apiPost('settings', body);
             } catch(e) {}
         }
+
+        // 환경에 따라 설정 UI 초기화
+        if (isStatic) {
+            document.getElementById('settings-note').style.display = '';
+            document.getElementById('setting-display').disabled = true;
+            document.getElementById('setting-difficulty').disabled = true;
+        } else {
+            document.getElementById('setting-sd').onclick = function() { toggleSetting('sd_illustration'); };
+            document.getElementById('setting-dice').onclick = function() { toggleSetting('show_dice_result'); };
+            document.getElementById('setting-display').onchange = function() { changeSetting('display_mode', this.value); };
+            document.getElementById('setting-difficulty').onchange = function() { changeSetting('difficulty', this.value); };
+        }
+
+        // 초기 맵 이미지 설정
+        document.getElementById('game-map').src = STATIC_PREFIX + 'map_mini.png';
 
         loadRules();
         loadItems();
         loadSkills();
         loadSettings();
         updateGameState();
-        setInterval(updateGameState, 2000);
+        if (!isStatic) {
+            setInterval(updateGameState, 2000);
+        }
         function openMapZoom() {
             document.getElementById('map-overlay').classList.add('active');
-            document.getElementById('map-zoom-img').src = '/static/map.png?t=' + Date.now();
+            document.getElementById('map-zoom-img').src = STATIC_PREFIX + 'map.png?t=' + Date.now();
         }
 
         function openPortraitZoom(src) {

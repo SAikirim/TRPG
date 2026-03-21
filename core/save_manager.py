@@ -219,9 +219,8 @@ class SaveManager:
         return 1  # 숲의 입구
 
     def _sync_docs(self, game_state):
-        """docs/ 폴더를 최신 상태로 동기화 (GitHub Pages용). HTML은 건드리지 않는다.
-        JSON 데이터, 이미지, 엔티티/템플릿/룰셋을 docs/에 복사한다.
-        docs/index.html은 독립적으로 관리되며, 이 함수로 생성/변환하지 않는다."""
+        """docs/ 폴더를 최신 상태로 동기화 (GitHub Pages용).
+        HTML 복사 + JSON 데이터, 이미지, 엔티티/템플릿/룰셋을 docs/에 복사한다."""
         docs_dir = os.path.join(BASE_DIR, "docs")
         os.makedirs(docs_dir, exist_ok=True)
 
@@ -357,3 +356,9 @@ class SaveManager:
                 if os.path.exists(dst):
                     shutil.rmtree(dst)
                 shutil.copytree(src, dst)
+
+        # 5. HTML 단순 복사 (동적/정적 동일 파일)
+        html_src = os.path.join(BASE_DIR, "templates", "index.html")
+        html_dst = os.path.join(docs_dir, "index.html")
+        if os.path.exists(html_src):
+            shutil.copy2(html_src, html_dst)

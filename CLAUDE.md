@@ -23,7 +23,7 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - ✅ SD 실패 시 Cairo 폴백 (빈 화면 없음)
 - ✅ 이미지 재활용 (이름 매칭 → 기존 고퀄 우선)
 - ✅ 초상화 배경 자동 제거 (transparent-background)
-- ✅ 저장 시 docs/ 자동 동기화 (GitHub Pages) — build_static.py가 데이터(JSON, 이미지)만 동기화
+- ✅ 저장 시 docs/ 자동 동기화 (GitHub Pages) — build_static.py가 HTML 복사 + 데이터(JSON, 이미지) 동기화
 - ✅ NPC 엔티티 자동 생성 (check_npcs)
 - ✅ 맵 장소별 자동 전환 (current_location → worldbuilding.json)
 
@@ -114,8 +114,8 @@ rulesets/ / scenarios/    - 룰셋/시나리오 카탈로그
 static/                   - 맵, 초상화, 일러스트 이미지
   map.png                 - 전체 맵 (클릭 확대용, ~1000x1000px)
   map_mini.png            - 미니맵 (플레이어 중심 크롭, 사이드바용)
-templates/                - 동적 웹 UI (Flask API 사용) + 캐릭터 클래스 템플릿
-docs/index.html           - 정적 웹 전용 파일 (독립적으로 관리, build_static.py로 생성하지 않음)
+templates/                - 웹 UI (동적/정적 자동 감지) + 캐릭터 클래스 템플릿
+docs/index.html           - templates/index.html 복사본 (build_static.py가 자동 복사)
 saves/                    - 세이브 데이터
 guides/                   - 상세 규칙 참조 파일
 ```
@@ -124,13 +124,14 @@ guides/                   - 상세 규칙 참조 파일
 
 ## 웹 관리 규칙
 
-docs/index.html은 정적 웹 전용 파일이며 독립적으로 관리한다.
-build_static.py는 데이터(JSON, 이미지)만 동기화한다. HTML을 변환/생성하지 않는다.
-기능 추가 시 templates/index.html과 docs/index.html을 각각 구조에 맞게 수정해야 한다.
+templates/index.html과 docs/index.html은 동일 파일이다.
+런타임에 isStatic 변수로 환경을 자동 감지하여 API/경로를 전환한다.
+build_static.py는 HTML 복사 + 데이터 동기화를 수행한다.
+웹 기능 수정 시 templates/index.html만 편집하면 docs/에 자동 반영된다.
 
-- **templates/index.html**: 동적 웹 전용 (Flask API 사용, setInterval 폴링, 설정 변경 가능)
-- **docs/index.html**: 정적 웹 전용 (JSON 파일 직접 읽기, 1회 로드, 설정 읽기 전용)
-- **build_static.py**: 데이터(JSON, 이미지, 엔티티)만 docs/에 동기화
+- **templates/index.html**: 단일 소스 (동적/정적 자동 감지)
+- **docs/index.html**: templates/index.html의 복사본 (build_static.py 또는 _sync_docs가 자동 복사)
+- **build_static.py**: HTML 복사 + 데이터(JSON, 이미지, 엔티티) docs/에 동기화
 
 ---
 
