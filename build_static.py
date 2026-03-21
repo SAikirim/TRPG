@@ -1,600 +1,25 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRPG (Static)</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #1a1a2e;
-            color: #eee;
-            min-height: 100vh;
-        }
-        header {
-            background: linear-gradient(135deg, #16213e, #0f3460);
-            padding: 12px 24px;
-            text-align: center;
-            border-bottom: 2px solid #e94560;
-        }
-        header h1 { font-size: 1.4em; color: #e94560; }
-        header p { font-size: 0.85em; color: #aaa; margin-top: 4px; }
-        .status-bar {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 6px;
-            font-size: 0.8em;
-            color: #888;
-        }
-        .status-bar .ending { color: #ffd700; font-weight: bold; }
-        .container {
-            display: flex;
-            gap: 16px;
-            padding: 16px;
-            max-width: 1400px;
-            margin: 0 auto;
-            min-height: calc(100vh - 80px);
-        }
-        .main-panel {
-            flex: 2;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            min-width: 0;
-        }
-        .sidebar {
-            width: 440px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            overflow-y: auto;
-            max-height: calc(100vh - 96px);
-        }
-        .panel {
-            background: #16213e;
-            border-radius: 12px;
-            padding: 14px;
-        }
-        .panel h3 {
-            font-size: 0.95em;
-            color: #e94560;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        /* Player cards */
-        .player-card {
-            background: #0f3460;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 8px;
-            display: flex;
-            gap: 10px;
-        }
-        .player-card:last-child { margin-bottom: 0; }
-        .player-card .name {
-            font-weight: bold;
-            font-size: 0.95em;
-            margin-bottom: 6px;
-        }
-        .player-card .name .class-badge {
-            font-size: 0.75em;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-left: 6px;
-        }
-        .class-warrior { background: #e63946; }
-        .class-mage { background: #457be0; }
-        .class-rogue { background: #2ecc71; }
-        .level-badge {
-            font-size: 0.7em;
-            padding: 1px 6px;
-            border-radius: 8px;
-            background: #ffd700;
-            color: #1a1a2e;
-            font-weight: bold;
-            margin-left: 4px;
-        }
-        .bar-xp { background: linear-gradient(90deg, #ffd700, #f0c040); }
-        .stat-mod { color: #ffd700; font-size: 0.85em; }
-        .rarity-common { color: #aaa; }
-        .rarity-uncommon { color: #2ecc71; }
-        .rarity-rare { color: #3498db; }
-        .rarity-epic { color: #9b59b6; }
-        .rarity-legendary { color: #e67e22; }
-        .bar-container {
-            background: #1a1a2e;
-            border-radius: 4px;
-            height: 16px;
-            margin: 3px 0;
-            position: relative;
-            overflow: hidden;
-        }
-        .bar {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s;
-        }
-        .bar-hp { background: linear-gradient(90deg, #e63946, #ff6b6b); }
-        .bar-mp { background: linear-gradient(90deg, #457be0, #74b9ff); }
-        .bar-label {
-            position: absolute;
-            top: 0; left: 8px;
-            font-size: 0.7em;
-            line-height: 16px;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-        }
-        .stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px 8px;
-            margin-top: 6px;
-            font-size: 0.75em;
-            color: #aaa;
-        }
-        .stats span { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
-        /* Collapsible details */
-        .detail-toggle {
-            display: flex;
-            gap: 4px;
-            margin-top: 6px;
-        }
-        .detail-toggle button {
-            flex: 1;
-            background: #1a1a2e;
-            border: 1px solid #333;
-            color: #aaa;
-            font-size: 0.7em;
-            padding: 3px 0;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-        }
-        .detail-toggle button:hover,
-        .detail-toggle button.active {
-            background: #0f3460;
-            color: #ffd700;
-            border-color: #ffd700;
-        }
-        .detail-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            margin-top: 0;
-        }
-        .detail-content.open {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 6px;
-        }
-        .detail-content ul {
-            list-style: none;
-            font-size: 0.75em;
-            color: #ccc;
-        }
-        .detail-content li {
-            padding: 2px 6px;
-            border-bottom: 1px solid #1a1a2e;
-        }
-        .detail-content li:last-child { border-bottom: none; }
-        .detail-content .equip-tag {
-            color: #ffd700;
-            font-size: 0.9em;
-            margin-left: 4px;
-        }
-        .detail-content .skill-item {
-            color: #74b9ff;
-        }
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 4px 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            position: relative;
-            cursor: default;
-        }
-        .detail-item:last-child { border-bottom: none; }
-        .detail-item:hover { background: rgba(255,255,255,0.05); }
-        .detail-item .item-name { flex: 1; }
-        .detail-item .item-stat {
-            font-size: 0.75em;
-            color: #ffd700;
-            margin-left: 8px;
-            white-space: nowrap;
-        }
-        .detail-item .tooltip {
-            display: none;
-            position: fixed;
-            background: #0a0a1a;
-            border: 1px solid #e94560;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 0.8em;
-            color: #ddd;
-            z-index: 9999;
-            pointer-events: none;
-            max-width: 300px;
-            word-break: keep-all;
-            overflow-wrap: break-word;
-            line-height: 1.5;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
-        }
-        .player-portrait {
-            width: 125px;
-            height: 125px;
-            border-radius: 8px;
-            border: 2px solid #333;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-        .player-info {
-            flex: 1;
-            min-width: 0;
-        }
-        /* Illustration */
-        .illustration-section .illustration-panel {
-            position: relative;
-            min-height: 400px;
-            background: #0d1b2a;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .illustration-panel .bg-layer {
-            width: 100%;
-            max-height: 500px;
-            object-fit: contain;
-            display: block;
-            margin: 0 auto;
-        }
-        .illustration-panel .layer-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-        .illustration-panel .portrait-wrapper {
-            position: absolute;
-            bottom: 5px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 22%;
-            max-height: 70%;
-        }
-        .portrait-wrapper.pos-0 { left: 2%; }
-        .portrait-wrapper.pos-1 { left: 27%; }
-        .portrait-wrapper.pos-2 { left: 52%; }
-        .portrait-wrapper.pos-3 { left: 77%; }
-        /* Legacy positions for compatibility */
-        .portrait-wrapper.pos-left { left: 2%; }
-        .portrait-wrapper.pos-center { left: 38%; }
-        .portrait-wrapper.pos-right { left: 72%; }
-        .portrait-wrapper .portrait-layer {
-            max-height: 100%;
-            max-width: 100%;
-            object-fit: contain;
-            filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.7));
-        }
-        .portrait-wrapper .layer-name {
-            background: rgba(0,0,0,0.7);
-            color: #fff;
-            font-size: 0.75em;
-            font-weight: bold;
-            padding: 1px 6px;
-            border-radius: 4px;
-            margin-bottom: 2px;
-            white-space: nowrap;
-        }
-        .illustration-panel .object-layer {
-            position: absolute;
-            max-height: 30%;
-            max-width: 25%;
-            object-fit: contain;
-            filter: drop-shadow(2px 2px 6px rgba(0,0,0,0.6));
-        }
-        .object-layer.pos-center { bottom: 10%; left: 50%; transform: translateX(-50%); }
-        .object-layer.pos-center-bottom { bottom: 5%; left: 50%; transform: translateX(-50%); }
-        .object-layer.pos-left { bottom: 10%; left: 10%; }
-        .object-layer.pos-right { bottom: 10%; right: 10%; }
-        .illustration-panel .generating-overlay {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            padding: 6px 12px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            color: #ffd700;
-            font-size: 0.8em;
-            font-style: italic;
-        }
-        .generating-overlay .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid #333;
-            border-top: 2px solid #ffd700;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 6px;
-        }
-        .illustration-placeholder {
-            color: #444;
-            font-size: 1.1em;
-            font-style: italic;
-        }
-        .illustration-loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffd700;
-            font-style: italic;
-        }
-        .illustration-loading .spinner {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border: 3px solid #333;
-            border-top: 3px solid #ffd700;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .sd-toggle {
-            font-size: 0.75em;
-            cursor: pointer;
-            padding: 2px 10px;
-            border-radius: 8px;
-            border: 1px solid #555;
-            background: #1a1a2e;
-            color: #aaa;
-            flex-shrink: 0;
-        }
-        .sd-toggle.active {
-            background: #2ecc71;
-            color: white;
-            border-color: #27ae60;
-        }
-        /* Events */
-        .events-list {
-            max-height: 300px;
-            overflow-y: auto;
-            font-size: 0.85em;
-        }
-        .event-item {
-            padding: 6px 8px;
-            border-bottom: 1px solid #1a1a2e;
-            line-height: 1.4;
-        }
-        .event-item .turn-badge {
-            display: inline-block;
-            background: #e94560;
-            color: white;
-            font-size: 0.7em;
-            padding: 1px 6px;
-            border-radius: 8px;
-            margin-right: 6px;
-        }
-        .event-item .narrative {
-            display: block;
-            color: #ffd700;
-            font-style: italic;
-            margin-top: 3px;
-        }
-        /* Map in sidebar */
-        .sidebar-map img {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            border: 2px solid #333;
-            cursor: pointer;
-        }
-        .sidebar-map img:hover { border-color: #e94560; }
-        /* Map zoom overlay — 적당한 크기 */
-        .map-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.85);
-            z-index: 10000;
-            cursor: pointer;
-            justify-content: center;
-            align-items: center;
-        }
-        .map-overlay.active { display: flex; }
-        .map-overlay img {
-            max-width: 95vw;
-            max-height: 95vh;
-            object-fit: contain;
-            border: 3px solid #e94560;
-            border-radius: 12px;
-        }
-        /* Legend */
-        .legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            font-size: 0.78em;
-            margin-top: 10px;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .legend-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 1px solid white;
-        }
-        .legend-tri {
-            width: 0; height: 0;
-            border-left: 7px solid transparent;
-            border-right: 7px solid transparent;
-            border-bottom: 12px solid #9b30ff;
-        }
-        /* Settings panel */
-        .settings-btn {
-            cursor: pointer;
-            font-size: 1.1em;
-            margin-left: 10px;
-        }
-        .settings-btn:hover { opacity: 0.7; }
-        .settings-dropdown {
-            display: none;
-            background: #0f3460;
-            border-radius: 0 0 8px 8px;
-            padding: 8px 20px;
-            max-width: 350px;
-            margin: 0 auto;
-        }
-        .settings-dropdown.open {
-            display: block;
-        }
-        .settings-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            border-bottom: 1px solid #1a1a2e;
-            font-size: 0.85em;
-        }
-        .settings-row:last-child { border-bottom: none; }
-        .settings-label { color: #ccc; }
-        .settings-toggle {
-            position: relative;
-            width: 40px;
-            height: 20px;
-            background: #333;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .settings-toggle.active {
-            background: #2ecc71;
-        }
-        .settings-toggle::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 16px;
-            height: 16px;
-            background: white;
-            border-radius: 50%;
-            transition: left 0.2s;
-        }
-        .settings-toggle.active::after {
-            left: 22px;
-        }
-        .settings-select {
-            background: #1a1a2e;
-            color: #ccc;
-            border: 1px solid #333;
-            border-radius: 4px;
-            padding: 2px 6px;
-            font-size: 0.85em;
-        }
-        .settings-value {
-            color: #ffd700;
-            font-size: 0.85em;
-        }
-        .settings-note {
-            font-size: 0.75em;
-            color: #666;
-            text-align: center;
-            padding: 4px 0;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1 id="game-title">TRPG</h1>
-        <p id="game-desc"></p>
-        <div class="status-bar">
-            <span>턴: <strong id="turn-count">-</strong></span>
-            <span>챕터: <strong id="chapter-info">-</strong></span>
-            <span id="ending-info" class="ending" style="display:none"></span>
-            <span class="settings-btn" onclick="toggleSettings()">⚙️</span>
-        </div>
-        <div id="settings-panel" class="settings-dropdown">
-            <div class="settings-row">
-                <span class="settings-label">SD 일러스트</span>
-                <div id="setting-sd" class="settings-toggle"></div>
-            </div>
-            <div class="settings-row">
-                <span class="settings-label">주사위 결과 공개</span>
-                <div id="setting-dice" class="settings-toggle"></div>
-            </div>
-            <div class="settings-row">
-                <span class="settings-label">표시 모드</span>
-                <select id="setting-display" class="settings-select" disabled>
-                    <option value="mobile">Mobile</option>
-                    <option value="terminal">Terminal</option>
-                </select>
-            </div>
-            <div class="settings-row">
-                <span class="settings-label">난이도</span>
-                <select id="setting-difficulty" class="settings-select" disabled>
-                    <option value="easy">Easy</option>
-                    <option value="normal">Normal</option>
-                    <option value="hard">Hard</option>
-                    <option value="nightmare">Nightmare</option>
-                </select>
-            </div>
-            <div class="settings-note">설정 변경은 동적 웹에서만 가능합니다</div>
-        </div>
-    </header>
+#!/usr/bin/env python
+"""Build static web (docs/index.html) from dynamic web (templates/index.html).
 
-    <div class="container">
-        <div class="main-panel">
-            <div class="panel illustration-section">
-                <h3>
-                    일러스트
-                    <span id="sd-badge" class="sd-toggle">SD OFF</span>
-                </h3>
-                <div id="illustration-panel" class="illustration-panel">
-                    <div class="illustration-placeholder">로딩 중...</div>
-                </div>
-            </div>
-            <div class="panel">
-                <h3>이벤트 로그</h3>
-                <div id="events-list" class="events-list"></div>
-            </div>
-        </div>
+동적 웹(Flask)의 templates/index.html을 원본으로 사용하여
+정적 웹(GitHub Pages)의 docs/index.html을 자동 생성한다.
 
-        <div class="sidebar">
-            <div class="panel sidebar-map">
-                <h3>게임 맵</h3>
-                <img id="game-map" src="static/map_mini.png" alt="Game Map" onclick="openMapZoom()">
-                <div id="map-legend" class="legend"></div>
-            </div>
+변환 내용:
+1. API fetch URL → 정적 JSON 파일 경로
+2. Flask 전용 기능 제거 (settings POST, SD toggle API, polling)
+3. 절대 경로(/static/) → 상대 경로(static/)
+4. 일러스트: API 기반 → 챕터별 정적 이미지
+5. 설정: 읽기 전용 (current_session.json에서 로드)
+"""
+import re
+import os
 
-            <div class="panel">
-                <h3>플레이어 정보</h3>
-                <div id="players-list"></div>
-            </div>
-        </div>
-    </div>
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-    <div id="map-overlay" class="map-overlay" onclick="this.classList.remove('active')">
-        <img id="map-zoom-img" src="" alt="Map Zoom">
-    </div>
 
-    <script>
+# === 정적 웹 전용 JavaScript ===
+# templates/index.html의 <script> 블록 전체를 이 코드로 교체한다.
+STATIC_SCRIPT = r"""    <script>
         let gameState = null;
         let rulesData = null;
         let itemsData = {};
@@ -1054,6 +479,102 @@
         }
 
         loadGame();
-    </script>
-</body>
-</html>
+    </script>"""
+
+
+def build():
+    """templates/index.html을 읽어서 정적 웹용 docs/index.html을 생성한다."""
+    src_path = os.path.join(BASE_DIR, "templates", "index.html")
+    dst_path = os.path.join(BASE_DIR, "docs", "index.html")
+
+    with open(src_path, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    # === 1. CSS 뒤에 정적 전용 스타일 추가 ===
+    static_css = """        .settings-note {
+            font-size: 0.75em;
+            color: #666;
+            text-align: center;
+            padding: 4px 0;
+        }"""
+    html = html.replace("    </style>", static_css + "\n    </style>")
+
+    # === 2. 절대 경로 → 상대 경로 ===
+    html = html.replace('src="/static/', 'src="static/')
+    html = html.replace("src='/static/", "src='static/")
+    html = html.replace("'/static/", "'static/")
+    html = html.replace('"/static/', '"static/')
+
+    # === 3. 타이틀에 (Static) 표시 ===
+    html = html.replace("<title>TRPG</title>", "<title>TRPG (Static)</title>")
+
+    # === 4. 설정 패널: toggleSetting/changeSetting → 읽기 전용 ===
+    # settings toggle onclick 제거
+    html = html.replace(
+        ' onclick="toggleSetting(\'sd_illustration\')"',
+        ""
+    )
+    html = html.replace(
+        ' onclick="toggleSetting(\'show_dice_result\')"',
+        ""
+    )
+    # display_mode select → disabled
+    html = html.replace(
+        " onchange=\"changeSetting('display_mode', this.value)\">",
+        " disabled>"
+    )
+    # difficulty select → disabled
+    html = html.replace(
+        " onchange=\"changeSetting('difficulty', this.value)\">",
+        " disabled>"
+    )
+    # 설정 패널에 안내 메시지 추가
+    html = html.replace(
+        "        </div>\n    </header>",
+        '            <div class="settings-note">설정 변경은 동적 웹에서만 가능합니다</div>\n        </div>\n    </header>'
+    )
+
+    # === 5. 일러스트 헤더에 SD badge 추가 ===
+    html = html.replace(
+        '<h3>일러스트</h3>',
+        '<h3>\n                    일러스트\n                    <span id="sd-badge" class="sd-toggle">SD OFF</span>\n                </h3>'
+    )
+
+    # === 6. 일러스트 placeholder 텍스트 변경 ===
+    html = html.replace(
+        '<div class="illustration-placeholder">대기 중...</div>',
+        '<div class="illustration-placeholder">로딩 중...</div>'
+    )
+
+    # === 7. <script> 블록 전체 교체 ===
+    # templates의 <script>...</script> 블록을 정적 웹 전용 JS로 교체
+    script_start = html.find("    <script>")
+    script_end = html.find("    </script>") + len("    </script>")
+    if script_start >= 0 and script_end > script_start:
+        html = html[:script_start] + STATIC_SCRIPT + html[script_end:]
+
+    # === 8. map-overlay를 script 앞으로 이동 (이미 되어있으면 건너뜀) ===
+    # 동적 버전은 script 뒤에 map-overlay가 있지만, 정적 버전은 script 앞에 있어야 함
+    overlay_block = '\n    <div id="map-overlay" class="map-overlay" onclick="this.classList.remove(\'active\')">\n        <img id="map-zoom-img" src="" alt="Map Zoom">\n    </div>\n'
+    # 기존 위치에서 제거
+    html = html.replace(overlay_block, "")
+    # </div> (container 닫기) 뒤, script 앞에 삽입
+    html = html.replace(
+        "    </div>\n\n    <script>",
+        "    </div>\n" + overlay_block + "\n    <script>"
+    )
+
+    # === 최종 출력 ===
+    os.makedirs(os.path.dirname(dst_path), exist_ok=True)
+    with open(dst_path, "w", encoding="utf-8") as f:
+        f.write(html)
+
+    src_size = os.path.getsize(src_path)
+    dst_size = os.path.getsize(dst_path)
+    print(f"Built docs/index.html from templates/index.html")
+    print(f"  Source: {src_size:,} bytes ({sum(1 for _ in open(src_path, encoding='utf-8'))} lines)")
+    print(f"  Output: {dst_size:,} bytes ({sum(1 for _ in open(dst_path, encoding='utf-8'))} lines)")
+
+
+if __name__ == "__main__":
+    build()

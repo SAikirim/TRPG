@@ -253,10 +253,11 @@ class SaveManager:
                 os.makedirs(os.path.dirname(dst), exist_ok=True)
                 shutil.copy2(src, dst)
 
-        # 개별 JSON 파일 동기화
+        # 개별 JSON 파일 동기화 (정적 웹에서 직접 읽는 파일 포함)
         json_files = [
             "rules.json", "current_session.json", "worldbuilding.json",
             "scenario.json", "pending_actions.json",
+            "items.json", "skills.json",
         ]
         for fname in json_files:
             src = os.path.join(BASE_DIR, "data", fname)
@@ -277,3 +278,14 @@ class SaveManager:
                 if os.path.exists(dst):
                     shutil.rmtree(dst)
                 shutil.copytree(src, dst)
+
+        # 정적 웹 HTML 빌드 (templates/index.html → docs/index.html)
+        try:
+            import sys
+            import subprocess
+            subprocess.run(
+                [sys.executable, os.path.join(BASE_DIR, "build_static.py")],
+                capture_output=True, timeout=10
+            )
+        except Exception:
+            pass

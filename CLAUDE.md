@@ -23,7 +23,7 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - ✅ SD 실패 시 Cairo 폴백 (빈 화면 없음)
 - ✅ 이미지 재활용 (이름 매칭 → 기존 고퀄 우선)
 - ✅ 초상화 배경 자동 제거 (transparent-background)
-- ✅ 저장 시 docs/ 자동 동기화 (GitHub Pages)
+- ✅ 저장 시 docs/ 자동 동기화 (GitHub Pages) + build_static.py 자동 실행
 - ✅ NPC 엔티티 자동 생성 (check_npcs)
 - ✅ 맵 장소별 자동 전환 (current_location → worldbuilding.json)
 
@@ -85,6 +85,7 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 ```
 app.py                    - Flask 웹 서버, API 엔드포인트, gm-update 처리
 game_start.py             - 게임 시작 자동화 CLI (새 게임/이어하기/세이브 로드)
+build_static.py           - 정적 웹 빌드 (templates/index.html → docs/index.html)
 session_validator.py      - 세션 검증 자동화 (상태 일관성 검사 + 자동 수정)
 core/                     - Python 엔진 모듈 (패키지)
   __init__.py
@@ -113,7 +114,8 @@ rulesets/ / scenarios/    - 룰셋/시나리오 카탈로그
 static/                   - 맵, 초상화, 일러스트 이미지
   map.png                 - 전체 맵 (클릭 확대용, ~1000x1000px)
   map_mini.png            - 미니맵 (플레이어 중심 크롭, 사이드바용)
-templates/                - 웹 UI + 캐릭터 클래스 템플릿
+templates/                - 웹 UI + 캐릭터 클래스 템플릿 (원본 — 여기만 편집)
+docs/index.html           - 정적 웹 (직접 편집 금지 — build_static.py로 자동 생성)
 saves/                    - 세이브 데이터
 guides/                   - 상세 규칙 참조 파일
 ```
