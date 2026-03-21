@@ -29,8 +29,8 @@
         "CON": 10
       },
       "position": [
-        8,
-        4
+        7,
+        5
       ],
       "status_effects": [],
       "inventory": [
@@ -65,8 +65,8 @@
         "CON": 15
       },
       "position": [
-        9,
-        4
+        8,
+        5
       ],
       "status_effects": [],
       "inventory": [
@@ -93,8 +93,8 @@
         "CON": 17
       },
       "position": [
-        7,
-        4
+        6,
+        5
       ],
       "status_effects": [],
       "inventory": [
@@ -122,8 +122,8 @@
       "attack": 3,
       "defense": 2,
       "position": [
-        9,
-        5
+        7,
+        6
       ],
       "threat_level": "none",
       "status": "alive",
@@ -146,8 +146,8 @@
       "attack": 2,
       "defense": 2,
       "position": [
-        10,
-        5
+        8,
+        6
       ],
       "threat_level": "none",
       "status": "alive",
@@ -155,38 +155,48 @@
     }
   ],
   "map": {
-    "width": 20,
-    "height": 15,
+    "width": 15,
+    "height": 12,
     "tile_size": 40,
     "locations": [
       {
-        "name": "교역로 남쪽",
-        "type": "road",
+        "name": "숲 (북쪽)",
+        "type": "grass",
         "area": {
           "x1": 0,
           "y1": 0,
-          "x2": 19,
-          "y2": 5
+          "x2": 14,
+          "y2": 3
         }
       },
       {
-        "name": "교역로 북쪽",
+        "name": "교역로",
         "type": "road",
         "area": {
           "x1": 0,
-          "y1": 6,
-          "x2": 19,
-          "y2": 10
+          "y1": 4,
+          "x2": 14,
+          "y2": 7
         }
       },
       {
-        "name": "카렌델 입구",
-        "type": "city",
+        "name": "수레 정차 지점",
+        "type": "village",
         "area": {
-          "x1": 5,
-          "y1": 11,
+          "x1": 6,
+          "y1": 5,
+          "x2": 8,
+          "y2": 6
+        }
+      },
+      {
+        "name": "숲 (남쪽)",
+        "type": "grass",
+        "area": {
+          "x1": 0,
+          "y1": 8,
           "x2": 14,
-          "y2": 14
+          "y2": 11
         }
       }
     ]

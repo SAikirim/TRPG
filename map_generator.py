@@ -121,6 +121,17 @@ class MapGenerator:
             except (OSError, IOError):
                 continue
 
+        # Emoji font for entity icons
+        emoji_font = None
+        try:
+            emoji_font = ImageFont.truetype("C:/Windows/Fonts/seguiemj.ttf", 36)
+        except (OSError, IOError):
+            pass
+
+        # Emoji maps
+        player_emojis = {"전사": "\u2694\ufe0f", "마법사": "\U0001f52e", "도적": "\U0001f5e1\ufe0f", "궁수": "\U0001f3f9", "성직자": "\u271d\ufe0f"}
+        npc_emojis = {"friendly": "\U0001f60a", "monster": "\U0001f479", "neutral": "\U0001f464"}
+
         for loc in locations:
             area = loc["area"]
             cx = ((area["x1"] + area["x2"]) / 2) * self.tile_size + margin_left
@@ -145,32 +156,49 @@ class MapGenerator:
             npc_type = npc.get("type", "neutral")
 
             if npc_type == "monster":
-                size = 22
-                triangle = [
-                    (cx, cy - size),
-                    (cx - size, cy + size),
-                    (cx + size, cy + size),
-                ]
-                draw.polygon(triangle, fill="#9b30ff", outline="white", width=2)
+                color = "#9b30ff"
                 label_color = "white"
             elif npc_type == "friendly":
-                r = 18
-                draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill="#f1c40f", outline="white", width=2)
+                color = "#f1c40f"
                 label_color = "#f1c40f"
             else:
-                r = 18
-                draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill="#95a5a6", outline="white", width=2)
+                color = "#95a5a6"
                 label_color = "#95a5a6"
+
+            r = 22
+            emoji = npc_emojis.get(npc_type, "\U0001f464")
+
+            if emoji_font:
+                # Draw background circle for visibility
+                draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color + "88", outline="white", width=2)
+                # Draw emoji centered
+                try:
+                    draw.text((cx - 18, cy - 18), emoji, font=emoji_font, embedded_color=True)
+                except TypeError:
+                    draw.text((cx - 18, cy - 18), emoji, font=emoji_font)
+            else:
+                if npc_type == "monster":
+                    size = 22
+                    triangle = [
+                        (cx, cy - size),
+                        (cx - size, cy + size),
+                        (cx + size, cy + size),
+                    ]
+                    draw.polygon(triangle, fill=color, outline="white", width=2)
+                else:
+                    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
 
             draw.text(
                 (cx - 20, cy + 24), npc["name"][:4], fill=label_color, font=font_small
             )
 
-        # Draw players as circles
+        # Draw players with emoji icons
         player_colors = {
             "전사": "#e63946",
             "마법사": "#457be0",
             "도적": "#2ecc71",
+            "궁수": "#e67e22",
+            "성직자": "#f1c40f",
         }
         for player in state["players"]:
             px, py = player["position"]
@@ -178,7 +206,19 @@ class MapGenerator:
             cy = py * self.tile_size + self.tile_size // 2 + margin_top
             color = player_colors.get(player["class"], "white")
             r = 22
-            draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=3)
+            emoji = player_emojis.get(player["class"], "\u2694\ufe0f")
+
+            if emoji_font:
+                # Draw background circle for visibility
+                draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color + "88", outline="white", width=3)
+                # Draw emoji centered
+                try:
+                    draw.text((cx - 18, cy - 18), emoji, font=emoji_font, embedded_color=True)
+                except TypeError:
+                    draw.text((cx - 18, cy - 18), emoji, font=emoji_font)
+            else:
+                draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=3)
+
             draw.text(
                 (cx - 16, cy + r + 4),
                 player["name"][:3],
