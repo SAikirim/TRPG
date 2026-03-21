@@ -121,6 +121,16 @@ python gm_turn.py end                # Phase 1 종료 — 누락 경고 출력
 - **웹 UI** (`http://localhost:5000`) → PIL 이미지 자동 갱신 (표시 전용)
 - **커스텀 이미지** → `static/custom/` 폴더에 파일 두면 PIL 생성본 대신 사용
 
+### 좌표 기반 거리 시스템
+- 거리 = 맨하탄 거리 (|x1-x2| + |y1-y2|)
+- 근접 공격: 1칸 이내
+- 원거리 공격: 10칸 (6칸 초과 시 명중 -2)
+- 마법 공격: 8칸
+- 범위 공격 (파이어볼): 반경 2칸 내 모든 대상
+- 이동: 턴당 3칸, 대시 6칸
+- 시각 인식: 8칸, 은신 시 거리 2칸당 DC -1
+- 도주 성공 시 적에게서 3칸 이상 이격 필요
+
 ### 저장 규칙
 - **저장 = git commit + push 한 세트** (반드시 push까지)
 - 커밋 메시지 형식: `save: 턴N 내용 — 결과 요약`
@@ -508,6 +518,9 @@ Agent 툴은 일회성이므로 연속성은 JSON 파일로 유지:
 - **최소 필수 필드**: id, name, type, status, personality, memory
 
 #### NPC 엔티티 구조
+> **모든 NPC(몬스터 포함)는 플레이어와 동일한 4능력치(STR/DEX/INT/CON) + HP/MP 시스템을 사용한다.**
+> stats, hp, max_hp, mp, max_mp는 필수 필드이다. 능력치 범위는 rules.json의 npc_stats.guidelines를 참고한다.
+
 ```json
 {
   "id": 300,
@@ -515,6 +528,16 @@ Agent 툴은 일회성이므로 연속성은 JSON 파일로 유지:
   "type": "friendly",        // friendly | monster | neutral
   "status": "alive",          // alive | dead | fled | unconscious
   "location": "교역로",
+  "stats": {                  // 필수 — 플레이어와 동일한 4능력치
+    "STR": 10,
+    "DEX": 10,
+    "INT": 14,
+    "CON": 10
+  },
+  "hp": 12,                   // 필수 — 현재 HP
+  "max_hp": 12,               // 필수 — 최대 HP
+  "mp": 3,                    // 필수 — 현재 MP
+  "max_mp": 3,                // 필수 — 최대 MP
   "personality": {
     "temperament": "gruff",   // 성격 기질
     "intelligence": "high",   // 지능 수준
@@ -529,6 +552,10 @@ Agent 툴은 일회성이므로 연속성은 JSON 파일로 유지:
   }
 }
 ```
+
+- 몬스터는 기존 `attack`, `defense` 필드를 편의상 유지하되, 실제 판정은 능력치 기반으로 수행한다
+  - attack = weapon_damage + STR modifier (또는 마법 몬스터는 INT modifier)
+  - defense = 10 + DEX modifier + armor
 
 #### CLI 명령어
 ```bash
@@ -551,7 +578,19 @@ python game_mechanics.py check_npcs    # 누락 검증 + 자동 생성
 8. `scenario.json` + `rules.json` — 현재 시나리오 챕터 구조 및 룰셋 확인
 9. `python game_mechanics.py check_npcs` — NPC 엔티티 누락 검증 + 자동 생성
 
-위 파일을 **모두 확인한 후** 유저에게 현재 상황 요약을 제시하고 게임을 이어간다.
+위 파일을 **모두 확인한 후**:
+
+10. **웹 UI 상태 복원** (Flask 서버가 실행 중일 때):
+    - Flask 서버 동작 확인 (`http://127.0.0.1:5000`)
+    - 현재 장면에 맞는 gm-update 전송 (배경 일러스트 포함)
+    - 기존 SD/Cairo 이미지가 있으면 재활용, 없으면 생성
+    - 현장 NPC가 있으면 레이어로 추가
+    - game_state의 최신 이벤트/상태가 웹에 반영되었는지 확인
+
+11. **유저에게 현재 상황 요약 제시** 후 게임을 이어간다.
+
+> **세션 로드 시 웹 UI가 빈 화면이거나 이전 장면을 보여주는 것은 금지.**
+> 반드시 현재 상황에 맞는 배경 + NPC 레이어가 표시된 상태에서 게임을 시작해야 한다.
 
 ### current_session.json 갱신 규칙
 - **저장 트리거 발생 시** (전투 종료, 아이템 변동, 챕터 전환 등) `current_session.json`도 함께 갱신

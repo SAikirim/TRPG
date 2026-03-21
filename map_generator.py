@@ -21,7 +21,32 @@ class MapGenerator:
 
     def generate_map(self):
         state = self.load_game_state()
-        img = Image.new("RGB", (self.img_width, self.img_height), "#2d5a1e")
+
+        # Try to load location-based map from worldbuilding
+        current_loc = state.get("current_location", "")
+        wb_map = None
+        if current_loc:
+            try:
+                wb_path = os.path.join(self.base_dir, "worldbuilding.json")
+                with open(wb_path, "r", encoding="utf-8") as f:
+                    wb = json.load(f)
+                loc_data = wb.get("locations", {}).get(current_loc, {})
+                wb_map = loc_data.get("map")
+            except Exception:
+                pass
+
+        if wb_map:
+            map_w = wb_map["width"]
+            map_h = wb_map["height"]
+            locations = wb_map["areas"]
+        else:
+            map_w = state["map"]["width"]
+            map_h = state["map"]["height"]
+            locations = state["map"]["locations"]
+
+        img_w = map_w * self.tile_size
+        img_h = map_h * self.tile_size
+        img = Image.new("RGB", (img_w, img_h), "#2d5a1e")
         draw = ImageDraw.Draw(img)
 
         # Draw location areas
@@ -33,7 +58,7 @@ class MapGenerator:
             "road": "#A0926B",
             "house": "#6B4226",
         }
-        for loc in state["map"]["locations"]:
+        for loc in locations:
             area = loc["area"]
             x1 = area["x1"] * self.tile_size
             y1 = area["y1"] * self.tile_size
@@ -43,16 +68,19 @@ class MapGenerator:
             draw.rectangle([x1, y1, x2, y2], fill=color)
 
         # Draw grid
-        for x in range(0, self.img_width + 1, self.tile_size):
-            draw.line([(x, 0), (x, self.img_height)], fill="#1a1a1a", width=1)
-        for y in range(0, self.img_height + 1, self.tile_size):
-            draw.line([(0, y), (self.img_width, y)], fill="#1a1a1a", width=1)
+        for x in range(0, img_w + 1, self.tile_size):
+            draw.line([(x, 0), (x, img_h)], fill="#1a1a1a", width=1)
+        for y in range(0, img_h + 1, self.tile_size):
+            draw.line([(0, y), (img_w, y)], fill="#1a1a1a", width=1)
 
         # Draw location labels
         # CJK 지원 폰트 탐색
         font_paths = [
+            "C:/Windows/Fonts/malgun.ttf",
+            "C:/Windows/Fonts/gulim.ttc",
+            "C:/Windows/Fonts/batang.ttc",
+            "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
             "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
-            "/usr/share/fonts/opentype/unifont/unifont.otf",
             "arial.ttf",
         ]
         font = font_small = ImageFont.load_default()
@@ -64,28 +92,52 @@ class MapGenerator:
             except (OSError, IOError):
                 continue
 
-        for loc in state["map"]["locations"]:
+        for loc in locations:
             area = loc["area"]
             cx = ((area["x1"] + area["x2"]) / 2) * self.tile_size
             cy = area["y1"] * self.tile_size + 5
             draw.text((cx - 20, cy), loc["name"], fill="white", font=font_small)
 
-        # Draw NPCs as triangles (purple)
+        # Draw NPCs — different styles by type
+        # Only draw alive NPCs at current location (skip dead/fled, skip off-map positions)
         for npc in state["npcs"]:
-            if npc.get("status") == "dead":
+            if npc.get("status") in ("dead", "fled"):
                 continue
             px, py = npc["position"]
+            if px < 0 or py < 0 or px >= map_w or py >= map_h:
+                continue
+            # If NPC has a location field, only draw if it matches current_location
+            npc_location = npc.get("location", "")
+            if current_loc and npc_location and npc_location != current_loc:
+                continue
+
             cx = px * self.tile_size + self.tile_size // 2
             cy = py * self.tile_size + self.tile_size // 2
-            size = 14
-            triangle = [
-                (cx, cy - size),
-                (cx - size, cy + size),
-                (cx + size, cy + size),
-            ]
-            draw.polygon(triangle, fill="#9b30ff", outline="white")
+            npc_type = npc.get("type", "neutral")
+
+            if npc_type == "monster":
+                # Purple triangle (existing style)
+                size = 14
+                triangle = [
+                    (cx, cy - size),
+                    (cx - size, cy + size),
+                    (cx + size, cy + size),
+                ]
+                draw.polygon(triangle, fill="#9b30ff", outline="white")
+                label_color = "white"
+            elif npc_type == "friendly":
+                # Yellow circle
+                r = 10
+                draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill="#f1c40f", outline="white", width=2)
+                label_color = "#f1c40f"
+            else:
+                # Neutral — gray circle
+                r = 10
+                draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill="#95a5a6", outline="white", width=2)
+                label_color = "#95a5a6"
+
             draw.text(
-                (cx - 15, cy + size + 2), npc["name"][:4], fill="white", font=font_small
+                (cx - 15, cy + 16), npc["name"][:4], fill=label_color, font=font_small
             )
 
         # Draw players as circles
@@ -108,10 +160,19 @@ class MapGenerator:
                 font=font_small,
             )
 
-        # Draw turn info
+        # Draw turn info and location name
         turn = state.get("turn_count", 0)
-        draw.rectangle([0, 0, 150, 25], fill="#00000088")
-        draw.text((5, 5), f"Turn: {turn}", fill="yellow", font=font)
+        loc_name = ""
+        if wb_map and current_loc:
+            try:
+                loc_name = loc_data.get("name", current_loc)
+            except Exception:
+                loc_name = current_loc
+        info_text = f"Turn: {turn}"
+        if loc_name:
+            info_text += f"  |  {loc_name}"
+        draw.rectangle([0, 0, max(250, len(info_text) * 10), 25], fill="#00000088")
+        draw.text((5, 5), info_text, fill="yellow", font=font)
 
         return img
 

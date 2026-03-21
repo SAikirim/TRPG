@@ -36,7 +36,7 @@
             min-width: 0;
         }
         .sidebar {
-            width: 380px;
+            width: 440px;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
@@ -124,12 +124,13 @@
         }
         .stats {
             display: flex;
-            gap: 8px;
+            flex-wrap: wrap;
+            gap: 4px 8px;
             margin-top: 6px;
             font-size: 0.75em;
             color: #aaa;
         }
-        .stats span { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; }
+        .stats span { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
         /* Collapsible details */
         .detail-toggle {
             display: flex;
@@ -367,6 +368,29 @@
             border-radius: 8px;
             border: 2px solid #333;
             image-rendering: pixelated;
+            cursor: pointer;
+        }
+        .sidebar-map img:hover { border-color: #e94560; }
+        /* Map zoom overlay */
+        .map-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85);
+            z-index: 10000;
+            cursor: pointer;
+            justify-content: center;
+            align-items: center;
+        }
+        .map-overlay.active { display: flex; }
+        .map-overlay img {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+            image-rendering: pixelated;
+            border: 3px solid #e94560;
+            border-radius: 12px;
         }
         /* Legend */
         .legend {
@@ -421,7 +445,7 @@
         <div class="sidebar">
             <div class="panel sidebar-map">
                 <h3>게임 맵</h3>
-                <img id="game-map" src="/static/map.png" alt="Game Map">
+                <img id="game-map" src="/static/map.png" alt="Game Map" onclick="openMapZoom()">
                 <div id="map-legend" class="legend"></div>
             </div>
 
@@ -865,6 +889,14 @@
         loadRules();
         updateGameState();
         setInterval(updateGameState, 2000);
+        function openMapZoom() {
+            document.getElementById('map-overlay').classList.add('active');
+            document.getElementById('map-zoom-img').src = '/static/map.png?t=' + Date.now();
+        }
     </script>
+
+    <div id="map-overlay" class="map-overlay" onclick="this.classList.remove('active')">
+        <img id="map-zoom-img" src="" alt="Map Zoom">
+    </div>
 </body>
 </html>

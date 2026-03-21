@@ -247,6 +247,63 @@ def get_player_modifier(player, stat_name):
     return stat_modifier(val)
 
 
+# ─── 거리 계산 시스템 ───
+
+def calc_distance(pos1, pos2):
+    """Calculate Manhattan distance between two positions."""
+    if not pos1 or not pos2:
+        return 999
+    return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
+
+
+def get_entities_in_range(center_pos, radius, state):
+    """Get all players and NPCs within radius of center position."""
+    results = {"players": [], "npcs": []}
+    for p in state.get("players", []):
+        if calc_distance(center_pos, p.get("position")) <= radius:
+            results["players"].append(p)
+    for n in state.get("npcs", []):
+        if n.get("status") not in ("dead", "fled") and calc_distance(center_pos, n.get("position")) <= radius:
+            results["npcs"].append(n)
+    return results
+
+
+def check_attack_range(attacker_pos, target_pos, attack_type="melee"):
+    """Check if target is within attack range. Returns (in_range, distance, penalty)."""
+    dist = calc_distance(attacker_pos, target_pos)
+
+    if attack_type == "melee":
+        return (dist <= 1, dist, 0)
+    elif attack_type == "ranged":
+        penalty = -2 if dist > 6 else 0
+        return (dist <= 10, dist, penalty)
+    elif attack_type == "magic":
+        return (dist <= 8, dist, 0)
+    return (True, dist, 0)
+
+
+def get_move_range(position, max_distance, state):
+    """Get list of valid positions within movement range."""
+    # Simple: all positions within Manhattan distance
+    valid = []
+    for dx in range(-max_distance, max_distance + 1):
+        for dy in range(-max_distance, max_distance + 1):
+            if abs(dx) + abs(dy) <= max_distance:
+                new_pos = [position[0] + dx, position[1] + dy]
+                if new_pos[0] >= 0 and new_pos[1] >= 0:
+                    valid.append(new_pos)
+    return valid
+
+
+def check_detection(observer_pos, target_pos, observer_int=10):
+    """Check if observer can detect target. Returns (detected, dc_modifier)."""
+    dist = calc_distance(observer_pos, target_pos)
+    if dist > 8:
+        return (False, 0)
+    dc_modifier = -(dist // 2)  # -1 per 2 distance
+    return (True, dc_modifier)
+
+
 # ─── 장비 효과 시스템 ───
 
 def _get_equipment_data(entity, state=None):
@@ -511,6 +568,27 @@ def attack_roll(attacker_id, target_id, action_name="공격", state=None):
     if not action_def:
         return {"error": f"액션 '{action_name}' 미정의"}
 
+    # 거리 기반 사거리 체크
+    attacker_pos = attacker.get("position")
+    target_pos = target.get("position")
+    range_penalty = 0
+    if attacker_pos and target_pos:
+        action_type = action_def.get("type", "combat")
+        if "magic" in action_type:
+            atk_type = "magic"
+        elif action_type == "combat" and action_def.get("roll", "").find("DEX") < 0:
+            # 기본 무기 타입 확인
+            weapon_name = _get_weapon_name(attacker, state) if _is_player(state, attacker_id) else None
+            weapon_type = rules.get("combat", {}).get("weapons", {}).get(weapon_name, {}).get("type", "melee") if weapon_name else "melee"
+            atk_type = weapon_type
+        else:
+            atk_type = "melee"
+        in_range, dist, range_penalty = check_attack_range(attacker_pos, target_pos, atk_type)
+        if not in_range:
+            max_range_map = {"melee": 1, "ranged": 10, "magic": 8}
+            max_r = max_range_map.get(atk_type, "?")
+            return {"error": f"사거리 밖입니다 (거리: {dist}칸, 최대: {max_r}칸)"}
+
     # 명중 판정
     d20 = roll("1d20")
     critical = d20 == 20
@@ -519,7 +597,7 @@ def attack_roll(attacker_id, target_id, action_name="공격", state=None):
     # 공격 보정값 결정
     stat_name = _attack_stat(action_def, attacker, state)
     atk_mod = _get_modifier(attacker, stat_name)
-    attack_total = d20 + atk_mod
+    attack_total = d20 + atk_mod + range_penalty
 
     # 대상 AC
     ac = calculate_ac(target) if _is_player(state, target_id) else _npc_ac(target)
@@ -539,6 +617,7 @@ def attack_roll(attacker_id, target_id, action_name="공격", state=None):
         "ac": ac, "critical": critical, "fumble": fumble,
         "hit": False, "damage": 0, "damage_rolls": [],
         "mp_cost": mp_cost,
+        "range_penalty": range_penalty,
     }
 
     # 장비 명중 보너스 적용

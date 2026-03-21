@@ -36,8 +36,64 @@ def update_map_image():
     gen.save_map()
 
 
-# Generate initial map on startup
+def restore_scene():
+    """Restore web UI scene from current game state. Called on startup and game load."""
+    state = load_game_state()
+    chapter = state.get("game_info", {}).get("current_chapter", 1)
+    events = state.get("events", [])
+
+    # Determine scene name from latest context
+    scene_name = None
+    # Check recent events for location hints
+    for e in reversed(events[-10:]):
+        msg = (e.get("message", "") + " " + e.get("narrative", "")).lower()
+        if any(k in msg for k in ["마을", "village", "집", "home", "cottage"]):
+            scene_name = "village"
+            break
+        elif any(k in msg for k in ["교역", "road", "길", "여행", "travel"]):
+            scene_name = "trade_road"
+            break
+        elif any(k in msg for k in ["시장", "market", "상점"]):
+            scene_name = "market"
+            break
+        elif any(k in msg for k in ["던전", "dungeon", "동굴"]):
+            scene_name = "dungeon"
+            break
+        elif any(k in msg for k in ["숲", "forest", "나무"]):
+            scene_name = "forest"
+            break
+        elif any(k in msg for k in ["보물", "treasure", "황금"]):
+            scene_name = "treasure"
+            break
+
+    # Fallback to chapter-based scene
+    if not scene_name:
+        chapter_scenes = {1: "forest", 2: "dungeon", 3: "treasure", 4: "village"}
+        scene_name = chapter_scenes.get(chapter, "default")
+
+    # Request illustration (will reuse existing or generate Cairo fallback)
+    request_illustration(
+        illustration_type="background",
+        prompt="",
+        turn_count=state.get("turn_count", 0),
+        name=scene_name,
+    )
+
+    # Restore NPC layers for alive NPCs in current scene
+    for npc in state.get("npcs", []):
+        if npc.get("status") in ("alive", "idle", "active"):
+            request_illustration(
+                illustration_type="portrait",
+                prompt="",
+                turn_count=state.get("turn_count", 0),
+                position="center",
+                name=npc.get("name", ""),
+            )
+
+
+# Generate initial map and restore scene on startup
 update_map_image()
+restore_scene()
 
 
 @app.route("/")
@@ -321,6 +377,7 @@ def load_game():
     if info is None:
         return jsonify({"error": "Save not found"}), 404
     update_map_image()
+    restore_scene()
     return jsonify({"success": True, "save_info": info})
 
 

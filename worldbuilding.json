@@ -31,6 +31,17 @@
       "type": "village",
       "description": "숲 근처의 작은 농촌 마을. 주민 약 200명.",
       "features": ["촌장의 집", "경비소", "잡화점", "여관 (작음)", "교회"],
+      "map": {
+        "width": 15,
+        "height": 10,
+        "areas": [
+          {"name": "마을 입구", "type": "road", "area": {"x1": 0, "y1": 4, "x2": 3, "y2": 6}},
+          {"name": "마을 광장", "type": "village", "area": {"x1": 4, "y1": 2, "x2": 10, "y2": 8}},
+          {"name": "사이키네 집", "type": "house", "area": {"x1": 7, "y1": 3, "x2": 9, "y2": 5}},
+          {"name": "촌장의 집", "type": "house", "area": {"x1": 5, "y1": 3, "x2": 6, "y2": 5}},
+          {"name": "숲길 (카렌델 방면)", "type": "grass", "area": {"x1": 11, "y1": 0, "x2": 14, "y2": 4}}
+        ]
+      },
       "notable_npcs": {
         "에르네스": {
           "role": "마을 촌장",
@@ -54,11 +65,44 @@
         "잃어버린 보물의 숲 던전": {"direction": "동쪽", "distance": "도보 반나절", "route": "숲 안쪽"}
       }
     },
+    "trade_road_karendel": {
+      "name": "교역로 (카렌델 방면)",
+      "type": "road",
+      "description": "하룬 마을에서 카렌델로 이어지는 교역로",
+      "map": {
+        "width": 20,
+        "height": 10,
+        "areas": [
+          {"name": "교역로", "type": "road", "area": {"x1": 0, "y1": 3, "x2": 19, "y2": 6}},
+          {"name": "숲 (남쪽)", "type": "grass", "area": {"x1": 0, "y1": 7, "x2": 19, "y2": 9}},
+          {"name": "숲 (북쪽)", "type": "grass", "area": {"x1": 0, "y1": 0, "x2": 19, "y2": 2}},
+          {"name": "수레 정차 지점", "type": "village", "area": {"x1": 8, "y1": 4, "x2": 11, "y2": 5}}
+        ]
+      },
+      "connections": {
+        "하룬 마을": {"direction": "서쪽", "distance": "도보 반나절"},
+        "카렌델": {"direction": "동쪽", "distance": "도보 1.5일"}
+      }
+    },
     "karendel": {
       "name": "카렌델",
       "type": "trade_city",
       "description": "북쪽의 교역 도시. 다양한 종족과 상인이 모이는 곳.",
       "features": ["마법사 길드", "모험가 조합", "감정사", "대장간", "시장", "여관 거리"],
+      "map": {
+        "width": 25,
+        "height": 15,
+        "areas": [
+          {"name": "남문 (하룬 방면)", "type": "road", "area": {"x1": 10, "y1": 12, "x2": 14, "y2": 14}},
+          {"name": "시장 거리", "type": "village", "area": {"x1": 6, "y1": 6, "x2": 18, "y2": 11}},
+          {"name": "마법사 길드", "type": "house", "area": {"x1": 2, "y1": 2, "x2": 6, "y2": 5}},
+          {"name": "모험가 조합", "type": "house", "area": {"x1": 8, "y1": 2, "x2": 12, "y2": 5}},
+          {"name": "붉은 굴뚝 여관", "type": "house", "area": {"x1": 18, "y1": 2, "x2": 22, "y2": 5}},
+          {"name": "대장간", "type": "house", "area": {"x1": 14, "y1": 3, "x2": 16, "y2": 5}},
+          {"name": "멜로스 골동품점", "type": "house", "area": {"x1": 19, "y1": 7, "x2": 22, "y2": 9}},
+          {"name": "북문", "type": "road", "area": {"x1": 10, "y1": 0, "x2": 14, "y2": 1}}
+        ]
+      },
       "notable_npcs": {
         "멜로스": "골동품점 주인. 까다롭지만 눈이 정확하고 바가지를 씌우지 않는다. 에르네스의 지인.",
         "볼프": "붉은 굴뚝 여관 주인. 에르네스의 옛 친구. 소개장 지참 시 하룻밤 무료 투숙. 무릎이 안 좋아 에르네스가 산약초를 구해 보내주는 사이."
