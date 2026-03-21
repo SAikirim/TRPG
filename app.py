@@ -305,6 +305,29 @@ def gm_update():
     if data.get("remove_layer"):
         remove_layer(data["remove_layer"])
 
+    # 현재 위치의 alive NPC를 자동으로 레이어에 추가
+    current_loc = state.get("current_location", "")
+    positions = ["left", "center", "right"]
+    pos_idx = 0
+    for npc in state.get("npcs", []):
+        if npc.get("status") not in ("alive", "idle", "active"):
+            continue
+        npc_loc = npc.get("location", "")
+        if current_loc and npc_loc and npc_loc != current_loc:
+            continue
+        # 이미 레이어에 있으면 스킵
+        scene = get_scene_state()
+        already = any(l.get("name") == npc.get("name") for l in scene.get("layers", []))
+        if not already:
+            request_illustration(
+                illustration_type="portrait",
+                prompt="",
+                turn_count=state["turn_count"],
+                position=positions[pos_idx % len(positions)],
+                name=npc.get("name", ""),
+            )
+            pos_idx += 1
+
     return jsonify({"success": True, "event": event, "turn": state["turn_count"],
                      "illustration": ill_result, "mechanics": mechanics_results})
 
