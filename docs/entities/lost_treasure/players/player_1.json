@@ -40,8 +40,13 @@
     "금화 1닢 (공용, 카렌델 환전 후 3등분)"
   ],
   "equipment": {
-    "weapon": "마법 지팡이",
-    "armor": null
+    "weapon": {
+      "name": "마법 지팡이",
+      "rarity": "common",
+      "properties": {}
+    },
+    "armor": null,
+    "accessory": null
   },
   "available_actions": [
     "공격",

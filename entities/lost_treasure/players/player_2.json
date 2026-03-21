@@ -32,8 +32,13 @@
     "밧줄"
   ],
   "equipment": {
-    "weapon": "단검 x2",
-    "armor": null
+    "weapon": {
+      "name": "단검 x2",
+      "rarity": "common",
+      "properties": {}
+    },
+    "armor": null,
+    "accessory": null
   },
   "available_actions": [
     "공격",

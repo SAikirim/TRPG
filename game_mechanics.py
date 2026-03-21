@@ -98,28 +98,158 @@ def get_player_modifier(player, stat_name):
     return stat_modifier(val)
 
 
+# ─── 장비 효과 시스템 ───
+
+def _get_equipment_data(entity, state=None):
+    """엔티티의 장비 상세 데이터 (properties 포함) 조회"""
+    ent_data = entity
+    if state and entity.get("id"):
+        loaded, _ = _load_entity(state, entity["id"])
+        if loaded:
+            ent_data = loaded
+    return ent_data.get("equipment", {})
+
+
+def get_equipment_bonus(entity, bonus_type, state=None):
+    """장비에서 특정 보너스 합산. bonus_type: attack_bonus, damage_bonus, defense_bonus 등"""
+    equip = _get_equipment_data(entity, state)
+    total = 0
+    for slot in ("weapon", "armor", "accessory"):
+        item = equip.get(slot)
+        if isinstance(item, dict):
+            props = item.get("properties", {})
+            total += props.get(bonus_type, 0)
+    return total
+
+
+def get_equipment_element(entity, state=None):
+    """장비의 원소 속성 조회. 있으면 {'type': 'fire', 'bonus_dice': '1d4'} 반환."""
+    equip = _get_equipment_data(entity, state)
+    weapon = equip.get("weapon")
+    if isinstance(weapon, dict):
+        props = weapon.get("properties", {})
+        elem = props.get("element")
+        if elem:
+            rules = load_rules()
+            elem_defs = rules.get("combat", {}).get("equipment_properties", {}).get("element", {}).get("types", {})
+            if elem in elem_defs:
+                return {"type": elem, **elem_defs[elem]}
+    return None
+
+
+def get_on_hit_effects(entity, state=None):
+    """장비의 적중 시 효과 목록 조회"""
+    equip = _get_equipment_data(entity, state)
+    effects = []
+    weapon = equip.get("weapon")
+    if isinstance(weapon, dict):
+        props = weapon.get("properties", {})
+        on_hit = props.get("on_hit")
+        if on_hit:
+            effects.append(on_hit)
+    return effects
+
+
+def get_passive_effects(entity, state=None):
+    """장비의 패시브 효과 목록 조회"""
+    equip = _get_equipment_data(entity, state)
+    passives = []
+    for slot in ("weapon", "armor", "accessory"):
+        item = equip.get(slot)
+        if isinstance(item, dict):
+            for p in item.get("properties", {}).get("passives", []):
+                passives.append(p)
+    return passives
+
+
+def apply_equipment_on_hit(attacker, target, damage, state=None):
+    """공격 적중 시 장비 효과 처리 (원소 데미지, 확률 효과)"""
+    results = []
+
+    # 원소 데미지
+    elem = get_equipment_element(attacker, state)
+    if elem:
+        elem_dmg = roll(elem["bonus_dice"])
+        results.append({"type": "element", "element": elem["type"], "damage": elem_dmg})
+        target["hp"] = max(0, target.get("hp", 0) - elem_dmg)
+
+    # 적중 시 확률 효과
+    for effect in get_on_hit_effects(attacker, state):
+        etype = effect.get("type", "")
+        chance = effect.get("chance", 0)
+        if random.random() < chance:
+            if etype == "poison":
+                _apply_status(target, "중독", 3)
+                results.append({"type": "on_hit", "effect": "중독", "triggered": True})
+            elif etype == "stun":
+                _apply_status(target, "기절", 1)
+                results.append({"type": "on_hit", "effect": "기절", "triggered": True})
+            elif etype == "bleed":
+                _apply_status(target, "출혈", 5)
+                results.append({"type": "on_hit", "effect": "출혈", "triggered": True})
+            elif etype == "lifesteal":
+                heal_amount = max(1, damage // 4)
+                attacker["hp"] = min(attacker.get("hp", 0) + heal_amount, attacker.get("max_hp", 999))
+                results.append({"type": "on_hit", "effect": "흡혈", "heal": heal_amount})
+
+    return results
+
+
+def apply_passive_tick(state=None):
+    """턴 시작 시 패시브 효과 처리 (HP/MP 재생 등)"""
+    owned = state is None
+    if owned:
+        state = load_game_state()
+    results = []
+    for p in state["players"]:
+        passives = get_passive_effects(p, state)
+        for pas in passives:
+            ptype = pas.get("type", "")
+            if ptype == "hp_regen":
+                amount = pas.get("amount", 1)
+                old = p["hp"]
+                p["hp"] = min(p["hp"] + amount, p["max_hp"])
+                if p["hp"] > old:
+                    results.append({"player": p["name"], "effect": "HP 재생", "amount": p["hp"] - old})
+            elif ptype == "mp_regen":
+                amount = pas.get("amount", 1)
+                old = p["mp"]
+                p["mp"] = min(p["mp"] + amount, p["max_mp"])
+                if p["mp"] > old:
+                    results.append({"player": p["name"], "effect": "MP 재생", "amount": p["mp"] - old})
+    if owned:
+        save_game_state(state)
+        sync_all_players(state)
+    return {"action": "passive_tick", "results": results}
+
+
 # ─── 방어력 계산 ───
 
-ARMOR_BONUS = {
-    "가죽 방패": 2,
-    "철 방패": 3,
-    "판금 갑옷": 4,
-}
-
-
-def calculate_ac(player):
-    """방어력 = 10 + DEX 보정 + 장비 보너스"""
+def calculate_ac(player, state=None):
+    """방어력 = 10 + DEX 보정 + 방어구 보너스 + 장비 마법 보너스"""
+    rules = load_rules()
     dex_mod = get_player_modifier(player, "DEX")
-    armor = 0
+
+    # 방어구 기본 보너스 (rules.json armor 테이블 참조)
+    armor_table = rules.get("combat", {}).get("armor", {})
+    armor_bonus = 0
     for item in player.get("inventory", []):
-        armor = max(armor, ARMOR_BONUS.get(item, 0))
-    # 상태이상 방어강화 체크
+        armor_def = armor_table.get(item)
+        if armor_def:
+            armor_bonus = max(armor_bonus, armor_def.get("bonus", 0))
+
+    # 장비 마법 defense_bonus
+    magic_def = get_equipment_bonus(player, "defense_bonus", state)
+
+    # 상태이상 방어강화
+    status_bonus = 0
     for eff in player.get("status_effects", []):
         if isinstance(eff, dict) and eff.get("name") == "방어 강화":
-            armor += 4
+            status_bonus += 4
         elif eff == "방어 강화":
-            armor += 4
-    return 10 + dex_mod + armor
+            status_bonus += 4
+
+    return 10 + dex_mod + armor_bonus + magic_def + status_bonus
 
 
 # ─── 휴식 & 회복 ───
@@ -262,6 +392,13 @@ def attack_roll(attacker_id, target_id, action_name="공격", state=None):
         "mp_cost": mp_cost,
     }
 
+    # 장비 명중 보너스 적용
+    equip_atk_bonus = get_equipment_bonus(attacker, "attack_bonus", state) if _is_player(state, attacker_id) else 0
+    attack_total += equip_atk_bonus
+    result["attack_total"] = attack_total
+    if equip_atk_bonus:
+        result["equip_attack_bonus"] = equip_atk_bonus
+
     if fumble:
         result["hit"] = False
         result["note"] = "펌블! 자동 실패 + 다음 턴 -2"
@@ -271,19 +408,28 @@ def attack_roll(attacker_id, target_id, action_name="공격", state=None):
         dmg_dice = _damage_dice(action_def, attacker, state)
         dmg_rolls = roll_dice(dmg_dice)
         dmg_mod = atk_mod
-        damage = sum(dmg_rolls) + dmg_mod
+        # 장비 데미지 보너스
+        equip_dmg_bonus = get_equipment_bonus(attacker, "damage_bonus", state) if _is_player(state, attacker_id) else 0
+        damage = sum(dmg_rolls) + dmg_mod + equip_dmg_bonus
         if critical:
             damage *= 2
             result["note"] = "크리티컬! 데미지 2배"
         damage = max(1, damage)
         result["damage"] = damage
         result["damage_rolls"] = dmg_rolls
+        if equip_dmg_bonus:
+            result["equip_damage_bonus"] = equip_dmg_bonus
 
         # 데미지 적용
         target["hp"] = max(0, target.get("hp", 0) - damage)
         if target["hp"] <= 0:
             target["status"] = "dead"
             result["target_dead"] = True
+
+        # 장비 적중 시 효과 (원소, 확률 효과)
+        equip_effects = apply_equipment_on_hit(attacker, target, damage, state)
+        if equip_effects:
+            result["equipment_effects"] = equip_effects
 
     if owned:
         save_game_state(state)
@@ -835,10 +981,7 @@ def _attack_stat(action_def, attacker=None, state=None):
     if "weapon" in roll_str.lower() and attacker and state:
         rules = load_rules()
         weapons = rules.get("combat", {}).get("weapons", {})
-        ent_data, _ = _load_entity(state, attacker.get("id", 0))
-        weapon_name = None
-        if ent_data:
-            weapon_name = ent_data.get("equipment", {}).get("weapon")
+        weapon_name = _get_weapon_name(attacker, state)
         if weapon_name and weapon_name in weapons:
             return weapons[weapon_name].get("stat", "STR")
     return "STR"
@@ -855,16 +998,24 @@ def _damage_dice(action_def, attacker=None, state=None):
     return dmg.split("+")[0].strip()
 
 
+def _get_weapon_name(entity, state=None):
+    """엔티티의 장비 무기 이름 조회 (새/구 equipment 구조 모두 지원)"""
+    ent_data = entity
+    if state and entity.get("id"):
+        loaded, _ = _load_entity(state, entity["id"])
+        if loaded:
+            ent_data = loaded
+    weapon = ent_data.get("equipment", {}).get("weapon")
+    if isinstance(weapon, dict):
+        return weapon.get("name")
+    return weapon  # 문자열이면 그대로
+
+
 def _get_weapon_dice(entity, state=None):
     """엔티티의 장비 무기 데미지 다이스 조회"""
     rules = load_rules()
     weapons = rules.get("combat", {}).get("weapons", {})
-    # 엔티티 파일에서 equipment 확인
-    weapon_name = None
-    if state and _is_player(state, entity.get("id", 0)):
-        ent_data, _ = _load_entity(state, entity["id"]) if hasattr(entity, 'get') else (None, None)
-        if ent_data:
-            weapon_name = ent_data.get("equipment", {}).get("weapon")
+    weapon_name = _get_weapon_name(entity, state)
     if not weapon_name:
         # inventory에서 무기 추정
         for item in entity.get("inventory", []):
@@ -911,6 +1062,10 @@ def main():
         print("  damage <tid> <amount>   직접 데미지")
         print("  initiative             이니셔티브 굴림")
         print("  tick                   상태이상 턴 처리")
+        print()
+        print()
+        print("  [장비]")
+        print("  equip                  파티 장비 상태")
         print()
         print("  [성장 시스템]")
         print("  growth                 파티 성장 상태")
@@ -959,6 +1114,29 @@ def main():
 
     elif cmd == "tick":
         _print_result(tick_status_effects())
+
+    elif cmd == "equip":
+        state = load_game_state()
+        rules = load_rules()
+        rarity_colors = {r: d["color"] for r, d in rules.get("combat", {}).get("equipment_properties", {}).get("rarity", {}).items()}
+        for p in state["players"]:
+            ent, _ = _load_entity(state, p["id"])
+            if not ent:
+                continue
+            equip = ent.get("equipment", {})
+            print(f"  {ent['name']}({ent['class']}):")
+            for slot in ("weapon", "armor", "accessory"):
+                item = equip.get(slot)
+                if not item:
+                    print(f"    {slot}: —")
+                elif isinstance(item, dict):
+                    rarity = item.get("rarity", "common")
+                    color = rarity_colors.get(rarity, "⬜")
+                    props = item.get("properties", {})
+                    prop_str = ", ".join(f"{k}:{v}" for k, v in props.items()) if props else "효과 없음"
+                    print(f"    {slot}: {color} {item['name']} [{rarity}] ({prop_str})")
+                else:
+                    print(f"    {slot}: ⬜ {item}")
 
     elif cmd == "growth":
         for g in growth_status():

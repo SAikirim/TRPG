@@ -42,9 +42,60 @@
       "대검": {"dice": "1d10", "type": "melee", "stat": "STR", "description": "양손 대검"},
       "활": {"dice": "1d6", "type": "ranged", "stat": "DEX", "description": "표준 단궁"}
     },
+    "equipment_properties": {
+      "_설명": "장비에 부여 가능한 마법 효과. 여러 속성 중첩 가능.",
+      "attack_bonus": {"description": "+N 명중 보너스", "example": 1},
+      "damage_bonus": {"description": "+N 데미지 보너스", "example": 2},
+      "defense_bonus": {"description": "+N 방어력(AC) 보너스", "example": 2},
+      "element": {
+        "description": "원소 속성 부여. 공격 시 추가 원소 데미지.",
+        "types": {
+          "fire": {"bonus_dice": "1d4", "description": "화염 — 추가 1d4 화상"},
+          "ice": {"bonus_dice": "1d4", "description": "냉기 — 추가 1d4 동상, 10% 감속"},
+          "lightning": {"bonus_dice": "1d6", "description": "전기 — 추가 1d6, 금속 갑옷 착용 시 +2"},
+          "holy": {"bonus_dice": "1d6", "description": "신성 — 추가 1d6, 언데드에게 2배"},
+          "dark": {"bonus_dice": "1d4", "description": "암흑 — 추가 1d4, 적중 시 HP 흡수"}
+        }
+      },
+      "on_hit": {
+        "description": "적중 시 확률 발동 효과",
+        "types": {
+          "poison": {"chance": 0.25, "effect": "중독 (턴당 2 데미지, 3턴)"},
+          "stun": {"chance": 0.15, "effect": "기절 (1턴 행동불가)"},
+          "bleed": {"chance": 0.2, "effect": "출혈 (턴당 1 데미지, 5턴)"},
+          "lifesteal": {"chance": 1.0, "effect": "데미지의 25% HP 회복"}
+        }
+      },
+      "passive": {
+        "description": "장착 중 상시 적용 효과",
+        "types": {
+          "hp_regen": {"description": "턴마다 HP N 회복"},
+          "mp_regen": {"description": "턴마다 MP N 회복"},
+          "stat_boost": {"description": "특정 능력치 +N"},
+          "resistance": {"description": "특정 원소 데미지 절반"},
+          "initiative_bonus": {"description": "이니셔티브 +N"}
+        }
+      },
+      "rarity": {
+        "common": {"color": "⬜", "max_properties": 0, "description": "일반 — 마법 효과 없음"},
+        "uncommon": {"color": "🟩", "max_properties": 1, "description": "비범 — 마법 효과 1개"},
+        "rare": {"color": "🟦", "max_properties": 2, "description": "희귀 — 마법 효과 2개"},
+        "epic": {"color": "🟪", "max_properties": 3, "description": "영웅 — 마법 효과 3개"},
+        "legendary": {"color": "🟧", "max_properties": 4, "description": "전설 — 고유 효과 + 마법 3개"}
+      }
+    },
+    "armor": {
+      "없음": {"bonus": 0},
+      "천 옷": {"bonus": 0, "description": "방어력 추가 없음"},
+      "가죽 갑옷": {"bonus": 1, "description": "경장갑, 은신 패널티 없음"},
+      "가죽 방패": {"bonus": 2, "description": "방패, 한 손 사용"},
+      "사슬 갑옷": {"bonus": 3, "description": "중장갑, 은신 -2"},
+      "판금 갑옷": {"bonus": 4, "description": "최중장, 은신 -4, DEX 보정 최대 +2"},
+      "철 방패": {"bonus": 3, "description": "무거운 방패, 한 손 사용"}
+    },
     "defense": {
-      "formula": "10 + DEX_modifier + armor_bonus",
-      "description": "방어력 = 기본 10 + DEX 보정 + 장비 보너스"
+      "formula": "10 + DEX_modifier + armor_bonus + equipment_defense_bonus",
+      "description": "방어력 = 기본 10 + DEX 보정 + 방어구 보너스 + 장비 마법 보너스"
     },
     "flee": {
       "formula": "1d20 + DEX_modifier >= flee_dc",

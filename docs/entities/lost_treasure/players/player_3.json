@@ -31,8 +31,19 @@
     "오크의 도끼"
   ],
   "equipment": {
-    "weapon": "오크의 도끼",
-    "armor": "가죽 방패"
+    "weapon": {
+      "name": "오크의 도끼",
+      "rarity": "uncommon",
+      "properties": {
+        "attack_bonus": 1
+      }
+    },
+    "armor": {
+      "name": "가죽 방패",
+      "rarity": "common",
+      "properties": {}
+    },
+    "accessory": null
   },
   "available_actions": [
     "공격",
