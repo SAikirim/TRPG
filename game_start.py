@@ -304,6 +304,9 @@ def new_game(scenario_id):
     print(f"\n게임 시작! (턴 0, 챕터 1: {chapter_name})")
     print(f"Flask 서버: python app.py -> http://localhost:5000")
     _print_state_summary(state)
+
+    # 정적 웹 동기화
+    _sync_docs()
     return True
 
 
@@ -392,6 +395,9 @@ def continue_game(scenario_id, from_scenario):
 
     print(f"\n  [OK] '{from_scenario}' 에서 캐릭터 데이터 이어받기 완료")
     _print_state_summary(state)
+
+    # 정적 웹 동기화 (캐리오버 데이터 반영)
+    _sync_docs()
     return True
 
 
@@ -464,7 +470,24 @@ def load_game():
     _try_restore_scene()
 
     _print_state_summary(save_data["game_state"])
+
+    # 정적 웹 동기화
+    _sync_docs()
     return True
+
+
+# ─── docs/ 동기화 (정적 웹) ───
+
+def _sync_docs():
+    """docs/ 폴더를 최신 상태로 동기화 (GitHub Pages용)."""
+    try:
+        from save_manager import SaveManager
+        state = load_json("game_state.json")
+        sm = SaveManager()
+        sm._sync_docs(state)
+        print("  [OK] docs/ 동기화 완료 (정적 웹)")
+    except Exception as e:
+        print(f"  [WARN] docs/ 동기화 실패: {e}")
 
 
 # ─── 유틸리티 ───
