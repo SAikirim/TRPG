@@ -80,6 +80,14 @@ def restore_scene():
     )
 
     # 현재 위치의 alive NPC를 일러스트 레이어에 추가 (초상화 있는 NPC만)
+    # Calculate player center position for distance-based portrait sizing
+    player_positions = [p.get("position", [0, 0]) for p in state.get("players", [])]
+    if player_positions:
+        player_cx = sum(p[0] for p in player_positions) / len(player_positions)
+        player_cy = sum(p[1] for p in player_positions) / len(player_positions)
+    else:
+        player_cx, player_cy = 0, 0
+
     current_loc = state.get("current_location", "")
     positions = ["left", "center", "right"]
     pos_idx = 0
@@ -102,12 +110,27 @@ def restore_scene():
                 break
         if not portrait_exists:
             continue
+
+        # Calculate distance from player center
+        npc_pos = npc.get("position", [0, 0])
+        distance = abs(npc_pos[0] - player_cx) + abs(npc_pos[1] - player_cy)
+
+        # Determine size class based on Manhattan distance
+        if distance <= 2:
+            size_class = "close"
+        elif distance <= 5:
+            size_class = "medium"
+        else:
+            size_class = "far"
+
         request_illustration(
             illustration_type="portrait",
             prompt="",
             turn_count=state.get("turn_count", 0),
             position=positions[pos_idx % len(positions)],
             name=npc_name,
+            distance=distance,
+            size_class=size_class,
         )
         pos_idx += 1
 
@@ -319,6 +342,14 @@ def gm_update():
         remove_layer(data["remove_layer"])
 
     # 현재 위치의 alive NPC를 자동으로 레이어에 추가 (초상화 있는 NPC만)
+    # Calculate player center position for distance-based portrait sizing
+    player_positions = [p.get("position", [0, 0]) for p in state.get("players", [])]
+    if player_positions:
+        player_cx = sum(p[0] for p in player_positions) / len(player_positions)
+        player_cy = sum(p[1] for p in player_positions) / len(player_positions)
+    else:
+        player_cx, player_cy = 0, 0
+
     current_loc = state.get("current_location", "")
     positions = ["left", "center", "right"]
     pos_idx = 0
@@ -341,6 +372,19 @@ def gm_update():
                 break
         if not portrait_exists:
             continue
+
+        # Calculate distance from player center
+        npc_pos = npc.get("position", [0, 0])
+        distance = abs(npc_pos[0] - player_cx) + abs(npc_pos[1] - player_cy)
+
+        # Determine size class based on Manhattan distance
+        if distance <= 2:
+            size_class = "close"    # 100%
+        elif distance <= 5:
+            size_class = "medium"   # 70%
+        else:
+            size_class = "far"      # 50%
+
         # 이미 레이어에 있으면 스킵
         scene = get_scene_state()
         already = any(l.get("name") == npc_name for l in scene.get("layers", []))
@@ -351,6 +395,8 @@ def gm_update():
                 turn_count=state["turn_count"],
                 position=positions[pos_idx % len(positions)],
                 name=npc_name,
+                distance=distance,
+                size_class=size_class,
             )
             pos_idx += 1
 

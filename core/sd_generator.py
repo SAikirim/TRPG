@@ -86,7 +86,7 @@ def _build_payload(illustration_type, prompt, negative_prompt):
     }
 
 
-def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, position, name):
+def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, position, name, distance=0, size_class="close"):
     global _scene_state
 
     try:
@@ -173,6 +173,8 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
                         "image": image_url,
                         "position": position,
                         "name": name,
+                        "distance": distance,
+                        "size_class": size_class,
                     })
                 _scene_state["generating"]["status"] = "idle"
                 _scene_state["generating"]["error"] = None
@@ -185,13 +187,13 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
                 })
     except requests.exceptions.ConnectionError:
         logger.warning("SD WebUI not reachable, falling back to Cairo")
-        _cairo_fallback(illustration_type, name, position, turn_count)
+        _cairo_fallback(illustration_type, name, position, turn_count, distance, size_class)
     except Exception as e:
         logger.warning(f"SD generation failed ({e}), falling back to Cairo")
-        _cairo_fallback(illustration_type, name, position, turn_count)
+        _cairo_fallback(illustration_type, name, position, turn_count, distance, size_class)
 
 
-def _cairo_fallback(illustration_type, name, position, turn_count):
+def _cairo_fallback(illustration_type, name, position, turn_count, distance=0, size_class="close"):
     """Generate Cairo fallback illustration when SD is unavailable."""
     try:
         from core.map_generator import MapGenerator
@@ -218,6 +220,8 @@ def _cairo_fallback(illustration_type, name, position, turn_count):
                     "image": image_url,
                     "position": position,
                     "name": name,
+                    "distance": distance,
+                    "size_class": size_class,
                 })
                 _scene_state["generating"]["status"] = "idle"
             return {"started": True, "type": illustration_type, "source": "cairo"}
@@ -368,7 +372,7 @@ def _find_existing_image(illustration_type, name):
     return None
 
 
-def request_illustration(illustration_type, prompt, negative_prompt="", turn_count=0, position="center", name=""):
+def request_illustration(illustration_type, prompt, negative_prompt="", turn_count=0, position="center", name="", distance=0, size_class="close"):
     global _scene_state
 
     # 1. Check for existing reusable image
@@ -387,6 +391,8 @@ def request_illustration(illustration_type, prompt, negative_prompt="", turn_cou
                     "image": image_url,
                     "position": position,
                     "name": name,
+                    "distance": distance,
+                    "size_class": size_class,
                 })
             _scene_state["generating"]["status"] = "idle"
         logger.info(f"Reusing existing image: {existing}")
@@ -400,7 +406,7 @@ def request_illustration(illustration_type, prompt, negative_prompt="", turn_cou
 
     # 3. SD OFF → Cairo fallback
     if not is_sd_enabled():
-        return _cairo_fallback(illustration_type, name, position, turn_count)
+        return _cairo_fallback(illustration_type, name, position, turn_count, distance, size_class)
 
     # 4. SD generation
     with _lock:
@@ -417,7 +423,7 @@ def request_illustration(illustration_type, prompt, negative_prompt="", turn_cou
 
     thread = threading.Thread(
         target=_generate_worker,
-        args=(illustration_type, prompt, negative_prompt, turn_count, position, name),
+        args=(illustration_type, prompt, negative_prompt, turn_count, position, name, distance, size_class),
         daemon=True,
     )
     thread.start()
