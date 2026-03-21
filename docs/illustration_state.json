@@ -4,18 +4,18 @@
     {
       "type": "portrait",
       "image": "static/portraits/sd/portrait_미라.webp",
-      "position": "0",
+      "position": "center",
       "name": "미라",
       "distance": 1,
-      "size_class": "near"
+      "size_class": "d1"
     },
     {
       "type": "portrait",
       "image": "static/portraits/sd/portrait_할란.webp",
-      "position": "1",
+      "position": "right",
       "name": "할란",
       "distance": 2,
-      "size_class": "close"
+      "size_class": "d2"
     }
   ],
   "generating": {
