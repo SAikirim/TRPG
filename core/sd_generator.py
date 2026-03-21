@@ -226,6 +226,97 @@ def _cairo_fallback(illustration_type, name, position, turn_count):
         return {"skipped": True, "reason": f"Cairo fallback failed: {e}"}
 
 
+def _build_portrait_prompt_from_entity(name):
+    """Build SD prompt from NPC entity appearance data."""
+    # Search all scenario entity directories
+    entities_dir = os.path.join(BASE_DIR, "entities")
+    for scenario_dir in os.listdir(entities_dir) if os.path.exists(entities_dir) else []:
+        npcs_dir = os.path.join(entities_dir, scenario_dir, "npcs")
+        if not os.path.exists(npcs_dir):
+            continue
+        for f in os.listdir(npcs_dir):
+            filepath = os.path.join(npcs_dir, f)
+            try:
+                with open(filepath, "r", encoding="utf-8") as fh:
+                    npc = json.load(fh)
+                if npc.get("name") == name:
+                    return _appearance_to_prompt(npc)
+            except Exception:
+                continue
+
+    # Also check player entities
+    for scenario_dir in os.listdir(entities_dir) if os.path.exists(entities_dir) else []:
+        players_dir = os.path.join(entities_dir, scenario_dir, "players")
+        if not os.path.exists(players_dir):
+            continue
+        for f in os.listdir(players_dir):
+            filepath = os.path.join(players_dir, f)
+            try:
+                with open(filepath, "r", encoding="utf-8") as fh:
+                    player = json.load(fh)
+                if player.get("name") == name:
+                    return _appearance_to_prompt(player)
+            except Exception:
+                continue
+
+    return ""
+
+
+def _appearance_to_prompt(entity):
+    """Convert entity appearance dict to SD-compatible English prompt."""
+    parts = []
+
+    race = entity.get("race", "인간")
+    # Race mapping to English
+    race_map = {
+        "인간": "human",
+        "엘프": "elf, pointed ears",
+        "드워프": "dwarf, short stature, beard",
+        "오크": "orc, green skin, tusks",
+        "수인": "beast-person, animal features",
+        "슬라임": "slime creature, translucent body",
+        "골렘": "stone golem, rocky body",
+        "늑대": "wolf, gray fur, four legs",
+        "말": "horse, four legs, hooves",
+        "고블린": "goblin, small, green skin, pointed ears",
+    }
+    parts.append(race_map.get(race, race))
+
+    appearance = entity.get("appearance", {})
+    if appearance:
+        # Map Korean appearance fields to English
+        if appearance.get("age"):
+            age_map = {
+                "10대": "teenager",
+                "20대": "young adult, 20s",
+                "30대": "adult, 30s",
+                "40대": "middle aged, 40s",
+                "50대": "older man, 50s",
+                "60대": "elderly, 60s",
+                "성체": "adult",
+            }
+            parts.append(age_map.get(appearance["age"], appearance["age"]))
+        if appearance.get("build"):
+            parts.append(appearance["build"])
+        if appearance.get("skin"):
+            parts.append(appearance["skin"])
+        if appearance.get("hair"):
+            parts.append(appearance["hair"])
+        if appearance.get("face"):
+            parts.append(appearance["face"])
+        if appearance.get("outfit"):
+            parts.append(appearance["outfit"])
+        if appearance.get("notable"):
+            parts.append(appearance["notable"])
+
+    # Add style keywords
+    parts.extend(["fantasy", "semi-realistic", "upper body portrait", "simple background", "masterpiece", "best quality"])
+
+    prompt = ", ".join(p for p in parts if p)
+    logger.info(f"Auto-generated portrait prompt for '{entity.get('name', '?')}': {prompt[:100]}...")
+    return prompt
+
+
 def _find_existing_image(illustration_type, name):
     """Check if a reusable image already exists for this name."""
     if not name:
@@ -274,11 +365,17 @@ def request_illustration(illustration_type, prompt, negative_prompt="", turn_cou
         logger.info(f"Reusing existing image: {existing}")
         return {"reused": True, "type": illustration_type, "image": image_url}
 
-    # 2. SD OFF → Cairo fallback
+    # 2. Auto-generate prompt from entity data if portrait/object and prompt is empty
+    if illustration_type in ("portrait", "object") and not prompt and name:
+        prompt = _build_portrait_prompt_from_entity(name)
+        if not prompt:
+            prompt = f"fantasy character portrait, {name}, simple background, masterpiece"
+
+    # 3. SD OFF → Cairo fallback
     if not is_sd_enabled():
         return _cairo_fallback(illustration_type, name, position, turn_count)
 
-    # 3. SD generation
+    # 4. SD generation
     with _lock:
         if _scene_state["generating"]["status"] == "generating":
             return {"skipped": True, "reason": "Generation already in progress"}
