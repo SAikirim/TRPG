@@ -290,13 +290,19 @@ class MapGenerator:
 
         cropped = full_img.crop((left, top, right, bottom))
 
-        # 미니맵에 좌표 오버레이 추가
+        # 미니맵에 좌표 오버레이 추가 — 크고 굵게, 타일 한 칸 크기
         from PIL import ImageDraw, ImageFont
         draw_mini = ImageDraw.Draw(cropped)
+
+        # 볼드 폰트 시도 (malgunbd = 맑은고딕 Bold)
         coord_font = ImageFont.load_default()
-        for fp in font_paths_global:
+        bold_paths = [
+            "C:/Windows/Fonts/malgunbd.ttf",
+            "C:/Windows/Fonts/arialbd.ttf",
+        ] + font_paths_global
+        for fp in bold_paths:
             try:
-                coord_font = ImageFont.truetype(fp, 11)
+                coord_font = ImageFont.truetype(fp, 28)
                 break
             except (OSError, IOError):
                 continue
@@ -307,17 +313,21 @@ class MapGenerator:
         tile_end_x = tile_start_x + int(crop_w / self.tile_size) + 1
         tile_end_y = tile_start_y + int(crop_h / self.tile_size) + 1
 
-        # 가로 좌표 (상단) — 12px from top to avoid clipping
+        # 가로 좌표 (상단) — 타일 중앙에 배치
         for i in range(tile_start_x, tile_end_x):
-            px = (i * self.tile_size + margin_left + self.tile_size // 2) - left - 4
-            if 0 <= px < cropped.width:
-                draw_mini.text((px, 12), str(i), fill="#cccccc", font=coord_font)
+            tile_center_x = (i * self.tile_size + margin_left + self.tile_size // 2) - left
+            text = str(i)
+            tx = tile_center_x - 8 if i < 10 else tile_center_x - 14
+            if 0 <= tx < cropped.width - 20:
+                draw_mini.text((tx, 2), text, fill="#dddddd", font=coord_font)
 
-        # 세로 좌표 (좌측) — 4px from left for readability
+        # 세로 좌표 (좌측) — 타일 중앙에 배치
         for i in range(tile_start_y, tile_end_y):
-            py = (i * self.tile_size + margin_top + self.tile_size // 2) - top - 6
-            if 12 <= py < cropped.height:
-                draw_mini.text((4, py), str(i), fill="#cccccc", font=coord_font)
+            tile_center_y = (i * self.tile_size + margin_top + self.tile_size // 2) - top
+            text = str(i)
+            ty = tile_center_y - 14
+            if 0 <= ty < cropped.height - 20:
+                draw_mini.text((2, ty), text, fill="#dddddd", font=coord_font)
 
         mini_path = os.path.join(self.base_dir, "static", "map_mini.png")
         cropped.save(mini_path, "PNG")
