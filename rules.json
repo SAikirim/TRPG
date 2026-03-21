@@ -147,8 +147,64 @@
     }
   },
   "level_up": {
-    "enabled": false,
-    "description": "현재 시나리오에서는 레벨업 없음. 향후 확장 예정."
+    "enabled": true,
+    "description": "경험치(XP) 획득 → 레벨업 → 능력치/HP/MP 성장 + 신규 스킬 해금",
+    "xp_table": {
+      "1": 0,
+      "2": 100,
+      "3": 300,
+      "4": 600,
+      "5": 1000,
+      "6": 1500,
+      "7": 2200,
+      "8": 3000,
+      "9": 4000,
+      "10": 5500
+    },
+    "xp_sources": {
+      "monster_kill": {"low": 15, "medium": 30, "high": 60, "boss": 120},
+      "quest_complete": 50,
+      "chapter_complete": 100,
+      "puzzle_solve": 25,
+      "exploration": 10,
+      "roleplay": 15
+    },
+    "per_level": {
+      "stat_points": 2,
+      "description": "레벨업마다 능력치 포인트 2점 자유 배분 (유저 선택)"
+    },
+    "class_growth": {
+      "마법사": {
+        "hp_per_level": 3,
+        "mp_per_level": 5,
+        "skills": {
+          "3": {"name": "마나 쉴드", "type": "defense", "description": "마나로 보호막 생성. 3턴간 받는 데미지 절반.", "cost": {"mp": 5}, "effect": {"damage_reduction": 0.5, "duration": 3}},
+          "5": {"name": "체인 라이트닝", "type": "magic_attack", "description": "전기 사슬이 적 3체까지 연쇄. 각각 1d6+INT 피해.", "roll": "1d6 + INT_modifier", "cost": {"mp": 7}, "targets": 3},
+          "7": {"name": "텔레포트", "type": "utility", "description": "시야 내 원하는 위치로 순간이동.", "cost": {"mp": 4}},
+          "9": {"name": "메테오", "type": "magic_attack", "description": "전체 범위 2d8+INT 피해. 아군 제외.", "roll": "2d8 + INT_modifier", "cost": {"mp": 12}}
+        }
+      },
+      "도적": {
+        "hp_per_level": 4,
+        "mp_per_level": 2,
+        "skills": {
+          "3": {"name": "독 바르기", "type": "buff", "description": "무기에 독을 발라 3턴간 공격 시 추가 독 데미지 2.", "cost": {"mp": 2}, "effect": {"poison_damage": 2, "duration": 3}},
+          "5": {"name": "그림자 걸음", "type": "utility", "description": "3턴간 은신. 다음 공격 시 자동 명중 + 데미지 2배.", "cost": {"mp": 4}, "effect": {"stealth": true, "duration": 3, "next_attack_bonus": "double"}},
+          "7": {"name": "급소 찌르기", "type": "combat", "description": "3d6+DEX 피해. 은신 상태면 4d6.", "roll": "3d6 + DEX_modifier", "cost": {"mp": 3}},
+          "9": {"name": "분신", "type": "defense", "description": "분신 생성. 2턴간 공격 50% 회피.", "cost": {"mp": 6}, "effect": {"evasion": 0.5, "duration": 2}}
+        }
+      },
+      "전사": {
+        "hp_per_level": 6,
+        "mp_per_level": 1,
+        "skills": {
+          "3": {"name": "강타", "type": "combat", "description": "전력을 다한 일격. 2d6+STR 피해. 대상 기절 1턴 (CON DC 13).", "roll": "2d6 + STR_modifier", "cost": {"mp": 2}, "effect": {"stun_dc": 13}},
+          "5": {"name": "전투 함성", "type": "buff", "description": "아군 전체 공격력 +2, 3턴 지속.", "cost": {"mp": 3}, "effect": {"attack_bonus": 2, "duration": 3, "target": "all_allies"}},
+          "7": {"name": "방패 돌진", "type": "combat", "description": "방패로 돌진. 1d8+STR 피해 + 밀어내기 2칸.", "roll": "1d8 + STR_modifier", "cost": {"mp": 2}, "effect": {"knockback": 2}},
+          "9": {"name": "불굴의 의지", "type": "passive", "description": "HP가 25% 이하일 때 방어력 +4, 공격력 +2 자동 적용."}
+        }
+      }
+    }
   },
   "death_rules": {
     "player_death": "HP가 0이 되면 기절. 다음 턴에 힐을 받지 못하면 사망.",

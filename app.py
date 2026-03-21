@@ -190,6 +190,16 @@ def gm_update():
                 mreq["player"], mreq["item"], state))
         elif mtype == "tick_status":
             mechanics_results.append(gm.tick_status_effects(state))
+        elif mtype == "grant_xp":
+            mechanics_results.append(gm.grant_xp(
+                mreq["player"], mreq["amount"],
+                mreq.get("source", ""), state))
+        elif mtype == "grant_xp_party":
+            mechanics_results.append(gm.grant_xp_party(
+                mreq["amount"], mreq.get("source", ""), state))
+        elif mtype == "allocate_stats":
+            mechanics_results.append(gm.allocate_stats(
+                mreq["player"], mreq["stats"], state))
 
     # Update game status if provided
     if "game_status" in data:

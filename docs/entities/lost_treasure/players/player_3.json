@@ -21,14 +21,23 @@
     "INT": 8,
     "CON": 14
   },
-  "position": [7, 5],
+  "position": [
+    7,
+    5
+  ],
   "status_effects": [],
-  "inventory": ["가죽 방패", "오크의 도끼"],
+  "inventory": [
+    "가죽 방패",
+    "오크의 도끼"
+  ],
   "equipment": {
     "weapon": "오크의 도끼",
     "armor": "가죽 방패"
   },
-  "available_actions": ["공격", "방어"],
+  "available_actions": [
+    "공격",
+    "방어"
+  ],
   "combat_state": {
     "is_in_combat": false,
     "defense_bonus": 0,
@@ -36,7 +45,14 @@
   },
   "history": {
     "actions_taken": [
-      {"turn": 3, "action": "공격", "target": "어두운 오크", "roll": "18+3=21 명중", "damage": 0, "result": "대상 이미 사망"}
+      {
+        "turn": 3,
+        "action": "공격",
+        "target": "어두운 오크",
+        "roll": "18+3=21 명중",
+        "damage": 0,
+        "result": "대상 이미 사망"
+      }
     ],
     "damage_dealt_total": 0,
     "damage_received_total": 0,
@@ -48,6 +64,35 @@
     "alive": true,
     "conscious": true,
     "death_save_turns": 0
+  },
+  "growth": {
+    "level": 2,
+    "xp": 285,
+    "xp_to_next": 300,
+    "stat_points_available": 2,
+    "learned_skills": [],
+    "xp_log": [
+      {
+        "source": "오크 처치 (high)",
+        "amount": 60
+      },
+      {
+        "source": "챕터1 완료",
+        "amount": 100
+      },
+      {
+        "source": "함정 해제 (퍼즐)",
+        "amount": 25
+      },
+      {
+        "source": "보물 상자 획득 (퀘스트)",
+        "amount": 50
+      },
+      {
+        "source": "탐색/RP (숲, 던전, 비문)",
+        "amount": 50
+      }
+    ]
   },
   "party_role": "전열 (탱커/근접딜)",
   "controlled_by": "agent"

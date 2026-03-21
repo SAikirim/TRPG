@@ -491,6 +491,286 @@ def check_mp(player_id, action_name, state=None):
     }
 
 
+# ─── 경험치 & 레벨업 ───
+
+def _load_entity(state, player_id):
+    """엔티티 파일에서 growth 포함 전체 데이터 로드"""
+    edir = _entity_dir(state)
+    path = os.path.join(edir, f"player_{player_id}.json")
+    if os.path.exists(path):
+        return _load_json(path), path
+    return None, None
+
+
+def _xp_table():
+    """레벨별 필요 XP 테이블"""
+    rules = load_rules()
+    table = rules.get("level_up", {}).get("xp_table", {})
+    return {int(k): v for k, v in table.items()}
+
+
+def _class_growth(class_name):
+    """클래스별 성장 데이터"""
+    rules = load_rules()
+    return rules.get("level_up", {}).get("class_growth", {}).get(class_name, {})
+
+
+def grant_xp(player_id, amount, source="", state=None):
+    """XP 부여 + 레벨업 자동 체크. 전체 파티에게 줄 때는 grant_xp_party 사용."""
+    owned = state is None
+    if owned:
+        state = load_game_state()
+
+    entity, epath = _load_entity(state, player_id)
+    if not entity:
+        return {"error": f"엔티티 {player_id} 없음"}
+
+    growth = entity.setdefault("growth", {"level": 1, "xp": 0, "xp_to_next": 100,
+                                           "stat_points_available": 0, "learned_skills": [], "xp_log": []})
+    growth["xp"] += amount
+    growth["xp_log"].append({"source": source, "amount": amount})
+
+    # 레벨업 체크
+    leveled = _check_level_up(entity, growth, state)
+
+    if epath:
+        _save_json(epath, entity)
+
+    result = {
+        "action": "grant_xp", "player": entity["name"],
+        "xp_gained": amount, "source": source,
+        "total_xp": growth["xp"], "level": growth["level"],
+        "xp_to_next": growth["xp_to_next"],
+    }
+    if leveled:
+        result["level_up"] = leveled
+
+    if owned:
+        # game_state에도 level 반영
+        _sync_level_to_state(state, player_id, growth)
+        save_game_state(state)
+    return result
+
+
+def grant_xp_party(amount, source="", state=None):
+    """파티 전원에게 동일 XP 부여"""
+    owned = state is None
+    if owned:
+        state = load_game_state()
+    results = []
+    for p in state["players"]:
+        r = grant_xp(p["id"], amount, source, state)
+        results.append(r)
+    if owned:
+        save_game_state(state)
+    return {"action": "grant_xp_party", "amount": amount, "source": source, "results": results}
+
+
+def _check_level_up(entity, growth, state):
+    """XP 확인 후 레벨업 처리. 다중 레벨업도 지원."""
+    xp_table = _xp_table()
+    class_name = entity.get("class", "")
+    cg = _class_growth(class_name)
+    rules = load_rules()
+    stat_points_per_level = rules.get("level_up", {}).get("per_level", {}).get("stat_points", 2)
+    leveled_info = []
+
+    while True:
+        next_level = growth["level"] + 1
+        xp_needed = xp_table.get(next_level)
+        if xp_needed is None or growth["xp"] < xp_needed:
+            break
+
+        growth["level"] = next_level
+        growth["stat_points_available"] += stat_points_per_level
+
+        # HP/MP 증가
+        hp_gain = cg.get("hp_per_level", 3)
+        mp_gain = cg.get("mp_per_level", 2)
+        entity["stats"]["max_hp"] += hp_gain
+        entity["stats"]["hp"] += hp_gain  # 레벨업 시 증가분만큼 현재 HP도 회복
+        entity["stats"]["max_mp"] += mp_gain
+        entity["stats"]["mp"] += mp_gain
+
+        # 신규 스킬 해금 체크
+        new_skill = cg.get("skills", {}).get(str(next_level))
+        skill_name = None
+        if new_skill:
+            skill_name = new_skill["name"]
+            growth["learned_skills"].append(skill_name)
+            # available_actions에도 추가
+            actions = entity.get("available_actions", [])
+            if skill_name not in actions:
+                actions.append(skill_name)
+                entity["available_actions"] = actions
+
+        leveled_info.append({
+            "new_level": next_level,
+            "hp_gain": hp_gain, "mp_gain": mp_gain,
+            "stat_points": stat_points_per_level,
+            "new_skill": skill_name,
+        })
+
+    # 다음 레벨 XP 갱신
+    next_next = growth["level"] + 1
+    growth["xp_to_next"] = xp_table.get(next_next, 99999)
+
+    return leveled_info if leveled_info else None
+
+
+def allocate_stats(player_id, stat_increases, state=None):
+    """
+    레벨업 시 능력치 포인트 배분.
+    stat_increases: {"STR": 1, "INT": 1} 같은 딕셔너리
+    """
+    owned = state is None
+    if owned:
+        state = load_game_state()
+
+    entity, epath = _load_entity(state, player_id)
+    if not entity:
+        return {"error": f"엔티티 {player_id} 없음"}
+
+    growth = entity.get("growth", {})
+    available = growth.get("stat_points_available", 0)
+    total_spend = sum(stat_increases.values())
+
+    if total_spend > available:
+        return {"error": f"포인트 부족 (사용: {total_spend}, 보유: {available})"}
+    if total_spend <= 0:
+        return {"error": "배분할 포인트 없음"}
+
+    # 적용
+    old_stats = {}
+    for stat, inc in stat_increases.items():
+        if stat not in ("STR", "DEX", "INT", "CON"):
+            return {"error": f"잘못된 능력치: {stat}"}
+        old_stats[stat] = entity["stats"][stat]
+        entity["stats"][stat] += inc
+
+    growth["stat_points_available"] -= total_spend
+
+    # HP/MP 재계산 (CON/INT 변동 시)
+    hp_mp_changes = _recalc_hp_mp(entity)
+
+    if epath:
+        _save_json(epath, entity)
+
+    # game_state 동기화
+    player = _find_player(state, player_id)
+    if player:
+        for stat in ("STR", "DEX", "INT", "CON"):
+            player["stats"][stat] = entity["stats"][stat]
+        player["max_hp"] = entity["stats"]["max_hp"]
+        player["hp"] = entity["stats"]["hp"]
+        player["max_mp"] = entity["stats"]["max_mp"]
+        player["mp"] = entity["stats"]["mp"]
+
+    if owned:
+        save_game_state(state)
+        sync_player_to_entity(state, player)
+
+    result = {
+        "action": "allocate_stats", "player": entity["name"],
+        "allocated": stat_increases,
+        "remaining_points": growth["stat_points_available"],
+    }
+    for stat, inc in stat_increases.items():
+        result[f"{stat}"] = f"{old_stats[stat]}→{entity['stats'][stat]}"
+    if hp_mp_changes:
+        result["hp_mp_recalc"] = hp_mp_changes
+    return result
+
+
+def _recalc_hp_mp(entity):
+    """CON/INT 변동 시 max_hp/max_mp 재계산 (클래스 공식 기반)"""
+    # character_classes.json에서 공식 로드
+    templates_path = os.path.join(BASE_DIR, "templates", "character_classes.json")
+    if not os.path.exists(templates_path):
+        return None
+    templates = _load_json(templates_path)
+    class_name = entity.get("class", "")
+    class_def = templates.get("classes", {}).get(class_name)
+    if not class_def:
+        return None
+
+    stats = entity["stats"]
+    growth = entity.get("growth", {})
+    level = growth.get("level", 1)
+
+    # 기본 공식: base + stat * multiplier + (level-1) * per_level
+    cg = _class_growth(class_name)
+    hp_base = class_def.get("hp_base", 10)
+    hp_per_con = class_def.get("hp_per_con", 0.5)
+    mp_base = class_def.get("mp_base", 5)
+    mp_per_int = class_def.get("mp_per_int", 0.5)
+    hp_per_level = cg.get("hp_per_level", 3)
+    mp_per_level = cg.get("mp_per_level", 2)
+
+    new_max_hp = int(hp_base + stats["CON"] * hp_per_con) + (level - 1) * hp_per_level
+    new_max_mp = int(mp_base + stats["INT"] * mp_per_int) + (level - 1) * mp_per_level
+
+    changes = {}
+    if new_max_hp != stats["max_hp"]:
+        diff = new_max_hp - stats["max_hp"]
+        stats["max_hp"] = new_max_hp
+        stats["hp"] = min(stats["hp"] + max(0, diff), new_max_hp)
+        changes["max_hp"] = new_max_hp
+    if new_max_mp != stats["max_mp"]:
+        diff = new_max_mp - stats["max_mp"]
+        stats["max_mp"] = new_max_mp
+        stats["mp"] = min(stats["mp"] + max(0, diff), new_max_mp)
+        changes["max_mp"] = new_max_mp
+
+    return changes if changes else None
+
+
+def _sync_level_to_state(state, player_id, growth):
+    """game_state 플레이어에 level/xp 필드 반영"""
+    player = _find_player(state, player_id)
+    if player:
+        player["level"] = growth["level"]
+        player["xp"] = growth["xp"]
+        # 엔티티에서 max_hp/max_mp도 동기화
+        entity, _ = _load_entity(state, player_id)
+        if entity:
+            player["max_hp"] = entity["stats"]["max_hp"]
+            player["hp"] = min(player["hp"], player["max_hp"])
+            player["max_mp"] = entity["stats"]["max_mp"]
+            player["mp"] = min(player["mp"], player["max_mp"])
+
+
+def growth_status(state=None):
+    """파티 전원 성장 상태 요약"""
+    if state is None:
+        state = load_game_state()
+    results = []
+    for p in state["players"]:
+        entity, _ = _load_entity(state, p["id"])
+        if not entity:
+            continue
+        growth = entity.get("growth", {})
+        cg = _class_growth(entity.get("class", ""))
+        skills_at = {int(k): v["name"] for k, v in cg.get("skills", {}).items()}
+        next_skill_level = None
+        next_skill_name = None
+        for lv in sorted(skills_at.keys()):
+            if lv > growth.get("level", 1):
+                next_skill_level = lv
+                next_skill_name = skills_at[lv]
+                break
+        results.append({
+            "name": entity["name"], "class": entity.get("class"),
+            "level": growth.get("level", 1),
+            "xp": growth.get("xp", 0),
+            "xp_to_next": growth.get("xp_to_next", 100),
+            "stat_points": growth.get("stat_points_available", 0),
+            "learned_skills": growth.get("learned_skills", []),
+            "next_skill": f"Lv{next_skill_level}: {next_skill_name}" if next_skill_name else "—",
+        })
+    return results
+
+
 # ─── 파티 상태 요약 ───
 
 def party_status(state=None):
@@ -501,6 +781,7 @@ def party_status(state=None):
     for p in state["players"]:
         summary.append({
             "id": p["id"], "name": p["name"], "class": p["class"],
+            "level": p.get("level", 1),
             "hp": f"{p['hp']}/{p['max_hp']}",
             "mp": f"{p['mp']}/{p['max_mp']}",
             "ac": calculate_ac(p),
@@ -592,6 +873,12 @@ def main():
         print("  damage <tid> <amount>   직접 데미지")
         print("  initiative             이니셔티브 굴림")
         print("  tick                   상태이상 턴 처리")
+        print()
+        print("  [성장 시스템]")
+        print("  growth                 파티 성장 상태")
+        print("  xp <pid> <amount> [source]  XP 부여")
+        print("  xp_party <amount> [source]  파티 전원 XP")
+        print("  alloc <pid> <STAT> <n>  능력치 배분 (예: alloc 1 INT 2)")
         return
 
     cmd = sys.argv[1]
@@ -634,6 +921,24 @@ def main():
 
     elif cmd == "tick":
         _print_result(tick_status_effects())
+
+    elif cmd == "growth":
+        for g in growth_status():
+            pts = f" [배분 가능: {g['stat_points']}pt]" if g['stat_points'] > 0 else ""
+            skills = f" 습득: {', '.join(g['learned_skills'])}" if g['learned_skills'] else ""
+            print(f"  {g['name']}({g['class']}) Lv{g['level']} XP:{g['xp']}/{g['xp_to_next']}{pts}{skills}")
+            print(f"    다음 스킬: {g['next_skill']}")
+
+    elif cmd == "xp" and len(sys.argv) >= 4:
+        source = sys.argv[4] if len(sys.argv) >= 5 else ""
+        _print_result(grant_xp(int(sys.argv[2]), int(sys.argv[3]), source))
+
+    elif cmd == "xp_party" and len(sys.argv) >= 3:
+        source = sys.argv[3] if len(sys.argv) >= 4 else ""
+        _print_result(grant_xp_party(int(sys.argv[2]), source))
+
+    elif cmd == "alloc" and len(sys.argv) >= 5:
+        _print_result(allocate_stats(int(sys.argv[2]), {sys.argv[3]: int(sys.argv[4])}))
 
     else:
         print(f"알 수 없는 명령: {cmd}")
