@@ -267,7 +267,7 @@ def check_scenario_files(state):
 
 
 def check_worldbuilding(state):
-    """worldbuilding.json 존재 및 현재 위치 검증."""
+    """worldbuilding.json 존재, 현재 위치, 방향/거리 일관성 검증."""
     print("\n[6] worldbuilding.json 검증")
     wb = load_json_safe("data/worldbuilding.json")
     if wb is None:
@@ -281,14 +281,79 @@ def check_worldbuilding(state):
 
     # 현재 위치가 worldbuilding에 존재하는지 확인
     current_loc = state.get("current_location", "")
+    locations = wb.get("locations", {})
     if current_loc:
-        locations = wb.get("locations", {})
         if current_loc in locations:
             log("ok", f"현재 위치 '{current_loc}' worldbuilding에 존재")
         else:
             log("warn", f"현재 위치 '{current_loc}' worldbuilding.locations에 없음")
     else:
         log("warn", "current_location 비어있음")
+
+    # 방향 대칭 검증: A→B 북쪽이면 B→A 남쪽이어야 함
+    opposite = {"북쪽": "남쪽", "남쪽": "북쪽", "동쪽": "서쪽", "서쪽": "동쪽",
+                "북동쪽": "남서쪽", "남서쪽": "북동쪽", "북서쪽": "남동쪽", "남동쪽": "북서쪽"}
+    direction_errors = []
+    for loc_id, loc_data in locations.items():
+        conns = loc_data.get("connections", {})
+        for target_name, conn_info in conns.items():
+            direction = conn_info.get("direction", "")
+            target_id = None
+            for tid, tdata in locations.items():
+                if tdata.get("name") == target_name:
+                    target_id = tid
+                    break
+            if not target_id or target_id not in locations:
+                continue
+            target_conns = locations[target_id].get("connections", {})
+            loc_name = loc_data.get("name", loc_id)
+            if loc_name in target_conns:
+                reverse_dir = target_conns[loc_name].get("direction", "")
+                expected_reverse = opposite.get(direction, "")
+                if expected_reverse and reverse_dir != expected_reverse:
+                    err_msg = f"방향 불일치: {loc_name}→{target_name}={direction}, {target_name}→{loc_name}={reverse_dir} (예상: {expected_reverse})"
+                    direction_errors.append(err_msg)
+                    if FIX_MODE:
+                        target_conns[loc_name]["direction"] = expected_reverse
+                        log("error", err_msg, auto_fixed=True)
+                    else:
+                        log("error", err_msg)
+
+    if not direction_errors:
+        log("ok", "세계관 방향 대칭 검증 통과")
+
+    # 거리 대칭 검증
+    distance_errors = []
+    for loc_id, loc_data in locations.items():
+        conns = loc_data.get("connections", {})
+        for target_name, conn_info in conns.items():
+            dist = conn_info.get("distance", "")
+            target_id = None
+            for tid, tdata in locations.items():
+                if tdata.get("name") == target_name:
+                    target_id = tid
+                    break
+            if not target_id or target_id not in locations:
+                continue
+            target_conns = locations[target_id].get("connections", {})
+            loc_name = loc_data.get("name", loc_id)
+            if loc_name in target_conns:
+                reverse_dist = target_conns[loc_name].get("distance", "")
+                if dist and reverse_dist and dist != reverse_dist:
+                    distance_errors.append(f"거리 불일치: {loc_name}↔{target_name} ({dist} vs {reverse_dist})")
+                    log("warn", f"거리 불일치: {loc_name}↔{target_name} ({dist} vs {reverse_dist})")
+
+    if not distance_errors:
+        log("ok", "세계관 거리 대칭 검증 통과")
+
+    # NPC 위치 일관성
+    for npc in state.get("npcs", []):
+        npc_loc = npc.get("location", "")
+        if npc_loc and npc_loc not in locations:
+            log("warn", f"NPC '{npc.get('name','?')}'의 location '{npc_loc}'이 worldbuilding에 없음")
+
+    if FIX_MODE and direction_errors:
+        save_json("data/worldbuilding.json", wb)
 
 
 def check_services():
@@ -403,6 +468,87 @@ def check_orphan_npcs(state):
         log("ok", "고아 NPC 엔티티 없음")
 
 
+def check_rules_consistency(state):
+    """룰 기반 데이터 일관성 검증."""
+    print("\n[11] 룰 일관성 검증")
+    if state is None:
+        return
+
+    rules = load_json_safe("data/rules.json")
+
+    for p in state.get("players", []):
+        name = p.get("name", "?")
+        stat_cap = 20
+        if rules:
+            stat_cap = rules.get("stat_cap", rules.get("rules", {}).get("stat_cap", 20))
+        for stat_name, stat_val in p.get("stats", {}).items():
+            if isinstance(stat_val, (int, float)) and stat_val > stat_cap:
+                log("warn", f"{name}의 {stat_name}={stat_val} > 상한({stat_cap})")
+                if FIX_MODE:
+                    p["stats"][stat_name] = stat_cap
+                    log("warn", f"{name}의 {stat_name}을 {stat_cap}로 조정", auto_fixed=True)
+
+        if p.get("hp", 0) < 0:
+            log("error", f"{name}의 HP={p['hp']} 음수")
+            if FIX_MODE:
+                p["hp"] = 0
+                log("warn", f"{name}의 HP를 0으로 조정", auto_fixed=True)
+        if p.get("mp", 0) < 0:
+            log("error", f"{name}의 MP={p['mp']} 음수")
+            if FIX_MODE:
+                p["mp"] = 0
+                log("warn", f"{name}의 MP를 0으로 조정", auto_fixed=True)
+
+        level = p.get("level", 1)
+        xp = p.get("xp", 0)
+        if rules:
+            xp_table = rules.get("xp_table", rules.get("rules", {}).get("xp_table", {}))
+            if xp_table:
+                expected_level = 1
+                for lv_str, req_xp in sorted(xp_table.items(), key=lambda x: int(x[0])):
+                    if xp >= req_xp:
+                        expected_level = int(lv_str)
+                if level != expected_level:
+                    log("warn", f"{name} 레벨 불일치: 현재 Lv{level}, XP({xp}) 기준 Lv{expected_level}")
+
+    for npc in state.get("npcs", []):
+        name = npc.get("name", "?")
+        if npc.get("hp", 0) > npc.get("max_hp", 999):
+            log("warn", f"NPC {name}의 HP({npc['hp']}) > max_hp({npc['max_hp']})")
+            if FIX_MODE:
+                npc["hp"] = npc["max_hp"]
+                log("warn", f"NPC {name} HP를 max_hp로 조정", auto_fixed=True)
+        if npc.get("hp", 0) < 0 and npc.get("status") == "alive":
+            log("error", f"NPC {name}의 HP={npc['hp']} 음수인데 status=alive")
+            if FIX_MODE:
+                npc["hp"] = 0
+                npc["status"] = "dead"
+                log("warn", f"NPC {name} status를 dead로 변경", auto_fixed=True)
+
+    log("ok", "룰 일관성 검증 완료")
+
+
+def check_quest_consistency(state):
+    """퀘스트 상태 일관성 검증."""
+    print("\n[12] 퀘스트 상태 검증")
+    quests = load_json_safe("data/quests.json")
+    if quests is None:
+        log("ok", "quests.json 없음 (퀘스트 미사용)")
+        return
+
+    raw_quests = quests if isinstance(quests, list) else quests.get("quests", [])
+    quest_list = raw_quests if isinstance(raw_quests, list) else list(raw_quests.values()) if isinstance(raw_quests, dict) else []
+    active = [q for q in quest_list if q.get("status") == "active"]
+    completed = [q for q in quest_list if q.get("status") == "completed"]
+    failed = [q for q in quest_list if q.get("status") == "failed"]
+    log("ok", f"퀘스트 현황: 활성 {len(active)}, 완료 {len(completed)}, 실패 {len(failed)}")
+
+    for q in active:
+        qid = q.get("id", q.get("title", "?"))
+        if not q.get("objective") and not q.get("objectives"):
+            log("warn", f"활성 퀘스트 '{qid}'에 objective 없음")
+
+
 # ─── 자동 수정 헬퍼 ───
 
 def _create_player_entity(scenario_id, player):
@@ -491,6 +637,8 @@ def main():
     check_orphan_npcs(state)
     check_services()
     check_illustrations(state)
+    check_rules_consistency(state)
+    check_quest_consistency(state)
 
     # 자동 수정된 game_state 저장
     if FIX_MODE and state is not None and results["fixed"] > 0:
