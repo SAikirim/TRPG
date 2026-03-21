@@ -740,7 +740,7 @@
                 }).join('');
                 return `
                 <div class="player-card">
-                    <img class="player-portrait" src="/static/portraits/pixel/player_${p.id}.png" alt="${p.name}" onerror="this.src='/static/portraits/pixel/player_${p.id}.png'" onclick="openPortraitZoom(playerOriginalImages[p.id] || '/static/portraits/pixel/player_${p.id}.png')" style="cursor:pointer">
+                    <img class="player-portrait" src="/static/portraits/pixel/player_${p.id}.png" alt="${p.name}" onerror="this.src='/static/portraits/pixel/player_${p.id}.png'" onclick="openPortraitZoom('${p.original_image || '/static/portraits/pixel/player_' + p.id + '.png'}')" style="cursor:pointer">
                     <div class="player-info">
                         <div class="name">
                         ${p.name}
