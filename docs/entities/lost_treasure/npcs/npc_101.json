@@ -10,14 +10,17 @@
     "motivation": "마나가 풍부한 장소에서 서식"
   },
   "stats": {
-    "hp": 0,
-    "max_hp": 15,
-    "attack": 5,
-    "defense": 2,
-    "speed": 4,
-    "mp": 12,
-    "max_mp": 12
+    "STR": 6,
+    "DEX": 10,
+    "INT": 14,
+    "CON": 8
   },
+  "hp": 0,
+  "max_hp": 15,
+  "mp": 10,
+  "max_mp": 10,
+  "attack": 5,
+  "defense": 2,
   "position": [10, 10],
   "status": "dead",
   "status_effects": [],

@@ -10,12 +10,17 @@
     "motivation": "던전 영역 수호"
   },
   "stats": {
-    "hp": 0,
-    "max_hp": 25,
-    "attack": 8,
-    "defense": 4,
-    "speed": 6
+    "STR": 16,
+    "DEX": 8,
+    "INT": 6,
+    "CON": 14
   },
+  "hp": 0,
+  "max_hp": 25,
+  "mp": 0,
+  "max_mp": 0,
+  "attack": 8,
+  "defense": 4,
   "position": [5, 10],
   "status": "dead",
   "status_effects": [],

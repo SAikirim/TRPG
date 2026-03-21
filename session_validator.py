@@ -235,6 +235,29 @@ def check_scenario_files(state):
         else:
             log("error", f"{fname} 파일 없음")
 
+    # scenario.json 타이틀이 현재 game_state의 시나리오와 일치하는지 검증
+    scenario_data = load_json_safe("scenario.json")
+    if scenario_data and state:
+        gs_scenario_id = state.get("game_info", {}).get("scenario_id", "")
+        sc_title = scenario_data.get("scenario_info", {}).get("title", "")
+        gs_title = state.get("game_info", {}).get("title", "")
+        if sc_title != gs_title:
+            log("error", f"scenario.json 타이틀 불일치: scenario.json='{sc_title}' vs game_state='{gs_title}'")
+            if "--fix" in sys.argv or "--fix" not in sys.argv:  # auto-fix by default
+                # Try to find and copy correct scenario file
+                idx = load_json_safe("scenarios/index.json")
+                if idx:
+                    for s in idx.get("scenarios", []):
+                        if s["id"] == gs_scenario_id:
+                            src = os.path.join(BASE_DIR, s.get("scenario_file", f"scenarios/{gs_scenario_id}.json"))
+                            if os.path.exists(src):
+                                import shutil
+                                shutil.copy2(src, os.path.join(BASE_DIR, "scenario.json"))
+                                log("fix", f"scenario.json을 '{gs_title}'로 교체")
+                            break
+        else:
+            log("ok", f"scenario.json 타이틀 일치: '{sc_title}'")
+
     # scenarios/index.json
     idx = load_json_safe("scenarios/index.json")
     if idx:

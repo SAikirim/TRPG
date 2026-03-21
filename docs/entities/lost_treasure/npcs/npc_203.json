@@ -4,6 +4,16 @@
   "type": "monster",
   "status": "fled",
   "location": "숲으로 도주",
+  "stats": {
+    "STR": 12,
+    "DEX": 14,
+    "INT": 4,
+    "CON": 10
+  },
+  "hp": 6,
+  "max_hp": 15,
+  "mp": 0,
+  "max_mp": 0,
   "personality": {
     "temperament": "cowardly",
     "intelligence": "low",
