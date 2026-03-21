@@ -28,6 +28,7 @@
   "locations": {
     "harun_village": {
       "name": "하룬 마을",
+      "world_pos": [5, 8],
       "type": "village",
       "description": "숲 근처의 작은 농촌 마을. 주민 약 200명.",
       "features": ["촌장의 집", "경비소", "잡화점", "여관 (작음)", "교회"],
@@ -67,6 +68,7 @@
     },
     "trade_road_karendel": {
       "name": "교역로 (카렌델 방면)",
+      "world_pos": [5, 5],
       "type": "road",
       "description": "하룬 마을에서 카렌델로 이어지는 교역로",
       "map": {
@@ -80,12 +82,13 @@
         ]
       },
       "connections": {
-        "하룬 마을": {"direction": "서쪽", "distance": "도보 반나절"},
-        "카렌델": {"direction": "동쪽", "distance": "도보 1.5일"}
+        "하룬 마을": {"direction": "남쪽", "distance": "도보 반나절"},
+        "카렌델": {"direction": "북쪽", "distance": "도보 1.5일"}
       }
     },
     "karendel": {
       "name": "카렌델",
+      "world_pos": [5, 2],
       "type": "trade_city",
       "description": "북쪽의 교역 도시. 다양한 종족과 상인이 모이는 곳.",
       "features": ["마법사 길드", "모험가 조합", "감정사", "대장간", "시장", "여관 거리"],
@@ -109,6 +112,25 @@
       },
       "connections": {
         "하룬 마을": {"direction": "남쪽", "distance": "도보 2일"}
+      }
+    },
+    "lost_treasure_dungeon": {
+      "name": "잃어버린 보물의 숲 던전",
+      "type": "dungeon",
+      "world_pos": [8, 8],
+      "description": "하룬 마을 동쪽 숲 깊은 곳의 고대 던전. 이미 클리어됨.",
+      "connections": {
+        "하룬 마을": {"direction": "서쪽", "distance": "도보 반나절"}
+      }
+    },
+    "crossroads_shelter": {
+      "name": "갈림길 쉼터",
+      "type": "rest_area",
+      "world_pos": [5, 4],
+      "description": "교역로 중간 지점의 갈림길. 남쪽으로 항구, 북쪽으로 카렌델.",
+      "connections": {
+        "카렌델": {"direction": "북쪽", "distance": "도보 1일"},
+        "교역로 (카렌델 방면)": {"direction": "남쪽", "distance": "도보 수시간"}
       }
     }
   },
