@@ -1,0 +1,24 @@
+{
+  "id": 301,
+  "name": "미라",
+  "type": "friendly",
+  "status": "alive",
+  "location": "교역로 (수레 파손 현장)",
+  "personality": {
+    "temperament": "cheerful",
+    "intelligence": "medium",
+    "behavior_pattern": "밝고 수다스러운 상인의 딸. 사람을 잘 사귀고 정보통. 아버지를 챙긴다.",
+    "speech_style": "활발하고 친근한 말투. 감사 표현을 잘 한다.",
+    "motivation": "아버지와 함께 무사히 카렌델 도착. 장사 성공."
+  },
+  "relationships": {
+    "할란": "아버지. 걱정되지만 존경한다.",
+    "사이키": "구해준 모험가. 호감."
+  },
+  "memory": {
+    "dialogue_history": [],
+    "key_events": [
+      "파티에게 늑대에서 구출됨."
+    ]
+  }
+}

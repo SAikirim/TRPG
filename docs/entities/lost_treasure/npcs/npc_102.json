@@ -1,0 +1,26 @@
+{
+  "id": 102,
+  "name": "에르네스",
+  "type": "friendly",
+  "status": "alive",
+  "location": "하룬 마을",
+  "personality": {
+    "temperament": "calm",
+    "intelligence": "high",
+    "behavior_pattern": "마을의 촌장. 노련하고 눈치가 빠르지만 캐묻지 않는다. 젊은이들을 조용히 챙겨주는 타입.",
+    "speech_style": "나직하고 담담한 어조. 말을 아끼지만 핵심을 찌른다.",
+    "motivation": "마을과 주민 보호. 볼프에게 약초 보내주기."
+  },
+  "relationships": {
+    "사이키": "마을 청년. 가난한 집안이지만 책임감 있다고 평가.",
+    "루체나": "사이키의 여동생. 거칠지만 영리하다고 봄.",
+    "노을": "고아. 어릴 때부터 밥을 챙겨줬던 인연.",
+    "볼프": "카렌델의 옛 친구. 무릎이 안 좋아 약초를 보내주는 사이."
+  },
+  "memory": {
+    "dialogue_history": [],
+    "key_events": [
+      "파티에게 소개장/노잣돈/약초 봉투 전달"
+    ]
+  }
+}

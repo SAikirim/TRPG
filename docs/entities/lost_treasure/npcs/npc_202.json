@@ -1,0 +1,19 @@
+{
+  "id": 202,
+  "name": "늑대B",
+  "type": "monster",
+  "status": "fled",
+  "location": "숲으로 도주",
+  "personality": {
+    "temperament": "cowardly",
+    "intelligence": "low",
+    "behavior_pattern": "겁이 많은 개체. 불에 맞자 사기 붕괴.",
+    "speech_style": "낑낑",
+    "motivation": "먹이 확보 → 도주"
+  },
+  "memory": {
+    "key_events": [
+      "파이어볼에 8뎀 맞고 도주"
+    ]
+  }
+}
