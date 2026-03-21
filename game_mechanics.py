@@ -1201,6 +1201,27 @@ def _apply_status(entity, name, duration):
 # ─── 조용한 실행 (show_dice_result: false 대응) ───
 
 QUIET_RESULT_PATH = os.path.join(BASE_DIR, ".last_result.json")
+TRACKER_PATH = os.path.join(BASE_DIR, ".turn_tracker.json")
+
+
+def _log_to_tracker(tag, message):
+    """턴 추적기에 실행 기록 자동 추가 (tracker 활성 시에만)"""
+    if not os.path.exists(TRACKER_PATH):
+        return
+    try:
+        with open(TRACKER_PATH, "r", encoding="utf-8") as f:
+            tracker = json.load(f)
+        if tracker.get("completed"):
+            return
+        tracker["steps"].append({
+            "tag": tag,
+            "message": message,
+            "time": datetime.now().isoformat(),
+        })
+        with open(TRACKER_PATH, "w", encoding="utf-8") as f:
+            json.dump(tracker, f, ensure_ascii=False, indent=2)
+    except (json.JSONDecodeError, KeyError):
+        pass
 
 
 def run_quiet(func, *args, **kwargs):
@@ -1279,9 +1300,11 @@ def main():
     cmd = sys.argv[1]
 
     if cmd == "long_rest":
+        _log_to_tracker("dice", "하룻밤 휴식 처리")
         _print_result(long_rest())
 
     elif cmd == "short_rest":
+        _log_to_tracker("dice", "짧은 휴식 처리")
         _print_result(short_rest())
 
     elif cmd == "status":
@@ -1289,15 +1312,18 @@ def main():
             print(f"  {p['name']}({p['class']}) HP:{p['hp']} MP:{p['mp']} AC:{p['ac']} {p['status_effects'] or ''}")
 
     elif cmd == "use_item" and len(sys.argv) >= 4:
+        _log_to_tracker("state", f"아이템 사용: player {sys.argv[2]} → {sys.argv[3]}")
         _print_result(use_item(int(sys.argv[2]), sys.argv[3]))
 
     elif cmd == "roll" and len(sys.argv) >= 3:
         dice = sys.argv[2]
         rolls = roll_dice(dice)
+        _log_to_tracker("dice", f"주사위 {dice}")
         print(f"🎲 {dice} → {rolls} = {sum(rolls)}")
 
     elif cmd == "check" and len(sys.argv) >= 5:
         r = skill_check(int(sys.argv[2]), sys.argv[3], int(sys.argv[4]))
+        _log_to_tracker("dice", f"판정 {sys.argv[3]} DC{sys.argv[4]} — player {sys.argv[2]}")
         if quiet:
             run_quiet(lambda: r)
         else:
@@ -1306,6 +1332,7 @@ def main():
     elif cmd == "attack" and len(sys.argv) >= 4:
         action = sys.argv[4] if len(sys.argv) >= 5 else "공격"
         r = attack_roll(int(sys.argv[2]), int(sys.argv[3]), action)
+        _log_to_tracker("dice", f"공격 판정: {sys.argv[2]} → {sys.argv[3]} ({action})")
         if quiet:
             run_quiet(lambda: r)
         else:
@@ -1313,6 +1340,7 @@ def main():
 
     elif cmd == "heal" and len(sys.argv) >= 4:
         r = cast_heal(int(sys.argv[2]), int(sys.argv[3]))
+        _log_to_tracker("dice", f"힐: {sys.argv[2]} → {sys.argv[3]}")
         if quiet:
             run_quiet(lambda: r)
         else:
@@ -1320,6 +1348,7 @@ def main():
 
     elif cmd == "damage" and len(sys.argv) >= 4:
         r = apply_damage(int(sys.argv[2]), int(sys.argv[3]))
+        _log_to_tracker("state", f"데미지: {sys.argv[2]} ← {sys.argv[3]}")
         if quiet:
             run_quiet(lambda: r)
         else:

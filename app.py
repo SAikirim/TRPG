@@ -115,6 +115,9 @@ def gm_update():
     data = request.get_json()
     state = load_game_state()
 
+    # 턴 추적기에 gm-update 실행 기록
+    gm._log_to_tracker("gm-update", data.get("description", "웹 UI 반영")[:60])
+
     description = data.get("description", "")
     narrative = data.get("narrative", "")
 
@@ -208,6 +211,7 @@ def gm_update():
 
     save_game_state(state)
     gm.sync_all_players(state)
+    gm._log_to_tracker("state", "game_state 저장 + 엔티티 동기화")
     update_map_image()
 
     # Handle illustration request

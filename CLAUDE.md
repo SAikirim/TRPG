@@ -37,6 +37,24 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - Phase 1 진행 중에는 간단한 상태 메시지만 허용 (예: "처리 중...")
 - **나레이션과 시스템 로그가 섞이는 것은 금지** — 몰입을 깨뜨림
 
+### GM 턴 추적기 (gm_turn.py) — 누락 방지
+> **실제로 실행한 작업만 기록한다. 실행하지 않은 에이전트/작업을 표시하는 것은 금지.**
+
+```bash
+python gm_turn.py start              # Phase 1 시작 — tracker 초기화
+# ... 실제 작업 수행 (game_mechanics.py, gm-update 등) ...
+# game_mechanics.py 실행 → 자동으로 tracker에 기록됨
+# gm-update API 호출 → 자동으로 tracker에 기록됨
+python gm_turn.py log npc "할란 대사 생성"   # Agent 사용 시 수동 기록
+python gm_turn.py log narration "나레이션 출력"  # 나레이션 후 기록
+python gm_turn.py end                # Phase 1 종료 — 누락 경고 출력
+```
+
+- **자동 기록**: `game_mechanics.py` CLI 실행, `gm-update` API 호출 시 tracker에 자동 등록
+- **수동 기록**: NPC Agent 호출, 나레이션 출력 등은 `python gm_turn.py log <tag> <msg>`로 기록
+- **턴 종료 검증**: `end` 시 필수 단계(gm-update, state 저장, 나레이션) 누락 여부 경고
+- **태그**: `dice`, `gm-update`, `state`, `entity`, `save`, `npc`, `narration`
+
 ### GM 웹 반영 필수 규칙
 - **GM이 나레이션할 때 반드시 gm-update API를 호출하여 웹 UI에 자동 반영해야 한다**
 - 터미널에 텍스트만 쓰고 API를 호출하지 않는 것은 금지
@@ -142,6 +160,7 @@ app.py                    - Flask 웹 서버 (포트 5000), API 엔드포인트,
 sd_generator.py           - SD WebUI API 래퍼, 비동기 스레드 생성, 레이어 시스템
 map_generator.py          - Cairo/PIL 이미지 생성 (맵 + 배경 + 초상화), SD OFF 시 폴백
 ascii_map.py              - CLI 터미널용 이모지 ASCII 맵 출력
+gm_turn.py                - GM 턴 추적기 (실행 작업 기록 + 누락 경고)
 save_manager.py           - 세이브/로드 매니저, current_session.json 자동 갱신
 game_state.json           - 현재 게임 상태 (플레이어/NPC/맵/턴/이벤트)
 current_session.json      - 현재 활성 세션 요약 (시나리오/세이브/진행상황 — 세션 복원용)
