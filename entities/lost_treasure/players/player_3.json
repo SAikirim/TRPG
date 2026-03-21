@@ -36,7 +36,8 @@
   },
   "available_actions": [
     "공격",
-    "방어"
+    "방어",
+    "도주"
   ],
   "combat_state": {
     "is_in_combat": false,

@@ -36,6 +36,7 @@
     "armor": null
   },
   "available_actions": [
+    "공격",
     "습격",
     "도주"
   ],

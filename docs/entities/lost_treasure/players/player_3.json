@@ -22,8 +22,8 @@
     "CON": 16
   },
   "position": [
-    7,
-    5
+    5,
+    7
   ],
   "status_effects": [],
   "inventory": [
@@ -36,7 +36,8 @@
   },
   "available_actions": [
     "공격",
-    "방어"
+    "방어",
+    "도주"
   ],
   "combat_state": {
     "is_in_combat": false,

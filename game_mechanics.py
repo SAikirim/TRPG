@@ -238,7 +238,7 @@ def attack_roll(attacker_id, target_id, action_name="공격", state=None):
     fumble = d20 == 1
 
     # 공격 보정값 결정
-    stat_name = _attack_stat(action_def)
+    stat_name = _attack_stat(action_def, attacker, state)
     atk_mod = _get_modifier(attacker, stat_name)
     attack_total = d20 + atk_mod
 
@@ -268,7 +268,7 @@ def attack_roll(attacker_id, target_id, action_name="공격", state=None):
         _apply_status(attacker, "펌블", 1)
     elif critical or attack_total >= ac:
         result["hit"] = True
-        dmg_dice = _damage_dice(action_def)
+        dmg_dice = _damage_dice(action_def, attacker, state)
         dmg_rolls = roll_dice(dmg_dice)
         dmg_mod = atk_mod
         damage = sum(dmg_rolls) + dmg_mod
@@ -821,7 +821,8 @@ def _get_modifier(entity, stat_name):
     return stat_modifier(val)
 
 
-def _attack_stat(action_def):
+def _attack_stat(action_def, attacker=None, state=None):
+    """공격 보정 능력치 결정. 기본 공격은 무기의 stat 사용."""
     atype = action_def.get("type", "")
     if "magic" in atype:
         return "INT"
@@ -830,12 +831,49 @@ def _attack_stat(action_def):
         return "INT"
     if "DEX" in roll_str:
         return "DEX"
+    # 기본 공격("weapon_stat")은 장비 무기의 stat 사용
+    if "weapon" in roll_str.lower() and attacker and state:
+        rules = load_rules()
+        weapons = rules.get("combat", {}).get("weapons", {})
+        ent_data, _ = _load_entity(state, attacker.get("id", 0))
+        weapon_name = None
+        if ent_data:
+            weapon_name = ent_data.get("equipment", {}).get("weapon")
+        if weapon_name and weapon_name in weapons:
+            return weapons[weapon_name].get("stat", "STR")
     return "STR"
 
 
-def _damage_dice(action_def):
+def _damage_dice(action_def, attacker=None, state=None):
+    """액션의 데미지 다이스. 기본 공격은 장비 무기 다이스 사용."""
     dmg = action_def.get("damage", "1d6")
+    # "weapon_dice" 포함 시 장비 무기에서 다이스 조회
+    if "weapon" in dmg.lower() and attacker:
+        weapon_dice = _get_weapon_dice(attacker, state)
+        if weapon_dice:
+            return weapon_dice
     return dmg.split("+")[0].strip()
+
+
+def _get_weapon_dice(entity, state=None):
+    """엔티티의 장비 무기 데미지 다이스 조회"""
+    rules = load_rules()
+    weapons = rules.get("combat", {}).get("weapons", {})
+    # 엔티티 파일에서 equipment 확인
+    weapon_name = None
+    if state and _is_player(state, entity.get("id", 0)):
+        ent_data, _ = _load_entity(state, entity["id"]) if hasattr(entity, 'get') else (None, None)
+        if ent_data:
+            weapon_name = ent_data.get("equipment", {}).get("weapon")
+    if not weapon_name:
+        # inventory에서 무기 추정
+        for item in entity.get("inventory", []):
+            if item in weapons:
+                weapon_name = item
+                break
+    if weapon_name and weapon_name in weapons:
+        return weapons[weapon_name]["dice"]
+    return None
 
 
 def _npc_ac(npc):

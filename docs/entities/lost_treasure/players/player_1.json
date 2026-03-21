@@ -14,7 +14,7 @@
   "stats": {
     "hp": 18,
     "max_hp": 18,
-    "mp": 35,
+    "mp": 31,
     "max_mp": 35,
     "STR": 8,
     "DEX": 16,
@@ -22,8 +22,8 @@
     "CON": 10
   },
   "position": [
-    7,
-    5
+    3,
+    7
   ],
   "status_effects": [],
   "inventory": [
@@ -44,6 +44,8 @@
     "armor": null
   },
   "available_actions": [
+    "공격",
+    "마법탄",
     "파이어볼",
     "힐"
   ],

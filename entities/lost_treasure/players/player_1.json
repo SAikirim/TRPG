@@ -44,6 +44,8 @@
     "armor": null
   },
   "available_actions": [
+    "공격",
+    "마법탄",
     "파이어볼",
     "힐"
   ],
