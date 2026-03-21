@@ -79,7 +79,7 @@ def restore_scene():
         name=scene_name,
     )
 
-    # 현재 위치의 alive NPC를 일러스트 레이어에 추가
+    # 현재 위치의 alive NPC를 일러스트 레이어에 추가 (초상화 있는 NPC만)
     current_loc = state.get("current_location", "")
     positions = ["left", "center", "right"]
     pos_idx = 0
@@ -89,12 +89,25 @@ def restore_scene():
         npc_loc = npc.get("location", "")
         if current_loc and npc_loc and npc_loc != current_loc:
             continue
+        # 초상화 파일이 존재하는 NPC만 레이어에 추가
+        npc_name = npc.get("name", "")
+        portrait_exists = False
+        for ext in [".webp", ".png"]:
+            for prefix in ["portrait_", ""]:
+                check_path = os.path.join(BASE_DIR, "static", "portraits", "sd", f"{prefix}{npc_name}{ext}")
+                if os.path.exists(check_path):
+                    portrait_exists = True
+                    break
+            if portrait_exists:
+                break
+        if not portrait_exists:
+            continue
         request_illustration(
             illustration_type="portrait",
             prompt="",
             turn_count=state.get("turn_count", 0),
             position=positions[pos_idx % len(positions)],
-            name=npc.get("name", ""),
+            name=npc_name,
         )
         pos_idx += 1
 
@@ -305,7 +318,7 @@ def gm_update():
     if data.get("remove_layer"):
         remove_layer(data["remove_layer"])
 
-    # 현재 위치의 alive NPC를 자동으로 레이어에 추가
+    # 현재 위치의 alive NPC를 자동으로 레이어에 추가 (초상화 있는 NPC만)
     current_loc = state.get("current_location", "")
     positions = ["left", "center", "right"]
     pos_idx = 0
@@ -315,16 +328,29 @@ def gm_update():
         npc_loc = npc.get("location", "")
         if current_loc and npc_loc and npc_loc != current_loc:
             continue
+        # 초상화 파일이 존재하는 NPC만 레이어에 추가
+        npc_name = npc.get("name", "")
+        portrait_exists = False
+        for ext in [".webp", ".png"]:
+            for prefix in ["portrait_", ""]:
+                check_path = os.path.join(BASE_DIR, "static", "portraits", "sd", f"{prefix}{npc_name}{ext}")
+                if os.path.exists(check_path):
+                    portrait_exists = True
+                    break
+            if portrait_exists:
+                break
+        if not portrait_exists:
+            continue
         # 이미 레이어에 있으면 스킵
         scene = get_scene_state()
-        already = any(l.get("name") == npc.get("name") for l in scene.get("layers", []))
+        already = any(l.get("name") == npc_name for l in scene.get("layers", []))
         if not already:
             request_illustration(
                 illustration_type="portrait",
                 prompt="",
                 turn_count=state["turn_count"],
                 position=positions[pos_idx % len(positions)],
-                name=npc.get("name", ""),
+                name=npc_name,
             )
             pos_idx += 1
 

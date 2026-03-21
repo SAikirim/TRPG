@@ -103,6 +103,13 @@ AnimateDiff
 - SD OFF 시에도 Cairo 배경이 항상 표시된다 (빈 화면 없음)
 - app.py의 /api/illustration 엔드포인트가 default_bg (sd/pixel 경로)를 제공
 
+일러스트 생성 기준
+===
+- 비중 없는 NPC/생물체(짐말, 배경 동물 등)는 일러스트를 생성하지 않는다
+- 유저가 명시적으로 요청한 경우에만 생성
+- 일러스트 이미지는 원본 크기를 사용한다 — 미리 축소하지 않음
+- 웹에서 CSS로 적절히 표시 (max-width/max-height로 제어)
+
 NPC 초상화 생성 시 필수 사항
 ===
 - SD로 NPC 초상화 생성 시 반드시 entities/{scenario_id}/npcs/npc_{id}.json의 appearance 필드를 참조
