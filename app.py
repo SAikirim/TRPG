@@ -79,8 +79,24 @@ def restore_scene():
         name=scene_name,
     )
 
-    # NPC 레이어는 자동 추가하지 않음 — GM이 나레이션 시 명시적으로 추가
-    # 배경만 복원하고, NPC/오브젝트 레이어는 게임 진행 중 GM이 관리
+    # 현재 위치의 alive NPC를 일러스트 레이어에 추가
+    current_loc = state.get("current_location", "")
+    positions = ["left", "center", "right"]
+    pos_idx = 0
+    for npc in state.get("npcs", []):
+        if npc.get("status") not in ("alive", "idle", "active"):
+            continue
+        npc_loc = npc.get("location", "")
+        if current_loc and npc_loc and npc_loc != current_loc:
+            continue
+        request_illustration(
+            illustration_type="portrait",
+            prompt="",
+            turn_count=state.get("turn_count", 0),
+            position=positions[pos_idx % len(positions)],
+            name=npc.get("name", ""),
+        )
+        pos_idx += 1
 
     # docs/ 동기화 (정적 웹 반영)
     try:
