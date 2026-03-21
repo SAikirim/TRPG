@@ -235,6 +235,7 @@ class SaveManager:
             ("static/illustrations/pixel", "static/illustrations/pixel"),
             ("static/portraits/pixel", "static/portraits/pixel"),
             ("static/portraits/sd", "static/portraits/sd"),
+            ("static/portraits/original", "static/portraits/original"),
             ("static/map.png", "static/map.png"),
             ("static/map_mini.png", "static/map_mini.png"),
         ]

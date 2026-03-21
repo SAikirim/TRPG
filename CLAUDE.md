@@ -17,6 +17,7 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - ❌ 나레이션과 시스템 로그가 섞이는 것 (Phase 분리 필수)
 - ❌ 배경 위 인물 레이어에 불투명 배경 사용
 - ❌ 동일 인물의 외형이 장면마다 바뀌는 것
+- ❌ 메인 세션에서 직접 Edit/Write/Bash 쓰기 실행 금지 — 반드시 Agent 백그라운드로 실행 (메인 세션 블로킹 방지)
 
 ### 필수 자동화 (코드로 동작)
 - ✅ Flask 시작/로드 시 `restore_scene()` → 배경 자동 복원
@@ -70,6 +71,14 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 ```
 
 > 상세: guides/entities.txt 참조
+
+### 메인 세션 블로킹 방지 (최우선 규칙)
+- 메인 Claude Code 세션은 언제나 명령 입력 대기 상태를 유지해야 한다
+- 읽기(Read, Grep, Glob, Bash 읽기 전용) → 메인 세션에서 직접 실행 가능
+- 쓰기(Edit, Write, Bash 쓰기/삭제) → 반드시 Agent 툴(run_in_background=true)로 실행
+- 여러 파일을 수정해야 할 때 → 하나의 Agent에 모든 수정을 맡기거나, 파일별 Agent 병렬 실행
+- 1줄 수정이라도 Agent로 보내야 한다 — 예외 없음
+- 이 규칙을 어기면 유저가 메시지를 보낼 수 없는 상태가 된다
 
 ---
 

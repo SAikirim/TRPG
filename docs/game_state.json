@@ -48,7 +48,8 @@
         "밧줄",
         "부싯돌"
       ],
-      "controlled_by": "user"
+      "controlled_by": "user",
+      "original_image": "/static/portraits/original/player_1_saiki.png"
     },
     {
       "id": 2,
@@ -76,7 +77,8 @@
         "도둑 도구",
         "밧줄"
       ],
-      "controlled_by": "agent"
+      "controlled_by": "agent",
+      "original_image": "/static/portraits/original/player_2_luchena.png"
     },
     {
       "id": 3,
@@ -104,7 +106,8 @@
         "오크의 도끼",
         "상처 치료 약병"
       ],
-      "controlled_by": "agent"
+      "controlled_by": "agent",
+      "original_image": "/static/portraits/original/player_3_noeul.png"
     }
   ],
   "npcs": [
