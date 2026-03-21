@@ -61,14 +61,25 @@ def _add_npc_layers(state):
         npcs_to_add.append((sort_key, npc_name, distance, size_class))
 
     npcs_to_add.sort(key=lambda x: x[0])
-    for idx, (_, npc_name, distance, size_class) in enumerate(npcs_to_add):
-        if idx > 3:
-            break
+    for idx, (sort_key, npc_name, distance, size_class) in enumerate(npcs_to_add[:4]):
+        # Map relative dx to screen position name
+        # sort_key = -(npc_x - p1_x), mirrored: positive sort_key = right on screen
+        if sort_key > 1:
+            pos_name = "far-right"
+        elif sort_key == 1:
+            pos_name = "right"
+        elif sort_key == 0:
+            pos_name = "center"
+        elif sort_key == -1:
+            pos_name = "left"
+        else:
+            pos_name = "far-left"
+
         request_illustration(
             illustration_type="portrait",
             prompt="",
             turn_count=state.get("turn_count", 0),
-            position=str(idx),
+            position=pos_name,
             name=npc_name,
             distance=distance,
             size_class=size_class,

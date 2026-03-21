@@ -268,14 +268,11 @@
             flex-direction: column;
             align-items: center;
         }
-        .portrait-wrapper.pos-0 { left: 2%; }
-        .portrait-wrapper.pos-1 { left: 27%; }
-        .portrait-wrapper.pos-2 { left: 52%; }
-        .portrait-wrapper.pos-3 { left: 77%; }
-        /* Legacy positions for compatibility */
-        .portrait-wrapper.pos-left { left: 2%; }
-        .portrait-wrapper.pos-center { left: 38%; }
-        .portrait-wrapper.pos-right { left: 72%; }
+        .portrait-wrapper.pos-far-left { left: 5%; }
+        .portrait-wrapper.pos-left { left: 20%; }
+        .portrait-wrapper.pos-center { left: 40%; }
+        .portrait-wrapper.pos-right { left: 60%; }
+        .portrait-wrapper.pos-far-right { left: 80%; }
         /* Distance-based portrait sizing (4 tiers) */
         .illustration-panel .portrait-wrapper.size-near {
             max-height: 90%;
@@ -1090,7 +1087,7 @@
                 if (data.layers && data.layers.length > 0) {
                     html += '<div class="layer-container">';
                     data.layers.forEach((layer, idx) => {
-                        const posClass = 'pos-' + Math.min(idx, 3);
+                        const posClass = 'pos-' + (layer.position || 'center');
                         const sizeClass = 'size-' + (layer.size_class || 'close');
                         const displayName = gameState?.npcs?.find(n => n.name === layer.name)?.known === false ? '???' : (layer.name || '');
                         if (layer.type === 'portrait') {

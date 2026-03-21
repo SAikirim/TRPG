@@ -308,11 +308,24 @@ class SaveManager:
                 npcs_to_add.append((sort_key, npc_name, portrait_path, distance, size_class))
 
             npcs_to_add.sort(key=lambda x: x[0])
-            for idx, (_, name, path, dist, size) in enumerate(npcs_to_add[:4]):
+            for idx, (sort_key, name, path, dist, size) in enumerate(npcs_to_add[:4]):
+                # Map relative dx to screen position name
+                # sort_key = -(npc_x - p1_x), mirrored: positive sort_key = right on screen
+                if sort_key > 1:
+                    pos_name = "far-right"
+                elif sort_key == 1:
+                    pos_name = "right"
+                elif sort_key == 0:
+                    pos_name = "center"
+                elif sort_key == -1:
+                    pos_name = "left"
+                else:
+                    pos_name = "far-left"
+
                 ill_state["layers"].append({
                     "type": "portrait",
                     "image": path,
-                    "position": str(idx),
+                    "position": pos_name,
                     "name": name,
                     "distance": dist,
                     "size_class": size,
