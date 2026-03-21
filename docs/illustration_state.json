@@ -1,6 +1,23 @@
 {
   "background": "static/illustrations/sd/background_trade_road_afternoon.webp",
-  "layers": [],
+  "layers": [
+    {
+      "type": "portrait",
+      "image": "static/portraits/sd/portrait_미라.webp",
+      "position": "0",
+      "name": "미라",
+      "distance": 1,
+      "size_class": "near"
+    },
+    {
+      "type": "portrait",
+      "image": "static/portraits/sd/portrait_할란.webp",
+      "position": "1",
+      "name": "할란",
+      "distance": 2,
+      "size_class": "close"
+    }
+  ],
   "generating": {
     "status": "idle",
     "type": null,
