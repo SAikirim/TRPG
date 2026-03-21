@@ -12,12 +12,12 @@
     }
   },
   "stats": {
-    "hp": 15,
-    "max_hp": 15,
-    "mp": 30,
-    "max_mp": 30,
+    "hp": 18,
+    "max_hp": 18,
+    "mp": 35,
+    "max_mp": 35,
     "STR": 8,
-    "DEX": 14,
+    "DEX": 16,
     "INT": 18,
     "CON": 10
   },
@@ -102,7 +102,7 @@
     "level": 2,
     "xp": 285,
     "xp_to_next": 300,
-    "stat_points_available": 2,
+    "stat_points_available": 0,
     "learned_skills": [],
     "xp_log": [
       {
