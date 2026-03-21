@@ -296,7 +296,7 @@ class SaveManager:
                 # Calculate position and distance
                 npc_pos = npc.get("position", [0, 0])
                 sort_key = -(npc_pos[0] - p1_x)
-                distance = abs(npc_pos[0] - p1_x) + abs(npc_pos[1] - p1_y)
+                distance = max(abs(npc_pos[0] - p1_x), abs(npc_pos[1] - p1_y))
                 if distance <= 1:
                     size_class = "d1"
                 elif distance <= 2:

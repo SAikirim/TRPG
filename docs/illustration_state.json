@@ -14,8 +14,8 @@
       "image": "static/portraits/sd/portrait_할란.webp",
       "position": "right",
       "name": "할란",
-      "distance": 2,
-      "size_class": "d2"
+      "distance": 1,
+      "size_class": "d1"
     }
   ],
   "generating": {
