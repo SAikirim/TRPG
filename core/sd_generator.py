@@ -141,7 +141,7 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
                 try:
                     if Remover is not None:
                         import numpy as np
-                        remover = Remover(fast=True)
+                        remover = Remover(mode="base")
                         result = remover.process(img, type="rgba")
                         if isinstance(result, np.ndarray):
                             img = Image.fromarray(result)
