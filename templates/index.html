@@ -517,6 +517,22 @@
             } catch(e) {}
         }
 
+        async function loadScenarioTitle() {
+            try {
+                const res = await fetch('/api/scenario');
+                const data = await res.json();
+                const title = data.scenario_info?.title || 'TRPG';
+                document.getElementById('game-title').textContent = title;
+                document.getElementById('game-title').dataset.loaded = 'true';
+                document.title = title;
+            } catch(e) {
+                // Fallback to game_state title
+                if (gameState?.game_info?.title) {
+                    document.getElementById('game-title').textContent = gameState.game_info.title;
+                }
+            }
+        }
+
         async function updateGameState() {
             try {
                 const res = await fetch('/api/game-state');
@@ -533,7 +549,9 @@
 
                 // Update header info
                 const info = gameState.game_info || {};
-                document.getElementById('game-title').textContent = info.title || 'TRPG';
+                if (!document.getElementById('game-title').dataset.loaded) {
+                    loadScenarioTitle();
+                }
                 document.getElementById('game-desc').textContent = info.scenario || '';
                 document.getElementById('turn-count').textContent = gameState.turn_count || 0;
                 document.getElementById('chapter-info').textContent = info.current_chapter || '-';

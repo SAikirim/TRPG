@@ -331,6 +331,14 @@ def get_rules():
     return jsonify(rules)
 
 
+@app.route("/api/scenario", methods=["GET"])
+def get_scenario():
+    scenario_path = os.path.join(BASE_DIR, "scenario.json")
+    with open(scenario_path, "r", encoding="utf-8") as f:
+        scenario = json.load(f)
+    return jsonify(scenario)
+
+
 @app.route("/api/reset-game", methods=["POST"])
 def reset_game():
     initial_path = os.path.join(BASE_DIR, "game_state_initial.json")
