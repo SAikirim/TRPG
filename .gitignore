@@ -4,3 +4,4 @@ __pycache__/
 static/map.png
 saves/
 .last_result.json
+.turn_tracker.json
