@@ -112,11 +112,19 @@ class MapGenerator:
             draw.text((4, y), str(i), fill="#888888", font=coord_font)
 
         # Draw location labels
-        font = font_small = ImageFont.load_default()
+        font = font_small = font_name = ImageFont.load_default()
+        bold_paths = ["C:/Windows/Fonts/malgunbd.ttf", "C:/Windows/Fonts/arialbd.ttf"] + font_paths_global
         for fp in font_paths_global:
             try:
                 font = ImageFont.truetype(fp, 14)
                 font_small = ImageFont.truetype(fp, 11)
+                break
+            except (OSError, IOError):
+                continue
+        # 이름 표시용 볼드 폰트
+        for fp in bold_paths:
+            try:
+                font_name = ImageFont.truetype(fp, 14)
                 break
             except (OSError, IOError):
                 continue
@@ -187,7 +195,7 @@ class MapGenerator:
                     draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
 
             draw.text(
-                (cx - 12, cy + 14), npc["name"][:4], fill=label_color, font=font_small
+                (cx - 14, cy - r - 16), npc["name"][:4], fill=label_color, font=font_name
             )
 
         # Draw players with emoji icons
@@ -216,10 +224,10 @@ class MapGenerator:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=3)
 
             draw.text(
-                (cx - 10, cy + r + 2),
+                (cx - 14, cy - r - 16),
                 player["name"][:3],
                 fill="white",
-                font=font_small,
+                font=font_name,
             )
 
         # Draw turn info and location name
@@ -328,6 +336,13 @@ class MapGenerator:
             ty = tile_center_y - 7
             if 0 <= ty < cropped.height - 10:
                 draw_mini.text((2, ty), text, fill="#dddddd", font=coord_font)
+
+        # 사이드바 너비(440px)에 맞게 리사이즈
+        sidebar_width = 412  # 440 - padding 28
+        if cropped.width > sidebar_width:
+            ratio = sidebar_width / cropped.width
+            new_h = int(cropped.height * ratio)
+            cropped = cropped.resize((sidebar_width, new_h), Image.LANCZOS)
 
         mini_path = os.path.join(self.base_dir, "static", "map_mini.png")
         cropped.save(mini_path, "PNG")
