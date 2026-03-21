@@ -2371,6 +2371,178 @@ class MapGenerator:
         ctx.fill()
 
 
+def generate_world_map():
+    """worldbuilding.json의 world_pos를 기반으로 세계 지도 이미지 생성."""
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    wb_path = os.path.join(BASE_DIR, "data", "worldbuilding.json")
+    if not os.path.exists(wb_path):
+        return None
+
+    with open(wb_path, "r", encoding="utf-8") as f:
+        wb = json.load(f)
+
+    locations = wb.get("locations", {})
+    if not locations:
+        return None
+
+    # world_pos가 있는 지역만
+    placed = {}
+    for loc_id, loc_data in locations.items():
+        wp = loc_data.get("world_pos")
+        if wp:
+            placed[loc_id] = {
+                "name": loc_data.get("name", loc_id),
+                "type": loc_data.get("type", ""),
+                "x": wp[0],
+                "y": wp[1],
+                "connections": loc_data.get("connections", {}),
+            }
+
+    if not placed:
+        return None
+
+    # 좌표 범위 계산
+    xs = [v["x"] for v in placed.values()]
+    ys = [v["y"] for v in placed.values()]
+    min_x, max_x = min(xs), max(xs)
+    min_y, max_y = min(ys), max(ys)
+
+    # 여백 추가
+    padding = 2
+    min_x -= padding
+    max_x += padding
+    min_y -= padding
+    max_y += padding
+
+    tile = 80  # 타일 크기
+    width = (max_x - min_x + 1) * tile
+    height = (max_y - min_y + 1) * tile
+
+    img = Image.new("RGB", (width, height), (40, 60, 30))
+    draw = ImageDraw.Draw(img)
+
+    # 폰트 로드
+    label_font = ImageFont.load_default()
+    title_font = ImageFont.load_default()
+    for fp in font_paths_global:
+        try:
+            label_font = ImageFont.truetype(fp, 16)
+            title_font = ImageFont.truetype(fp, 22)
+            break
+        except (OSError, IOError):
+            continue
+
+    emoji_font = None
+    try:
+        emoji_font = ImageFont.truetype("C:/Windows/Fonts/seguiemj.ttf", 32)
+    except (OSError, IOError):
+        pass
+
+    # 타입별 색상
+    type_colors = {
+        "village": (120, 180, 80),
+        "trade_city": (200, 160, 60),
+        "road": (160, 140, 100),
+        "dungeon": (100, 80, 120),
+        "rest_area": (140, 160, 100),
+    }
+
+    # 타입별 아이콘
+    type_icons = {
+        "village": "\U0001f3d8\ufe0f",
+        "trade_city": "\U0001f3f0",
+        "road": "\U0001f6e4\ufe0f",
+        "dungeon": "\u2694\ufe0f",
+        "rest_area": "\u26fa",
+    }
+
+    def to_pixel(wx, wy):
+        px = (wx - min_x) * tile + tile // 2
+        py = (wy - min_y) * tile + tile // 2
+        return px, py
+
+    # 연결선 그리기
+    drawn_connections = set()
+    for loc_id, loc in placed.items():
+        for target_name, conn in loc["connections"].items():
+            # target_name으로 id 찾기
+            target_id = None
+            for tid, tdata in placed.items():
+                if tdata["name"] == target_name:
+                    target_id = tid
+                    break
+            if not target_id:
+                continue
+            pair = tuple(sorted([loc_id, target_id]))
+            if pair in drawn_connections:
+                continue
+            drawn_connections.add(pair)
+
+            x1, y1 = to_pixel(loc["x"], loc["y"])
+            x2, y2 = to_pixel(placed[target_id]["x"], placed[target_id]["y"])
+            draw.line([(x1, y1), (x2, y2)], fill=(180, 170, 140), width=3)
+
+            # 거리 표시
+            dist_text = conn.get("distance", "")
+            if dist_text:
+                mx, my = (x1 + x2) // 2, (y1 + y2) // 2
+                draw.text((mx + 5, my - 10), dist_text, fill=(220, 210, 180), font=label_font)
+
+    # 지역 아이콘과 이름 그리기
+    for loc_id, loc in placed.items():
+        px, py = to_pixel(loc["x"], loc["y"])
+        color = type_colors.get(loc["type"], (150, 150, 150))
+
+        # 배경 원
+        r = 24
+        draw.ellipse([px - r, py - r, px + r, py + r], fill=color, outline=(255, 255, 255), width=2)
+
+        # 아이콘
+        icon = type_icons.get(loc["type"], "\U0001f4cd")
+        if emoji_font:
+            try:
+                draw.text((px - 14, py - 16), icon, font=emoji_font, embedded_color=True)
+            except Exception:
+                pass
+
+        # 이름 라벨 (아래쪽)
+        name = loc["name"]
+        try:
+            bbox = draw.textbbox((0, 0), name, font=label_font)
+            tw = bbox[2] - bbox[0]
+        except Exception:
+            tw = len(name) * 14
+        # 배경 박스
+        lx = px - tw // 2 - 4
+        ly = py + r + 4
+        draw.rectangle([lx, ly, lx + tw + 8, ly + 20], fill=(0, 0, 0, 180))
+        draw.text((px - tw // 2, ly + 2), name, fill=(255, 255, 255), font=label_font)
+
+    # 제목
+    draw.text((10, 10), "세계 지도", fill=(255, 255, 200), font=title_font)
+
+    # 현재 위치 표시
+    try:
+        gs_path = os.path.join(BASE_DIR, "data", "game_state.json")
+        if os.path.exists(gs_path):
+            with open(gs_path, "r", encoding="utf-8") as f:
+                gs = json.load(f)
+            cur_loc = gs.get("current_location", "")
+            if cur_loc in placed:
+                px, py = to_pixel(placed[cur_loc]["x"], placed[cur_loc]["y"])
+                # 현재 위치 강조 (빨간 테두리)
+                r2 = 30
+                draw.ellipse([px - r2, py - r2, px + r2, py + r2], outline=(255, 50, 50), width=3)
+                draw.text((px + r2 + 5, py - 10), "← 현재 위치", fill=(255, 100, 100), font=label_font)
+    except Exception:
+        pass
+
+    # 저장
+    output_path = os.path.join(BASE_DIR, "static", "world_map.png")
+    img.save(output_path)
+    return output_path
+
+
 if __name__ == "__main__":
     gen = MapGenerator()
     path = gen.save_map()

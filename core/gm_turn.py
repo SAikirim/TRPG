@@ -16,6 +16,7 @@ GM 턴 추적기 — 실제 동작만 기록하고, 턴 종료 시 누락 경고
   save      — git commit + push
   npc       — NPC 대사/행동 생성
   narration — 나레이션 출력 완료
+  worldbuilding — 세계관 검증 완료 (새 지역/세력/지리 반영 확인)
 """
 
 import json
@@ -31,6 +32,7 @@ REQUIRED_STEPS = {
     "gm-update": "gm-update API 호출 (웹 UI 반영)",
     "state": "game_state.json 저장",
     "narration": "나레이션 출력",
+    "worldbuilding": "세계관 검증 (새 지역/세력/지리 → worldbuilding.json 반영 확인)",
 }
 
 # 조건부 필수 (판정이 있었으면 dice 필요 등)
@@ -90,6 +92,7 @@ def log_step(tag, message):
         "save": "📌",
         "npc": "💬",
         "narration": "📖",
+        "worldbuilding": "🌍",
     }
     icon = icons.get(tag, "▸")
     print(f"  {icon} [{tag}] {message}")
@@ -126,7 +129,8 @@ def end_turn():
     print(f"  수행된 작업: {len(tracker['steps'])}건")
     for s in tracker["steps"]:
         icons = {"dice": "🎲", "gm-update": "🖼️", "state": "💾",
-                 "entity": "📁", "save": "📌", "npc": "💬", "narration": "📖"}
+                 "entity": "📁", "save": "📌", "npc": "💬", "narration": "📖",
+                 "worldbuilding": "🌍"}
         icon = icons.get(s["tag"], "▸")
         print(f"    {icon} {s['message']}")
 
