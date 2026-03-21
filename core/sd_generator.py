@@ -264,56 +264,83 @@ def _build_portrait_prompt_from_entity(name):
 
 def _appearance_to_prompt(entity):
     """Convert entity appearance dict to SD-compatible English prompt."""
+    import re
+
     parts = []
 
     race = entity.get("race", "인간")
-    # Race mapping to English
     race_map = {
         "인간": "human",
         "엘프": "elf, pointed ears",
-        "드워프": "dwarf, short stature, beard",
-        "오크": "orc, green skin, tusks",
+        "드워프": "dwarf, short stature, thick beard",
+        "오크": "orc, green skin, tusks, muscular",
         "수인": "beast-person, animal features",
-        "슬라임": "slime creature, translucent body",
-        "골렘": "stone golem, rocky body",
-        "늑대": "wolf, gray fur, four legs",
-        "말": "horse, four legs, hooves",
-        "고블린": "goblin, small, green skin, pointed ears",
+        "슬라임": "slime creature, translucent gelatinous body",
+        "골렘": "stone golem, massive rocky body, glowing runes",
+        "늑대": "wolf, gray fur, four legs, fangs",
+        "말": "horse, brown fur, four legs, hooves, mane",
+        "고블린": "goblin, small green creature, pointed ears",
     }
     parts.append(race_map.get(race, race))
 
     appearance = entity.get("appearance", {})
     if appearance:
-        # Map Korean appearance fields to English
-        if appearance.get("age"):
-            age_map = {
-                "10대": "teenager",
-                "20대": "young adult, 20s",
-                "30대": "adult, 30s",
-                "40대": "middle aged, 40s",
-                "50대": "older man, 50s",
-                "60대": "elderly, 60s",
-                "성체": "adult",
-            }
-            parts.append(age_map.get(appearance["age"], appearance["age"]))
-        if appearance.get("build"):
-            parts.append(appearance["build"])
-        if appearance.get("skin"):
-            parts.append(appearance["skin"])
-        if appearance.get("hair"):
-            parts.append(appearance["hair"])
-        if appearance.get("face"):
-            parts.append(appearance["face"])
-        if appearance.get("outfit"):
-            parts.append(appearance["outfit"])
-        if appearance.get("notable"):
-            parts.append(appearance["notable"])
+        # Korean to English keyword translation
+        kr_to_en = {
+            # Age
+            "10대": "teenager", "20대": "young adult in 20s", "30대": "adult in 30s",
+            "40대": "middle aged in 40s", "50대": "older adult in 50s", "60대": "elderly in 60s",
+            "성체": "adult",
+            # Build
+            "다부진": "sturdy build", "날씬한": "slim", "근육질": "muscular",
+            "튼튼한": "sturdy", "작은": "small", "거대한": "massive", "큰": "large",
+            # Skin/fur
+            "갈색": "brown", "검은": "black", "흰": "white", "밝은": "light",
+            "짙은": "dark", "녹색": "green", "회색": "gray", "붉은": "red",
+            "그을린": "tanned", "창백한": "pale",
+            # Hair
+            "머리": "hair", "갈기": "mane", "털": "fur", "단발": "short hair",
+            "긴": "long", "짧은": "short", "묶어": "tied up", "올림": "updo",
+            # Face
+            "주름": "wrinkles", "날카로운": "sharp", "온순한": "gentle",
+            "눈": "eyes", "턱수염": "beard", "수염": "beard",
+            "호기심": "curious",
+            # Outfit
+            "가죽": "leather", "갑옷": "armor", "로브": "robe", "조끼": "vest",
+            "바지": "pants", "부츠": "boots", "외투": "coat", "치마": "skirt",
+            "마구": "harness", "고삐": "reins", "안장": "saddle",
+            # General
+            "낡은": "worn", "오래된": "old", "새": "new", "화려한": "ornate",
+            "단순한": "simple", "붕대": "bandage", "절뚝": "limping",
+        }
 
-    # Add style keywords
+        def translate_field(text):
+            """Simple keyword-based Korean to English translation."""
+            if not text:
+                return ""
+            result = text
+            for kr, en in kr_to_en.items():
+                result = result.replace(kr, en)
+            # Remove any remaining Korean characters (they'll confuse SD)
+            # Keep English, numbers, punctuation, spaces
+            cleaned = re.sub(r'[가-힣]+', '', result).strip()
+            # Clean up multiple spaces/commas
+            cleaned = re.sub(r'\s+', ' ', cleaned)
+            cleaned = re.sub(r',\s*,', ',', cleaned)
+            cleaned = cleaned.strip(' ,')
+            return cleaned
+
+        for field in ["age", "build", "skin", "hair", "face", "outfit", "notable"]:
+            val = appearance.get(field, "")
+            translated = translate_field(val)
+            if translated:
+                parts.append(translated)
+
+    # Style keywords
     parts.extend(["fantasy", "semi-realistic", "upper body portrait", "simple background", "masterpiece", "best quality"])
 
     prompt = ", ".join(p for p in parts if p)
-    logger.info(f"Auto-generated portrait prompt for '{entity.get('name', '?')}': {prompt[:100]}...")
+    logger.info(f"Auto-generated portrait prompt for '{entity.get('name', '?')}': {prompt[:150]}...")
     return prompt
 
 
