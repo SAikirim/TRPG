@@ -2,7 +2,7 @@
   "game_info": {
     "title": "판타지 TRPG - 보물을 찾은 모험가들",
     "scenario_id": "lost_treasure",
-    "scenario": "세 모험가가 보물 감정을 위해 카렌델로 떠나려 한다",
+    "scenario": "세 모험가가 하룬 마을을 떠나 카렌델로 향하고 있다",
     "ruleset": "fantasy_basic",
     "difficulty": "normal",
     "stat_pool": 50,
@@ -186,7 +186,7 @@
       }
     ]
   },
-  "turn_count": 24,
+  "turn_count": 25,
   "events": [
     {
       "turn": 0,
@@ -379,6 +379,16 @@
       "turn": 24,
       "message": "금화 1닢은 카렌델 환전 후 3등분 약속. 사이키가 공용 자금(금화 1닢)과 노잣돈(은화 10닢)을 보관.",
       "timestamp": "재화분배"
+    },
+    {
+      "turn": 25,
+      "message": "사이키가 촌장 에르네스에게 작별 인사를 했다.",
+      "timestamp": "턴25"
+    },
+    {
+      "turn": 25,
+      "message": "파티가 하룬 마을을 떠나 카렌델을 향해 북쪽 길로 출발했다. 도보 2일 여정.",
+      "timestamp": "턴25"
     }
   ]
 }
