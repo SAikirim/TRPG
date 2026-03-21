@@ -17,7 +17,7 @@ font_paths_global = [
 
 class MapGenerator:
     def __init__(self):
-        self.tile_size = 48
+        self.tile_size = 34
         self.map_width = 20
         self.map_height = 15
         self.img_width = self.map_width * self.tile_size
