@@ -201,7 +201,7 @@
       }
     ]
   },
-  "turn_count": 3,
+  "turn_count": 4,
   "events": [
     {
       "turn": 0,
@@ -219,6 +219,12 @@
       "message": "[GM] [로드] 카렌델로 가는 길 — 교역로, 상인 할란/미라와 동행 중.",
       "narrative": "",
       "timestamp": "21:31:11"
+    },
+    {
+      "turn": 4,
+      "message": "[GM] [로드] 카렌델로 가는 길 — 교역로, 상인 할란/미라와 동행 중.",
+      "narrative": "",
+      "timestamp": "21:54:38"
     }
   ]
 }

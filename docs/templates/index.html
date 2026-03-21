@@ -499,10 +499,7 @@
     <div class="container">
         <div class="main-panel">
             <div class="panel illustration-section">
-                <h3>
-                    일러스트
-                    <button id="sd-toggle" class="sd-toggle" onclick="toggleSD()">SD OFF</button>
-                </h3>
+                <h3>일러스트</h3>
                 <div id="illustration-panel" class="illustration-panel">
                     <div class="illustration-placeholder">대기 중...</div>
                 </div>
@@ -542,7 +539,12 @@
                     </div>
                     <div class="settings-row">
                         <span class="settings-label">난이도</span>
-                        <span id="setting-difficulty" class="settings-value">normal</span>
+                        <select id="setting-difficulty" class="settings-select" onchange="changeSetting('difficulty', this.value)">
+                            <option value="easy">Easy</option>
+                            <option value="normal">Normal</option>
+                            <option value="hard">Hard</option>
+                            <option value="nightmare">Nightmare</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -1033,7 +1035,7 @@
                 document.getElementById('setting-sd').className = 'settings-toggle' + (data.sd_illustration ? ' active' : '');
                 document.getElementById('setting-dice').className = 'settings-toggle' + (data.show_dice_result ? ' active' : '');
                 document.getElementById('setting-display').value = data.display_mode;
-                document.getElementById('setting-difficulty').textContent = data.difficulty;
+                document.getElementById('setting-difficulty').value = data.difficulty;
 
                 // Also update SD toggle in illustration panel if exists
                 const sdToggle = document.getElementById('sd-toggle');

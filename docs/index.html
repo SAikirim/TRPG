@@ -383,6 +383,61 @@
             border-right: 7px solid transparent;
             border-bottom: 12px solid #9b30ff;
         }
+        /* Settings panel (read-only) */
+        .settings-panel {
+            margin-top: 8px;
+        }
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #1a1a2e;
+            font-size: 0.85em;
+        }
+        .settings-row:last-child { border-bottom: none; }
+        .settings-label { color: #ccc; }
+        .settings-toggle {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            cursor: default;
+            transition: background 0.2s;
+        }
+        .settings-toggle.active {
+            background: #2ecc71;
+        }
+        .settings-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: left 0.2s;
+        }
+        .settings-toggle.active::after {
+            left: 22px;
+        }
+        .settings-select {
+            background: #1a1a2e;
+            color: #ccc;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.85em;
+        }
+        .settings-note {
+            font-size: 0.72em;
+            color: #666;
+            margin-top: 8px;
+            text-align: center;
+            font-style: italic;
+        }
         @media (max-width: 900px) {
             .container { flex-direction: column; }
             .sidebar { width: 100% !important; max-height: none !important; }
@@ -406,7 +461,7 @@
             <div class="panel illustration-section">
                 <h3>
                     일러스트
-                    <span class="sd-toggle">SD OFF</span>
+                    <span id="sd-badge" class="sd-toggle">SD OFF</span>
                 </h3>
                 <div id="illustration-panel" class="illustration-panel">
                     <div class="illustration-placeholder">로딩 중...</div>
@@ -423,6 +478,37 @@
                 <h3>게임 맵</h3>
                 <img id="game-map" src="static/map_mini.png" alt="Game Map" onclick="openMapZoom()">
                 <div id="map-legend" class="legend"></div>
+            </div>
+
+            <div class="panel">
+                <h3>설정</h3>
+                <div id="settings-panel" class="settings-panel">
+                    <div class="settings-row">
+                        <span class="settings-label">SD 일러스트</span>
+                        <div id="setting-sd" class="settings-toggle"></div>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">주사위 결과 공개</span>
+                        <div id="setting-dice" class="settings-toggle"></div>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">표시 모드</span>
+                        <select id="setting-display" class="settings-select" disabled>
+                            <option value="mobile">Mobile</option>
+                            <option value="terminal">Terminal</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">난이도</span>
+                        <select id="setting-difficulty" class="settings-select" disabled>
+                            <option value="easy">Easy</option>
+                            <option value="normal">Normal</option>
+                            <option value="hard">Hard</option>
+                            <option value="nightmare">Nightmare</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="settings-note">설정 변경은 동적 웹에서만 가능합니다</div>
             </div>
 
             <div class="panel">
@@ -497,6 +583,7 @@
 
                 loadScenarioTitle();
                 renderGame();
+                loadSettings();
             } catch (e) {
                 document.getElementById('game-title').textContent = 'TRPG - 로딩 실패';
                 console.error(e);
@@ -796,6 +883,34 @@
             tip.style.left = x + 'px';
             tip.style.top = y + 'px';
         });
+
+        async function loadSettings() {
+            try {
+                const res = await fetch('current_session.json');
+                const session = await res.json();
+                // Update toggle display
+                const sdEl = document.getElementById('setting-sd');
+                if (sdEl) sdEl.className = 'settings-toggle' + (session.sd_illustration ? ' active' : '');
+                const diceEl = document.getElementById('setting-dice');
+                if (diceEl) diceEl.className = 'settings-toggle' + (session.show_dice_result ? ' active' : '');
+                const dispEl = document.getElementById('setting-display');
+                if (dispEl) dispEl.value = session.display_mode || 'mobile';
+                // Update SD badge in illustration header
+                const sdBadge = document.getElementById('sd-badge');
+                if (sdBadge) {
+                    sdBadge.textContent = session.sd_illustration ? 'SD ON' : 'SD OFF';
+                    sdBadge.style.color = session.sd_illustration ? '#2ecc71' : '#666';
+                    sdBadge.style.borderColor = session.sd_illustration ? '#2ecc71' : '#555';
+                }
+            } catch(e) {}
+            // Load difficulty from game_state.json
+            try {
+                if (gameState?.game_info?.difficulty) {
+                    const diffEl = document.getElementById('setting-difficulty');
+                    if (diffEl) diffEl.value = gameState.game_info.difficulty;
+                }
+            } catch(e) {}
+        }
 
         loadGame();
     </script>

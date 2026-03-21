@@ -359,6 +359,16 @@ def update_settings():
 
     with open(session_path, "w", encoding="utf-8") as f:
         json.dump(session, f, ensure_ascii=False, indent=2)
+
+    # 난이도는 game_state에 저장
+    if "difficulty" in data and data["difficulty"] in ("easy", "normal", "hard", "nightmare"):
+        state = load_game_state()
+        state["game_info"]["difficulty"] = data["difficulty"]
+        # stat_pool 연동
+        pools = {"easy": 55, "normal": 50, "hard": 45, "nightmare": 40}
+        state["game_info"]["stat_pool"] = pools.get(data["difficulty"], 50)
+        save_game_state(state)
+
     return jsonify({"success": True})
 
 
