@@ -140,104 +140,105 @@ class MapGenerator:
         player_emojis = {"전사": "\u2694\ufe0f", "마법사": "\U0001f52e", "도적": "\U0001f5e1\ufe0f", "궁수": "\U0001f3f9", "성직자": "\u271d\ufe0f"}
         npc_emojis = {"friendly": "\U0001f60a", "monster": "\U0001f479", "neutral": "\U0001f464"}
 
-        # 장소 라벨은 엔티티 뒤에 그림 (아래에서 처리)
+        # === 충돌 회피 라벨 시스템 ===
+        # 1) 모든 엔티티 아이콘 위치 수집
+        entity_icons = []  # [(cx, cy, r)] 아이콘 중심과 반경
 
-        # Draw NPCs — different styles by type
-        # Only draw alive NPCs at current location (skip dead/fled, skip off-map positions)
+        # NPC 아이콘 그리기 + 위치 수집
+        r = 12
         for npc in state["npcs"]:
             if npc.get("status") in ("dead", "fled"):
                 continue
             px, py = npc["position"]
             if px < 0 or py < 0 or px >= map_w or py >= map_h:
                 continue
-            # If NPC has a location field, only draw if it matches current_location
             npc_location = npc.get("location", "")
             if current_loc and npc_location and npc_location != current_loc:
                 continue
-
             cx = px * self.tile_size + self.tile_size // 2 + margin_left
             cy = py * self.tile_size + self.tile_size // 2 + margin_top
             npc_type = npc.get("type", "neutral")
-
             if npc_type == "monster":
                 color = "#9b30ff"
-                label_color = "white"
             elif npc_type == "friendly":
                 color = "#f1c40f"
-                label_color = "#f1c40f"
             else:
                 color = "#95a5a6"
-                label_color = "#95a5a6"
-
-            r = 12
-            emoji = npc_emojis.get(npc_type, "\U0001f464")
-
             if emoji_font:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color + "88", outline="white", width=2)
                 try:
-                    draw.text((cx - 10, cy - 10), emoji, font=emoji_font, embedded_color=True)
+                    draw.text((cx - 10, cy - 10), npc_emojis.get(npc_type, "\U0001f464"), font=emoji_font, embedded_color=True)
                 except TypeError:
-                    draw.text((cx - 10, cy - 10), emoji, font=emoji_font)
+                    draw.text((cx - 10, cy - 10), npc_emojis.get(npc_type, "\U0001f464"), font=emoji_font)
             else:
-                if npc_type == "monster":
-                    size = 16
-                    triangle = [
-                        (cx, cy - size),
-                        (cx - size, cy + size),
-                        (cx + size, cy + size),
-                    ]
-                    draw.polygon(triangle, fill=color, outline="white", width=2)
-                else:
-                    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
+                draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
+            entity_icons.append({"cx": cx, "cy": cy, "r": r, "name": npc["name"][:4], "color": color, "type": "npc"})
 
-            draw.text(
-                (cx - 14, cy + r + 2), npc["name"][:4], fill=label_color, font=font_name
-            )
-
-        # Draw players with emoji icons
-        player_colors = {
-            "전사": "#e63946",
-            "마법사": "#457be0",
-            "도적": "#2ecc71",
-            "궁수": "#e67e22",
-            "성직자": "#f1c40f",
-        }
+        # 플레이어 아이콘 그리기 + 위치 수집
+        player_colors = {"전사": "#e63946", "마법사": "#457be0", "도적": "#2ecc71", "궁수": "#e67e22", "성직자": "#f1c40f"}
         for player in state["players"]:
             px, py = player["position"]
             cx = px * self.tile_size + self.tile_size // 2 + margin_left
             cy = py * self.tile_size + self.tile_size // 2 + margin_top
             color = player_colors.get(player["class"], "white")
-            r = 12
-            emoji = player_emojis.get(player["class"], "\u2694\ufe0f")
-
             if emoji_font:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color + "88", outline="white", width=2)
                 try:
-                    draw.text((cx - 10, cy - 10), emoji, font=emoji_font, embedded_color=True)
+                    draw.text((cx - 10, cy - 10), player_emojis.get(player["class"], "\u2694\ufe0f"), font=emoji_font, embedded_color=True)
                 except TypeError:
-                    draw.text((cx - 10, cy - 10), emoji, font=emoji_font)
+                    draw.text((cx - 10, cy - 10), player_emojis.get(player["class"], "\u2694\ufe0f"), font=emoji_font)
             else:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=3)
+            entity_icons.append({"cx": cx, "cy": cy, "r": r, "name": player["name"][:3], "color": "white", "type": "player"})
 
-            draw.text(
-                (cx - 14, cy + r + 2),
-                player["name"][:3],
-                fill="white",
-                font=font_name,
-            )
+        # 2) 점유 영역 추적 (충돌 회피용)
+        occupied = []  # [(x1, y1, x2, y2)] 이미 배치된 라벨/아이콘 영역
+        for e in entity_icons:
+            occupied.append((e["cx"] - e["r"], e["cy"] - e["r"], e["cx"] + e["r"], e["cy"] + e["r"]))
 
-        # 장소 라벨 (엔티티 위에 그림 — 가려지지 않게)
-        # 볼드 폰트 사용, 반투명 배경 박스 포함
-        label_font = font_name  # 14px Bold
+        def is_overlapping(x1, y1, x2, y2):
+            for ox1, oy1, ox2, oy2 in occupied:
+                if x1 < ox2 and x2 > ox1 and y1 < oy2 and y2 > oy1:
+                    return True
+            return False
+
+        # 3) 장소 라벨 — 충돌 회피하며 배치
+        label_font = font_name
         for loc in locations:
             area = loc["area"]
-            cx = ((area["x1"] + area["x2"]) / 2) * self.tile_size + margin_left
-            cy = area["y1"] * self.tile_size + margin_top + 3
             text = loc["name"]
-            # 배경 박스
             tw = len(text) * 8 + 4
-            draw.rectangle([cx - tw//2, cy - 1, cx + tw//2, cy + 16], fill="#000000aa")
-            draw.text((cx - tw//2 + 2, cy), text, fill="white", font=label_font)
+            label_cx = ((area["x1"] + area["x2"]) / 2) * self.tile_size + margin_left
+            # 기본: 영역 상단
+            label_y = area["y1"] * self.tile_size + margin_top + 3
+            lx1, ly1 = label_cx - tw // 2, label_y - 1
+            lx2, ly2 = label_cx + tw // 2, label_y + 16
+            # 충돌 시 위로 이동
+            if is_overlapping(lx1, ly1, lx2, ly2):
+                label_y -= self.tile_size
+                lx1, ly1 = label_cx - tw // 2, label_y - 1
+                lx2, ly2 = label_cx + tw // 2, label_y + 16
+            draw.rectangle([lx1, ly1, lx2, ly2], fill="#000000aa")
+            draw.text((lx1 + 2, label_y), text, fill="white", font=label_font)
+            occupied.append((lx1, ly1, lx2, ly2))
+
+        # 4) 엔티티 이름 — 충돌 회피하며 배치
+        for e in entity_icons:
+            name = e["name"]
+            fill = e["color"] if e["type"] == "npc" else "white"
+            ntw = len(name) * 8 + 4
+            # 기본: 아이콘 아래
+            nx = e["cx"] - ntw // 2
+            ny = e["cy"] + e["r"] + 2
+            if is_overlapping(nx, ny, nx + ntw, ny + 16):
+                # 아래 충돌 → 위로
+                ny = e["cy"] - e["r"] - 16
+                if is_overlapping(nx, ny, nx + ntw, ny + 16):
+                    # 위도 충돌 → 오른쪽
+                    nx = e["cx"] + e["r"] + 2
+                    ny = e["cy"] - 7
+            draw.text((nx, ny), name, fill=fill, font=font_name)
+            occupied.append((nx, ny, nx + ntw, ny + 16))
 
         # Draw turn info and location name
         turn = state.get("turn_count", 0)
