@@ -152,9 +152,13 @@ python game_start.py load               # 세이브 로드
 ## 실행 방법
 ```bash
 pip install -r requirements.txt
-python app.py          # 웹 UI: http://localhost:5000
+C:\git\WebUI\stable-diffusion-webui\venv\Scripts\Python.exe app.py    # 웹 UI (SD venv 사용)
 python ascii_map.py    # 터미널 맵 확인
+# 또는 편의 스크립트: start_server.bat (Windows) / start_server.sh (Git Bash)
 ```
+
+> **참고**: Flask 서버는 SD WebUI의 venv Python으로 실행해야 torch GPU, transparent-background, PIL 등
+> 라이브러리를 통일할 수 있다. 시스템 Python에 별도 설치할 필요 없음.
 
 ---
 

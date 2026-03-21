@@ -302,7 +302,7 @@ def new_game(scenario_id):
     if opening_narrative:
         print(f"\n{opening_narrative}")
     print(f"\n게임 시작! (턴 0, 챕터 1: {chapter_name})")
-    print(f"Flask 서버: python app.py -> http://localhost:5000")
+    print(f"Flask 서버: start_server.bat 또는 SD venv Python app.py -> http://localhost:5000")
     _print_state_summary(state)
 
     # 정적 웹 동기화
@@ -522,7 +522,7 @@ def _try_restore_scene():
         # 대신 load API를 통해 간접 트리거하거나, 유저에게 안내
         print(f"  [INFO] 웹 UI 장면 복원: Flask 서버 재시작 또는 브라우저 새로고침 필요")
     except Exception:
-        print(f"  [INFO] Flask 서버 미실행. 나중에 python app.py 실행 시 자동 복원됩니다.")
+        print(f"  [INFO] Flask 서버 미실행. start_server.bat 또는 SD venv Python app.py 실행 시 자동 복원됩니다.")
 
 
 def _print_state_summary(state):
