@@ -235,6 +235,7 @@ class SaveManager:
             ("static/illustrations/pixel", "static/illustrations/pixel"),
             ("static/portraits/pixel", "static/portraits/pixel"),
             ("static/map.png", "static/map.png"),
+            ("static/map_mini.png", "static/map_mini.png"),
         ]
         for src_rel, dst_rel in sync_dirs:
             src = os.path.join(BASE_DIR, src_rel)
