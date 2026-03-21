@@ -1,0 +1,26 @@
+{
+  "description": "아이템 데이터베이스. 모든 아이템의 효과, 설명, 수치를 정의한다.",
+  "items": {
+    "철검": {"type": "weapon", "subtype": "melee", "slot": "weapon", "damage": "1d6 + STR", "range": 1, "requirements": {"STR": 8}, "desc": "기본 근접 무기", "stat": "DMG 1d6", "rarity": "common"},
+    "가죽 방패": {"type": "armor", "subtype": "shield", "slot": "offhand", "defense": 2, "requirements": {"STR": 6}, "desc": "기본 방어 장비. 방어 시 DEF +4 추가", "stat": "DEF +2", "rarity": "common"},
+    "마법 지팡이": {"type": "weapon", "subtype": "magic", "slot": "weapon", "damage": "1d8 + INT", "range": 8, "requirements": {"INT": 10}, "desc": "마법사의 기본 무기. 마법 공격 매개체", "stat": "DMG 1d8", "rarity": "common"},
+    "마나 포션": {"type": "consumable", "effect": "heal_mp", "amount": 8, "desc": "MP 8 회복", "stat": "MP +8", "rarity": "common"},
+    "단검 x2": {"type": "weapon", "subtype": "melee", "slot": "weapon", "damage": "2d6 + DEX", "range": 1, "requirements": {"DEX": 10}, "desc": "도적의 이중 무기. 습격 시 추가 피해", "stat": "DMG 2d6", "rarity": "common"},
+    "도둑 도구": {"type": "tool", "desc": "함정 해제, 자물쇠 따기에 사용", "stat": "DEX +2", "rarity": "common"},
+    "치유 약초": {"type": "consumable", "effect": "heal_hp", "amount": 5, "desc": "자연의 치유력. HP 5 회복", "stat": "HP +5", "rarity": "common"},
+    "약초": {"type": "consumable", "effect": "heal_hp", "amount": 5, "desc": "상처를 치유하는 약초. HP 5 회복", "stat": "HP +5", "rarity": "common"},
+    "마나 결정": {"type": "consumable", "effect": "heal_mp", "amount": 5, "desc": "응축된 마력의 결정. MP 5 회복", "stat": "MP +5", "rarity": "uncommon"},
+    "슬라임 젤리": {"type": "material", "desc": "슬라임에서 추출한 젤리. 연금술 재료", "stat": "소재", "rarity": "common"},
+    "고대 열쇠": {"type": "key", "desc": "고대 던전의 문을 여는 마법 열쇠. 아직 마력이 남아있다", "stat": "열쇠", "rarity": "rare"},
+    "전설의 보물": {"type": "quest", "desc": "고대 장식함. 정체 불명. 카렌델에서 감정 필요", "stat": "???", "rarity": "legendary"},
+    "밧줄": {"type": "tool", "desc": "등반, 묶기, 구조에 사용. 10m 길이", "stat": "도구", "rarity": "common"},
+    "오크의 도끼": {"type": "weapon", "subtype": "melee", "slot": "weapon", "damage": "1d8+2 + STR", "range": 1, "requirements": {"STR": 12}, "desc": "어두운 오크에게서 획득한 전투 도끼. 묵직하고 강력하다", "stat": "DMG 1d8+2", "rarity": "uncommon"},
+    "황금 100개": {"type": "currency", "value": 100, "desc": "반짝이는 금화 100개", "stat": "100G", "rarity": "common"},
+    "에르네스의 소개장": {"type": "quest", "desc": "하룬 마을 촌장 에르네스가 써준 소개장. 카렌델의 멜로스, 볼프에게 사용 가능", "stat": "소개장", "rarity": "uncommon"},
+    "약초 봉투 (볼프에게 전달)": {"type": "quest", "desc": "에르네스가 볼프에게 전해달라고 맡긴 산약초 봉투", "stat": "전달품", "rarity": "common"},
+    "노잣돈 (은화 10닢)": {"type": "currency", "value": 10, "desc": "에르네스가 여행 경비로 준 은화", "stat": "10S", "rarity": "common"},
+    "금화 1닢 (공용, 카렌델 환전 후 3등분)": {"type": "currency", "value": 1, "desc": "파티 공용 금화. 카렌델에서 환전 후 분배 예정", "stat": "1G", "rarity": "common"},
+    "부싯돌": {"type": "tool", "desc": "불을 피울 수 있는 부싯돌", "stat": "도구", "rarity": "common"},
+    "상처 치료 약병": {"type": "consumable", "effect": "heal_hp", "amount": 10, "desc": "미라가 준 상처 치료용 약병. HP 10 회복", "stat": "HP +10", "rarity": "uncommon"}
+  }
+}

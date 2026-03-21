@@ -157,6 +157,29 @@
       "status": "alive",
       "location": "trade_road_karendel",
       "known": true
+    },
+    {
+      "id": 302,
+      "name": "짐말",
+      "type": "friendly",
+      "race": "말",
+      "known": true,
+      "stats": {
+        "STR": 16,
+        "DEX": 12,
+        "INT": 2,
+        "CON": 14
+      },
+      "hp": 20,
+      "max_hp": 20,
+      "mp": 0,
+      "max_mp": 0,
+      "position": [
+        11,
+        12
+      ],
+      "status": "alive",
+      "location": "trade_road_karendel"
     }
   ],
   "map": {

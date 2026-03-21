@@ -580,34 +580,39 @@
         let lastGameStateHash = '';
         let lastMapTime = 0;
         let rulesData = null;
+        let itemsData = {};
 
-        // 아이템 정보를 rules.json에서 동적으로 가져옴
+        async function loadItems() {
+            try {
+                const res = await fetch('/api/items');
+                const data = await res.json();
+                itemsData = data.items || {};
+            } catch(e) {}
+        }
+
+        // 아이템 정보를 items.json에서 조회, 없으면 rules.json 폴백
         function getItemInfo(name) {
-            // 무기 테이블에서 조회
+            // items.json 우선 조회
+            if (itemsData[name]) {
+                const info = itemsData[name];
+                return { desc: info.desc || name, stat: info.stat || '', rarity: info.rarity || 'common' };
+            }
+            // rules.json 무기 테이블 폴백
             if (rulesData?.combat?.weapons?.[name]) {
                 const w = rulesData.combat.weapons[name];
-                return { desc: w.description, stat: 'DMG ' + w.dice };
+                return { desc: w.description, stat: 'DMG ' + w.dice, rarity: 'common' };
             }
-            // 방어구 테이블에서 조회
+            // rules.json 방어구 테이블 폴백
             if (rulesData?.combat?.armor?.[name]) {
                 const a = rulesData.combat.armor[name];
-                return { desc: a.description || name, stat: a.bonus ? 'DEF +' + a.bonus : '' };
+                return { desc: a.description || name, stat: a.bonus ? 'DEF +' + a.bonus : '', rarity: 'common' };
             }
-            // 소모품
+            // rules.json 소모품 폴백
             if (rulesData?.rest?.use_item?.[name]) {
                 const u = rulesData.rest.use_item[name];
-                return { desc: u.description, stat: u.heal_hp ? 'HP +' + u.heal_hp : u.heal_mp ? 'MP +' + u.heal_mp : '' };
+                return { desc: u.description, stat: u.heal_hp ? 'HP +' + u.heal_hp : u.heal_mp ? 'MP +' + u.heal_mp : '', rarity: 'common' };
             }
-            // 폴백 (알려진 기타 아이템)
-            const fallback = {
-                '도둑 도구': { desc: '함정 해제, 자물쇠 따기', stat: 'DEX +2' },
-                '마나 결정': { desc: '응축된 마력의 결정', stat: 'MP +5' },
-                '슬라임 젤리': { desc: '슬라임에서 추출한 젤리', stat: '소재' },
-                '고대 열쇠': { desc: '보물실의 문을 여는 열쇠', stat: '열쇠' },
-                '전설의 보물': { desc: '던전의 최종 보물', stat: '보물' },
-                '밧줄': { desc: '등반, 묶기에 사용', stat: '도구' },
-            };
-            return fallback[name] || { desc: name, stat: '' };
+            return { desc: name, stat: '', rarity: 'common' };
         }
         function statMod(val) {
             const m = Math.floor((val - 10) / 2);
@@ -709,7 +714,8 @@
                     : '';
                 const invItems = (p.inventory || []).map(item => {
                     const info = getItemInfo(item);
-                    return `<div class="detail-item"><span class="item-name">${item}</span>${info.stat ? '<span class="item-stat">' + info.stat + '</span>' : ''}<div class="tooltip">${info.desc}</div></div>`;
+                    const rarityClass = info.rarity ? ' rarity-' + info.rarity : '';
+                    return `<div class="detail-item"><span class="item-name${rarityClass}">${item}</span>${info.stat ? '<span class="item-stat">' + info.stat + '</span>' : ''}<div class="tooltip">${info.desc}</div></div>`;
                 }).join('');
                 return `
                 <div class="player-card">
@@ -1101,6 +1107,7 @@
         }
 
         loadRules();
+        loadItems();
         loadSettings();
         updateGameState();
         setInterval(updateGameState, 2000);

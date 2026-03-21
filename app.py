@@ -413,6 +413,14 @@ def update_settings():
     return jsonify({"success": True})
 
 
+@app.route("/api/items", methods=["GET"])
+def get_items():
+    items_path = os.path.join(BASE_DIR, "items.json")
+    with open(items_path, "r", encoding="utf-8") as f:
+        items = json.load(f)
+    return jsonify(items)
+
+
 @app.route("/api/rules", methods=["GET"])
 def get_rules():
     rules_path = os.path.join(BASE_DIR, "rules.json")

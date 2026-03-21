@@ -95,6 +95,7 @@ game_state.json           - 현재 게임 상태
 current_session.json      - 현재 활성 세션 요약 (세션 복원용)
 worldbuilding.json        - 세계관 설정 (시나리오 독립)
 rules.json / scenario.json - 현재 활성 룰셋 / 시나리오
+items.json                - 아이템 데이터베이스 (효과, 설명, 수치, 희귀도)
 entities/{scenario_id}/   - npcs/ players/ objects/ 엔티티 파일
 rulesets/ / scenarios/    - 룰셋/시나리오 카탈로그
 static/                   - 맵, 초상화, 일러스트 이미지

@@ -342,7 +342,9 @@
       "boss_monster": {"STR": "18-20", "DEX": "10-14", "INT": "10-16", "CON": "16-20", "HP": "35-60"},
       "civilian": {"STR": "6-10", "DEX": "8-12", "INT": "10-14", "CON": "8-10", "HP": "6-12"},
       "guard": {"STR": "12-14", "DEX": "10-12", "INT": "8-10", "CON": "12-14", "HP": "15-25"},
-      "merchant": {"STR": "8-10", "DEX": "10-12", "INT": "12-16", "CON": "8-12", "HP": "8-15"}
+      "merchant": {"STR": "8-10", "DEX": "10-12", "INT": "12-16", "CON": "8-12", "HP": "8-15"},
+      "animal_horse": {"STR": "14-18", "DEX": "12-14", "INT": "2-4", "CON": "12-16", "HP": "15-25"},
+      "animal_wolf": {"STR": "12-14", "DEX": "14-16", "INT": "4-6", "CON": "10-12", "HP": "10-18"}
     },
     "hp_formula": "base + floor(CON * 0.5)",
     "mp_formula": "base + floor(INT * 0.3)",
