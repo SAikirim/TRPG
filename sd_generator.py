@@ -133,10 +133,24 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
                 # Remove background for compositing on any scene
                 try:
                     from transparent_background import Remover
-                    remover = Remover(mode="fast")
-                    img = remover.process(img, type="rgba")
+                except ImportError as e:
+                    logger.error(f"transparent-background library import failed: {e}. "
+                                 "Portraits will have opaque backgrounds. "
+                                 "Install with: pip install transparent-background")
+                    Remover = None
+                try:
+                    if Remover is not None:
+                        import numpy as np
+                        remover = Remover(fast=True)
+                        result = remover.process(img, type="rgba")
+                        if isinstance(result, np.ndarray):
+                            img = Image.fromarray(result)
+                        else:
+                            img = result
+                    else:
+                        img = img.convert("RGBA")
                 except Exception as e:
-                    logger.warning(f"Background removal failed, saving as-is: {e}")
+                    logger.warning(f"Background removal processing failed, saving as-is: {e}")
                     img = img.convert("RGBA")
                 img.save(filepath, "WEBP", quality=90)
             else:

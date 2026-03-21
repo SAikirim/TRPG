@@ -369,6 +369,29 @@ saves/                    - 세이브 데이터
 - negative prompt에 자동으로 "detailed background, scenery, landscape" 추가됨
 - 프롬프트에 "simple background, solid color background" 포함 권장
 
+### 캐릭터 외형 일관성 규칙
+- **동일 인물은 항상 같은 외형(얼굴, 체형, 의상, 머리색)을 유지해야 한다**
+- 캐릭터별 기준 이미지(reference)를 `static/portraits/sd/` 또는 `static/portraits/pixel/`에 저장
+- 새 장면에서 같은 캐릭터가 등장할 때 기존 이미지를 재활용한다
+- 외형이 변경되는 경우(장비 변경, 부상 등)에만 새 이미지를 생성
+- 동작/포즈만 바꿔야 할 경우: img2img로 기존 이미지를 기반으로 변형
+- **레이어 초상화는 반드시 투명 배경** — 배경이 있는 초상화는 메인 배경을 가림
+- SD 생성 시 transparent-background 라이브러리로 자동 배경 제거
+- 배경 제거 실패 시 로그 경고 + 그대로 저장 (수동 확인 필요)
+
+### 캐릭터 이미지 파일 규칙
+| 용도 | 경로 | 이름 규칙 | 배경 |
+|------|------|----------|------|
+| 기준 이미지 (정면) | portraits/sd/ | portrait_{name}.webp | 투명 |
+| 동작 변형 | portraits/sd/ | portrait_{name}_{action}.webp | 투명 |
+| 프로필 카드용 | portraits/pixel/ | player_{id}.png | 원형 마스크 |
+
+예시:
+- portrait_할란.webp (기본 — 정면)
+- portrait_할란_injured.webp (부상 상태)
+- portrait_미라.webp (기본)
+- portrait_미라_angry.webp (화난 표정)
+
 #### 시나리오 이미지 생성 절차
 1. 시나리오 Agent가 scenario.json 생성 시 전체 스토리 파악
 2. 필요한 이미지 목록 추출: 모든 챕터 배경, 등장 NPC, 주요 오브젝트, 주요 장소
