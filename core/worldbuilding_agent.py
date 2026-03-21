@@ -47,40 +47,82 @@ def save_worldbuilding(wb):
 
 # ─── 텍스트에서 세계관 요소 감지 ───
 
-def check_narrative(text):
-    """나레이션 텍스트를 분석해서 worldbuilding.json에 없는 요소를 찾는다.
-    반환: {"missing_locations": [...], "missing_factions": [...], "conflicts": [...]}"""
+def check_narrative(text, game_state=None):
+    """나레이션 텍스트 + game_state를 분석해서 worldbuilding.json과 대조.
+    반환: {"mentioned": [...], "unregistered": [...], "warnings": [...]}"""
     wb = load_worldbuilding()
     locations = wb.get("locations", {})
     factions = wb.get("factions", {})
 
-    # 등록된 이름 목록
     known_loc_names = {v.get("name", "") for v in locations.values()}
     known_faction_names = set(factions.keys())
 
     result = {
-        "missing_locations": [],
-        "missing_factions": [],
-        "conflicts": [],
-        "mentioned_locations": [],
+        "mentioned": [],
+        "unregistered": [],
+        "warnings": [],
     }
 
-    # 등록된 지역 중 텍스트에 언급된 것
+    # 1. 등록된 지역/세력 중 텍스트에 언급된 것
     for loc_id, loc_data in locations.items():
         name = loc_data.get("name", "")
         if name and name in text:
-            result["mentioned_locations"].append({
-                "id": loc_id, "name": name, "status": "registered"
-            })
+            result["mentioned"].append({"id": loc_id, "name": name, "type": "location"})
 
-    # 등록된 세력 중 텍스트에 언급된 것
     for fname in known_faction_names:
         if fname in text:
-            result["mentioned_locations"].append({
-                "id": fname, "name": fname, "type": "faction", "status": "registered"
-            })
+            result["mentioned"].append({"name": fname, "type": "faction"})
+
+    # 2. game_state 기반 미등록 감지
+    if game_state:
+        # current_location이 worldbuilding에 없으면 경고
+        current_loc = game_state.get("current_location", "")
+        if current_loc and current_loc not in locations:
+            # name으로도 검색
+            if current_loc not in known_loc_names:
+                result["unregistered"].append({
+                    "name": current_loc, "source": "current_location",
+                    "action": "register_location 필요"
+                })
+
+        # NPC location이 worldbuilding에 없으면 경고
+        for npc in game_state.get("npcs", []):
+            npc_loc = npc.get("location", "")
+            if npc_loc and npc_loc not in known_loc_names:
+                # location id로도 확인
+                if npc_loc not in locations:
+                    result["unregistered"].append({
+                        "name": npc_loc,
+                        "source": f"NPC '{npc.get('name', '?')}' location",
+                        "action": "register_location 필요"
+                    })
+
+    # 중복 제거
+    seen = set()
+    deduped = []
+    for u in result["unregistered"]:
+        if u["name"] not in seen:
+            seen.add(u["name"])
+            deduped.append(u)
+    result["unregistered"] = deduped
 
     return result
+
+
+def check_and_warn(narrative="", game_state=None):
+    """gm-update에서 호출되는 자동 감지. 경고를 문자열 리스트로 반환."""
+    if game_state is None:
+        if os.path.isfile(GAME_STATE_PATH):
+            game_state = _load_json(GAME_STATE_PATH)
+
+    result = check_narrative(narrative, game_state)
+    warnings = []
+
+    for u in result["unregistered"]:
+        warnings.append(
+            f"⚠ 세계관 미등록: '{u['name']}' ({u['source']}) — {u['action']}")
+
+    return warnings
 
 
 # ─── 등록 ───

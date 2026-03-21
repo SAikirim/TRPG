@@ -8,6 +8,7 @@ from core.map_generator import MapGenerator
 from core.save_manager import SaveManager
 from core.sd_generator import request_illustration, get_scene_state, is_sd_enabled, clear_scene, remove_layer
 import core.game_mechanics as gm
+from core.worldbuilding_agent import check_and_warn
 
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -364,8 +365,17 @@ def gm_update():
 
     _add_npc_layers(state)
 
+    # 세계관 자동 감지 — 나레이션에서 미등록 요소 경고
+    wb_warnings = check_and_warn(
+        narrative=f"{description} {narrative}", game_state=state)
+    if wb_warnings:
+        gm._log_to_tracker("worldbuilding", f"⚠ 미등록 {len(wb_warnings)}건 감지")
+    else:
+        gm._log_to_tracker("worldbuilding", "세계관 정합성 확인")
+
     return jsonify({"success": True, "event": event, "turn": state["turn_count"],
-                     "illustration": ill_result, "mechanics": mechanics_results})
+                     "illustration": ill_result, "mechanics": mechanics_results,
+                     "worldbuilding_warnings": wb_warnings})
 
 
 @app.route("/api/illustration", methods=["GET"])
