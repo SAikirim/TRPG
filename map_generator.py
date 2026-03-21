@@ -17,7 +17,7 @@ font_paths_global = [
 
 class MapGenerator:
     def __init__(self):
-        self.tile_size = 60
+        self.tile_size = 48
         self.map_width = 20
         self.map_height = 15
         self.img_width = self.map_width * self.tile_size
@@ -54,8 +54,8 @@ class MapGenerator:
             map_h = state["map"]["height"]
             locations = state["map"]["locations"]
 
-        margin_left = 28   # 세로 좌표 표시 여백
-        margin_top = 20    # 가로 좌표 표시 여백
+        margin_left = 22   # 세로 좌표 표시 여백
+        margin_top = 16    # 가로 좌표 표시 여백
         grid_w = map_w * self.tile_size
         grid_h = map_h * self.tile_size
         img_w = grid_w + margin_left
@@ -67,7 +67,7 @@ class MapGenerator:
         coord_font = ImageFont.load_default()
         for fp in font_paths_global:
             try:
-                coord_font = ImageFont.truetype(fp, 12)
+                coord_font = ImageFont.truetype(fp, 10)
                 break
             except (OSError, IOError):
                 continue
@@ -115,8 +115,8 @@ class MapGenerator:
         font = font_small = ImageFont.load_default()
         for fp in font_paths_global:
             try:
-                font = ImageFont.truetype(fp, 18)
-                font_small = ImageFont.truetype(fp, 13)
+                font = ImageFont.truetype(fp, 14)
+                font_small = ImageFont.truetype(fp, 11)
                 break
             except (OSError, IOError):
                 continue
@@ -124,7 +124,7 @@ class MapGenerator:
         # Emoji font for entity icons
         emoji_font = None
         try:
-            emoji_font = ImageFont.truetype("C:/Windows/Fonts/seguiemj.ttf", 26)
+            emoji_font = ImageFont.truetype("C:/Windows/Fonts/seguiemj.ttf", 20)
         except (OSError, IOError):
             pass
 
@@ -165,15 +165,15 @@ class MapGenerator:
                 color = "#95a5a6"
                 label_color = "#95a5a6"
 
-            r = 16
+            r = 12
             emoji = npc_emojis.get(npc_type, "\U0001f464")
 
             if emoji_font:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color + "88", outline="white", width=2)
                 try:
-                    draw.text((cx - 13, cy - 13), emoji, font=emoji_font, embedded_color=True)
+                    draw.text((cx - 10, cy - 10), emoji, font=emoji_font, embedded_color=True)
                 except TypeError:
-                    draw.text((cx - 13, cy - 13), emoji, font=emoji_font)
+                    draw.text((cx - 10, cy - 10), emoji, font=emoji_font)
             else:
                 if npc_type == "monster":
                     size = 16
@@ -187,7 +187,7 @@ class MapGenerator:
                     draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
 
             draw.text(
-                (cx - 15, cy + 18), npc["name"][:4], fill=label_color, font=font_small
+                (cx - 12, cy + 14), npc["name"][:4], fill=label_color, font=font_small
             )
 
         # Draw players with emoji icons
@@ -203,20 +203,20 @@ class MapGenerator:
             cx = px * self.tile_size + self.tile_size // 2 + margin_left
             cy = py * self.tile_size + self.tile_size // 2 + margin_top
             color = player_colors.get(player["class"], "white")
-            r = 16
+            r = 12
             emoji = player_emojis.get(player["class"], "\u2694\ufe0f")
 
             if emoji_font:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color + "88", outline="white", width=2)
                 try:
-                    draw.text((cx - 13, cy - 13), emoji, font=emoji_font, embedded_color=True)
+                    draw.text((cx - 10, cy - 10), emoji, font=emoji_font, embedded_color=True)
                 except TypeError:
-                    draw.text((cx - 13, cy - 13), emoji, font=emoji_font)
+                    draw.text((cx - 10, cy - 10), emoji, font=emoji_font)
             else:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=3)
 
             draw.text(
-                (cx - 12, cy + r + 2),
+                (cx - 10, cy + r + 2),
                 player["name"][:3],
                 fill="white",
                 font=font_small,
@@ -233,8 +233,8 @@ class MapGenerator:
         info_text = f"Turn: {turn}"
         if loc_name:
             info_text += f"  |  {loc_name}"
-        draw.rectangle([0, 0, max(300, len(info_text) * 11), 28], fill="#00000088")
-        draw.text((6, 4), info_text, fill="yellow", font=font)
+        draw.rectangle([0, 0, max(250, len(info_text) * 9), 22], fill="#00000088")
+        draw.text((4, 3), info_text, fill="yellow", font=font)
 
         return img
 
@@ -267,7 +267,7 @@ class MapGenerator:
         avg_y = sum(p[1] for p in positions) / len(positions)
 
         # 주변 반경 (타일 단위)
-        radius = 5
+        radius = 4
         margin_left = 36
         margin_top = 28
 
@@ -899,7 +899,7 @@ class MapGenerator:
             ctx.set_source_rgba(1, 0.95, 0.5, 0.5)
             ctx.save()
             ctx.translate(gx + 4, gy + 4)
-            ctx.scale(6, 4)
+            ctx.scale(4, 3)
             ctx.arc(0, 0, 1, 0, 2 * math.pi)
             ctx.restore()
             ctx.stroke()
