@@ -23,6 +23,12 @@ def _add_npc_layers(state):
     p1_y = player1["position"][1]
     current_loc = state.get("current_location", "")
 
+    # 기존 NPC portrait 레이어 제거 (위치 재계산을 위해)
+    scene = get_scene_state()
+    for layer in list(scene.get("layers", [])):
+        if layer.get("type") == "portrait":
+            remove_layer(layer.get("name", ""))
+
     npcs_to_add = []
     for npc in state.get("npcs", []):
         if npc.get("status") not in ("alive", "idle", "active"):
@@ -41,10 +47,6 @@ def _add_npc_layers(state):
             if portrait_exists:
                 break
         if not portrait_exists:
-            continue
-        # Already in layers check
-        scene = get_scene_state()
-        if any(l.get("name") == npc_name for l in scene.get("layers", [])):
             continue
         # Distance and position
         npc_pos = npc.get("position", [0, 0])
