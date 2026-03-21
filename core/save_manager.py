@@ -219,73 +219,16 @@ class SaveManager:
         return 1  # 숲의 입구
 
     def _sync_docs(self, game_state):
-        """docs/ 폴더를 최신 상태로 동기화 (GitHub Pages용)"""
-        docs_dir = os.path.join(BASE_DIR, "docs")
-        if not os.path.exists(docs_dir):
-            return
-
-        # game_state.json 동기화
-        docs_state = os.path.join(docs_dir, "game_state.json")
-        with open(docs_state, "w", encoding="utf-8") as f:
-            json.dump(game_state, f, ensure_ascii=False, indent=2)
-
-        # static 파일 동기화 (illustrations, portraits)
-        sync_dirs = [
-            ("static/illustrations/sd", "static/illustrations/sd"),
-            ("static/illustrations/pixel", "static/illustrations/pixel"),
-            ("static/portraits/pixel", "static/portraits/pixel"),
-            ("static/portraits/sd", "static/portraits/sd"),
-            ("static/portraits/original", "static/portraits/original"),
-            ("static/map.png", "static/map.png"),
-            ("static/map_mini.png", "static/map_mini.png"),
-        ]
-        for src_rel, dst_rel in sync_dirs:
-            src = os.path.join(BASE_DIR, src_rel)
-            dst = os.path.join(docs_dir, dst_rel)
-            if os.path.isdir(src):
-                os.makedirs(dst, exist_ok=True)
-                for f in os.listdir(src):
-                    src_file = os.path.join(src, f)
-                    dst_file = os.path.join(dst, f)
-                    if os.path.isfile(src_file):
-                        shutil.copy2(src_file, dst_file)
-            elif os.path.isfile(src):
-                os.makedirs(os.path.dirname(dst), exist_ok=True)
-                shutil.copy2(src, dst)
-
-        # 개별 JSON 파일 동기화 (정적 웹에서 직접 읽는 파일 포함)
-        json_files = [
-            "rules.json", "current_session.json", "worldbuilding.json",
-            "scenario.json", "pending_actions.json",
-            "items.json", "skills.json",
-        ]
-        for fname in json_files:
-            src = os.path.join(BASE_DIR, "data", fname)
-            dst = os.path.join(docs_dir, fname)
-            if os.path.isfile(src):
-                shutil.copy2(src, dst)
-
-        # 디렉토리 동기화 (copytree)
-        dir_syncs = [
-            ("entities", "entities"),
-            ("templates", "templates"),
-            ("rulesets", "rulesets"),
-        ]
-        for src_rel, dst_rel in dir_syncs:
-            src = os.path.join(BASE_DIR, src_rel)
-            dst = os.path.join(docs_dir, dst_rel)
-            if os.path.exists(src):
-                if os.path.exists(dst):
-                    shutil.rmtree(dst)
-                shutil.copytree(src, dst)
-
-        # 정적 웹 HTML 빌드 (templates/index.html → docs/index.html)
+        """docs/ 폴더를 최신 상태로 동기화 (GitHub Pages용). HTML은 건드리지 않는다.
+        build_static.py의 sync() 함수를 호출하여 데이터만 동기화한다."""
         try:
-            import sys
-            import subprocess
-            subprocess.run(
-                [sys.executable, os.path.join(BASE_DIR, "build_static.py")],
-                capture_output=True, timeout=10
-            )
+            # build_static.py를 직접 import하여 호출 (subprocess 대신)
+            import importlib.util
+            spec = importlib.util.spec_from_file_location(
+                "build_static",
+                os.path.join(BASE_DIR, "build_static.py"))
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            mod.sync()
         except Exception:
             pass

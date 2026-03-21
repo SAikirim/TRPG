@@ -166,3 +166,12 @@ GM 턴 추적기 (gm_turn.py) 상세
 - 수동 기록: NPC Agent 호출, 나레이션 출력 등은 python gm_turn.py log <tag> <msg>로 기록
 - 턴 종료 검증: end 시 필수 단계(gm-update, state 저장, 나레이션) 누락 여부 경고
 - 태그: dice, gm-update, state, entity, save, npc, narration
+
+
+웹 관리 규칙
+===
+- templates/index.html: 동적 웹 전용 (Flask API 사용)
+- docs/index.html: 정적 웹 전용 (JSON 파일 직접 읽기)
+- 두 파일은 독립적으로 관리한다. build_static.py로 HTML을 변환/생성하지 않는다.
+- 기능 추가/수정 시 반드시 양쪽 모두 각 구조에 맞게 작업한다.
+- build_static.py는 데이터(JSON, 이미지)만 docs/에 동기화한다.

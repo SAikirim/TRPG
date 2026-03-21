@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRPG (Static)</title>
+    <title>TRPG</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -428,7 +428,7 @@
             cursor: pointer;
         }
         .sidebar-map img:hover { border-color: #e94560; }
-        /* Map zoom overlay — 적당한 크기 */
+        /* Map zoom overlay */
         .map-overlay {
             display: none;
             position: fixed;
@@ -507,7 +507,7 @@
             height: 20px;
             background: #333;
             border-radius: 10px;
-            cursor: pointer;
+            cursor: default;
             transition: background 0.2s;
         }
         .settings-toggle.active {
@@ -539,13 +539,15 @@
             color: #ffd700;
             font-size: 0.85em;
         }
+        .settings-note {
+            color: #888;
+            font-size: 0.75em;
+            text-align: center;
+            padding: 6px 0 2px;
+            font-style: italic;
+        }
     </style>
-
-    <script>
-    // Static mode: illustration fallback
-    window._staticIllustrationFallback = true;
-    </script>
-    </head>
+</head>
 <body>
     <header>
         <h1 id="game-title">TRPG</h1>
@@ -554,27 +556,28 @@
             <span>턴: <strong id="turn-count">-</strong></span>
             <span>챕터: <strong id="chapter-info">-</strong></span>
             <span id="ending-info" class="ending" style="display:none"></span>
-            <span class="settings-btn" onclick="toggleSettings()">⚙️</span>
+            <span class="settings-btn" onclick="toggleSettings()">&#9881;</span>
         </div>
         <div id="settings-panel" class="settings-dropdown">
+            <div class="settings-note">설정 변경은 동적 웹에서만 가능합니다</div>
             <div class="settings-row">
                 <span class="settings-label">SD 일러스트</span>
-                <div id="setting-sd" class="settings-toggle" onclick="toggleSetting('sd_illustration')"></div>
+                <div id="setting-sd" class="settings-toggle" title="설정 변경은 동적 웹에서만 가능합니다"></div>
             </div>
             <div class="settings-row">
                 <span class="settings-label">주사위 결과 공개</span>
-                <div id="setting-dice" class="settings-toggle" onclick="toggleSetting('show_dice_result')"></div>
+                <div id="setting-dice" class="settings-toggle" title="설정 변경은 동적 웹에서만 가능합니다"></div>
             </div>
             <div class="settings-row">
                 <span class="settings-label">표시 모드</span>
-                <select id="setting-display" class="settings-select" onchange="changeSetting('display_mode', this.value)">
+                <select id="setting-display" class="settings-select" disabled title="설정 변경은 동적 웹에서만 가능합니다">
                     <option value="mobile">Mobile</option>
                     <option value="terminal">Terminal</option>
                 </select>
             </div>
             <div class="settings-row">
                 <span class="settings-label">난이도</span>
-                <select id="setting-difficulty" class="settings-select" onchange="changeSetting('difficulty', this.value)">
+                <select id="setting-difficulty" class="settings-select" disabled title="설정 변경은 동적 웹에서만 가능합니다">
                     <option value="easy">Easy</option>
                     <option value="normal">Normal</option>
                     <option value="hard">Hard</option>
@@ -737,8 +740,7 @@
                 updateLegend();
                 document.getElementById('game-map').src = 'static/map_mini.png?t=' + Date.now();
             } catch (e) {
-                const connEl = document.getElementById('connection-status');
-                if (connEl) { connEl.textContent = '연결 끊김'; connEl.className = 'status-indicator'; }
+                console.log('Static mode: game_state.json load failed', e);
             }
         }
 
@@ -858,7 +860,7 @@
             btn.classList.add('active');
             openDetails[`detail-${type}-${playerId}`] = true;
 
-            // Lazy load skill/equip from entity API
+            // Lazy load skill/equip from entity JSON files
             if ((type === 'skill' || type === 'equip') && !playerDetailCache[playerId]) {
                 try {
                     const res = await fetch(`entities/${(gameState?.game_info?.scenario_id || 'karendel_journey')}/players/player_${playerId}.json`);
@@ -978,7 +980,6 @@
                 const res = await fetch('illustration_state.json');
                 const data = await res.json();
                 const panel = document.getElementById('illustration-panel');
-                // SD 상태는 설정 패널에서 표시
 
                 // Build a hash to detect changes
                 const sceneHash = JSON.stringify({
@@ -1060,15 +1061,6 @@
             } catch (e) {}
         }
 
-        async function toggleSD() {
-            try {
-                await /* static: disabled */ false && fetch('/api/illustration/toggle', { method: 'POST' });
-                await updateIllustration();
-            } catch (e) {
-                console.error('Toggle failed:', e);
-            }
-        }
-
         // Tooltip: show/hide on mouse move using event delegation
         document.addEventListener('mouseover', function(e) {
             const item = e.target.closest('.detail-item');
@@ -1113,51 +1105,18 @@
                 const data = await res.json();
                 document.getElementById('setting-sd').className = 'settings-toggle' + (data.sd_illustration ? ' active' : '');
                 document.getElementById('setting-dice').className = 'settings-toggle' + (data.show_dice_result ? ' active' : '');
-                document.getElementById('setting-display').value = data.display_mode;
-                document.getElementById('setting-difficulty').value = data.difficulty;
-
-                // Also update SD toggle in illustration panel if exists
-                const sdToggle = document.getElementById('sd-toggle');
-                if (sdToggle) {
-                    sdToggle.textContent = data.sd_illustration ? 'SD ON' : 'SD OFF';
-                    sdToggle.className = 'sd-toggle' + (data.sd_illustration ? ' active' : '');
-                }
+                document.getElementById('setting-display').value = data.display_mode || 'mobile';
+                document.getElementById('setting-difficulty').value = data.difficulty || 'normal';
             } catch(e) {}
         }
 
-        async function toggleSetting(key) {
-            try {
-                const el = document.getElementById(key === 'sd_illustration' ? 'setting-sd' : 'setting-dice');
-                const current = el.classList.contains('active');
-                const body = {};
-                body[key] = !current;
-                await fetch('current_session.json', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(body)
-                });
-                await loadSettings();
-            } catch(e) {}
-        }
-
-        async function changeSetting(key, value) {
-            try {
-                const body = {};
-                body[key] = value;
-                await fetch('current_session.json', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(body)
-                });
-            } catch(e) {}
-        }
-
+        // Load once on page load (no polling)
         loadRules();
         loadItems();
         loadSkills();
         loadSettings();
         updateGameState();
-        // setInterval disabled in static mode
+
         function openMapZoom() {
             document.getElementById('map-overlay').classList.add('active');
             document.getElementById('map-zoom-img').src = 'static/map.png?t=' + Date.now();
