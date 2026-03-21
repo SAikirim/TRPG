@@ -1,0 +1,118 @@
+{
+  "description": "스킬 데이터베이스. 모든 스킬의 효과, 비용, 사거리, 요구사항을 정의한다.",
+  "skills": {
+    "공격": {
+      "type": "combat",
+      "class": "all",
+      "level_req": 1,
+      "cost": {"mp": 0},
+      "damage": "1d6 + STR",
+      "range": 1,
+      "target": "enemy",
+      "desc": "근접 무기로 적을 공격한다. 장착 무기의 데미지 적용.",
+      "stat": "MP 0 / 무기 DMG"
+    },
+    "방어": {
+      "type": "defense",
+      "class": "전사",
+      "level_req": 1,
+      "cost": {"mp": 0},
+      "effect": {"defense_bonus": 4, "duration": 1},
+      "range": 0,
+      "target": "self",
+      "desc": "방패를 들어 방어 태세. 다음 턴까지 방어력 +4.",
+      "stat": "MP 0 / DEF +4"
+    },
+    "파이어볼": {
+      "type": "magic_attack",
+      "class": "마법사",
+      "level_req": 1,
+      "cost": {"mp": 4},
+      "damage": "1d8 + INT",
+      "range": 8,
+      "aoe": 2,
+      "target": "enemy",
+      "desc": "화염 구체를 날려 마법 피해. 반경 2칸 범위 공격 가능.",
+      "stat": "MP 4 / 1d8+INT / 범위 2"
+    },
+    "힐": {
+      "type": "heal",
+      "class": "마법사",
+      "level_req": 1,
+      "cost": {"mp": 3},
+      "heal": "1d8 + INT",
+      "range": 1,
+      "target": "ally",
+      "desc": "치유 마법으로 아군 한 명의 HP를 회복한다.",
+      "stat": "MP 3 / 1d8+INT 회복"
+    },
+    "도주": {
+      "type": "utility",
+      "class": "all",
+      "level_req": 1,
+      "cost": {"mp": 0},
+      "check": "1d20 + DEX vs DC",
+      "range": 0,
+      "target": "self",
+      "desc": "전투에서 도주를 시도한다. 실패 시 적의 기회 공격.",
+      "stat": "MP 0 / DEX 판정"
+    },
+    "습격": {
+      "type": "combat",
+      "class": "도적",
+      "level_req": 1,
+      "cost": {"mp": 2},
+      "damage": "2d6 + DEX",
+      "range": 1,
+      "target": "enemy",
+      "check": {"stat": "DEX", "dc": 13, "fail": "발각 — 1d6 일반 공격으로 전환"},
+      "desc": "은밀하게 접근하여 급소를 노린다. DEX 판정 성공 시 추가 피해.",
+      "stat": "MP 2 / 2d6+DEX"
+    },
+    "마법탄": {
+      "type": "magic_attack",
+      "class": "마법사",
+      "level_req": 2,
+      "cost": {"mp": 2},
+      "damage": "1d6 + INT",
+      "range": 8,
+      "target": "enemy",
+      "desc": "마력을 응축한 탄환을 발사한다. 중거리 단일 대상.",
+      "stat": "MP 2 / 1d6+INT"
+    },
+    "마나 쉴드": {
+      "type": "defense",
+      "class": "마법사",
+      "level_req": 3,
+      "cost": {"mp": 5},
+      "effect": {"absorb_damage": "INT_modifier * 2", "duration": 3},
+      "range": 0,
+      "target": "self",
+      "desc": "마력으로 보호막을 생성. 3턴간 피해를 INT보정*2만큼 흡수.",
+      "stat": "MP 5 / 흡수 INT*2 / 3턴"
+    },
+    "독 바르기": {
+      "type": "buff",
+      "class": "도적",
+      "level_req": 3,
+      "cost": {"mp": 3},
+      "effect": {"poison_damage": 2, "duration": 3},
+      "range": 0,
+      "target": "self_weapon",
+      "desc": "무기에 독을 발라 3턴간 공격 시 추가 독 피해 2.",
+      "stat": "MP 3 / 독 2/턴 / 3턴"
+    },
+    "강타": {
+      "type": "combat",
+      "class": "전사",
+      "level_req": 3,
+      "cost": {"mp": 3},
+      "damage": "2d6 + STR",
+      "range": 1,
+      "target": "enemy",
+      "effect": {"stun_chance": 0.3},
+      "desc": "전력을 다해 내려친다. 높은 데미지 + 30% 확률로 기절.",
+      "stat": "MP 3 / 2d6+STR / 기절 30%"
+    }
+  }
+}

@@ -96,6 +96,11 @@ current_session.json      - 현재 활성 세션 요약 (세션 복원용)
 worldbuilding.json        - 세계관 설정 (시나리오 독립)
 rules.json / scenario.json - 현재 활성 룰셋 / 시나리오
 items.json                - 아이템 데이터베이스 (효과, 설명, 수치, 희귀도)
+skills.json               - 스킬 데이터베이스 (효과, 비용, 사거리, 요구 레벨)
+status_effects.json       - 상태이상 데이터베이스 (버프/디버프, 지속시간, 치료법)
+creature_templates.json   - 생물체 템플릿 (몬스터, 동물, 소환수 — 능력치, 공격, 드롭, 행동 패턴)
+shops.json                - 상점 데이터베이스 (위치, 품목, 가격, 매입률)
+quests.json               - 퀘스트 데이터베이스 (활성/완료/실패 상태 추적)
 entities/{scenario_id}/   - npcs/ players/ objects/ 엔티티 파일
 rulesets/ / scenarios/    - 룰셋/시나리오 카탈로그
 static/                   - 맵, 초상화, 일러스트 이미지

@@ -1,0 +1,58 @@
+{
+  "description": "퀘스트 데이터베이스. 활성/완료/실패 상태를 추적한다.",
+  "quests": {
+    "보물_감정": {
+      "title": "전설의 보물 감정",
+      "type": "main",
+      "status": "active",
+      "description": "고대 장식함의 정체를 밝히기 위해 카렌델의 멜로스 골동품점에서 감정을 받는다.",
+      "objectives": [
+        {"id": 1, "text": "카렌델에 도착", "completed": false},
+        {"id": 2, "text": "멜로스 골동품점 방문", "completed": false},
+        {"id": 3, "text": "전설의 보물 감정 받기", "completed": false}
+      ],
+      "rewards": {"xp": 100, "gold": 0, "items": []},
+      "giver": "에르네스 (소개장)",
+      "location": "karendel"
+    },
+    "약초_전달": {
+      "title": "볼프에게 약초 전달",
+      "type": "side",
+      "status": "active",
+      "description": "에르네스가 맡긴 산약초 봉투를 카렌델의 붉은 굴뚝 여관 주인 볼프에게 전달한다.",
+      "objectives": [
+        {"id": 1, "text": "붉은 굴뚝 여관 찾기", "completed": false},
+        {"id": 2, "text": "볼프에게 약초 봉투 전달", "completed": false}
+      ],
+      "rewards": {"xp": 30, "gold": 0, "items": ["무료 숙박 1박"]},
+      "giver": "에르네스",
+      "location": "karendel"
+    },
+    "황금_분배": {
+      "title": "황금 100개 분배",
+      "type": "side",
+      "status": "active",
+      "description": "던전에서 획득한 황금 100개를 파티원 셋이서 나눈다.",
+      "objectives": [
+        {"id": 1, "text": "카렌델에서 환전", "completed": false},
+        {"id": 2, "text": "3등분 분배", "completed": false}
+      ],
+      "rewards": {"xp": 0, "gold": 33, "items": []},
+      "giver": "파티 합의",
+      "location": "karendel"
+    },
+    "상인_호위": {
+      "title": "상인 할란 호위",
+      "type": "side",
+      "status": "active",
+      "description": "부상당한 상인 할란과 딸 미라를 카렌델까지 안전하게 호위한다.",
+      "objectives": [
+        {"id": 1, "text": "카렌델까지 동행", "completed": false},
+        {"id": 2, "text": "할란 일행 무사 도착", "completed": false}
+      ],
+      "rewards": {"xp": 50, "gold": 10, "items": []},
+      "giver": "할란",
+      "location": "trade_road_karendel"
+    }
+  }
+}

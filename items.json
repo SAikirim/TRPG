@@ -21,6 +21,21 @@
     "노잣돈 (은화 10닢)": {"type": "currency", "value": 10, "desc": "에르네스가 여행 경비로 준 은화", "stat": "10S", "rarity": "common"},
     "금화 1닢 (공용, 카렌델 환전 후 3등분)": {"type": "currency", "value": 1, "desc": "파티 공용 금화. 카렌델에서 환전 후 분배 예정", "stat": "1G", "rarity": "common"},
     "부싯돌": {"type": "tool", "desc": "불을 피울 수 있는 부싯돌", "stat": "도구", "rarity": "common"},
-    "상처 치료 약병": {"type": "consumable", "effect": "heal_hp", "amount": 10, "desc": "미라가 준 상처 치료용 약병. HP 10 회복", "stat": "HP +10", "rarity": "uncommon"}
+    "상처 치료 약병": {"type": "consumable", "effect": "heal_hp", "amount": 10, "desc": "미라가 준 상처 치료용 약병. HP 10 회복", "stat": "HP +10", "rarity": "uncommon"},
+    "장검": {"type": "weapon", "subtype": "melee", "slot": "weapon", "damage": "1d8 + STR", "range": 1, "requirements": {"STR": 10}, "desc": "표준 장검. 철검보다 길고 강력하다", "stat": "DMG 1d8", "rarity": "common"},
+    "체인메일": {"type": "armor", "subtype": "body", "slot": "armor", "defense": 4, "requirements": {"STR": 10}, "desc": "쇠사슬로 엮은 갑옷. 방어력이 높다", "stat": "DEF +4", "rarity": "uncommon"},
+    "해독제": {"type": "consumable", "effect": "cure_poison", "desc": "중독 상태를 즉시 해제", "stat": "해독", "rarity": "common"},
+    "횃불": {"type": "tool", "desc": "어두운 곳을 밝히는 횃불. 4시간 지속", "stat": "도구", "rarity": "common"},
+    "마법 반지 (INT+1)": {"type": "accessory", "slot": "accessory", "effect": {"INT": 1}, "requirements": {}, "desc": "마력이 깃든 반지. INT +1", "stat": "INT +1", "rarity": "rare"},
+    "보호의 부적": {"type": "accessory", "slot": "accessory", "effect": {"defense": 2}, "requirements": {}, "desc": "고대 보호 마법이 깃든 부적. DEF +2", "stat": "DEF +2", "rarity": "rare"},
+    "늑대 가죽": {"type": "material", "desc": "늑대에서 벗긴 가죽. 가공하면 방어구 재료", "stat": "소재", "rarity": "common"},
+    "늑대 이빨": {"type": "material", "desc": "늑대의 날카로운 이빨. 장신구나 무기 재료", "stat": "소재", "rarity": "common"},
+    "오크 가죽": {"type": "material", "desc": "질긴 오크 가죽. 고급 방어구 재료", "stat": "소재", "rarity": "uncommon"},
+    "룬 조각": {"type": "material", "desc": "골렘에서 떨어진 룬 조각. 마법 부여 재료", "stat": "소재", "rarity": "rare"},
+    "마법석": {"type": "material", "desc": "마력이 응축된 돌. 마법 장비 재료", "stat": "소재", "rarity": "rare"},
+    "동전 주머니": {"type": "currency", "value": 5, "desc": "동전 몇 개가 든 작은 주머니", "stat": "5G", "rarity": "common"},
+    "녹슨 단검": {"type": "weapon", "subtype": "melee", "slot": "weapon", "damage": "1d4", "range": 1, "desc": "녹이 슨 단검. 거의 쓸모없다", "stat": "DMG 1d4", "rarity": "common"},
+    "석궁 볼트": {"type": "ammo", "desc": "석궁용 화살. 10발", "stat": "탄약 x10", "rarity": "common"},
+    "낡은 검": {"type": "weapon", "subtype": "melee", "slot": "weapon", "damage": "1d6", "range": 1, "desc": "산적이 쓰던 낡은 검. 상태가 좋지 않다", "stat": "DMG 1d6", "rarity": "common"}
   }
 }

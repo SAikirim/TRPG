@@ -421,6 +421,14 @@ def get_items():
     return jsonify(items)
 
 
+@app.route("/api/skills", methods=["GET"])
+def get_skills():
+    skills_path = os.path.join(BASE_DIR, "skills.json")
+    with open(skills_path, "r", encoding="utf-8") as f:
+        skills = json.load(f)
+    return jsonify(skills)
+
+
 @app.route("/api/rules", methods=["GET"])
 def get_rules():
     rules_path = os.path.join(BASE_DIR, "rules.json")
@@ -492,6 +500,34 @@ def get_progress(scenario_id):
     if progress is None:
         return jsonify({"error": "No progress found"}), 404
     return jsonify(progress)
+
+
+@app.route("/api/status-effects", methods=["GET"])
+def get_status_effects():
+    path = os.path.join(BASE_DIR, "status_effects.json")
+    with open(path, "r", encoding="utf-8") as f:
+        return jsonify(json.load(f))
+
+
+@app.route("/api/creatures", methods=["GET"])
+def get_creatures():
+    path = os.path.join(BASE_DIR, "creature_templates.json")
+    with open(path, "r", encoding="utf-8") as f:
+        return jsonify(json.load(f))
+
+
+@app.route("/api/shops", methods=["GET"])
+def get_shops():
+    path = os.path.join(BASE_DIR, "shops.json")
+    with open(path, "r", encoding="utf-8") as f:
+        return jsonify(json.load(f))
+
+
+@app.route("/api/quests", methods=["GET"])
+def get_quests():
+    path = os.path.join(BASE_DIR, "quests.json")
+    with open(path, "r", encoding="utf-8") as f:
+        return jsonify(json.load(f))
 
 
 @app.route("/api/npc/reveal", methods=["POST"])

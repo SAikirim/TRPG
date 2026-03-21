@@ -581,12 +581,21 @@
         let lastMapTime = 0;
         let rulesData = null;
         let itemsData = {};
+        let skillsData = {};
 
         async function loadItems() {
             try {
                 const res = await fetch('/api/items');
                 const data = await res.json();
                 itemsData = data.items || {};
+            } catch(e) {}
+        }
+
+        async function loadSkills() {
+            try {
+                const res = await fetch('/api/skills');
+                const data = await res.json();
+                skillsData = data.skills || {};
             } catch(e) {}
         }
 
@@ -811,28 +820,15 @@
             }
 
             if (type === 'skill') {
-                const actions = rulesData ? rulesData.actions || {} : {};
-                const playerClass = gameState.players.find(p => p.id === playerId);
-                const className = playerClass ? playerClass.class : '';
-                // "all" 클래스 + 자기 클래스 액션 모두 표시
-                const classSkills = Object.entries(actions).filter(([k,v]) =>
-                    k !== '_설명' && (v.class === className || v.class === 'all'));
-                if (classSkills.length) {
-                    el.innerHTML = classSkills.map(([name, info]) => {
-                        const cost = info.cost && info.cost.mp ? 'MP ' + info.cost.mp : 'MP 0';
-                        let dmgStr = '';
-                        if (info.damage) {
-                            // "weapon_dice" → 실제 무기 다이스로 치환
-                            let dmg = info.damage.split(' + ')[0];
-                            if (dmg.includes('weapon')) {
-                                const weaponName = playerDetailCache[playerId]?.equipment?.weapon;
-                                const wn = typeof weaponName === 'object' ? weaponName?.name : weaponName;
-                                const wDef = rulesData?.combat?.weapons?.[wn];
-                                dmg = wDef ? wDef.dice : '1d2';
-                            }
-                            dmgStr = ' / ' + dmg;
-                        }
-                        return `<div class="detail-item"><span class="item-name">${name}</span><span class="item-stat">${cost}${dmgStr}</span><div class="tooltip">${info.description || name}</div></div>`;
+                const playerObj = gameState.players.find(p => p.id === playerId);
+                const actions = playerDetailCache[playerId]?.available_actions || [];
+                if (actions.length) {
+                    el.innerHTML = actions.map(name => {
+                        const info = skillsData[name] || {};
+                        const stat = info.stat || '';
+                        const desc = info.desc || name;
+                        const lvl = info.level_req ? 'Lv.' + info.level_req : '';
+                        return `<div class="detail-item"><span class="item-name">${name}</span><span class="item-stat">${stat}</span><div class="tooltip">${desc}${lvl ? ' (' + lvl + ')' : ''}</div></div>`;
                     }).join('');
                 } else {
                     el.innerHTML = '<div class="detail-item" style="color:#666">없음</div>';
@@ -1108,6 +1104,7 @@
 
         loadRules();
         loadItems();
+        loadSkills();
         loadSettings();
         updateGameState();
         setInterval(updateGameState, 2000);
