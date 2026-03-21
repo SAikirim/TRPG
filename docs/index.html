@@ -262,17 +262,39 @@
             height: 100%;
             pointer-events: none;
         }
-        .illustration-panel .portrait-layer {
+        .illustration-panel .portrait-wrapper {
             position: absolute;
-            bottom: 0;
-            max-height: 90%;
-            max-width: 40%;
+            bottom: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 22%;
+            max-height: 70%;
+        }
+        .portrait-wrapper.pos-0 { left: 2%; }
+        .portrait-wrapper.pos-1 { left: 27%; }
+        .portrait-wrapper.pos-2 { left: 52%; }
+        .portrait-wrapper.pos-3 { left: 77%; }
+        /* Legacy positions for compatibility */
+        .portrait-wrapper.pos-left { left: 2%; }
+        .portrait-wrapper.pos-center { left: 38%; }
+        .portrait-wrapper.pos-right { left: 72%; }
+        .portrait-wrapper .portrait-layer {
+            max-height: 100%;
+            max-width: 100%;
             object-fit: contain;
             filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.7));
         }
-        .portrait-layer.pos-left { left: 5%; }
-        .portrait-layer.pos-center { left: 50%; transform: translateX(-50%); }
-        .portrait-layer.pos-right { right: 5%; }
+        .portrait-wrapper .layer-name {
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            font-size: 0.75em;
+            font-weight: bold;
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+        }
         .illustration-panel .object-layer {
             position: absolute;
             max-height: 30%;

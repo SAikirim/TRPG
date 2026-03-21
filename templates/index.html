@@ -264,16 +264,21 @@
         }
         .illustration-panel .portrait-wrapper {
             position: absolute;
-            bottom: 0;
-            max-height: 90%;
-            max-width: 40%;
+            bottom: 5px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            max-width: 22%;
+            max-height: 70%;
         }
-        .portrait-wrapper.pos-left { left: 5%; }
-        .portrait-wrapper.pos-center { left: 50%; transform: translateX(-50%); }
-        .portrait-wrapper.pos-right { right: 5%; }
+        .portrait-wrapper.pos-0 { left: 2%; }
+        .portrait-wrapper.pos-1 { left: 27%; }
+        .portrait-wrapper.pos-2 { left: 52%; }
+        .portrait-wrapper.pos-3 { left: 77%; }
+        /* Legacy positions for compatibility */
+        .portrait-wrapper.pos-left { left: 2%; }
+        .portrait-wrapper.pos-center { left: 38%; }
+        .portrait-wrapper.pos-right { left: 72%; }
         .portrait-wrapper .portrait-layer {
             max-height: 100%;
             max-width: 100%;
@@ -283,9 +288,9 @@
         .portrait-wrapper .layer-name {
             background: rgba(0,0,0,0.7);
             color: #fff;
-            font-size: 0.8em;
+            font-size: 0.75em;
             font-weight: bold;
-            padding: 2px 8px;
+            padding: 1px 6px;
             border-radius: 4px;
             margin-bottom: 2px;
             white-space: nowrap;
@@ -994,8 +999,8 @@
 
                 if (data.layers && data.layers.length > 0) {
                     html += '<div class="layer-container">';
-                    data.layers.forEach(layer => {
-                        const posClass = 'pos-' + (layer.position || 'center');
+                    data.layers.forEach((layer, idx) => {
+                        const posClass = 'pos-' + Math.min(idx, 3);
                         const displayName = gameState?.npcs?.find(n => n.name === layer.name)?.known === false ? '???' : (layer.name || '');
                         if (layer.type === 'portrait') {
                             html += '<div class="portrait-wrapper ' + posClass + '">';
