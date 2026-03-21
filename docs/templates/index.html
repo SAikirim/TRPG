@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>판타지 TRPG - 잃어버린 보물의 숲 던전</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        header {
+            background: linear-gradient(135deg, #16213e, #0f3460);
+            padding: 12px 24px;
+            text-align: center;
+            border-bottom: 2px solid #e94560;
+        }
+        header h1 { font-size: 1.4em; color: #e94560; }
+        header p { font-size: 0.85em; color: #aaa; margin-top: 4px; }
+        .container {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 80px);
+        }
+        .main-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 0;
+        }
+        .sidebar {
+            width: 380px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            max-height: calc(100vh - 96px);
+        }
+        .panel {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 14px;
+        }
+        .panel h3 {
+            font-size: 0.95em;
+            color: #e94560;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        /* Player cards */
+        .player-card {
+            background: #0f3460;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            gap: 10px;
+        }
+        .player-card:last-child { margin-bottom: 0; }
+        .player-card .name {
+            font-weight: bold;
+            font-size: 0.95em;
+            margin-bottom: 6px;
+        }
+        .player-card .name .class-badge {
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
+        .class-warrior { background: #e63946; }
+        .class-mage { background: #457be0; }
+        .class-rogue { background: #2ecc71; }
+        .level-badge {
+            font-size: 0.7em;
+            padding: 1px 6px;
+            border-radius: 8px;
+            background: #ffd700;
+            color: #1a1a2e;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+        .bar-xp { background: linear-gradient(90deg, #ffd700, #f0c040); }
+        .stat-mod { color: #ffd700; font-size: 0.85em; }
+        .rarity-common { color: #aaa; }
+        .rarity-uncommon { color: #2ecc71; }
+        .rarity-rare { color: #3498db; }
+        .rarity-epic { color: #9b59b6; }
+        .rarity-legendary { color: #e67e22; }
+        .bar-container {
+            background: #1a1a2e;
+            border-radius: 4px;
+            height: 16px;
+            margin: 3px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        .bar-hp { background: linear-gradient(90deg, #e63946, #ff6b6b); }
+        .bar-mp { background: linear-gradient(90deg, #457be0, #74b9ff); }
+        .bar-label {
+            position: absolute;
+            top: 0; left: 8px;
+            font-size: 0.7em;
+            line-height: 16px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+        .stats {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+            font-size: 0.75em;
+            color: #aaa;
+        }
+        .stats span { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; }
+        /* Collapsible details */
+        .detail-toggle {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .detail-toggle button {
+            flex: 1;
+            background: #1a1a2e;
+            border: 1px solid #333;
+            color: #aaa;
+            font-size: 0.7em;
+            padding: 3px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .detail-toggle button:hover,
+        .detail-toggle button.active {
+            background: #0f3460;
+            color: #ffd700;
+            border-color: #ffd700;
+        }
+        .detail-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-top: 0;
+        }
+        .detail-content.open {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 6px;
+        }
+        .detail-content ul {
+            list-style: none;
+            font-size: 0.75em;
+            color: #ccc;
+        }
+        .detail-content li {
+            padding: 2px 6px;
+            border-bottom: 1px solid #1a1a2e;
+        }
+        .detail-content li:last-child { border-bottom: none; }
+        .detail-content .equip-tag {
+            color: #ffd700;
+            font-size: 0.9em;
+            margin-left: 4px;
+        }
+        .detail-content .skill-item {
+            color: #74b9ff;
+        }
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            cursor: default;
+        }
+        .detail-item:last-child { border-bottom: none; }
+        .detail-item:hover { background: rgba(255,255,255,0.05); }
+        .detail-item .item-name { flex: 1; }
+        .detail-item .item-stat {
+            font-size: 0.75em;
+            color: #ffd700;
+            margin-left: 8px;
+            white-space: nowrap;
+        }
+        .detail-item .tooltip {
+            display: none;
+            position: fixed;
+            background: #0a0a1a;
+            border: 1px solid #e94560;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.8em;
+            color: #ddd;
+            z-index: 9999;
+            pointer-events: none;
+            max-width: 300px;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            line-height: 1.5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+        }
+        .player-portrait {
+            width: 125px;
+            height: 125px;
+            border-radius: 8px;
+            border: 2px solid #333;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .player-info {
+            flex: 1;
+            min-width: 0;
+        }
+        /* Illustration */
+        .illustration-section .illustration-panel {
+            position: relative;
+            min-height: 400px;
+            background: #0d1b2a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .illustration-panel .bg-layer {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+        .illustration-panel .layer-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .illustration-panel .portrait-layer {
+            position: absolute;
+            bottom: 0;
+            max-height: 90%;
+            max-width: 40%;
+            object-fit: contain;
+            filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.7));
+        }
+        .portrait-layer.pos-left { left: 5%; }
+        .portrait-layer.pos-center { left: 50%; transform: translateX(-50%); }
+        .portrait-layer.pos-right { right: 5%; }
+        .illustration-panel .object-layer {
+            position: absolute;
+            max-height: 30%;
+            max-width: 25%;
+            object-fit: contain;
+            filter: drop-shadow(2px 2px 6px rgba(0,0,0,0.6));
+        }
+        .object-layer.pos-center { bottom: 10%; left: 50%; transform: translateX(-50%); }
+        .object-layer.pos-center-bottom { bottom: 5%; left: 50%; transform: translateX(-50%); }
+        .object-layer.pos-left { bottom: 10%; left: 10%; }
+        .object-layer.pos-right { bottom: 10%; right: 10%; }
+        .illustration-panel .generating-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            color: #ffd700;
+            font-size: 0.8em;
+            font-style: italic;
+        }
+        .generating-overlay .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #333;
+            border-top: 2px solid #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 6px;
+        }
+        .illustration-placeholder {
+            color: #444;
+            font-size: 1.1em;
+            font-style: italic;
+        }
+        .illustration-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffd700;
+            font-style: italic;
+        }
+        .illustration-loading .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #333;
+            border-top: 3px solid #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .sd-toggle {
+            font-size: 0.75em;
+            cursor: pointer;
+            padding: 2px 10px;
+            border-radius: 8px;
+            border: 1px solid #555;
+            background: #1a1a2e;
+            color: #aaa;
+            flex-shrink: 0;
+        }
+        .sd-toggle.active {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+        /* Events */
+        .events-list {
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 0.85em;
+        }
+        .event-item {
+            padding: 6px 8px;
+            border-bottom: 1px solid #1a1a2e;
+            line-height: 1.4;
+        }
+        .event-item .turn-badge {
+            display: inline-block;
+            background: #e94560;
+            color: white;
+            font-size: 0.7em;
+            padding: 1px 6px;
+            border-radius: 8px;
+            margin-right: 6px;
+        }
+        .event-item .narrative {
+            display: block;
+            color: #ffd700;
+            font-style: italic;
+            margin-top: 3px;
+        }
+        /* Map in sidebar */
+        .sidebar-map img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 2px solid #333;
+            image-rendering: pixelated;
+        }
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.78em;
+            margin-top: 10px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid white;
+        }
+        .legend-tri {
+            width: 0; height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-bottom: 12px solid #9b30ff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>판타지 TRPG - 잃어버린 보물의 숲 던전</h1>
+        <p>3명의 모험가가 숲의 던전에서 잃어버린 보물을 찾는다</p>
+    </header>
+
+    <div class="container">
+        <div class="main-panel">
+            <div class="panel illustration-section">
+                <h3>
+                    일러스트
+                    <button id="sd-toggle" class="sd-toggle" onclick="toggleSD()">SD OFF</button>
+                </h3>
+                <div id="illustration-panel" class="illustration-panel">
+                    <div class="illustration-placeholder">대기 중...</div>
+                </div>
+            </div>
+            <div class="panel">
+                <h3>이벤트 로그</h3>
+                <div id="events-list" class="events-list"></div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="panel sidebar-map">
+                <h3>게임 맵</h3>
+                <img id="game-map" src="/static/map.png" alt="Game Map">
+                <div id="map-legend" class="legend"></div>
+            </div>
+
+            <div class="panel">
+                <h3>플레이어 정보</h3>
+                <div id="players-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameState = null;
+        let lastGameStateHash = '';
+        let lastMapTime = 0;
+        let rulesData = null;
+
+        // 아이템 정보를 rules.json에서 동적으로 가져옴
+        function getItemInfo(name) {
+            // 무기 테이블에서 조회
+            if (rulesData?.combat?.weapons?.[name]) {
+                const w = rulesData.combat.weapons[name];
+                return { desc: w.description, stat: 'DMG ' + w.dice };
+            }
+            // 방어구 테이블에서 조회
+            if (rulesData?.combat?.armor?.[name]) {
+                const a = rulesData.combat.armor[name];
+                return { desc: a.description || name, stat: a.bonus ? 'DEF +' + a.bonus : '' };
+            }
+            // 소모품
+            if (rulesData?.rest?.use_item?.[name]) {
+                const u = rulesData.rest.use_item[name];
+                return { desc: u.description, stat: u.heal_hp ? 'HP +' + u.heal_hp : u.heal_mp ? 'MP +' + u.heal_mp : '' };
+            }
+            // 폴백 (알려진 기타 아이템)
+            const fallback = {
+                '도둑 도구': { desc: '함정 해제, 자물쇠 따기', stat: 'DEX +2' },
+                '마나 결정': { desc: '응축된 마력의 결정', stat: 'MP +5' },
+                '슬라임 젤리': { desc: '슬라임에서 추출한 젤리', stat: '소재' },
+                '고대 열쇠': { desc: '보물실의 문을 여는 열쇠', stat: '열쇠' },
+                '전설의 보물': { desc: '던전의 최종 보물', stat: '보물' },
+                '밧줄': { desc: '등반, 묶기에 사용', stat: '도구' },
+            };
+            return fallback[name] || { desc: name, stat: '' };
+        }
+        function statMod(val) {
+            const m = Math.floor((val - 10) / 2);
+            return m >= 0 ? '+' + m : '' + m;
+        }
+        const rarityEmoji = { common: '⬜', uncommon: '🟩', rare: '🟦', epic: '🟪', legendary: '🟧' };
+
+        async function loadRules() {
+            try {
+                const res = await fetch('/api/rules');
+                rulesData = await res.json();
+            } catch(e) {}
+        }
+
+        async function updateGameState() {
+            try {
+                const res = await fetch('/api/game-state');
+                const newState = await res.json();
+                const hash = JSON.stringify(newState);
+
+                // Always update illustration (has its own change detection)
+                gameState = newState;
+                updateIllustration();
+
+                // Only re-render if game state actually changed
+                if (hash === lastGameStateHash) return;
+                lastGameStateHash = hash;
+
+                updatePlayersList();
+                updateEventsList();
+                updateLegend();
+                document.getElementById('game-map').src = '/static/map.png?t=' + Date.now();
+            } catch (e) {
+                const connEl = document.getElementById('connection-status');
+                if (connEl) { connEl.textContent = '연결 끊김'; connEl.className = 'status-indicator'; }
+            }
+        }
+
+        // Cache for player detail data (from entity files)
+        const playerDetailCache = {};
+
+        // Track which detail panels are open
+        const openDetails = {};
+
+        function updatePlayersList() {
+            const container = document.getElementById('players-list');
+            const classMap = { '전사': 'warrior', '마법사': 'mage', '도적': 'rogue' };
+
+            // Save open state before re-render
+            container.querySelectorAll('.detail-content.open').forEach(el => {
+                openDetails[el.id] = true;
+            });
+
+            container.innerHTML = gameState.players.map(p => {
+                const cls = classMap[p.class] || 'warrior';
+                const hpPct = (p.hp / p.max_hp * 100).toFixed(0);
+                const mpPct = (p.mp / p.max_mp * 100).toFixed(0);
+                const lv = p.level || 1;
+                const xp = p.xp || 0;
+                const xpTable = rulesData?.level_up?.xp_table || {};
+                const xpNext = xpTable[String(lv + 1)] || 100;
+                const xpPrev = xpTable[String(lv)] || 0;
+                const xpPct = xpNext > xpPrev ? ((xp - xpPrev) / (xpNext - xpPrev) * 100).toFixed(0) : 100;
+                const effects = p.status_effects.length > 0
+                    ? `<div style="font-size:0.75em;color:#ffd700;margin-top:4px">상태: ${p.status_effects.map(e => typeof e === 'string' ? e : e.name).join(', ')}</div>`
+                    : '';
+                const invItems = (p.inventory || []).map(item => {
+                    const info = getItemInfo(item);
+                    return `<div class="detail-item"><span class="item-name">${item}</span>${info.stat ? '<span class="item-stat">' + info.stat + '</span>' : ''}<div class="tooltip">${info.desc}</div></div>`;
+                }).join('');
+                return `
+                <div class="player-card">
+                    <img class="player-portrait" src="/static/portraits/pixel/player_${p.id}.png" alt="${p.name}" onerror="this.src='/static/portraits/pixel/player_${p.id}.png'">
+                    <div class="player-info">
+                        <div class="name">
+                        ${p.name}
+                        <span class="class-badge class-${cls}">${p.class}</span>
+                        <span class="level-badge">LV ${lv}</span>
+                        <span style="float:right;font-size:0.75em;color:#aaa">위치: [${p.position}]</span>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar bar-hp" style="width:${hpPct}%"></div>
+                        <div class="bar-label">HP ${p.hp}/${p.max_hp}</div>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar bar-mp" style="width:${mpPct}%"></div>
+                        <div class="bar-label">MP ${p.mp}/${p.max_mp}</div>
+                    </div>
+                    <div class="bar-container" style="height:10px">
+                        <div class="bar bar-xp" style="width:${xpPct}%"></div>
+                        <div class="bar-label" style="font-size:0.6em;line-height:10px">XP ${xp}/${xpNext}</div>
+                    </div>
+                    <div class="stats">
+                        <span>STR ${p.stats.STR}<span class="stat-mod">(${statMod(p.stats.STR)})</span></span>
+                        <span>DEX ${p.stats.DEX}<span class="stat-mod">(${statMod(p.stats.DEX)})</span></span>
+                        <span>INT ${p.stats.INT}<span class="stat-mod">(${statMod(p.stats.INT)})</span></span>
+                        <span>CON ${p.stats.CON}<span class="stat-mod">(${statMod(p.stats.CON)})</span></span>
+                    </div>
+                    ${effects}
+                    <div class="detail-toggle">
+                        <button onclick="toggleDetail(${p.id}, 'inv', this)">소지품 (${(p.inventory||[]).length})</button>
+                        <button onclick="toggleDetail(${p.id}, 'skill', this)">스킬</button>
+                        <button onclick="toggleDetail(${p.id}, 'equip', this)">장비</button>
+                    </div>
+                    <div id="detail-inv-${p.id}" class="detail-content">
+                        ${invItems || '<div class="detail-item" style="color:#666">없음</div>'}
+                    </div>
+                    <div id="detail-skill-${p.id}" class="detail-content">
+                        <ul><li style="color:#666">로딩 중...</li></ul>
+                    </div>
+                    <div id="detail-equip-${p.id}" class="detail-content">
+                        <ul><li style="color:#666">로딩 중...</li></ul>
+                    </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Restore open state after re-render
+            Object.keys(openDetails).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('open');
+                    // Also activate the corresponding button
+                    const type = id.split('-')[1];
+                    const playerId = id.split('-')[2];
+                    const card = el.closest('.player-card');
+                    if (card) {
+                        const btn = card.querySelector(`button[onclick*="'${type}'"]`);
+                        if (btn) btn.classList.add('active');
+                    }
+                }
+            });
+        }
+
+        async function toggleDetail(playerId, type, btn) {
+            const el = document.getElementById(`detail-${type}-${playerId}`);
+            const isOpen = el.classList.contains('open');
+
+            // Close all details for this player
+            ['inv', 'skill', 'equip'].forEach(t => {
+                const d = document.getElementById(`detail-${t}-${playerId}`);
+                if (d) d.classList.remove('open');
+                delete openDetails[`detail-${t}-${playerId}`];
+            });
+            // Deactivate all buttons in same toggle group
+            btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+
+            if (isOpen) return; // Was open, now closed
+
+            el.classList.add('open');
+            btn.classList.add('active');
+            openDetails[`detail-${type}-${playerId}`] = true;
+
+            // Lazy load skill/equip from entity API
+            if ((type === 'skill' || type === 'equip') && !playerDetailCache[playerId]) {
+                try {
+                    const res = await fetch(`/api/player-stats/${playerId}`);
+                    playerDetailCache[playerId] = await res.json();
+                } catch(e) {
+                    playerDetailCache[playerId] = {};
+                }
+            }
+
+            if (type === 'skill') {
+                const actions = rulesData ? rulesData.actions || {} : {};
+                const playerClass = gameState.players.find(p => p.id === playerId);
+                const className = playerClass ? playerClass.class : '';
+                // "all" 클래스 + 자기 클래스 액션 모두 표시
+                const classSkills = Object.entries(actions).filter(([k,v]) =>
+                    k !== '_설명' && (v.class === className || v.class === 'all'));
+                if (classSkills.length) {
+                    el.innerHTML = classSkills.map(([name, info]) => {
+                        const cost = info.cost && info.cost.mp ? 'MP ' + info.cost.mp : 'MP 0';
+                        let dmgStr = '';
+                        if (info.damage) {
+                            // "weapon_dice" → 실제 무기 다이스로 치환
+                            let dmg = info.damage.split(' + ')[0];
+                            if (dmg.includes('weapon')) {
+                                const weaponName = playerDetailCache[playerId]?.equipment?.weapon;
+                                const wn = typeof weaponName === 'object' ? weaponName?.name : weaponName;
+                                const wDef = rulesData?.combat?.weapons?.[wn];
+                                dmg = wDef ? wDef.dice : '1d2';
+                            }
+                            dmgStr = ' / ' + dmg;
+                        }
+                        return `<div class="detail-item"><span class="item-name">${name}</span><span class="item-stat">${cost}${dmgStr}</span><div class="tooltip">${info.description || name}</div></div>`;
+                    }).join('');
+                } else {
+                    el.innerHTML = '<div class="detail-item" style="color:#666">없음</div>';
+                }
+            }
+            if (type === 'equip') {
+                const detail = playerDetailCache[playerId] || {};
+                const equip = detail.equipment || {};
+                const slots = ['weapon', 'armor', 'accessory'];
+                const slotNames = { weapon: '무기', armor: '방어구', accessory: '장신구' };
+                el.innerHTML = slots.map(slot => {
+                    const item = equip[slot];
+                    if (!item) return `<div class="detail-item"><span class="item-name">${slotNames[slot]}: —</span></div>`;
+                    if (typeof item === 'string') {
+                        const info = getItemInfo(item);
+                        return `<div class="detail-item"><span class="item-name">${slotNames[slot]}: ⬜ ${item}</span><span class="item-stat">${info.stat}</span><div class="tooltip">${info.desc}</div></div>`;
+                    }
+                    const rarity = item.rarity || 'common';
+                    const emoji = rarityEmoji[rarity] || '⬜';
+                    const props = item.properties || {};
+                    const wDef = rulesData?.combat?.weapons?.[item.name];
+                    let statStr = wDef ? 'DMG ' + wDef.dice : '';
+                    const aDef = rulesData?.combat?.armor?.[item.name];
+                    if (aDef) statStr = 'DEF +' + aDef.bonus;
+                    // 마법 속성 표시
+                    let propParts = [];
+                    if (props.attack_bonus) propParts.push('명중+' + props.attack_bonus);
+                    if (props.damage_bonus) propParts.push('데미지+' + props.damage_bonus);
+                    if (props.defense_bonus) propParts.push('방어+' + props.defense_bonus);
+                    if (props.element) propParts.push('🔮' + props.element);
+                    if (props.on_hit) propParts.push('⚡' + (props.on_hit.type || ''));
+                    const propStr = propParts.length ? ' [' + propParts.join(', ') + ']' : '';
+                    const desc = (wDef?.description || aDef?.description || item.name) + propStr;
+                    return `<div class="detail-item"><span class="item-name rarity-${rarity}">${slotNames[slot]}: ${emoji} ${item.name}</span><span class="item-stat">${statStr}${propStr}</span><div class="tooltip">${desc}</div></div>`;
+                }).join('');
+            }
+        }
+
+        function updateEventsList() {
+            const container = document.getElementById('events-list');
+            const events = gameState.events.slice(-10).reverse();
+            container.innerHTML = events.map(e => {
+                const narrative = e.narrative ? `<span class="narrative">${e.narrative}</span>` : '';
+                return `
+                <div class="event-item">
+                    <span class="turn-badge">T${e.turn}</span>
+                    ${e.message}
+                    ${narrative}
+                </div>`;
+            }).join('');
+        }
+
+        function updateLegend() {
+            const container = document.getElementById('map-legend');
+            if (!container || !gameState) return;
+            const playerColors = { '전사': '#e63946', '마법사': '#457be0', '도적': '#2ecc71' };
+            const locColors = { 'grass': '#4a8c2a', 'dungeon': '#6b6b6b', 'treasure': '#c8a82a', 'village': '#8B7355', 'road': '#A0926B', 'house': '#6B4226' };
+            let html = '';
+            gameState.players.forEach(p => {
+                html += `<div class="legend-item"><div class="legend-dot" style="background:${playerColors[p.class] || '#fff'}"></div> ${p.name}</div>`;
+            });
+            const seen = new Set();
+            (gameState.map?.locations || []).forEach(loc => {
+                if (!seen.has(loc.type)) {
+                    seen.add(loc.type);
+                    const color = locColors[loc.type] || '#888';
+                    html += `<div class="legend-item"><div class="legend-dot" style="background:${color}"></div> ${loc.name.split(' ')[0]}</div>`;
+                }
+            });
+            // Add monster legend if any alive NPCs
+            if (gameState.npcs?.some(n => n.status !== 'dead')) {
+                html += '<div class="legend-item"><div class="legend-tri"></div> 몬스터</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        let lastSceneHash = '';
+
+        async function updateIllustration() {
+            try {
+                const res = await fetch('/api/illustration');
+                const data = await res.json();
+                const panel = document.getElementById('illustration-panel');
+                const toggleBtn = document.getElementById('sd-toggle');
+
+                if (data.enabled) {
+                    toggleBtn.textContent = 'SD ON';
+                    toggleBtn.className = 'sd-toggle active';
+                } else {
+                    toggleBtn.textContent = 'SD OFF';
+                    toggleBtn.className = 'sd-toggle';
+                }
+
+                // Build a hash to detect changes
+                const sceneHash = JSON.stringify({
+                    bg: data.background,
+                    layers: data.layers,
+                    status: data.generating?.status,
+                    default_bg: data.default_bg,
+                    enabled: data.enabled
+                });
+
+                if (sceneHash === lastSceneHash) return;
+                lastSceneHash = sceneHash;
+
+                const generating = data.generating || {};
+                const hasContent = data.background || (data.layers && data.layers.length > 0);
+
+                if (!data.enabled) {
+                    if (data.default_bg) {
+                        panel.innerHTML = '<img class="bg-layer" src="' + data.default_bg.pixel + '?t=default" alt="Background">';
+                    } else {
+                        panel.innerHTML = '<div class="illustration-placeholder">SD 비활성</div>';
+                    }
+                    return;
+                }
+
+                if (!hasContent && generating.status !== 'generating') {
+                    if (generating.status === 'error' && generating.error) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.style.cssText = 'color:#e63946;font-size:0.9em;padding:20px;text-align:center';
+                        errorDiv.textContent = '오류: ' + generating.error;
+                        panel.innerHTML = '';
+                        panel.appendChild(errorDiv);
+                    } else if (data.default_bg) {
+                        // Show default chapter background
+                        const bgSrc = data.enabled ? data.default_bg.sd : data.default_bg.pixel;
+                        const fallbackSrc = data.default_bg.pixel;
+                        panel.innerHTML = '<img class="bg-layer" src="' + bgSrc + '?t=default" alt="Background" onerror="this.src=\'' + fallbackSrc + '?t=default\'">';
+                    } else {
+                        panel.innerHTML = '<div class="illustration-placeholder">대기 중...</div>';
+                    }
+                    return;
+                }
+
+                // Build scene with layers
+                let html = '';
+
+                if (data.background) {
+                    html += '<img class="bg-layer" src="' + data.background + '?t=' + Date.now() + '" alt="Background">';
+                }
+
+                if (data.layers && data.layers.length > 0) {
+                    html += '<div class="layer-container">';
+                    data.layers.forEach(layer => {
+                        const posClass = 'pos-' + (layer.position || 'center');
+                        if (layer.type === 'portrait') {
+                            html += '<img class="portrait-layer ' + posClass + '" src="' + layer.image + '?t=' + Date.now() + '" alt="' + (layer.name || '') + '" title="' + (layer.name || '') + '">';
+                        } else if (layer.type === 'object') {
+                            html += '<img class="object-layer ' + posClass + '" src="' + layer.image + '?t=' + Date.now() + '" alt="' + (layer.name || '') + '" title="' + (layer.name || '') + '">';
+                        }
+                    });
+                    html += '</div>';
+                }
+
+                // Show generating overlay if something is being generated while scene is visible
+                if (generating.status === 'generating') {
+                    if (hasContent) {
+                        html += '<div class="generating-overlay"><div class="spinner"></div>생성 중...</div>';
+                    } else {
+                        html = '<div class="illustration-loading"><div class="spinner"></div>생성 중...</div>';
+                    }
+                }
+
+                panel.innerHTML = html;
+            } catch (e) {}
+        }
+
+        async function toggleSD() {
+            try {
+                await fetch('/api/illustration/toggle', { method: 'POST' });
+                await updateIllustration();
+            } catch (e) {
+                console.error('Toggle failed:', e);
+            }
+        }
+
+        // Tooltip: show/hide on mouse move using event delegation
+        document.addEventListener('mouseover', function(e) {
+            const item = e.target.closest('.detail-item');
+            if (!item) return;
+            const tip = item.querySelector('.tooltip');
+            if (tip) tip.style.display = 'block';
+        });
+        document.addEventListener('mouseout', function(e) {
+            const item = e.target.closest('.detail-item');
+            if (!item) return;
+            const tip = item.querySelector('.tooltip');
+            if (tip) tip.style.display = 'none';
+        });
+        document.addEventListener('mousemove', function(e) {
+            const item = e.target.closest('.detail-item');
+            if (!item) return;
+            const tip = item.querySelector('.tooltip');
+            if (!tip || tip.style.display !== 'block') return;
+            const tipRect = tip.getBoundingClientRect();
+            const tipW = tipRect.width || 200;
+            const tipH = tipRect.height || 40;
+            let x = e.clientX + 15;
+            let y = e.clientY + 15;
+            // Prevent overflow right
+            if (x + tipW > window.innerWidth - 5) x = e.clientX - tipW - 10;
+            // Prevent overflow bottom
+            if (y + tipH > window.innerHeight - 5) y = e.clientY - tipH - 10;
+            // Prevent overflow top/left
+            if (y < 5) y = 5;
+            if (x < 5) x = 5;
+            tip.style.left = x + 'px';
+            tip.style.top = y + 'px';
+        });
+
+        loadRules();
+        updateGameState();
+        setInterval(updateGameState, 2000);
+    </script>
+</body>
+</html>

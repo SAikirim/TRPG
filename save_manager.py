@@ -250,10 +250,27 @@ class SaveManager:
                 os.makedirs(os.path.dirname(dst), exist_ok=True)
                 shutil.copy2(src, dst)
 
-        # entities 동기화
-        src_entities = os.path.join(BASE_DIR, "entities")
-        dst_entities = os.path.join(docs_dir, "entities")
-        if os.path.exists(src_entities):
-            if os.path.exists(dst_entities):
-                shutil.rmtree(dst_entities)
-            shutil.copytree(src_entities, dst_entities)
+        # 개별 JSON 파일 동기화
+        json_files = [
+            "rules.json", "current_session.json", "worldbuilding.json",
+            "scenario.json", "pending_actions.json",
+        ]
+        for fname in json_files:
+            src = os.path.join(BASE_DIR, fname)
+            dst = os.path.join(docs_dir, fname)
+            if os.path.isfile(src):
+                shutil.copy2(src, dst)
+
+        # 디렉토리 동기화 (copytree)
+        dir_syncs = [
+            ("entities", "entities"),
+            ("templates", "templates"),
+            ("rulesets", "rulesets"),
+        ]
+        for src_rel, dst_rel in dir_syncs:
+            src = os.path.join(BASE_DIR, src_rel)
+            dst = os.path.join(docs_dir, dst_rel)
+            if os.path.exists(src):
+                if os.path.exists(dst):
+                    shutil.rmtree(dst)
+                shutil.copytree(src, dst)
