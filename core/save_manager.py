@@ -267,6 +267,58 @@ class SaveManager:
                 "default_bg": chapter_bgs.get(chapter, chapter_bgs[1]),
                 "current_chapter": chapter,
             }
+
+            # NPC 레이어 추가 (초상화 파일이 존재하는 NPC만)
+            player1 = next((p for p in game_state.get("players", []) if p.get("id") == 1), None)
+            p1_x = player1["position"][0] if player1 else 0
+            p1_y = player1["position"][1] if player1 else 0
+            current_loc = game_state.get("current_location", "")
+
+            npcs_to_add = []
+            for npc in game_state.get("npcs", []):
+                if npc.get("status") not in ("alive", "idle", "active"):
+                    continue
+                npc_loc = npc.get("location", "")
+                if current_loc and npc_loc and npc_loc != current_loc:
+                    continue
+                npc_name = npc.get("name", "")
+                # Check portrait exists
+                portrait_path = None
+                for ext in [".webp", ".png"]:
+                    for prefix in ["portrait_", ""]:
+                        check = os.path.join(BASE_DIR, "static", "portraits", "sd", f"{prefix}{npc_name}{ext}")
+                        if os.path.exists(check):
+                            portrait_path = f"static/portraits/sd/{prefix}{npc_name}{ext}"
+                            break
+                    if portrait_path:
+                        break
+                if not portrait_path:
+                    continue
+                # Calculate position and distance
+                npc_pos = npc.get("position", [0, 0])
+                sort_key = -(npc_pos[0] - p1_x)
+                distance = abs(npc_pos[0] - p1_x) + abs(npc_pos[1] - p1_y)
+                if distance <= 1:
+                    size_class = "near"
+                elif distance <= 2:
+                    size_class = "close"
+                elif distance <= 4:
+                    size_class = "medium"
+                else:
+                    size_class = "far"
+                npcs_to_add.append((sort_key, npc_name, portrait_path, distance, size_class))
+
+            npcs_to_add.sort(key=lambda x: x[0])
+            for idx, (_, name, path, dist, size) in enumerate(npcs_to_add[:4]):
+                ill_state["layers"].append({
+                    "type": "portrait",
+                    "image": path,
+                    "position": str(idx),
+                    "name": name,
+                    "distance": dist,
+                    "size_class": size,
+                })
+
             with open(os.path.join(docs_dir, "illustration_state.json"),
                        "w", encoding="utf-8") as f:
                 json.dump(ill_state, f, ensure_ascii=False, indent=2)
