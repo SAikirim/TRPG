@@ -1,0 +1,44 @@
+시나리오/룰셋 상세
+===
+
+새 시나리오 추가
+===
+1. scenarios/ 에 {scenario_id}.json 파일 생성
+2. scenarios/index.json 에 메타데이터 등록
+3. entities/{scenario_id}/ 디렉토리 생성 후 npcs/players/objects/ 파일 작성
+4. 게임 시작 시 game_state.json 에 scenario_id 지정
+
+새 룰셋 추가
+===
+1. rulesets/ 에 {ruleset_id}.json 파일 생성 (fantasy_basic.json 참고)
+2. rulesets/index.json 에 등록
+3. scenario.json 의 ruleset 필드에서 참조
+
+시나리오 구성 요소
+===
+{
+  "id": "scenario_id",
+  "title": "시나리오 제목",
+  "ruleset": "fantasy_basic",
+  "chapters": [...],
+  "chapter_themes": {
+    "1": {"name": "숲", "bg_type": "forest"},
+    "2": {"name": "던전", "bg_type": "dungeon"},
+    "3": {"name": "보물실", "bg_type": "treasure"}
+  },
+  "default_party": {...},
+  "endings": [...]
+}
+
+- chapter_themes.bg_type 값으로 배경 이미지 자동 생성 (map_generator.py 참고)
+
+게임 시작 플로우 (신규 게임)
+===
+1. scenarios/index.json 에서 시나리오 선택
+2. 연결된 룰셋 (rulesets/) 확인
+3. 캐릭터 메이킹 (templates/character_classes.json 참고)
+   - 유저가 선택: 파티 인원, 클래스, 이름, 능력치 배분
+   - 미선택 항목: 시나리오 기본값 자동 적용
+4. entities/{scenario_id}/ 엔티티 파일 생성
+5. game_state.json 초기화
+6. 챕터 1 오프닝 + 맵 표시

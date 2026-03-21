@@ -1,0 +1,137 @@
+일러스트 시스템 상세
+===
+
+SD 일러스트 연동 시스템 (sd_generator.py)
+===
+
+SD ON/OFF 토글:
+- current_session.json의 sd_illustration 값으로 제어
+- 웹 UI의 토글 버튼 또는 /api/illustration/toggle API로 전환 가능
+
+sd_generator.py 동작:
+- 비동기 스레드로 SD WebUI API 호출 (request_illustration)
+- 모델 자동 확인: dreamshaper_8이 아니면 자동 전환
+- 생성 중 상태 추적: _scene_state["generating"]["status"] (idle/generating/error)
+- 스레드 안전: threading.Lock으로 scene_state 보호
+
+레이어 시스템
+===
+비주얼노벨 스타일 레이어 구조:
+  [배경 이미지 - 전체]
+    +-- [캐릭터 portrait - left/center/right]
+    +-- [오브젝트 - 위치 지정]
+
+- 배경 생성 시 기존 레이어 자동 클리어
+- remove_layer("이름")으로 특정 레이어 제거
+- clear_scene으로 전체 초기화
+
+생성 사이즈:
+| 타입                       | 사이즈   |
+| 배경 (background/scene)    | 768x512  |
+| 초상화 (portrait)          | 384x512  |
+| 오브젝트 (object)          | 256x256  |
+
+SD 파라미터
+===
+- 모델: dreamshaper_8.safetensors
+- 샘플러: DPM++ 2M Karras
+- 스텝: 20, CFG Scale: 7
+- 네거티브: lowres, bad anatomy, bad hands, text, watermark, worst quality, low quality
+
+gm-update 일러스트 payload
+===
+
+배경 생성:
+  {"illustration": {"type": "background", "prompt": "..."}}
+
+캐릭터 초상화 배치:
+  {"illustration": {"type": "portrait", "prompt": "...", "position": "left", "name": "사이키"}}
+
+오브젝트 배치:
+  {"illustration": {"type": "object", "prompt": "...", "position": "center-bottom", "name": "보물상자"}}
+
+특정 레이어 제거:
+  {"remove_layer": "오크"}
+
+전체 장면 초기화:
+  {"clear_scene": true}
+
+Cairo 폴백 (SD OFF 시)
+===
+- map_generator.py 기반 Cairo(pycairo)/Pillow 코드 생성
+- 그라디언트, 베지어, 안티앨리어싱
+- 배경: static/illustrations/pixel/ (forest.png, dungeon.png, treasure.png)
+- 초상화: static/portraits/pixel/ (player_1.png ~ player_3.png)
+
+AnimateDiff
+===
+- 모션 모듈: extensions/sd-webui-animatediff/model/mm_sd_v15_v2.ckpt (1.7GB)
+- WebP 직접 출력 지원: format: ["WEBP"]
+- 8GB VRAM에서 8~12프레임 생성 가능
+
+시나리오 사전 생성 이미지
+===
+시나리오 Agent가 시나리오를 생성하면, 전체 스토리를 기반으로 필요한 모든 이미지를 사전 생성한다.
+게임 중 실시간 생성 대기 없이 즉시 표시 가능. 포맷은 WebP.
+
+사전 생성 대상:
+| 분류              | 파일명 규칙                    | 크기    | 배경 |
+| 챕터 배경         | background_{name}.webp         | 896x512 | 있음 |
+| 장소/이벤트 배경  | background_{name}.webp         | 896x512 | 있음 |
+| NPC/몬스터        | portrait_{name}.webp           | 384x512 | 투명 |
+| 플레이어 캐릭터   | portrait_{name}.webp           | 384x512 | 투명 |
+| 오브젝트          | object_{name}.webp             | 256x256 | 투명 |
+
+인물/오브젝트 투명 배경 규칙:
+- 인물과 오브젝트는 배경 없이(투명) 생성한다 -> 어떤 배경 위에든 합성 가능
+- SD 생성 후 transparent-background 라이브러리로 자동 배경 제거
+- negative prompt에 자동으로 "detailed background, scenery, landscape" 추가됨
+- 프롬프트에 "simple background, solid color background" 포함 권장
+
+시나리오 이미지 생성 절차:
+1. 시나리오 Agent가 scenario.json 생성 시 전체 스토리 파악
+2. 필요한 이미지 목록 추출: 모든 챕터 배경, 등장 NPC, 주요 오브젝트, 주요 장소
+3. 각 항목에 대한 영문 프롬프트 작성
+4. SD API로 순차 생성 (VRAM 제약으로 동시 생성 금지)
+5. 품질 확인 -> 문제 시 프롬프트 개선 후 재생성
+6. static/illustrations/sd/ 및 static/portraits/sd/에 저장
+7. git commit + push (docs/ 자동 동기화)
+
+기본 배경 자동 표시:
+- 웹 UI는 현재 챕터에 맞는 배경을 자동 표시한다
+- 우선순위: GM 요청 장면 > SD 사전 생성 배경 > Cairo 폴백 배경
+- SD OFF 시에도 Cairo 배경이 항상 표시된다 (빈 화면 없음)
+- app.py의 /api/illustration 엔드포인트가 default_bg (sd/pixel 경로)를 제공
+
+캐릭터 외형 일관성 규칙
+===
+- 동일 인물은 항상 같은 외형(얼굴, 체형, 의상, 머리색)을 유지해야 한다
+- 캐릭터별 기준 이미지(reference)를 static/portraits/sd/ 또는 static/portraits/pixel/에 저장
+- 새 장면에서 같은 캐릭터가 등장할 때 기존 이미지를 재활용한다
+- 외형이 변경되는 경우(장비 변경, 부상 등)에만 새 이미지를 생성
+- 동작/포즈만 바꿔야 할 경우: img2img로 기존 이미지를 기반으로 변형
+- 레이어 초상화는 반드시 투명 배경 -- 배경이 있는 초상화는 메인 배경을 가림
+- SD 생성 시 transparent-background 라이브러리로 자동 배경 제거
+- 배경 제거 실패 시 로그 경고 + 그대로 저장 (수동 확인 필요)
+
+캐릭터 이미지 파일 규칙:
+| 용도              | 경로             | 이름 규칙                          | 배경      |
+| 기준 이미지(정면) | portraits/sd/    | portrait_{name}.webp               | 투명      |
+| 동작 변형         | portraits/sd/    | portrait_{name}_{action}.webp      | 투명      |
+| 프로필 카드용     | portraits/pixel/ | player_{id}.png                    | 원형 마스크|
+
+예시:
+- portrait_할란.webp (기본 -- 정면)
+- portrait_할란_injured.webp (부상 상태)
+- portrait_미라.webp (기본)
+- portrait_미라_angry.webp (화난 표정)
+
+이미지 품질 관리
+===
+- 생성 후 품질 확인 필수: 흐릿함(blurry), 초점 이탈(out of focus), 왜곡(deformed) 체크
+- 문제 있는 이미지는 프롬프트 개선 후 재생성
+- 프롬프트 개선 팁:
+  - 흐릿한 결과: negative에 "blurry, out of focus, bokeh, depth of field" 추가
+  - 손/신체 왜곡: negative에 "bad hands, bad anatomy, deformed, extra fingers" 추가
+  - 초점 안 맞음: prompt에 "sharp focus, 4k" 추가
+  - 배경에 인물 포함됨: negative에 "people, characters, person" 추가
