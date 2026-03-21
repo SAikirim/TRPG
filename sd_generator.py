@@ -170,26 +170,101 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
                     "error": "No images in SD response",
                 })
     except requests.exceptions.ConnectionError:
-        with _lock:
-            _scene_state["generating"].update({
-                "status": "error",
-                "error": "SD WebUI not reachable at port 7860",
-            })
+        logger.warning("SD WebUI not reachable, falling back to Cairo")
+        _cairo_fallback(illustration_type, name, position, turn_count)
     except Exception as e:
-        logger.error(f"Illustration generation failed: {e}")
-        with _lock:
-            _scene_state["generating"].update({
-                "status": "error",
-                "error": str(e),
-            })
+        logger.warning(f"SD generation failed ({e}), falling back to Cairo")
+        _cairo_fallback(illustration_type, name, position, turn_count)
+
+
+def _cairo_fallback(illustration_type, name, position, turn_count):
+    """Generate Cairo fallback illustration when SD is unavailable."""
+    try:
+        from map_generator import MapGenerator
+        gen = MapGenerator()
+
+        if illustration_type == "background":
+            filepath = gen.generate_scene_background(name or "default")
+            image_url = filepath.replace(os.sep, "/").split("static/")[-1]
+            image_url = f"/static/{image_url}"
+            with _lock:
+                _scene_state["background"] = image_url
+                _scene_state["layers"] = []
+                _scene_state["generating"]["status"] = "idle"
+            return {"started": True, "type": illustration_type, "source": "cairo"}
+
+        elif illustration_type in ("portrait", "object"):
+            filepath = gen.generate_scene_element(illustration_type, name or "unknown")
+            image_url = filepath.replace(os.sep, "/").split("static/")[-1]
+            image_url = f"/static/{image_url}"
+            with _lock:
+                _scene_state["layers"] = [l for l in _scene_state["layers"] if l.get("name") != name]
+                _scene_state["layers"].append({
+                    "type": illustration_type,
+                    "image": image_url,
+                    "position": position,
+                    "name": name,
+                })
+                _scene_state["generating"]["status"] = "idle"
+            return {"started": True, "type": illustration_type, "source": "cairo"}
+    except Exception as e:
+        logger.error(f"Cairo fallback failed: {e}")
+        return {"skipped": True, "reason": f"Cairo fallback failed: {e}"}
+
+
+def _find_existing_image(illustration_type, name):
+    """Check if a reusable image already exists for this name."""
+    if not name:
+        return None
+    safe_name = name.replace(" ", "_")
+
+    # Check SD images first (higher quality)
+    search_dirs = []
+    if illustration_type == "portrait":
+        search_dirs = [SD_PORTRAITS_DIR, os.path.join(BASE_DIR, "static", "portraits", "pixel")]
+    else:
+        search_dirs = [SD_ILLUSTRATIONS_DIR, os.path.join(BASE_DIR, "static", "illustrations", "pixel")]
+
+    for search_dir in search_dirs:
+        if not os.path.exists(search_dir):
+            continue
+        for f in os.listdir(search_dir):
+            fname_lower = f.lower()
+            name_lower = safe_name.lower()
+            if name_lower in fname_lower and (f.endswith(".webp") or f.endswith(".png")):
+                return os.path.join(search_dir, f)
+    return None
 
 
 def request_illustration(illustration_type, prompt, negative_prompt="", turn_count=0, position="center", name=""):
     global _scene_state
 
-    if not is_sd_enabled():
-        return {"skipped": True, "reason": "sd_illustration is disabled"}
+    # 1. Check for existing reusable image
+    existing = _find_existing_image(illustration_type, name)
+    if existing:
+        image_url = existing.replace(os.sep, "/").split("static/")[-1]
+        image_url = f"/static/{image_url}"
+        with _lock:
+            if illustration_type == "background":
+                _scene_state["background"] = image_url
+                _scene_state["layers"] = []
+            else:
+                _scene_state["layers"] = [l for l in _scene_state["layers"] if l.get("name") != name]
+                _scene_state["layers"].append({
+                    "type": illustration_type,
+                    "image": image_url,
+                    "position": position,
+                    "name": name,
+                })
+            _scene_state["generating"]["status"] = "idle"
+        logger.info(f"Reusing existing image: {existing}")
+        return {"reused": True, "type": illustration_type, "image": image_url}
 
+    # 2. SD OFF → Cairo fallback
+    if not is_sd_enabled():
+        return _cairo_fallback(illustration_type, name, position, turn_count)
+
+    # 3. SD generation
     with _lock:
         if _scene_state["generating"]["status"] == "generating":
             return {"skipped": True, "reason": "Generation already in progress"}
