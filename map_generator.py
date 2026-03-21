@@ -267,8 +267,8 @@ class MapGenerator:
         avg_y = sum(p[1] for p in positions) / len(positions)
 
         # 주변 반경 (타일 단위) — 가로세로 다르게
-        radius_x = 8
-        radius_y = 5  # 세로 2칸 축소
+        radius_x = 7
+        radius_y = 4
         margin_left = 22
         margin_top = 16
 
@@ -302,7 +302,7 @@ class MapGenerator:
         ] + font_paths_global
         for fp in bold_paths:
             try:
-                coord_font = ImageFont.truetype(fp, 28)
+                coord_font = ImageFont.truetype(fp, 14)
                 break
             except (OSError, IOError):
                 continue
@@ -317,16 +317,16 @@ class MapGenerator:
         for i in range(tile_start_x, tile_end_x):
             tile_center_x = (i * self.tile_size + margin_left + self.tile_size // 2) - left
             text = str(i)
-            tx = tile_center_x - 8 if i < 10 else tile_center_x - 14
-            if 0 <= tx < cropped.width - 20:
+            tx = tile_center_x - 4 if i < 10 else tile_center_x - 8
+            if 0 <= tx < cropped.width - 10:
                 draw_mini.text((tx, 2), text, fill="#dddddd", font=coord_font)
 
         # 세로 좌표 (좌측) — 타일 중앙에 배치
         for i in range(tile_start_y, tile_end_y):
             tile_center_y = (i * self.tile_size + margin_top + self.tile_size // 2) - top
             text = str(i)
-            ty = tile_center_y - 14
-            if 0 <= ty < cropped.height - 20:
+            ty = tile_center_y - 7
+            if 0 <= ty < cropped.height - 10:
                 draw_mini.text((2, ty), text, fill="#dddddd", font=coord_font)
 
         mini_path = os.path.join(self.base_dir, "static", "map_mini.png")
