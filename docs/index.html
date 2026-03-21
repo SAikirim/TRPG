@@ -674,7 +674,7 @@
             if (!gameState) return;
             gameState.players.forEach(p => {
                 if (p.original_image) {
-                    playerOriginalImages[p.id] = p.original_image;
+                    playerOriginalImages[p.id] = staticPath(p.original_image);
                 }
             });
         }
@@ -833,7 +833,7 @@
                 }).join('');
                 return `
                 <div class="player-card">
-                    <img class="player-portrait" src="${STATIC_PREFIX}portraits/pixel/player_${p.id}.png" alt="${p.name}" onerror="this.src='${STATIC_PREFIX}portraits/pixel/player_${p.id}.png'" onclick="openPortraitZoom('${p.original_image || STATIC_PREFIX + 'portraits/pixel/player_' + p.id + '.png'}')" style="cursor:pointer">
+                    <img class="player-portrait" src="${STATIC_PREFIX}portraits/pixel/player_${p.id}.png" alt="${p.name}" onerror="this.src='${STATIC_PREFIX}portraits/pixel/player_${p.id}.png'" onclick="openPortraitZoom('${p.original_image ? staticPath(p.original_image) : STATIC_PREFIX + 'portraits/pixel/player_' + p.id + '.png'}')" style="cursor:pointer">
                     <div class="player-info">
                         <div class="name">
                         ${p.name}
