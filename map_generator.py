@@ -140,11 +140,7 @@ class MapGenerator:
         player_emojis = {"전사": "\u2694\ufe0f", "마법사": "\U0001f52e", "도적": "\U0001f5e1\ufe0f", "궁수": "\U0001f3f9", "성직자": "\u271d\ufe0f"}
         npc_emojis = {"friendly": "\U0001f60a", "monster": "\U0001f479", "neutral": "\U0001f464"}
 
-        for loc in locations:
-            area = loc["area"]
-            cx = ((area["x1"] + area["x2"]) / 2) * self.tile_size + margin_left
-            cy = area["y1"] * self.tile_size + margin_top + 5
-            draw.text((cx - 20, cy), loc["name"], fill="white", font=font_small)
+        # 장소 라벨은 엔티티 뒤에 그림 (아래에서 처리)
 
         # Draw NPCs — different styles by type
         # Only draw alive NPCs at current location (skip dead/fled, skip off-map positions)
@@ -229,6 +225,19 @@ class MapGenerator:
                 fill="white",
                 font=font_name,
             )
+
+        # 장소 라벨 (엔티티 위에 그림 — 가려지지 않게)
+        # 볼드 폰트 사용, 반투명 배경 박스 포함
+        label_font = font_name  # 14px Bold
+        for loc in locations:
+            area = loc["area"]
+            cx = ((area["x1"] + area["x2"]) / 2) * self.tile_size + margin_left
+            cy = area["y1"] * self.tile_size + margin_top + 3
+            text = loc["name"]
+            # 배경 박스
+            tw = len(text) * 8 + 4
+            draw.rectangle([cx - tw//2, cy - 1, cx + tw//2, cy + 16], fill="#000000aa")
+            draw.text((cx - tw//2 + 2, cy), text, fill="white", font=label_font)
 
         # Draw turn info and location name
         turn = state.get("turn_count", 0)
