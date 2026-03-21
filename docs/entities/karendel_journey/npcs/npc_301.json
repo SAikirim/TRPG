@@ -2,6 +2,7 @@
   "id": 301,
   "name": "미라",
   "type": "friendly",
+  "known": true,
   "status": "alive",
   "location": "교역로 (수레 파손 현장)",
   "personality": {

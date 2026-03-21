@@ -184,7 +184,9 @@ class MapGenerator:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
 
             label_color = "#666" if is_dead else (color if npc_type != "monster" else "white")
-            entity_icons.append({"cx": cx, "cy": cy, "r": r, "name": npc["name"][:4], "color": label_color, "type": "npc"})
+            # NPC name - show "???" if unknown
+            npc_name = npc["name"][:4] if npc.get("known", False) else "???"
+            entity_icons.append({"cx": cx, "cy": cy, "r": r, "name": npc_name, "color": label_color, "type": "npc"})
 
         # 플레이어 아이콘 그리기 + 위치 수집
         player_colors = {"전사": "#e63946", "마법사": "#457be0", "도적": "#2ecc71", "궁수": "#e67e22", "성직자": "#f1c40f"}

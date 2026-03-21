@@ -848,15 +848,27 @@
             }
         }
 
+        function filterNpcNames(text) {
+            if (!gameState || !gameState.npcs) return text;
+            gameState.npcs.forEach(npc => {
+                if (!npc.known && npc.name) {
+                    const regex = new RegExp(npc.name, 'g');
+                    text = text.replace(regex, '???');
+                }
+            });
+            return text;
+        }
+
         function updateEventsList() {
             const container = document.getElementById('events-list');
             const events = gameState.events.slice(-10).reverse();
             container.innerHTML = events.map(e => {
-                const narrative = e.narrative ? `<span class="narrative">${e.narrative}</span>` : '';
+                const message = filterNpcNames(e.message || '');
+                const narrative = e.narrative ? `<span class="narrative">${filterNpcNames(e.narrative)}</span>` : '';
                 return `
                 <div class="event-item">
                     <span class="turn-badge">T${e.turn}</span>
-                    ${e.message}
+                    ${message}
                     ${narrative}
                 </div>`;
             }).join('');
@@ -953,10 +965,11 @@
                     html += '<div class="layer-container">';
                     data.layers.forEach(layer => {
                         const posClass = 'pos-' + (layer.position || 'center');
+                        const displayName = gameState?.npcs?.find(n => n.name === layer.name)?.known === false ? '???' : (layer.name || '');
                         if (layer.type === 'portrait') {
-                            html += '<img class="portrait-layer ' + posClass + '" src="' + layer.image + '?t=' + Date.now() + '" alt="' + (layer.name || '') + '" title="' + (layer.name || '') + '">';
+                            html += '<img class="portrait-layer ' + posClass + '" src="' + layer.image + '?t=' + Date.now() + '" alt="' + displayName + '" title="' + displayName + '">';
                         } else if (layer.type === 'object') {
-                            html += '<img class="object-layer ' + posClass + '" src="' + layer.image + '?t=' + Date.now() + '" alt="' + (layer.name || '') + '" title="' + (layer.name || '') + '">';
+                            html += '<img class="object-layer ' + posClass + '" src="' + layer.image + '?t=' + Date.now() + '" alt="' + displayName + '" title="' + displayName + '">';
                         }
                     });
                     html += '</div>';

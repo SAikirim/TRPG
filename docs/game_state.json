@@ -127,7 +127,8 @@
       ],
       "threat_level": "none",
       "status": "alive",
-      "location": "trade_road_karendel"
+      "location": "trade_road_karendel",
+      "known": true
     },
     {
       "id": 301,
@@ -151,7 +152,8 @@
       ],
       "threat_level": "none",
       "status": "alive",
-      "location": "trade_road_karendel"
+      "location": "trade_road_karendel",
+      "known": true
     }
   ],
   "map": {

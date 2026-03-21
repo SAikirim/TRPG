@@ -2,6 +2,7 @@
   "id": 300,
   "name": "할란",
   "type": "friendly",
+  "known": true,
   "status": "alive",
   "location": "교역로 (수레 파손 현장)",
   "personality": {

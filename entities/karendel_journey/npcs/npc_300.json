@@ -2,8 +2,19 @@
   "id": 300,
   "name": "할란",
   "type": "friendly",
+  "race": "인간",
+  "known": true,
   "status": "alive",
   "location": "교역로 (수레 파손 현장)",
+  "appearance": {
+    "age": "50대",
+    "build": "다부진 중년 남성",
+    "skin": "햇볕에 그을린 갈색 피부",
+    "hair": "짧게 깎은 회색 섞인 갈색 머리",
+    "face": "깊은 주름, 날카로운 눈, 짧고 거친 턱수염. 무뚝뚝하지만 신뢰감 있는 인상",
+    "outfit": "낡은 가죽 조끼, 두꺼운 천 바지, 허리에 돈주머니와 작은 단검",
+    "notable": "왼쪽 종아리에 붕대. 절뚝거림"
+  },
   "personality": {
     "temperament": "gruff",
     "intelligence": "high",

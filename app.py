@@ -221,6 +221,8 @@ def gm_update():
                             n["position"] = val
                         elif key == "status":
                             n["status"] = val
+                        elif key == "known":
+                            n["known"] = bool(val)
                 break
 
     # Add new NPCs if provided + auto-create entity files
@@ -459,6 +461,20 @@ def get_progress(scenario_id):
     if progress is None:
         return jsonify({"error": "No progress found"}), 404
     return jsonify(progress)
+
+
+@app.route("/api/npc/reveal", methods=["POST"])
+def reveal_npc():
+    data = request.get_json()
+    npc_id = data.get("npc_id")
+    state = load_game_state()
+    for npc in state["npcs"]:
+        if npc["id"] == npc_id:
+            npc["known"] = True
+            break
+    save_game_state(state)
+    update_map_image()
+    return jsonify({"success": True})
 
 
 if __name__ == "__main__":
