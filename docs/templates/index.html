@@ -242,17 +242,18 @@
         /* Illustration */
         .illustration-section .illustration-panel {
             position: relative;
-            min-height: 400px;
+            aspect-ratio: 16 / 9;
             background: #0d1b2a;
             border-radius: 8px;
             overflow: hidden;
         }
         .illustration-panel .bg-layer {
             width: 100%;
-            max-height: 500px;
-            object-fit: contain;
-            display: block;
-            margin: 0 auto;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            object-fit: cover;
         }
         .illustration-panel .layer-container {
             position: absolute;
@@ -584,10 +585,7 @@
                 order: 2;
             }
             .illustration-section .illustration-panel {
-                min-height: 220px;
-            }
-            .illustration-panel .bg-layer {
-                max-height: 280px;
+                aspect-ratio: 16 / 9;
             }
             .player-card {
                 flex-direction: column;
