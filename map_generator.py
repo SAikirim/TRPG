@@ -267,8 +267,8 @@ class MapGenerator:
         avg_y = sum(p[1] for p in positions) / len(positions)
 
         # 주변 반경 (타일 단위) — 가로세로 다르게
-        radius_x = 6
-        radius_y = 5  # 세로 한 칸 더
+        radius_x = 8
+        radius_y = 7  # 정사각형에 가깝게
         margin_left = 22
         margin_top = 16
 
@@ -307,17 +307,17 @@ class MapGenerator:
         tile_end_x = tile_start_x + int(crop_w / self.tile_size) + 1
         tile_end_y = tile_start_y + int(crop_h / self.tile_size) + 1
 
-        # 가로 좌표 (상단)
+        # 가로 좌표 (상단) — 12px from top to avoid clipping
         for i in range(tile_start_x, tile_end_x):
             px = (i * self.tile_size + margin_left + self.tile_size // 2) - left - 4
             if 0 <= px < cropped.width:
-                draw_mini.text((px, 2), str(i), fill="#cccccc", font=coord_font)
+                draw_mini.text((px, 12), str(i), fill="#cccccc", font=coord_font)
 
-        # 세로 좌표 (좌측)
+        # 세로 좌표 (좌측) — 4px from left for readability
         for i in range(tile_start_y, tile_end_y):
             py = (i * self.tile_size + margin_top + self.tile_size // 2) - top - 6
-            if 0 <= py < cropped.height:
-                draw_mini.text((2, py), str(i), fill="#cccccc", font=coord_font)
+            if 12 <= py < cropped.height:
+                draw_mini.text((4, py), str(i), fill="#cccccc", font=coord_font)
 
         mini_path = os.path.join(self.base_dir, "static", "map_mini.png")
         cropped.save(mini_path, "PNG")
