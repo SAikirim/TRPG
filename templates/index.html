@@ -896,15 +896,7 @@
                 const res = await fetch('/api/illustration');
                 const data = await res.json();
                 const panel = document.getElementById('illustration-panel');
-                const toggleBtn = document.getElementById('sd-toggle');
-
-                if (data.enabled) {
-                    toggleBtn.textContent = 'SD ON';
-                    toggleBtn.className = 'sd-toggle active';
-                } else {
-                    toggleBtn.textContent = 'SD OFF';
-                    toggleBtn.className = 'sd-toggle';
-                }
+                // SD 상태는 설정 패널에서 표시
 
                 // Build a hash to detect changes
                 const sceneHash = JSON.stringify({
