@@ -8,7 +8,10 @@ from core.map_generator import MapGenerator
 from core.save_manager import SaveManager
 from core.sd_generator import request_illustration, get_scene_state, is_sd_enabled, clear_scene, remove_layer
 import core.game_mechanics as gm
-from core.worldbuilding_agent import check_and_warn
+from core.worldbuilding_agent import check_and_warn as wb_check
+from core.rules_agent import check_and_warn as rules_check
+from core.scenario_agent import check_and_warn as scenario_check
+from core.npc_agent import check_and_warn as npc_check
 
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -365,17 +368,40 @@ def gm_update():
 
     _add_npc_layers(state)
 
-    # 세계관 자동 감지 — 나레이션에서 미등록 요소 경고
-    wb_warnings = check_and_warn(
-        narrative=f"{description} {narrative}", game_state=state)
-    if wb_warnings:
-        gm._log_to_tracker("worldbuilding", f"⚠ 미등록 {len(wb_warnings)}건 감지")
+    # ─── 에이전트 자동 검증 (Agent 호출 후의 최종 상태를 체크하는 안전망) ───
+    agent_warnings = {}
+
+    wb_w = wb_check(narrative=f"{description} {narrative}", game_state=state)
+    if wb_w:
+        gm._log_to_tracker("worldbuilding", f"⚠ 미등록 {len(wb_w)}건 감지")
+        agent_warnings["worldbuilding"] = wb_w
     else:
         gm._log_to_tracker("worldbuilding", "세계관 정합성 확인")
 
+    rules_w = rules_check(game_state=state, mechanics_results=mechanics_results)
+    if rules_w:
+        gm._log_to_tracker("rules", f"⚠ 룰 위반 {len(rules_w)}건 감지")
+        agent_warnings["rules"] = rules_w
+    else:
+        gm._log_to_tracker("rules", "룰 정합성 확인")
+
+    scenario_w = scenario_check(game_state=state)
+    if scenario_w:
+        gm._log_to_tracker("scenario", f"📜 시나리오 감지 {len(scenario_w)}건")
+        agent_warnings["scenario"] = scenario_w
+    else:
+        gm._log_to_tracker("scenario", "시나리오 정합성 확인")
+
+    npc_w = npc_check(game_state=state)
+    if npc_w:
+        gm._log_to_tracker("npc", f"⚠ NPC 문제 {len(npc_w)}건 감지")
+        agent_warnings["npc"] = npc_w
+    else:
+        gm._log_to_tracker("npc", "NPC 정합성 확인")
+
     return jsonify({"success": True, "event": event, "turn": state["turn_count"],
                      "illustration": ill_result, "mechanics": mechanics_results,
-                     "worldbuilding_warnings": wb_warnings})
+                     "agent_warnings": agent_warnings})
 
 
 @app.route("/api/illustration", methods=["GET"])
