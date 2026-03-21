@@ -14,6 +14,67 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 GAME_STATE_PATH = os.path.join(BASE_DIR, "data", "game_state.json")
 
 
+def _add_npc_layers(state):
+    """현재 위치의 NPC를 일러스트 레이어에 자동 추가."""
+    player1 = next((p for p in state.get("players", []) if p.get("id") == 1), None)
+    if not player1:
+        return
+    p1_x = player1["position"][0]
+    p1_y = player1["position"][1]
+    current_loc = state.get("current_location", "")
+
+    npcs_to_add = []
+    for npc in state.get("npcs", []):
+        if npc.get("status") not in ("alive", "idle", "active"):
+            continue
+        npc_loc = npc.get("location", "")
+        if current_loc and npc_loc and npc_loc != current_loc:
+            continue
+        npc_name = npc.get("name", "")
+        # Portrait exists check
+        portrait_exists = False
+        for ext in [".webp", ".png"]:
+            for prefix in ["portrait_", ""]:
+                if os.path.exists(os.path.join(BASE_DIR, "static", "portraits", "sd", f"{prefix}{npc_name}{ext}")):
+                    portrait_exists = True
+                    break
+            if portrait_exists:
+                break
+        if not portrait_exists:
+            continue
+        # Already in layers check
+        scene = get_scene_state()
+        if any(l.get("name") == npc_name for l in scene.get("layers", [])):
+            continue
+        # Distance and position
+        npc_pos = npc.get("position", [0, 0])
+        sort_key = -(npc_pos[0] - p1_x)
+        distance = abs(npc_pos[0] - p1_x) + abs(npc_pos[1] - p1_y)
+        if distance <= 1:
+            size_class = "near"
+        elif distance <= 2:
+            size_class = "close"
+        elif distance <= 4:
+            size_class = "medium"
+        else:
+            size_class = "far"
+        npcs_to_add.append((sort_key, npc_name, distance, size_class))
+
+    npcs_to_add.sort(key=lambda x: x[0])
+    for idx, (_, npc_name, distance, size_class) in enumerate(npcs_to_add):
+        if idx > 3:
+            break
+        request_illustration(
+            illustration_type="portrait",
+            prompt="",
+            turn_count=state.get("turn_count", 0),
+            position=str(idx),
+            name=npc_name,
+            distance=distance,
+            size_class=size_class,
+        )
+
+
 def load_game_state():
     with open(GAME_STATE_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
@@ -79,70 +140,7 @@ def restore_scene():
         name=scene_name,
     )
 
-    # 현재 위치의 alive NPC를 일러스트 레이어에 추가 (초상화 있는 NPC만)
-    # Player 1 위치 기준으로 NPC 일러스트 위치 결정
-    player1 = next((p for p in state.get("players", []) if p.get("id") == 1), None)
-    p1_x = player1["position"][0] if player1 else 0
-    p1_y = player1["position"][1] if player1 else 0
-
-    current_loc = state.get("current_location", "")
-
-    # Collect NPCs with their relative position to player 1
-    npcs_to_add = []
-    for npc in state.get("npcs", []):
-        if npc.get("status") not in ("alive", "idle", "active"):
-            continue
-        npc_loc = npc.get("location", "")
-        if current_loc and npc_loc and npc_loc != current_loc:
-            continue
-        # 초상화 파일이 존재하는 NPC만 레이어에 추가
-        npc_name = npc.get("name", "")
-        portrait_exists = False
-        for ext in [".webp", ".png"]:
-            for prefix in ["portrait_", ""]:
-                check_path = os.path.join(BASE_DIR, "static", "portraits", "sd", f"{prefix}{npc_name}{ext}")
-                if os.path.exists(check_path):
-                    portrait_exists = True
-                    break
-            if portrait_exists:
-                break
-        if not portrait_exists:
-            continue
-
-        # Calculate distance from player 1
-        npc_pos = npc.get("position", [0, 0])
-        distance = abs(npc_pos[0] - p1_x) + abs(npc_pos[1] - p1_y)
-
-        # Determine size class based on Manhattan distance (4 tiers, max 6 tiles)
-        if distance <= 1:
-            size_class = "near"      # 바로 옆
-        elif distance <= 2:
-            size_class = "close"     # 가까움
-        elif distance <= 4:
-            size_class = "medium"    # 중간
-        else:
-            size_class = "far"       # 멀리 (5~6칸)
-
-        # Sort key: relative x position to player 1 (미러링: 맵 동쪽(+X) → 일러스트 왼쪽)
-        sort_key = -(npc_pos[0] - p1_x)  # 미러링: 맵 동쪽(+X) → 일러스트 왼쪽
-        npcs_to_add.append((sort_key, npc_name, distance, size_class))
-
-    # Sort: leftmost first, then center, then rightmost
-    npcs_to_add.sort(key=lambda x: x[0])
-
-    # Add to illustration layers with numbered positions
-    for idx, (sort_key, npc_name, distance, size_class) in enumerate(npcs_to_add):
-        if idx > 3:
-            break  # max 4
-        request_illustration(
-            illustration_type="portrait",
-            prompt="",
-            turn_count=state.get("turn_count", 0),
-            position=str(idx),
-            name=npc_name,
-            distance=distance,
-            size_class=size_class,
-        )
+    _add_npc_layers(state)
 
     # docs/ 동기화 (정적 웹 반영)
     try:
@@ -351,75 +349,7 @@ def gm_update():
     if data.get("remove_layer"):
         remove_layer(data["remove_layer"])
 
-    # 현재 위치의 alive NPC를 자동으로 레이어에 추가 (초상화 있는 NPC만)
-    # Player 1 위치 기준으로 NPC 일러스트 위치 결정
-    player1 = next((p for p in state.get("players", []) if p.get("id") == 1), None)
-    p1_x = player1["position"][0] if player1 else 0
-    p1_y = player1["position"][1] if player1 else 0
-
-    current_loc = state.get("current_location", "")
-
-    # Collect NPCs with their relative position to player 1
-    npcs_to_add = []
-    scene = get_scene_state()
-    for npc in state.get("npcs", []):
-        if npc.get("status") not in ("alive", "idle", "active"):
-            continue
-        npc_loc = npc.get("location", "")
-        if current_loc and npc_loc and npc_loc != current_loc:
-            continue
-        # 초상화 파일이 존재하는 NPC만 레이어에 추가
-        npc_name = npc.get("name", "")
-        portrait_exists = False
-        for ext in [".webp", ".png"]:
-            for prefix in ["portrait_", ""]:
-                check_path = os.path.join(BASE_DIR, "static", "portraits", "sd", f"{prefix}{npc_name}{ext}")
-                if os.path.exists(check_path):
-                    portrait_exists = True
-                    break
-            if portrait_exists:
-                break
-        if not portrait_exists:
-            continue
-
-        # 이미 레이어에 있으면 스킵
-        if any(l.get("name") == npc_name for l in scene.get("layers", [])):
-            continue
-
-        # Calculate distance from player 1
-        npc_pos = npc.get("position", [0, 0])
-        distance = abs(npc_pos[0] - p1_x) + abs(npc_pos[1] - p1_y)
-
-        # Determine size class based on Manhattan distance (4 tiers, max 6 tiles)
-        if distance <= 1:
-            size_class = "near"      # 바로 옆
-        elif distance <= 2:
-            size_class = "close"     # 가까움
-        elif distance <= 4:
-            size_class = "medium"    # 중간
-        else:
-            size_class = "far"       # 멀리 (5~6칸)
-
-        # Sort key: relative x position to player 1 (미러링: 맵 동쪽(+X) → 일러스트 왼쪽)
-        sort_key = -(npc_pos[0] - p1_x)  # 미러링: 맵 동쪽(+X) → 일러스트 왼쪽
-        npcs_to_add.append((sort_key, npc_name, distance, size_class))
-
-    # Sort: leftmost first, then center, then rightmost
-    npcs_to_add.sort(key=lambda x: x[0])
-
-    # Add to illustration layers with numbered positions
-    for idx, (sort_key, npc_name, distance, size_class) in enumerate(npcs_to_add):
-        if idx > 3:
-            break  # max 4
-        request_illustration(
-            illustration_type="portrait",
-            prompt="",
-            turn_count=state["turn_count"],
-            position=str(idx),
-            name=npc_name,
-            distance=distance,
-            size_class=size_class,
-        )
+    _add_npc_layers(state)
 
     return jsonify({"success": True, "event": event, "turn": state["turn_count"],
                      "illustration": ill_result, "mechanics": mechanics_results})

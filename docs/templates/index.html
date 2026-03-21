@@ -1055,15 +1055,6 @@
             } catch (e) {}
         }
 
-        async function toggleSD() {
-            try {
-                await fetch('/api/illustration/toggle', { method: 'POST' });
-                await updateIllustration();
-            } catch (e) {
-                console.error('Toggle failed:', e);
-            }
-        }
-
         // Tooltip: show/hide on mouse move using event delegation
         document.addEventListener('mouseover', function(e) {
             const item = e.target.closest('.detail-item');

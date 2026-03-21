@@ -220,15 +220,88 @@ class SaveManager:
 
     def _sync_docs(self, game_state):
         """docs/ 폴더를 최신 상태로 동기화 (GitHub Pages용). HTML은 건드리지 않는다.
-        build_static.py의 sync() 함수를 호출하여 데이터만 동기화한다."""
+        JSON 데이터, 이미지, 엔티티/템플릿/룰셋을 docs/에 복사한다.
+        docs/index.html은 독립적으로 관리되며, 이 함수로 생성/변환하지 않는다."""
+        docs_dir = os.path.join(BASE_DIR, "docs")
+        os.makedirs(docs_dir, exist_ok=True)
+
+        # 1. JSON 데이터 파일 동기화
+        json_files = [
+            "game_state.json", "current_session.json", "scenario.json",
+            "rules.json", "worldbuilding.json", "items.json", "skills.json",
+            "status_effects.json", "creature_templates.json", "shops.json",
+            "quests.json", "pending_actions.json",
+        ]
+        for fname in json_files:
+            src = os.path.join(BASE_DIR, "data", fname)
+            dst = os.path.join(docs_dir, fname)
+            if os.path.isfile(src):
+                shutil.copy2(src, dst)
+
+        # 2. illustration_state.json 생성 (정적 웹의 일러스트 표시용)
         try:
-            # build_static.py를 직접 import하여 호출 (subprocess 대신)
-            import importlib.util
-            spec = importlib.util.spec_from_file_location(
-                "build_static",
-                os.path.join(BASE_DIR, "build_static.py"))
-            mod = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(mod)
-            mod.sync()
+            chapter = game_state.get("game_info", {}).get("current_chapter", 1)
+            chapter_bgs = {
+                1: {"sd": "static/illustrations/sd/ch1_forest.png",
+                    "pixel": "static/illustrations/pixel/forest.png"},
+                2: {"sd": "static/illustrations/sd/ch2_dungeon.png",
+                    "pixel": "static/illustrations/pixel/dungeon.png"},
+                3: {"sd": "static/illustrations/sd/ch3_treasure.png",
+                    "pixel": "static/illustrations/pixel/treasure.png"},
+            }
+            background = None
+            sd_bgs = sorted(
+                glob.glob(os.path.join(
+                    BASE_DIR, "static", "illustrations", "sd", "background_*")),
+                key=os.path.getmtime, reverse=True)
+            if sd_bgs:
+                background = "static/illustrations/sd/" + os.path.basename(sd_bgs[0])
+
+            ill_state = {
+                "background": background,
+                "layers": [],
+                "generating": {
+                    "status": "idle", "type": None, "prompt": None,
+                    "error": None, "started_at": None},
+                "enabled": False,
+                "default_bg": chapter_bgs.get(chapter, chapter_bgs[1]),
+                "current_chapter": chapter,
+            }
+            with open(os.path.join(docs_dir, "illustration_state.json"),
+                       "w", encoding="utf-8") as f:
+                json.dump(ill_state, f, ensure_ascii=False, indent=2)
         except Exception:
             pass
+
+        # 3. 이미지 파일 동기화
+        image_dirs = [
+            ("static/illustrations/sd", "static/illustrations/sd"),
+            ("static/illustrations/pixel", "static/illustrations/pixel"),
+            ("static/portraits/pixel", "static/portraits/pixel"),
+            ("static/portraits/sd", "static/portraits/sd"),
+            ("static/portraits/original", "static/portraits/original"),
+            ("static/map.png", "static/map.png"),
+            ("static/map_mini.png", "static/map_mini.png"),
+        ]
+        for src_rel, dst_rel in image_dirs:
+            src = os.path.join(BASE_DIR, src_rel)
+            dst = os.path.join(docs_dir, dst_rel)
+            if os.path.isdir(src):
+                os.makedirs(dst, exist_ok=True)
+                for fname in os.listdir(src):
+                    sf = os.path.join(src, fname)
+                    df = os.path.join(dst, fname)
+                    if os.path.isfile(sf):
+                        shutil.copy2(sf, df)
+            elif os.path.isfile(src):
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+                shutil.copy2(src, dst)
+
+        # 4. 엔티티/템플릿/룰셋 동기화
+        for src_rel in ["entities", "templates", "rulesets"]:
+            src = os.path.join(BASE_DIR, src_rel)
+            dst = os.path.join(docs_dir, src_rel)
+            if os.path.exists(src):
+                if os.path.exists(dst):
+                    shutil.rmtree(dst)
+                shutil.copytree(src, dst)

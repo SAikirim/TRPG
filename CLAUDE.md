@@ -85,7 +85,7 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 ```
 app.py                    - Flask 웹 서버, API 엔드포인트, gm-update 처리
 game_start.py             - 게임 시작 자동화 CLI (새 게임/이어하기/세이브 로드)
-build_static.py           - 정적 웹 데이터 동기화 (JSON, 이미지 → docs/)
+build_static.py           - docs/ 데이터 동기화 CLI (save_manager._sync_docs 호출)
 session_validator.py      - 세션 검증 자동화 (상태 일관성 검사 + 자동 수정)
 core/                     - Python 엔진 모듈 (패키지)
   __init__.py
