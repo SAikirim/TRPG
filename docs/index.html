@@ -564,6 +564,76 @@
             padding: 6px 0 2px;
             font-style: italic;
         }
+
+        /* ─── 모바일 반응형 ─── */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 8px;
+                gap: 8px;
+            }
+            .sidebar {
+                width: 100%;
+                max-height: none;
+                overflow-y: visible;
+            }
+            .main-panel {
+                order: 1;
+            }
+            .sidebar {
+                order: 2;
+            }
+            .illustration-section .illustration-panel {
+                min-height: 220px;
+            }
+            .illustration-panel .bg-layer {
+                max-height: 280px;
+            }
+            .player-card {
+                flex-direction: column;
+                gap: 6px;
+            }
+            .player-portrait {
+                width: 80px;
+                height: 80px;
+                align-self: center;
+            }
+            .player-info {
+                width: 100%;
+            }
+            header {
+                padding: 8px 12px;
+            }
+            header h1 { font-size: 1.1em; }
+            .panel {
+                padding: 10px;
+                border-radius: 8px;
+            }
+            .events-list {
+                max-height: 200px;
+            }
+            .settings-dropdown {
+                max-width: 100%;
+            }
+            .detail-content.open {
+                max-height: 150px;
+            }
+            .map-overlay img {
+                max-width: 98vw;
+                max-height: 90vh;
+            }
+        }
+
+        /* 태블릿 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sidebar {
+                width: 320px;
+            }
+            .player-portrait {
+                width: 90px;
+                height: 90px;
+            }
+        }
     </style>
 </head>
 <body>

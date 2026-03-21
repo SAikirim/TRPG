@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 import glob
+import filecmp
 from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -218,13 +219,70 @@ class SaveManager:
             return 2  # 고대 던전
         return 1  # 숲의 입구
 
+    @staticmethod
+    def _copy_if_changed(src, dst):
+        """mtime+size 비교 후 변경된 파일만 복사. 복사했으면 True 반환."""
+        if not os.path.isfile(src):
+            return False
+        if os.path.isfile(dst):
+            s_stat = os.stat(src)
+            d_stat = os.stat(dst)
+            if (s_stat.st_size == d_stat.st_size
+                    and s_stat.st_mtime <= d_stat.st_mtime):
+                return False
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copy2(src, dst)
+        return True
+
+    @staticmethod
+    def _sync_dir_incremental(src_dir, dst_dir):
+        """디렉토리 증분 동기화: 변경분만 복사 + dst에만 있는 파일 삭제."""
+        if not os.path.isdir(src_dir):
+            return 0
+        os.makedirs(dst_dir, exist_ok=True)
+        copied = 0
+
+        # src 기준으로 변경/추가 파일 복사
+        for root, dirs, files in os.walk(src_dir):
+            rel = os.path.relpath(root, src_dir)
+            dst_root = os.path.join(dst_dir, rel) if rel != "." else dst_dir
+            os.makedirs(dst_root, exist_ok=True)
+            for f in files:
+                sf = os.path.join(root, f)
+                df = os.path.join(dst_root, f)
+                if not os.path.isfile(df):
+                    shutil.copy2(sf, df)
+                    copied += 1
+                else:
+                    s_stat = os.stat(sf)
+                    d_stat = os.stat(df)
+                    if (s_stat.st_size != d_stat.st_size
+                            or s_stat.st_mtime > d_stat.st_mtime):
+                        shutil.copy2(sf, df)
+                        copied += 1
+
+        # dst에만 있는 파일/디렉토리 삭제
+        for root, dirs, files in os.walk(dst_dir, topdown=False):
+            rel = os.path.relpath(root, dst_dir)
+            src_root = os.path.join(src_dir, rel) if rel != "." else src_dir
+            for f in files:
+                if not os.path.exists(os.path.join(src_root, f)):
+                    os.remove(os.path.join(root, f))
+            for d in dirs:
+                src_d = os.path.join(src_root, d)
+                dst_d = os.path.join(root, d)
+                if not os.path.exists(src_d) and os.path.isdir(dst_d):
+                    shutil.rmtree(dst_d)
+
+        return copied
+
     def _sync_docs(self, game_state):
-        """docs/ 폴더를 최신 상태로 동기화 (GitHub Pages용).
-        HTML 복사 + JSON 데이터, 이미지, 엔티티/템플릿/룰셋을 docs/에 복사한다."""
+        """docs/ 증분 동기화 (GitHub Pages용).
+        변경된 파일만 복사하여 I/O 최소화."""
         docs_dir = os.path.join(BASE_DIR, "docs")
         os.makedirs(docs_dir, exist_ok=True)
 
-        # 1. JSON 데이터 파일 동기화
+        # 1. JSON 데이터 파일 — 변경분만 복사
         json_files = [
             "game_state.json", "current_session.json", "scenario.json",
             "rules.json", "worldbuilding.json", "items.json", "skills.json",
@@ -234,10 +292,43 @@ class SaveManager:
         for fname in json_files:
             src = os.path.join(BASE_DIR, "data", fname)
             dst = os.path.join(docs_dir, fname)
-            if os.path.isfile(src):
-                shutil.copy2(src, dst)
+            self._copy_if_changed(src, dst)
 
-        # 2. illustration_state.json 생성 (정적 웹의 일러스트 표시용)
+        # 2. illustration_state.json 생성
+        self._build_illustration_state(game_state, docs_dir)
+
+        # 3. 이미지 파일 — 증분 동기화
+        image_dirs = [
+            "static/illustrations/sd",
+            "static/illustrations/pixel",
+            "static/portraits/pixel",
+            "static/portraits/sd",
+            "static/portraits/original",
+        ]
+        for rel in image_dirs:
+            self._sync_dir_incremental(
+                os.path.join(BASE_DIR, rel),
+                os.path.join(docs_dir, rel))
+
+        # 단일 파일 (맵)
+        for fname in ["static/map.png", "static/map_mini.png"]:
+            self._copy_if_changed(
+                os.path.join(BASE_DIR, fname),
+                os.path.join(docs_dir, fname))
+
+        # 4. 엔티티/템플릿/룰셋 — 증분 동기화 (rmtree 제거)
+        for src_rel in ["entities", "templates", "rulesets"]:
+            self._sync_dir_incremental(
+                os.path.join(BASE_DIR, src_rel),
+                os.path.join(docs_dir, src_rel))
+
+        # 5. HTML 복사
+        self._copy_if_changed(
+            os.path.join(BASE_DIR, "templates", "index.html"),
+            os.path.join(docs_dir, "index.html"))
+
+    def _build_illustration_state(self, game_state, docs_dir):
+        """정적 웹용 illustration_state.json 생성"""
         try:
             chapter = game_state.get("game_info", {}).get("current_chapter", 1)
             chapter_bgs = {
@@ -281,7 +372,6 @@ class SaveManager:
                 if current_loc and npc_loc and npc_loc != current_loc:
                     continue
                 npc_name = npc.get("name", "")
-                # Check portrait exists
                 portrait_path = None
                 for ext in [".webp", ".png"]:
                     for prefix in ["portrait_", ""]:
@@ -293,7 +383,6 @@ class SaveManager:
                         break
                 if not portrait_path:
                     continue
-                # Calculate position and distance
                 npc_pos = npc.get("position", [0, 0])
                 sort_key = -(npc_pos[0] - p1_x)
                 distance = max(abs(npc_pos[0] - p1_x), abs(npc_pos[1] - p1_y))
@@ -309,8 +398,6 @@ class SaveManager:
 
             npcs_to_add.sort(key=lambda x: x[0])
             for idx, (sort_key, name, path, dist, size) in enumerate(npcs_to_add[:4]):
-                # Map relative dx to screen position name
-                # sort_key = -(npc_x - p1_x), mirrored: positive sort_key = right on screen
                 if sort_key > 1:
                     pos_name = "far-right"
                 elif sort_key == 1:
@@ -336,42 +423,3 @@ class SaveManager:
                 json.dump(ill_state, f, ensure_ascii=False, indent=2)
         except Exception:
             pass
-
-        # 3. 이미지 파일 동기화
-        image_dirs = [
-            ("static/illustrations/sd", "static/illustrations/sd"),
-            ("static/illustrations/pixel", "static/illustrations/pixel"),
-            ("static/portraits/pixel", "static/portraits/pixel"),
-            ("static/portraits/sd", "static/portraits/sd"),
-            ("static/portraits/original", "static/portraits/original"),
-            ("static/map.png", "static/map.png"),
-            ("static/map_mini.png", "static/map_mini.png"),
-        ]
-        for src_rel, dst_rel in image_dirs:
-            src = os.path.join(BASE_DIR, src_rel)
-            dst = os.path.join(docs_dir, dst_rel)
-            if os.path.isdir(src):
-                os.makedirs(dst, exist_ok=True)
-                for fname in os.listdir(src):
-                    sf = os.path.join(src, fname)
-                    df = os.path.join(dst, fname)
-                    if os.path.isfile(sf):
-                        shutil.copy2(sf, df)
-            elif os.path.isfile(src):
-                os.makedirs(os.path.dirname(dst), exist_ok=True)
-                shutil.copy2(src, dst)
-
-        # 4. 엔티티/템플릿/룰셋 동기화
-        for src_rel in ["entities", "templates", "rulesets"]:
-            src = os.path.join(BASE_DIR, src_rel)
-            dst = os.path.join(docs_dir, src_rel)
-            if os.path.exists(src):
-                if os.path.exists(dst):
-                    shutil.rmtree(dst)
-                shutil.copytree(src, dst)
-
-        # 5. HTML 단순 복사 (동적/정적 동일 파일)
-        html_src = os.path.join(BASE_DIR, "templates", "index.html")
-        html_dst = os.path.join(docs_dir, "index.html")
-        if os.path.exists(html_src):
-            shutil.copy2(html_src, html_dst)
