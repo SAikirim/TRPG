@@ -647,7 +647,7 @@
                 }).join('');
                 return `
                 <div class="player-card">
-                    <img class="player-portrait" src="static/portraits/pixel/player_${p.id}.png" alt="${p.name}">
+                    <img class="player-portrait" src="static/portraits/pixel/player_${p.id}.png" alt="${p.name}" onclick="openPortraitZoom('${p.original_image ? p.original_image.replace('/static/', 'static/') : 'static/portraits/pixel/player_' + p.id + '.png'}')" style="cursor:pointer">
                     <div class="player-info">
                         <div class="name">
                         ${p.name}
@@ -862,6 +862,11 @@
         function openMapZoom() {
             document.getElementById('map-overlay').classList.add('active');
             document.getElementById('map-zoom-img').src = 'static/map.png';
+        }
+
+        function openPortraitZoom(src) {
+            document.getElementById('map-overlay').classList.add('active');
+            document.getElementById('map-zoom-img').src = src;
         }
 
         // Tooltip: show/hide on mouse move using event delegation
