@@ -23,7 +23,7 @@ import os
 import sys
 from datetime import datetime
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TRACKER_PATH = os.path.join(BASE_DIR, ".turn_tracker.json")
 
 # 턴에서 수행해야 할 필수 단계

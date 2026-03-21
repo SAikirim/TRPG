@@ -432,7 +432,7 @@ def show_emoji_map(state):
     }
     scenario_id = state.get('game_info', {}).get('scenario_id', '')
     if scenario_id:
-        script_dir  = os.path.dirname(os.path.abspath(__file__))
+        script_dir  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         obj_dir     = os.path.join(script_dir, 'entities', scenario_id, 'objects')
         if os.path.isdir(obj_dir):
             for fname in sorted(os.listdir(obj_dir)):
@@ -508,8 +508,8 @@ def show_all(state):
 # ─────────────────────────────────────────
 
 if __name__ == '__main__':
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    json_path  = os.path.join(script_dir, 'game_state.json')
+    script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    json_path  = os.path.join(script_dir, 'data', 'game_state.json')
 
     if not os.path.exists(json_path):
         print(f"{RED}오류: {json_path} 파일을 찾을 수 없습니다.{RESET}")

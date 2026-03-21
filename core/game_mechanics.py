@@ -12,9 +12,9 @@ import random
 import sys
 from datetime import datetime
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-GAME_STATE_PATH = os.path.join(BASE_DIR, "game_state.json")
-RULES_PATH = os.path.join(BASE_DIR, "rules.json")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+GAME_STATE_PATH = os.path.join(BASE_DIR, "data", "game_state.json")
+RULES_PATH = os.path.join(BASE_DIR, "data", "rules.json")
 
 
 def _load_json(path):

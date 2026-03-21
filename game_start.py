@@ -165,10 +165,10 @@ def new_game(scenario_id):
     scenario = load_json(scenario_file)
 
     # initial_state 로드
-    initial_file = scenario_entry.get("initial_state", "game_state_initial.json")
+    initial_file = scenario_entry.get("initial_state", "data/game_state_initial.json")
     if not os.path.exists(os.path.join(BASE_DIR, initial_file)):
-        # 폴백: 루트의 game_state_initial.json
-        initial_file = "game_state_initial.json"
+        # 폴백: data/game_state_initial.json
+        initial_file = "data/game_state_initial.json"
     if not os.path.exists(os.path.join(BASE_DIR, initial_file)):
         print(f"[ERROR] initial_state 파일을 찾을 수 없습니다: {initial_file}")
         return False
@@ -245,7 +245,7 @@ def new_game(scenario_id):
     }]
 
     # game_state.json 저장
-    save_json("game_state.json", state)
+    save_json("data/game_state.json", state)
     print(f"\n  [OK] game_state.json 저장 완료")
 
     # 엔티티 생성
@@ -276,7 +276,7 @@ def new_game(scenario_id):
         "sd_illustration": True,
         "last_updated": datetime.now().strftime("%Y-%m-%d"),
     }
-    save_json("current_session.json", session)
+    save_json("data/current_session.json", session)
     print(f"  [OK] current_session.json 저장 완료")
 
     # 활성 시나리오/룰셋 파일 복사 (scenario.json, rules.json)
@@ -284,7 +284,7 @@ def new_game(scenario_id):
 
     # 맵 생성
     try:
-        from map_generator import MapGenerator
+        from core.map_generator import MapGenerator
         MapGenerator().save_map()
         print(f"  [OK] 맵 생성 완료")
     except Exception as e:
@@ -342,7 +342,7 @@ def continue_game(scenario_id, from_scenario):
         return False
 
     # 이전 캐릭터 데이터로 오버라이드
-    state = load_json("game_state.json")
+    state = load_json("data/game_state.json")
     for prev_p in prev_players:
         for curr_p in state["players"]:
             if curr_p["id"] == prev_p["id"]:
@@ -360,7 +360,7 @@ def continue_game(scenario_id, from_scenario):
                     "controlled_by": prev_p.get("controlled_by", "agent"),
                 })
                 break
-    save_json("game_state.json", state)
+    save_json("data/game_state.json", state)
 
     # 엔티티 파일도 이어받기 데이터로 갱신
     for p in state["players"]:
@@ -381,7 +381,7 @@ def continue_game(scenario_id, from_scenario):
             save_json(ent_path, ent)
 
     # current_session 파티 요약 갱신
-    session = load_json("current_session.json")
+    session = load_json("data/current_session.json")
     session["party_summary"] = [
         {
             "name": p["name"], "class": p["class"],
@@ -391,7 +391,7 @@ def continue_game(scenario_id, from_scenario):
         for p in state["players"]
     ]
     session["progress_notes"].insert(0, f"'{from_scenario}' 에서 캐릭터 이어받기 완료")
-    save_json("current_session.json", session)
+    save_json("data/current_session.json", session)
 
     print(f"\n  [OK] '{from_scenario}' 에서 캐릭터 데이터 이어받기 완료")
     _print_state_summary(state)
@@ -455,12 +455,12 @@ def load_game():
         save_data = json.load(f)
 
     # game_state.json에 적용
-    save_json("game_state.json", save_data["game_state"])
+    save_json("data/game_state.json", save_data["game_state"])
     print(f"\n  [OK] 세이브 로드 완료: {selected['scenario_id']}/{selected['slot']}")
 
     # 맵 갱신
     try:
-        from map_generator import MapGenerator
+        from core.map_generator import MapGenerator
         MapGenerator().save_map()
         print(f"  [OK] 맵 갱신 완료")
     except Exception as e:
@@ -481,8 +481,8 @@ def load_game():
 def _sync_docs():
     """docs/ 폴더를 최신 상태로 동기화 (GitHub Pages용)."""
     try:
-        from save_manager import SaveManager
-        state = load_json("game_state.json")
+        from core.save_manager import SaveManager
+        state = load_json("data/game_state.json")
         sm = SaveManager()
         sm._sync_docs(state)
         print("  [OK] docs/ 동기화 완료 (정적 웹)")
@@ -493,22 +493,22 @@ def _sync_docs():
 # ─── 유틸리티 ───
 
 def _activate_scenario_files(scenario_entry, scenario_file):
-    """활성 시나리오/룰셋 파일을 루트에 복사 (scenario.json, rules.json)."""
+    """활성 시나리오/룰셋 파일을 data/에 복사 (scenario.json, rules.json)."""
     # scenario.json
     src = os.path.join(BASE_DIR, scenario_file)
-    dst = os.path.join(BASE_DIR, "scenario.json")
+    dst = os.path.join(BASE_DIR, "data", "scenario.json")
     if os.path.exists(src) and os.path.abspath(src) != os.path.abspath(dst):
         shutil.copy2(src, dst)
-        print(f"  [OK] scenario.json <- {scenario_file}")
+        print(f"  [OK] data/scenario.json <- {scenario_file}")
 
     # rules.json (룰셋)
     ruleset_id = scenario_entry.get("ruleset", "fantasy_basic")
     ruleset_file = f"rulesets/{ruleset_id}.json"
     ruleset_src = os.path.join(BASE_DIR, ruleset_file)
-    rules_dst = os.path.join(BASE_DIR, "rules.json")
+    rules_dst = os.path.join(BASE_DIR, "data", "rules.json")
     if os.path.exists(ruleset_src):
         shutil.copy2(ruleset_src, rules_dst)
-        print(f"  [OK] rules.json <- {ruleset_file}")
+        print(f"  [OK] data/rules.json <- {ruleset_file}")
 
 
 def _try_restore_scene():

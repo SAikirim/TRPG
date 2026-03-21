@@ -9,10 +9,10 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SD_ILLUSTRATIONS_DIR = os.path.join(BASE_DIR, "static", "illustrations", "sd")
 SD_PORTRAITS_DIR = os.path.join(BASE_DIR, "static", "portraits", "sd")
-CURRENT_SESSION_PATH = os.path.join(BASE_DIR, "current_session.json")
+CURRENT_SESSION_PATH = os.path.join(BASE_DIR, "data", "current_session.json")
 SD_API_URL = "http://127.0.0.1:7860"
 
 _lock = threading.Lock()
@@ -194,7 +194,7 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
 def _cairo_fallback(illustration_type, name, position, turn_count):
     """Generate Cairo fallback illustration when SD is unavailable."""
     try:
-        from map_generator import MapGenerator
+        from core.map_generator import MapGenerator
         gen = MapGenerator()
 
         if illustration_type == "background":

@@ -86,21 +86,28 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 app.py                    - Flask 웹 서버, API 엔드포인트, gm-update 처리
 game_start.py             - 게임 시작 자동화 CLI (새 게임/이어하기/세이브 로드)
 session_validator.py      - 세션 검증 자동화 (상태 일관성 검사 + 자동 수정)
-sd_generator.py           - SD WebUI API 래퍼, 레이어 시스템
-map_generator.py          - Cairo/PIL 이미지 생성, SD OFF 시 폴백
-ascii_map.py              - CLI 터미널용 이모지 ASCII 맵 출력
-gm_turn.py                - GM 턴 추적기 (실행 작업 기록 + 누락 경고)
-save_manager.py           - 세이브/로드 매니저
-game_state.json           - 현재 게임 상태
-current_session.json      - 현재 활성 세션 요약 (세션 복원용)
-worldbuilding.json        - 세계관 설정 (시나리오 독립)
-rules.json / scenario.json - 현재 활성 룰셋 / 시나리오
-items.json                - 아이템 데이터베이스 (효과, 설명, 수치, 희귀도)
-skills.json               - 스킬 데이터베이스 (효과, 비용, 사거리, 요구 레벨)
-status_effects.json       - 상태이상 데이터베이스 (버프/디버프, 지속시간, 치료법)
-creature_templates.json   - 생물체 템플릿 (몬스터, 동물, 소환수 — 능력치, 공격, 드롭, 행동 패턴)
-shops.json                - 상점 데이터베이스 (위치, 품목, 가격, 매입률)
-quests.json               - 퀘스트 데이터베이스 (활성/완료/실패 상태 추적)
+core/                     - Python 엔진 모듈 (패키지)
+  __init__.py
+  sd_generator.py         - SD WebUI API 래퍼, 레이어 시스템
+  map_generator.py        - Cairo/PIL 이미지 생성, SD OFF 시 폴백
+  ascii_map.py            - CLI 터미널용 이모지 ASCII 맵 출력
+  gm_turn.py              - GM 턴 추적기 (실행 작업 기록 + 누락 경고)
+  save_manager.py         - 세이브/로드 매니저
+  game_mechanics.py       - 주사위, 판정, 전투, 회복, 아이템, 상태이상 처리
+data/                     - JSON 데이터 파일
+  game_state.json         - 현재 게임 상태
+  current_session.json    - 현재 활성 세션 요약 (세션 복원용)
+  worldbuilding.json      - 세계관 설정 (시나리오 독립)
+  rules.json              - 현재 활성 룰셋
+  scenario.json           - 현재 활성 시나리오
+  items.json              - 아이템 데이터베이스 (효과, 설명, 수치, 희귀도)
+  skills.json             - 스킬 데이터베이스 (효과, 비용, 사거리, 요구 레벨)
+  status_effects.json     - 상태이상 데이터베이스 (버프/디버프, 지속시간, 치료법)
+  creature_templates.json - 생물체 템플릿 (몬스터, 동물, 소환수)
+  shops.json              - 상점 데이터베이스 (위치, 품목, 가격, 매입률)
+  quests.json             - 퀘스트 데이터베이스 (활성/완료/실패 상태 추적)
+  pending_actions.json    - 보류 중인 액션
+  game_state_initial.json - 초기 게임 상태 템플릿
 entities/{scenario_id}/   - npcs/ players/ objects/ 엔티티 파일
 rulesets/ / scenarios/    - 룰셋/시나리오 카탈로그
 static/                   - 맵, 초상화, 일러스트 이미지
@@ -116,7 +123,7 @@ guides/                   - 상세 규칙 참조 파일
 ## 세션 시작 체크리스트
 1. CLAUDE.md 읽기 (이 파일)
 2. `python session_validator.py` 실행 — 상태 검증 + 자동 수정
-3. `current_session.json` → `worldbuilding.json` → `game_state.json` 읽기
+3. `data/current_session.json` → `data/worldbuilding.json` → `data/game_state.json` 읽기
 4. Flask 서버 확인 → 웹 UI 장면 복원 (자동: `restore_scene`)
 5. 유저에게 현재 상황 요약 → 게임 이어가기
 
@@ -124,9 +131,9 @@ guides/                   - 상세 규칙 참조 파일
 
 ### 세션 로드 상세
 1. `CLAUDE.md` → 2. `python session_validator.py` (상태 검증 + 엔티티 누락 자동 생성)
-3. `current_session.json` → 4. `worldbuilding.json` → 5. `game_state.json`
+3. `data/current_session.json` → 4. `data/worldbuilding.json` → 5. `data/game_state.json`
 6. `entities/{scenario_id}/` (players, npcs, objects)
-7. `scenario.json` + `rules.json`
+7. `data/scenario.json` + `data/rules.json`
 8. Flask 서버 확인 → gm-update로 현재 장면 복원 (배경+NPC 레이어)
 9. 유저에게 현재 상황 요약 제시
 

@@ -4,14 +4,14 @@ from datetime import datetime
 
 from flask import Flask, jsonify, render_template, request
 
-from map_generator import MapGenerator
-from save_manager import SaveManager
-from sd_generator import request_illustration, get_scene_state, is_sd_enabled, clear_scene, remove_layer
-import game_mechanics as gm
+from core.map_generator import MapGenerator
+from core.save_manager import SaveManager
+from core.sd_generator import request_illustration, get_scene_state, is_sd_enabled, clear_scene, remove_layer
+import core.game_mechanics as gm
 
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-GAME_STATE_PATH = os.path.join(BASE_DIR, "game_state.json")
+GAME_STATE_PATH = os.path.join(BASE_DIR, "data", "game_state.json")
 
 
 def load_game_state():
@@ -360,7 +360,7 @@ def clear_illustration():
 
 @app.route("/api/illustration/toggle", methods=["POST"])
 def toggle_illustration():
-    session_path = os.path.join(BASE_DIR, "current_session.json")
+    session_path = os.path.join(BASE_DIR, "data", "current_session.json")
     with open(session_path, "r", encoding="utf-8") as f:
         session = json.load(f)
     current = session.get("sd_illustration", False)
@@ -372,7 +372,7 @@ def toggle_illustration():
 
 @app.route("/api/settings", methods=["GET"])
 def get_settings():
-    session_path = os.path.join(BASE_DIR, "current_session.json")
+    session_path = os.path.join(BASE_DIR, "data", "current_session.json")
     with open(session_path, "r", encoding="utf-8") as f:
         session = json.load(f)
     state = load_game_state()
@@ -387,7 +387,7 @@ def get_settings():
 @app.route("/api/settings", methods=["POST"])
 def update_settings():
     data = request.get_json()
-    session_path = os.path.join(BASE_DIR, "current_session.json")
+    session_path = os.path.join(BASE_DIR, "data", "current_session.json")
     with open(session_path, "r", encoding="utf-8") as f:
         session = json.load(f)
 
@@ -415,7 +415,7 @@ def update_settings():
 
 @app.route("/api/items", methods=["GET"])
 def get_items():
-    items_path = os.path.join(BASE_DIR, "items.json")
+    items_path = os.path.join(BASE_DIR, "data", "items.json")
     with open(items_path, "r", encoding="utf-8") as f:
         items = json.load(f)
     return jsonify(items)
@@ -423,7 +423,7 @@ def get_items():
 
 @app.route("/api/skills", methods=["GET"])
 def get_skills():
-    skills_path = os.path.join(BASE_DIR, "skills.json")
+    skills_path = os.path.join(BASE_DIR, "data", "skills.json")
     with open(skills_path, "r", encoding="utf-8") as f:
         skills = json.load(f)
     return jsonify(skills)
@@ -431,7 +431,7 @@ def get_skills():
 
 @app.route("/api/rules", methods=["GET"])
 def get_rules():
-    rules_path = os.path.join(BASE_DIR, "rules.json")
+    rules_path = os.path.join(BASE_DIR, "data", "rules.json")
     with open(rules_path, "r", encoding="utf-8") as f:
         rules = json.load(f)
     return jsonify(rules)
@@ -439,7 +439,7 @@ def get_rules():
 
 @app.route("/api/scenario", methods=["GET"])
 def get_scenario():
-    scenario_path = os.path.join(BASE_DIR, "scenario.json")
+    scenario_path = os.path.join(BASE_DIR, "data", "scenario.json")
     with open(scenario_path, "r", encoding="utf-8") as f:
         scenario = json.load(f)
     return jsonify(scenario)
@@ -447,7 +447,7 @@ def get_scenario():
 
 @app.route("/api/reset-game", methods=["POST"])
 def reset_game():
-    initial_path = os.path.join(BASE_DIR, "game_state_initial.json")
+    initial_path = os.path.join(BASE_DIR, "data", "game_state_initial.json")
     if os.path.exists(initial_path):
         with open(initial_path, "r", encoding="utf-8") as f:
             state = json.load(f)
@@ -504,28 +504,28 @@ def get_progress(scenario_id):
 
 @app.route("/api/status-effects", methods=["GET"])
 def get_status_effects():
-    path = os.path.join(BASE_DIR, "status_effects.json")
+    path = os.path.join(BASE_DIR, "data", "status_effects.json")
     with open(path, "r", encoding="utf-8") as f:
         return jsonify(json.load(f))
 
 
 @app.route("/api/creatures", methods=["GET"])
 def get_creatures():
-    path = os.path.join(BASE_DIR, "creature_templates.json")
+    path = os.path.join(BASE_DIR, "data", "creature_templates.json")
     with open(path, "r", encoding="utf-8") as f:
         return jsonify(json.load(f))
 
 
 @app.route("/api/shops", methods=["GET"])
 def get_shops():
-    path = os.path.join(BASE_DIR, "shops.json")
+    path = os.path.join(BASE_DIR, "data", "shops.json")
     with open(path, "r", encoding="utf-8") as f:
         return jsonify(json.load(f))
 
 
 @app.route("/api/quests", methods=["GET"])
 def get_quests():
-    path = os.path.join(BASE_DIR, "quests.json")
+    path = os.path.join(BASE_DIR, "data", "quests.json")
     with open(path, "r", encoding="utf-8") as f:
         return jsonify(json.load(f))
 

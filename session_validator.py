@@ -62,7 +62,7 @@ def save_json(path, data):
 def check_game_state():
     """game_state.json 존재 및 유효성 검사."""
     print("\n[1] game_state.json 검증")
-    state = load_json_safe("game_state.json")
+    state = load_json_safe("data/game_state.json")
     if state is None:
         log("error", "game_state.json이 없거나 파싱 불가")
         return None
@@ -94,7 +94,7 @@ def check_game_state():
 def check_current_session(state):
     """current_session.json과 game_state 일치 검사."""
     print("\n[2] current_session.json 검증")
-    session = load_json_safe("current_session.json")
+    session = load_json_safe("data/current_session.json")
     if session is None:
         log("error", "current_session.json이 없거나 파싱 불가")
         return None
@@ -109,7 +109,7 @@ def check_current_session(state):
         log("error", f"시나리오 ID 불일치: game_state={state_sid}, session={session_sid}")
         if FIX_MODE:
             session["active_scenario"] = state_sid
-            save_json("current_session.json", session)
+            save_json("data/current_session.json", session)
             log("warn", f"current_session.active_scenario를 '{state_sid}'로 수정", auto_fixed=True)
     else:
         log("ok", f"시나리오 ID 일치: {state_sid}")
@@ -226,17 +226,17 @@ def check_scenario_files(state):
     """시나리오/룰셋 파일 존재 검사."""
     print("\n[5] 시나리오/룰셋 파일 검증")
     for fname in ["scenario.json", "rules.json"]:
-        path = os.path.join(BASE_DIR, fname)
+        path = os.path.join(BASE_DIR, "data", fname)
         if os.path.exists(path):
-            data = load_json_safe(fname)
+            data = load_json_safe(os.path.join("data", fname))
             if data:
-                log("ok", f"{fname} 존재 + 유효")
+                log("ok", f"data/{fname} 존재 + 유효")
             # 파싱 실패는 load_json_safe에서 이미 에러 기록
         else:
-            log("error", f"{fname} 파일 없음")
+            log("error", f"data/{fname} 파일 없음")
 
     # scenario.json 타이틀이 현재 game_state의 시나리오와 일치하는지 검증
-    scenario_data = load_json_safe("scenario.json")
+    scenario_data = load_json_safe("data/scenario.json")
     if scenario_data and state:
         gs_scenario_id = state.get("game_info", {}).get("scenario_id", "")
         sc_title = scenario_data.get("scenario_info", {}).get("title", "")
@@ -252,7 +252,7 @@ def check_scenario_files(state):
                             src = os.path.join(BASE_DIR, s.get("scenario_file", f"scenarios/{gs_scenario_id}.json"))
                             if os.path.exists(src):
                                 import shutil
-                                shutil.copy2(src, os.path.join(BASE_DIR, "scenario.json"))
+                                shutil.copy2(src, os.path.join(BASE_DIR, "data", "scenario.json"))
                                 log("fix", f"scenario.json을 '{gs_title}'로 교체")
                             break
         else:
@@ -269,7 +269,7 @@ def check_scenario_files(state):
 def check_worldbuilding(state):
     """worldbuilding.json 존재 및 현재 위치 검증."""
     print("\n[6] worldbuilding.json 검증")
-    wb = load_json_safe("worldbuilding.json")
+    wb = load_json_safe("data/worldbuilding.json")
     if wb is None:
         log("error", "worldbuilding.json이 없거나 파싱 불가")
         return
@@ -494,7 +494,7 @@ def main():
 
     # 자동 수정된 game_state 저장
     if FIX_MODE and state is not None and results["fixed"] > 0:
-        save_json("game_state.json", state)
+        save_json("data/game_state.json", state)
         print(f"\n  [INFO] game_state.json에 수정 사항 저장 완료")
 
     # 결과 요약

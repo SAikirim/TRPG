@@ -4,10 +4,10 @@ import shutil
 import glob
 from datetime import datetime
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SAVES_DIR = os.path.join(BASE_DIR, "saves")
-GAME_STATE_PATH = os.path.join(BASE_DIR, "game_state.json")
-CURRENT_SESSION_PATH = os.path.join(BASE_DIR, "current_session.json")
+GAME_STATE_PATH = os.path.join(BASE_DIR, "data", "game_state.json")
+CURRENT_SESSION_PATH = os.path.join(BASE_DIR, "data", "current_session.json")
 
 
 class SaveManager:
@@ -257,7 +257,7 @@ class SaveManager:
             "scenario.json", "pending_actions.json",
         ]
         for fname in json_files:
-            src = os.path.join(BASE_DIR, fname)
+            src = os.path.join(BASE_DIR, "data", fname)
             dst = os.path.join(docs_dir, fname)
             if os.path.isfile(src):
                 shutil.copy2(src, dst)

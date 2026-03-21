@@ -22,10 +22,10 @@ class MapGenerator:
         self.map_height = 15
         self.img_width = self.map_width * self.tile_size
         self.img_height = self.map_height * self.tile_size
-        self.base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     def load_game_state(self):
-        path = os.path.join(self.base_dir, "game_state.json")
+        path = os.path.join(self.base_dir, "data", "game_state.json")
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
 
@@ -37,7 +37,7 @@ class MapGenerator:
         wb_map = None
         if current_loc:
             try:
-                wb_path = os.path.join(self.base_dir, "worldbuilding.json")
+                wb_path = os.path.join(self.base_dir, "data", "worldbuilding.json")
                 with open(wb_path, "r", encoding="utf-8") as f:
                     wb = json.load(f)
                 loc_data = wb.get("locations", {}).get(current_loc, {})
