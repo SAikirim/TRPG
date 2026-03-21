@@ -370,16 +370,19 @@
             font-style: italic;
             margin-top: 3px;
         }
-        /* Map in sidebar */
+        /* Map in sidebar — 크게 표시 */
+        .sidebar-map {
+            overflow-x: auto;
+        }
         .sidebar-map img {
-            width: 100%;
+            min-width: 600px;
             height: auto;
             border-radius: 8px;
             border: 2px solid #333;
             cursor: pointer;
         }
         .sidebar-map img:hover { border-color: #e94560; }
-        /* Map zoom overlay */
+        /* Map zoom overlay — 적당한 크기 */
         .map-overlay {
             display: none;
             position: fixed;
@@ -393,8 +396,8 @@
         }
         .map-overlay.active { display: flex; }
         .map-overlay img {
-            max-width: 90vw;
-            max-height: 90vh;
+            max-width: 75vw;
+            max-height: 75vh;
             object-fit: contain;
             border: 3px solid #e94560;
             border-radius: 12px;
