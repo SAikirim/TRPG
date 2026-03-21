@@ -1,0 +1,82 @@
+{
+  "description": "상태이상 데이터베이스. 전투/탐험 중 적용되는 모든 상태 효과 정의.",
+  "effects": {
+    "중독": {
+      "type": "debuff",
+      "damage_per_turn": 2,
+      "duration": 3,
+      "cure": ["해독제", "힐"],
+      "desc": "턴마다 2 피해. 3턴 지속. 힐 또는 해독제로 치료.",
+      "icon": "🟢"
+    },
+    "방어 강화": {
+      "type": "buff",
+      "defense_bonus": 4,
+      "duration": 1,
+      "desc": "방어력 +4. 1턴 지속.",
+      "icon": "🛡️"
+    },
+    "기절": {
+      "type": "debuff",
+      "skip_turn": true,
+      "duration": 1,
+      "desc": "행동 불가. 1턴 지속.",
+      "icon": "💫"
+    },
+    "은신": {
+      "type": "buff",
+      "next_attack_auto_hit": true,
+      "bonus_damage": 4,
+      "duration": -1,
+      "end_on": "attack",
+      "desc": "다음 공격 시 자동 명중 + 추가 피해 4. 공격하면 해제.",
+      "icon": "👤"
+    },
+    "출혈": {
+      "type": "debuff",
+      "damage_per_turn": 3,
+      "duration": 2,
+      "cure": ["붕대", "힐"],
+      "desc": "턴마다 3 피해. 2턴 지속.",
+      "icon": "🩸"
+    },
+    "화상": {
+      "type": "debuff",
+      "damage_per_turn": 2,
+      "duration": 2,
+      "defense_penalty": -2,
+      "desc": "턴마다 2 피해 + 방어력 -2. 2턴 지속.",
+      "icon": "🔥"
+    },
+    "독 무기": {
+      "type": "buff",
+      "bonus_poison_damage": 2,
+      "duration": 3,
+      "target": "self_weapon",
+      "desc": "3턴간 공격 시 추가 독 피해 2. 독 바르기 스킬로 적용.",
+      "icon": "🗡️"
+    },
+    "마나 쉴드": {
+      "type": "buff",
+      "absorb_damage": "INT_modifier * 2",
+      "duration": 3,
+      "desc": "3턴간 피해를 INT보정*2만큼 흡수.",
+      "icon": "🔮"
+    },
+    "공포": {
+      "type": "debuff",
+      "attack_penalty": -2,
+      "flee_bonus": 2,
+      "duration": 2,
+      "desc": "공격 판정 -2, 도주 판정 +2. 2턴 지속.",
+      "icon": "😱"
+    },
+    "축복": {
+      "type": "buff",
+      "all_bonus": 1,
+      "duration": 3,
+      "desc": "모든 판정 +1. 3턴 지속.",
+      "icon": "✨"
+    }
+  }
+}
