@@ -383,9 +383,23 @@
             border-right: 7px solid transparent;
             border-bottom: 12px solid #9b30ff;
         }
-        /* Settings panel (read-only) */
-        .settings-panel {
-            margin-top: 8px;
+        /* Settings panel */
+        .settings-btn {
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-left: 10px;
+        }
+        .settings-btn:hover { opacity: 0.7; }
+        .settings-dropdown {
+            display: none;
+            background: #0f3460;
+            border-radius: 0 0 8px 8px;
+            padding: 8px 20px;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+        .settings-dropdown.open {
+            display: block;
         }
         .settings-row {
             display: flex;
@@ -453,6 +467,34 @@
             <span>턴: <strong id="turn-count">-</strong></span>
             <span>챕터: <strong id="chapter-info">-</strong></span>
             <span id="ending-info" class="ending" style="display:none"></span>
+            <span class="settings-btn" onclick="toggleSettings()">⚙️</span>
+        </div>
+        <div id="settings-panel" class="settings-dropdown">
+            <div class="settings-row">
+                <span class="settings-label">SD 일러스트</span>
+                <div id="setting-sd" class="settings-toggle"></div>
+            </div>
+            <div class="settings-row">
+                <span class="settings-label">주사위 결과 공개</span>
+                <div id="setting-dice" class="settings-toggle"></div>
+            </div>
+            <div class="settings-row">
+                <span class="settings-label">표시 모드</span>
+                <select id="setting-display" class="settings-select" disabled>
+                    <option value="mobile">Mobile</option>
+                    <option value="terminal">Terminal</option>
+                </select>
+            </div>
+            <div class="settings-row">
+                <span class="settings-label">난이도</span>
+                <select id="setting-difficulty" class="settings-select" disabled>
+                    <option value="easy">Easy</option>
+                    <option value="normal">Normal</option>
+                    <option value="hard">Hard</option>
+                    <option value="nightmare">Nightmare</option>
+                </select>
+            </div>
+            <div class="settings-note">설정 변경은 동적 웹에서만 가능합니다</div>
         </div>
     </header>
 
@@ -478,37 +520,6 @@
                 <h3>게임 맵</h3>
                 <img id="game-map" src="static/map_mini.png" alt="Game Map" onclick="openMapZoom()">
                 <div id="map-legend" class="legend"></div>
-            </div>
-
-            <div class="panel">
-                <h3>설정</h3>
-                <div id="settings-panel" class="settings-panel">
-                    <div class="settings-row">
-                        <span class="settings-label">SD 일러스트</span>
-                        <div id="setting-sd" class="settings-toggle"></div>
-                    </div>
-                    <div class="settings-row">
-                        <span class="settings-label">주사위 결과 공개</span>
-                        <div id="setting-dice" class="settings-toggle"></div>
-                    </div>
-                    <div class="settings-row">
-                        <span class="settings-label">표시 모드</span>
-                        <select id="setting-display" class="settings-select" disabled>
-                            <option value="mobile">Mobile</option>
-                            <option value="terminal">Terminal</option>
-                        </select>
-                    </div>
-                    <div class="settings-row">
-                        <span class="settings-label">난이도</span>
-                        <select id="setting-difficulty" class="settings-select" disabled>
-                            <option value="easy">Easy</option>
-                            <option value="normal">Normal</option>
-                            <option value="hard">Hard</option>
-                            <option value="nightmare">Nightmare</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="settings-note">설정 변경은 동적 웹에서만 가능합니다</div>
             </div>
 
             <div class="panel">
@@ -883,6 +894,10 @@
             tip.style.left = x + 'px';
             tip.style.top = y + 'px';
         });
+
+        function toggleSettings() {
+            document.getElementById('settings-panel').classList.toggle('open');
+        }
 
         async function loadSettings() {
             try {
