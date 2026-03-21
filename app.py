@@ -7,6 +7,7 @@ from flask import Flask, jsonify, render_template, request
 from map_generator import MapGenerator
 from save_manager import SaveManager
 from sd_generator import request_illustration, get_scene_state, is_sd_enabled, clear_scene, remove_layer
+import game_mechanics as gm
 
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -162,11 +163,40 @@ def gm_update():
     }
     state["events"].append(event)
 
+    # Process mechanics requests (자동 판정/회복/전투)
+    mechanics_results = []
+    for mreq in data.get("mechanics", []):
+        mtype = mreq.get("type", "")
+        if mtype == "long_rest":
+            mechanics_results.append(gm.long_rest(state))
+        elif mtype == "short_rest":
+            mechanics_results.append(gm.short_rest(state))
+        elif mtype == "attack":
+            mechanics_results.append(gm.attack_roll(
+                mreq["attacker"], mreq["target"],
+                mreq.get("action", "공격"), state))
+        elif mtype == "skill_check":
+            mechanics_results.append(gm.skill_check(
+                mreq["player"], mreq["stat"], mreq["dc"], state))
+        elif mtype == "damage":
+            mechanics_results.append(gm.apply_damage(
+                mreq["target"], mreq["amount"],
+                mreq.get("source", ""), state))
+        elif mtype == "heal":
+            mechanics_results.append(gm.cast_heal(
+                mreq["caster"], mreq["target"], state))
+        elif mtype == "use_item":
+            mechanics_results.append(gm.use_item(
+                mreq["player"], mreq["item"], state))
+        elif mtype == "tick_status":
+            mechanics_results.append(gm.tick_status_effects(state))
+
     # Update game status if provided
     if "game_status" in data:
         state["game_info"]["status"] = data["game_status"]
 
     save_game_state(state)
+    gm.sync_all_players(state)
     update_map_image()
 
     # Handle illustration request
@@ -188,7 +218,8 @@ def gm_update():
     if data.get("remove_layer"):
         remove_layer(data["remove_layer"])
 
-    return jsonify({"success": True, "event": event, "turn": state["turn_count"], "illustration": ill_result})
+    return jsonify({"success": True, "event": event, "turn": state["turn_count"],
+                     "illustration": ill_result, "mechanics": mechanics_results})
 
 
 @app.route("/api/illustration", methods=["GET"])
