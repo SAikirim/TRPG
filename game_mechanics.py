@@ -1194,6 +1194,38 @@ def _apply_status(entity, name, duration):
     entity["status_effects"] = effects
 
 
+# ─── 조용한 실행 (show_dice_result: false 대응) ───
+
+QUIET_RESULT_PATH = os.path.join(BASE_DIR, ".last_result.json")
+
+
+def run_quiet(func, *args, **kwargs):
+    """
+    판정 함수를 실행하고 결과를 .last_result.json에만 저장.
+    터미널에 출력하지 않음. GM이 나레이션 작성 시 파일을 읽어 참고.
+    """
+    result = func(*args, **kwargs)
+    _save_json(QUIET_RESULT_PATH, result)
+    # 성공/실패만 한 줄 출력 (스포일러 없이)
+    if isinstance(result, dict):
+        if "hit" in result:
+            print("⚔️ 처리 완료")
+        elif "success" in result:
+            print("🎲 판정 완료")
+        elif "action" in result:
+            print(f"✅ {result['action']} 완료")
+        else:
+            print("✅ 처리 완료")
+    return result
+
+
+def get_last_result():
+    """마지막 quiet 실행 결과 조회"""
+    if os.path.exists(QUIET_RESULT_PATH):
+        return _load_json(QUIET_RESULT_PATH)
+    return None
+
+
 # ─── CLI 인터페이스 ───
 
 def _print_result(result):
@@ -1201,8 +1233,16 @@ def _print_result(result):
 
 
 def main():
+    # -q 플래그: quiet 모드 (결과를 .last_result.json에만 저장, 터미널 스포일러 없음)
+    quiet = "-q" in sys.argv
+    if quiet:
+        sys.argv.remove("-q")
+    output = _print_result if not quiet else lambda r: run_quiet(lambda: r)
+
     if len(sys.argv) < 2:
-        print("사용법: python game_mechanics.py <command> [args]")
+        print("사용법: python game_mechanics.py [-q] <command> [args]")
+        print()
+        print("  -q                     조용한 모드 (결과 숨김, .last_result.json에만 저장)")
         print()
         print("명령어:")
         print("  long_rest              하룻밤 수면 (HP/MP 전부 회복)")
@@ -1253,22 +1293,41 @@ def main():
         print(f"🎲 {dice} → {rolls} = {sum(rolls)}")
 
     elif cmd == "check" and len(sys.argv) >= 5:
-        _print_result(skill_check(int(sys.argv[2]), sys.argv[3], int(sys.argv[4])))
+        r = skill_check(int(sys.argv[2]), sys.argv[3], int(sys.argv[4]))
+        if quiet:
+            run_quiet(lambda: r)
+        else:
+            _print_result(r)
 
     elif cmd == "attack" and len(sys.argv) >= 4:
         action = sys.argv[4] if len(sys.argv) >= 5 else "공격"
-        _print_result(attack_roll(int(sys.argv[2]), int(sys.argv[3]), action))
+        r = attack_roll(int(sys.argv[2]), int(sys.argv[3]), action)
+        if quiet:
+            run_quiet(lambda: r)
+        else:
+            _print_result(r)
 
     elif cmd == "heal" and len(sys.argv) >= 4:
-        _print_result(cast_heal(int(sys.argv[2]), int(sys.argv[3])))
+        r = cast_heal(int(sys.argv[2]), int(sys.argv[3]))
+        if quiet:
+            run_quiet(lambda: r)
+        else:
+            _print_result(r)
 
     elif cmd == "damage" and len(sys.argv) >= 4:
-        _print_result(apply_damage(int(sys.argv[2]), int(sys.argv[3])))
+        r = apply_damage(int(sys.argv[2]), int(sys.argv[3]))
+        if quiet:
+            run_quiet(lambda: r)
+        else:
+            _print_result(r)
 
     elif cmd == "initiative":
-        result = roll_initiative()
-        for i, e in enumerate(result["order"], 1):
-            print(f"  {i}. {e['name']} ({e['type']}) — 이니셔티브 {e['initiative']}")
+        r = roll_initiative()
+        if quiet:
+            run_quiet(lambda: r)
+        else:
+            for i, e in enumerate(r["order"], 1):
+                print(f"  {i}. {e['name']} ({e['type']}) — 이니셔티브 {e['initiative']}")
 
     elif cmd == "tick":
         _print_result(tick_status_effects())
