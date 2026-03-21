@@ -996,11 +996,13 @@
                 const generating = data.generating || {};
                 const hasContent = data.background || (data.layers && data.layers.length > 0);
 
-                if (!data.enabled) {
+                if (!hasContent && !data.enabled) {
                     if (data.default_bg) {
-                        panel.innerHTML = '<img class="bg-layer" src="' + data.default_bg.pixel + '?t=default" alt="Background">';
+                        const bgSrc = data.default_bg.sd || data.default_bg.pixel;
+                        const fallbackSrc = data.default_bg.pixel;
+                        panel.innerHTML = '<img class="bg-layer" src="' + bgSrc + '" alt="Background" onerror="this.src=\'' + fallbackSrc + '\'">';
                     } else {
-                        panel.innerHTML = '<div class="illustration-placeholder">SD 비활성</div>';
+                        panel.innerHTML = '<div class="illustration-placeholder">일러스트 없음</div>';
                     }
                     return;
                 }
