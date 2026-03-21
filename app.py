@@ -85,14 +85,6 @@ def restore_scene():
     p1_x = player1["position"][0] if player1 else 0
     p1_y = player1["position"][1] if player1 else 0
 
-    # Calculate player center position for distance-based portrait sizing
-    player_positions = [p.get("position", [0, 0]) for p in state.get("players", [])]
-    if player_positions:
-        player_cx = sum(p[0] for p in player_positions) / len(player_positions)
-        player_cy = sum(p[1] for p in player_positions) / len(player_positions)
-    else:
-        player_cx, player_cy = 0, 0
-
     current_loc = state.get("current_location", "")
 
     # Collect NPCs with their relative position to player 1
@@ -117,9 +109,9 @@ def restore_scene():
         if not portrait_exists:
             continue
 
-        # Calculate distance from player center
+        # Calculate distance from player 1
         npc_pos = npc.get("position", [0, 0])
-        distance = abs(npc_pos[0] - player_cx) + abs(npc_pos[1] - player_cy)
+        distance = abs(npc_pos[0] - p1_x) + abs(npc_pos[1] - p1_y)
 
         # Determine size class based on Manhattan distance (4 tiers, max 6 tiles)
         if distance <= 1:
@@ -365,14 +357,6 @@ def gm_update():
     p1_x = player1["position"][0] if player1 else 0
     p1_y = player1["position"][1] if player1 else 0
 
-    # Calculate player center position for distance-based portrait sizing
-    player_positions = [p.get("position", [0, 0]) for p in state.get("players", [])]
-    if player_positions:
-        player_cx = sum(p[0] for p in player_positions) / len(player_positions)
-        player_cy = sum(p[1] for p in player_positions) / len(player_positions)
-    else:
-        player_cx, player_cy = 0, 0
-
     current_loc = state.get("current_location", "")
 
     # Collect NPCs with their relative position to player 1
@@ -402,9 +386,9 @@ def gm_update():
         if any(l.get("name") == npc_name for l in scene.get("layers", [])):
             continue
 
-        # Calculate distance from player center
+        # Calculate distance from player 1
         npc_pos = npc.get("position", [0, 0])
-        distance = abs(npc_pos[0] - player_cx) + abs(npc_pos[1] - player_cy)
+        distance = abs(npc_pos[0] - p1_x) + abs(npc_pos[1] - p1_y)
 
         # Determine size class based on Manhattan distance (4 tiers, max 6 tiles)
         if distance <= 1:
