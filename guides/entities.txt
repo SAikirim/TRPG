@@ -25,7 +25,7 @@ stats, hp, max_hp, mp, max_mp는 필수 필드이다. 능력치 범위는 rules.
   "id": 300,
   "name": "할란",
   "type": "friendly",        // friendly | monster | neutral
-  "status": "alive",          // alive | dead | fled | unconscious
+  "status": "alive",          // alive | dead | fled | unconscious | looted
   "location": "교역로",
   "stats": {                  // 필수 -- 플레이어와 동일한 4능력치
     "STR": 10,

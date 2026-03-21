@@ -789,12 +789,15 @@
                     html += `<div class="legend-item"><div class="legend-dot" style="background:${color}"></div> ${loc.name.split(' ')[0]}</div>`;
                 }
             });
-            // NPC type별 범례 (alive만)
-            const aliveNpcs = (gameState.npcs || []).filter(n => n.status !== 'dead' && n.status !== 'fled');
+            // NPC type별 범례 (fled 제외)
+            const visibleNpcs = (gameState.npcs || []).filter(n => n.status !== 'fled');
+            const aliveNpcs = visibleNpcs.filter(n => n.status !== 'dead');
+            const deadNpcs = visibleNpcs.filter(n => n.status === 'dead');
             const npcTypes = new Set(aliveNpcs.map(n => n.type));
             if (npcTypes.has('monster')) html += '<div class="legend-item"><div class="legend-dot" style="background:#9b30ff"></div> 몬스터</div>';
             if (npcTypes.has('friendly')) html += '<div class="legend-item"><div class="legend-dot" style="background:#f1c40f"></div> NPC</div>';
             if (npcTypes.has('neutral')) html += '<div class="legend-item"><div class="legend-dot" style="background:#95a5a6"></div> 중립</div>';
+            if (deadNpcs.length > 0) html += '<div class="legend-item"><div class="legend-dot" style="background:#555"></div> 시체</div>';
             container.innerHTML = html;
         }
 

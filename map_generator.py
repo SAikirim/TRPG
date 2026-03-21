@@ -147,8 +147,8 @@ class MapGenerator:
         # NPC 아이콘 그리기 + 위치 수집
         r = 12
         for npc in state["npcs"]:
-            if npc.get("status") in ("dead", "fled"):
-                continue
+            if npc.get("status") == "fled":
+                continue  # 도주한 NPC만 제외, 시체는 표시
             px, py = npc["position"]
             if px < 0 or py < 0 or px >= map_w or py >= map_h:
                 continue
@@ -158,21 +158,33 @@ class MapGenerator:
             cx = px * self.tile_size + self.tile_size // 2 + margin_left
             cy = py * self.tile_size + self.tile_size // 2 + margin_top
             npc_type = npc.get("type", "neutral")
-            if npc_type == "monster":
+            is_dead = npc.get("status") == "dead"
+
+            if is_dead:
+                # 시체: 회색 + 💀
+                color = "#555555"
+                emoji_char = "\U0001f480"  # 💀
+            elif npc_type == "monster":
                 color = "#9b30ff"
+                emoji_char = npc_emojis.get("monster", "\U0001f479")
             elif npc_type == "friendly":
                 color = "#f1c40f"
+                emoji_char = npc_emojis.get("friendly", "\U0001f60a")
             else:
                 color = "#95a5a6"
+                emoji_char = npc_emojis.get("neutral", "\U0001f464")
+
             if emoji_font:
-                draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color + "88", outline="white", width=2)
+                draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color + "88", outline="white" if not is_dead else "#666", width=2)
                 try:
-                    draw.text((cx - 10, cy - 10), npc_emojis.get(npc_type, "\U0001f464"), font=emoji_font, embedded_color=True)
+                    draw.text((cx - 10, cy - 10), emoji_char, font=emoji_font, embedded_color=True)
                 except TypeError:
-                    draw.text((cx - 10, cy - 10), npc_emojis.get(npc_type, "\U0001f464"), font=emoji_font)
+                    draw.text((cx - 10, cy - 10), emoji_char, font=emoji_font)
             else:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
-            entity_icons.append({"cx": cx, "cy": cy, "r": r, "name": npc["name"][:4], "color": color, "type": "npc"})
+
+            label_color = "#666" if is_dead else (color if npc_type != "monster" else "white")
+            entity_icons.append({"cx": cx, "cy": cy, "r": r, "name": npc["name"][:4], "color": label_color, "type": "npc"})
 
         # 플레이어 아이콘 그리기 + 위치 수집
         player_colors = {"전사": "#e63946", "마법사": "#457be0", "도적": "#2ecc71", "궁수": "#e67e22", "성직자": "#f1c40f"}
