@@ -97,6 +97,47 @@ def check_narrative(text, game_state=None):
                         "action": "register_location 필요"
                     })
 
+    # 3. 방향 키워드 대조 — 나레이션에서 "지명 + 방향" 패턴을 찾아 충돌 감지
+    direction_keywords = ["북쪽", "남쪽", "동쪽", "서쪽",
+                          "북동쪽", "남서쪽", "북서쪽", "남동쪽"]
+
+    # 현재 위치 기준 connections 수집
+    current_loc_id = None
+    if game_state:
+        cl = game_state.get("current_location", "")
+        # id 또는 name으로 현재 위치 찾기
+        for lid, ldata in locations.items():
+            if lid == cl or ldata.get("name") == cl:
+                current_loc_id = lid
+                break
+
+    if current_loc_id:
+        current_conns = locations[current_loc_id].get("connections", {})
+    else:
+        # 모든 location의 connections를 합산
+        current_conns = {}
+        for lid, ldata in locations.items():
+            current_conns.update(ldata.get("connections", {}))
+
+    for loc_name, conn_info in current_conns.items():
+        registered_dir = conn_info.get("direction", "")
+        if not registered_dir or loc_name not in text:
+            continue
+        # 텍스트에서 이 지명 주변에 방향 키워드가 있는지 확인
+        for d in direction_keywords:
+            if d in text and d != registered_dir:
+                # 이 방향이 해당 지명과 근접해서 쓰였는지 확인 (30자 이내)
+                for m in re.finditer(re.escape(loc_name), text):
+                    start = max(0, m.start() - 30)
+                    end = min(len(text), m.end() + 30)
+                    context = text[start:end]
+                    if d in context:
+                        result["warnings"].append(
+                            f"🌍 방향 충돌: '{loc_name}'이 '{d}'으로 언급됐으나 "
+                            f"worldbuilding에는 '{registered_dir}' — "
+                            f"NPC 오인/GM 실수/세계관 변경 확인 필요")
+                        break
+
     # 중복 제거
     seen = set()
     deduped = []
@@ -121,6 +162,9 @@ def check_and_warn(narrative="", game_state=None):
     for u in result["unregistered"]:
         warnings.append(
             f"⚠ 세계관 미등록: '{u['name']}' ({u['source']}) — {u['action']}")
+
+    # 방향 충돌 등 세계관 경고
+    warnings.extend(result.get("warnings", []))
 
     return warnings
 
