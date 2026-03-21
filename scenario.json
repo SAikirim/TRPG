@@ -3,7 +3,55 @@
     "title": "잃어버린 보물의 숲 던전",
     "description": "고대 숲 깊은 곳에 잠든 전설의 보물. 세 명의 모험가가 위험을 무릅쓰고 던전에 발을 들인다.",
     "difficulty": "normal",
-    "recommended_level": 1
+    "recommended_level": 1,
+    "prerequisite": null,
+    "prerequisite_required": false,
+    "backstory": "고대 숲 깊은 곳에 전설의 보물이 잠들어 있다는 소문. 세 명의 모험가가 위험을 무릅쓰고 던전에 발을 들인다."
+  },
+  "opening": {
+    "new_game": "새 게임 시작 — 레벨 1 캐릭터로 시작합니다.",
+    "narrative": "하룬 마을의 촌장 에른스트가 모험가들에게 의뢰를 맡겼다. 숲 깊은 곳 고대 던전에 잠든 전설의 보물을 찾아오라. 세 모험가는 숲의 입구에 도착한다."
+  },
+  "default_party": {
+    "description": "기본 파티 (레벨 1)",
+    "players": [
+      {
+        "id": 1,
+        "name": "",
+        "class": "전사",
+        "level": 1,
+        "xp": 0,
+        "stats": {"STR": 18, "DEX": 10, "INT": 8, "CON": 14},
+        "hp_base": 25,
+        "mp_base": 5,
+        "starting_inventory": ["철검", "가죽 방패"],
+        "controlled_by": "user"
+      },
+      {
+        "id": 2,
+        "name": "",
+        "class": "마법사",
+        "level": 1,
+        "xp": 0,
+        "stats": {"STR": 6, "DEX": 12, "INT": 18, "CON": 8},
+        "hp_base": 10,
+        "mp_base": 12,
+        "starting_inventory": ["마법 지팡이", "마나 포션"],
+        "controlled_by": "agent"
+      },
+      {
+        "id": 3,
+        "name": "",
+        "class": "도적",
+        "level": 1,
+        "xp": 0,
+        "stats": {"STR": 10, "DEX": 18, "INT": 12, "CON": 10},
+        "hp_base": 15,
+        "mp_base": 5,
+        "starting_inventory": ["단검 x2", "도둑 도구"],
+        "controlled_by": "agent"
+      }
+    ]
   },
   "chapters": [
     {
