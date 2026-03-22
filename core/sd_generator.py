@@ -27,6 +27,9 @@ _scene_state = {
         "started_at": None,
     },
 }
+# 중복 SD 생성 방지: 현재 SD 생성 진행 중인 (type, name) 세트
+_pending_sd = set()
+_pending_sd_lock = threading.Lock()
 
 
 def is_sd_enabled():
@@ -115,7 +118,11 @@ def _build_payload(illustration_type, prompt, negative_prompt):
 
 
 def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, position, name, distance=0, size_class="close"):
+    """SD 백그라운드 생성 워커. Skia 플레이스홀더가 이미 존재하므로,
+    SD 실패 시 추가 폴백 없이 Skia 이미지를 유지한다.
+    SD 성공 시 같은 경로에 고품질 이미지를 덮어쓰고 scene_state를 갱신한다."""
     global _scene_state
+    pending_key = (illustration_type, name)
 
     try:
         # Ensure correct model is loaded
@@ -206,25 +213,35 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
                     })
                 _scene_state["generating"]["status"] = "idle"
                 _scene_state["generating"]["error"] = None
-            logger.info(f"Illustration generated: {filename}")
+            logger.info(f"SD image generated (replacing Skia placeholder): {filename}")
             # game_state.json의 current_scene 갱신
             _sync_scene_to_game_state()
         else:
+            logger.warning("No images in SD response — Skia placeholder retained")
             with _lock:
                 _scene_state["generating"].update({
-                    "status": "error",
-                    "error": "No images in SD response",
+                    "status": "idle",
+                    "error": "No images in SD response (Skia placeholder retained)",
                 })
     except requests.exceptions.ConnectionError:
-        logger.warning("SD WebUI not reachable, falling back to Cairo")
-        _cairo_fallback(illustration_type, name, position, turn_count, distance, size_class)
+        logger.warning("SD WebUI not reachable — Skia placeholder retained")
+        with _lock:
+            _scene_state["generating"]["status"] = "idle"
     except Exception as e:
-        logger.warning(f"SD generation failed ({e}), falling back to Cairo")
-        _cairo_fallback(illustration_type, name, position, turn_count, distance, size_class)
+        logger.warning(f"SD generation failed ({e}) — Skia placeholder retained")
+        with _lock:
+            _scene_state["generating"]["status"] = "idle"
+    finally:
+        # 중복 생성 방지 플래그 해제
+        with _pending_sd_lock:
+            _pending_sd.discard(pending_key)
 
 
-def _cairo_fallback(illustration_type, name, position, turn_count, distance=0, size_class="close"):
-    """Generate Cairo fallback illustration when SD is unavailable."""
+def _skia_placeholder(illustration_type, name, position, turn_count, distance=0, size_class="close"):
+    """Skia로 즉시 플레이스홀더 이미지를 생성한다.
+    반환값: {"started": True, "image_url": ..., "output_path": ..., "source": "skia"}
+    SD가 나중에 같은 output_path에 덮어쓰기할 수 있다.
+    """
     try:
         from core.map_generator import MapGenerator
         gen = MapGenerator()
@@ -238,7 +255,8 @@ def _cairo_fallback(illustration_type, name, position, turn_count, distance=0, s
                 _scene_state["layers"] = []
                 _scene_state["generating"]["status"] = "idle"
             _sync_scene_to_game_state()
-            return {"started": True, "type": illustration_type, "source": "cairo"}
+            return {"started": True, "type": illustration_type, "source": "skia",
+                    "image_url": image_url, "output_path": filepath}
 
         elif illustration_type in ("portrait", "object"):
             filepath = gen.generate_scene_element(illustration_type, name or "unknown")
@@ -256,10 +274,11 @@ def _cairo_fallback(illustration_type, name, position, turn_count, distance=0, s
                 })
                 _scene_state["generating"]["status"] = "idle"
             _sync_scene_to_game_state()
-            return {"started": True, "type": illustration_type, "source": "cairo"}
+            return {"started": True, "type": illustration_type, "source": "skia",
+                    "image_url": image_url, "output_path": filepath}
     except Exception as e:
-        logger.error(f"Cairo fallback failed: {e}")
-        return {"skipped": True, "reason": f"Cairo fallback failed: {e}"}
+        logger.error(f"Skia placeholder failed: {e}")
+        return {"skipped": True, "reason": f"Skia placeholder failed: {e}"}
 
 
 def _build_portrait_prompt_from_entity(name):
@@ -459,6 +478,14 @@ def remove_all_portrait_backgrounds():
 
 
 def request_illustration(illustration_type, prompt, negative_prompt="", turn_count=0, position="center", name="", distance=0, size_class="close"):
+    """Skia 즉시 생성 + SD 백그라운드 교체 패턴.
+
+    1. 기존 이미지가 있으면 재활용
+    2. Skia로 즉시 플레이스홀더 생성 (화면이 바로 갱신됨)
+    3. SD ON이면 백그라운드에서 고품질 이미지 생성 → 완료 시 덮어쓰기
+       (웹 UI 2초 폴링으로 자동 감지)
+    4. SD OFF이면 Skia 이미지만 유지
+    """
     global _scene_state
 
     # 1. Check for existing reusable image
@@ -490,15 +517,29 @@ def request_illustration(illustration_type, prompt, negative_prompt="", turn_cou
         if not prompt:
             prompt = f"fantasy character portrait, {name}, simple background, masterpiece"
 
-    # 3. SD OFF → Cairo fallback
+    # 3. Skia 즉시 생성 (SD ON/OFF 모두)
+    skia_result = _skia_placeholder(illustration_type, name, position, turn_count, distance, size_class)
+    if skia_result.get("skipped"):
+        logger.warning(f"Skia placeholder failed: {skia_result.get('reason')}")
+        # Skia도 실패하면 더 이상 할 수 없음
+        return skia_result
+
+    # 4. SD OFF → Skia 이미지만 유지하고 종료
     if not is_sd_enabled():
-        return _cairo_fallback(illustration_type, name, position, turn_count, distance, size_class)
+        logger.info(f"SD OFF — Skia placeholder only: {illustration_type}/{name}")
+        return skia_result
 
-    # 4. SD generation
+    # 5. SD ON → 백그라운드에서 고품질 이미지 생성
+    pending_key = (illustration_type, name)
+
+    # 중복 SD 생성 방지
+    with _pending_sd_lock:
+        if pending_key in _pending_sd:
+            logger.info(f"SD generation already pending for {pending_key} — Skia placeholder shown")
+            return {**skia_result, "sd_status": "already_pending"}
+        _pending_sd.add(pending_key)
+
     with _lock:
-        if _scene_state["generating"]["status"] == "generating":
-            return {"skipped": True, "reason": "Generation already in progress"}
-
         _scene_state["generating"].update({
             "status": "generating",
             "type": illustration_type,
@@ -514,13 +555,14 @@ def request_illustration(illustration_type, prompt, negative_prompt="", turn_cou
     )
     thread.start()
 
-    return {"started": True, "type": illustration_type}
+    logger.info(f"Skia placeholder shown, SD generating in background: {illustration_type}/{name}")
+    return {**skia_result, "sd_status": "generating"}
 
 
 def pre_generate_images(scenario_id):
     """시나리오 사전 이미지 생성 — 새 게임 시작 시 호출.
     챕터 배경 + 주요 NPC/플레이어 초상화를 미리 생성한다.
-    SD OFF 시에도 Cairo 폴백으로 생성.
+    SD OFF 시에도 Skia 폴백으로 생성.
     """
     import time
 

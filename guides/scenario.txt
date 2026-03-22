@@ -5,7 +5,7 @@
 ===
 1. 세계관 설계 (세계 지도 먼저):
    - worldbuildings/ 에 세계관 파일 생성 (terrain + locations + world_pos)
-   - 세계 지도 이미지 생성 (generate_world_map)
+   - 세계 지도 생성 (조건/방법 → guides/illustration.txt "세계 지도 생성 규칙" 참조)
    - 지역/지형 배치를 확정한 뒤 시나리오 작업 시작
 2. scenarios/ 에 {scenario_id}.json 파일 생성
 3. scenarios/index.json 에 메타데이터 등록 (worldbuilding, ruleset 필드 포함)

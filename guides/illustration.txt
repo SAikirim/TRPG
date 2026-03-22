@@ -1,38 +1,44 @@
 일러스트 시스템 상세
 ===
 
-이미지 생성 폴백 규칙 (최우선)
+이미지 생성 방식 (Skia 즉시 + SD 교체)
 ===
-모든 이미지 생성은 SD WebUI를 우선 사용한다. SD가 동작하지 않으면 Cairo로 폴백한다.
+모든 이미지 생성은 2단계로 동작한다:
 
-우선순위:
-1. SD WebUI API (http://127.0.0.1:7860) — 고품질, GPU 필요
-2. Cairo (pycairo) — 벡터 렌더링, CPU만으로 동작, 안티앨리어싱
-3. PIL (Pillow) — 최종 폴백, 기본 래스터 렌더링
+  [1단계] Skia 즉시 생성 (0.1초 이내)
+    - 요청 즉시 Skia가 플레이스홀더 이미지를 생성하여 웹에 표시
+    - 빈 화면 없이 즉시 시각적 피드백 제공
+
+  [2단계] SD 백그라운드 생성 (10~30초)
+    - SD WebUI가 고품질 이미지를 백그라운드에서 생성
+    - 완료 시 Skia 이미지를 SD 이미지로 자동 교체
+    - 웹 UI의 2초 폴링이 자동으로 새 이미지를 감지
+    - SD OFF 또는 SD 실패 시 Skia 이미지가 최종본으로 유지
 
 적용 대상:
-| 이미지 종류 | SD 사용 | Cairo 폴백 | PIL 폴백 |
-| 배경 일러스트 | O (txt2img) | O (그라디언트+도형) | X |
-| 캐릭터 초상화 | O (txt2img + 배경제거) | O (클래스별 실루엣) | X |
-| 게임 맵 (미니맵/전체맵) | X | O (타일 렌더링) | X |
-| 세계 지도 | O (배경 텍스처) | O (헥스 그리드) | X |
-| 오브젝트 | O (txt2img) | O (도형) | X |
+| 대상 | Skia 플레이스홀더 | SD 최종 |
+| 씬 배경 | 벡터 배경 (숲/던전/마을 등) | SD 고품질 배경 |
+| NPC/PC 초상화 | 실루엣 + 색상 | SD 초상화 |
+| 세계 지도 배경 | 지형색 맵 | SD 판타지 텍스처 |
+| 오브젝트 아이콘 | 벡터 아이콘 | Skia 유지 (SD 불필요) |
+
+SD가 꺼져 있으면 Skia가 최종 이미지 역할을 한다.
 
 SD 동작 확인:
 - current_session.json의 sd_illustration 값으로 ON/OFF 제어
 - sd_generator.py의 is_sd_enabled()로 확인
-- SD WebUI 미응답 시 자동으로 Cairo 폴백 (ConnectionError → _cairo_fallback)
+- SD WebUI 미응답 시 Skia 이미지가 최종본으로 유지
 
-Cairo 사용 원칙:
+Skia 사용 원칙:
 - 직선보다 곡선(베지어) 우선 사용 — 판타지 느낌
-- 안티앨리어싱 항상 활성화 (cairo.ANTIALIAS_BEST)
+- 안티앨리어싱 항상 활성화
 - 벡터 기반이므로 해상도 자유롭게 설정 가능
 - 그라디언트, 투명도, 그림자 적극 활용
 
 SD 시작/종료:
 - 게임 세션 시작 시 SD WebUI 자동 확인 (guides/process.txt 참조)
 - sd_illustration이 true이면 SD가 동작 중이어야 한다
-- SD 미실행 시 Cairo 폴백으로 게임 진행에 영향 없음
+- SD 미실행 시 Skia 플레이스홀더가 최종 이미지로 유지 — 게임 진행에 영향 없음
 
 SD 일러스트 연동 시스템 (sd_generator.py)
 ===
@@ -89,41 +95,62 @@ gm-update 일러스트 payload
 전체 장면 초기화:
   {"clear_scene": true}
 
-Cairo 폴백 (SD OFF 시)
+Skia 플레이스홀더 (SD OFF 시)
 ===
-- map_generator.py 기반 Cairo(pycairo)/Pillow 코드 생성
+- map_generator.py 기반 Skia/Pillow 코드 생성
 - 그라디언트, 베지어, 안티앨리어싱
 - 배경: static/illustrations/pixel/ (forest.png, dungeon.png, treasure.png)
 - 초상화: static/portraits/pixel/ (player_1.png ~ player_3.png)
 
 세계 지도 생성 규칙
 ===
-generate_world_map() 함수가 세계 지도를 자동 생성한다.
+세계 지도는 4단계로 생성한다.
 
-생성 흐름:
-1. worldbuilding.json에서 terrain + locations + world_info 로드
-2. Cairo로 지형별 그라디언트 색상맵 생성 (가우시안 블러 적용)
-3. SD img2img로 판타지 텍스처 변환 시도 (캐시: maps/world/{세계관}/background_sd.webp)
-4. SD 실패 시 Cairo 양피지 + 헥스 그리드 폴백
-5. Cairo 오버레이: 강(베지어 곡선) + 도로(메인/샛길) + 지역 마커 + 라벨 + 현재 위치
-6. 장식: 세계 이름 + 테두리 + 나침반
+[1단계] 대륙 이미지 생성 (SD)
+  - 세계관의 지형 설명을 기반으로 SD txt2img/img2img로 백지도 이미지 생성
+  - 프롬프트에 지형 특징 반영 (해안, 산맥, 숲, 강, 사막 등)
+  - 텍스트/마커/라벨 없이 순수 지형만 생성
+  - 결과: static/maps/world/{세계관}/background_sd.webp
+  - SD OFF 시 Skia가 폴백 백지도 생성
 
-세계 지도 제목:
-- worldbuilding.json의 world_info.name을 읽어 "{이름} 세계 지도"로 표시
-- name이 없으면 "세계 지도"로 폴백
+[2단계] 이미지에서 자연 데이터 자동 추출
+  - 백지도 이미지의 색상을 분석하여 지형 데이터를 자동 추출
+  - 추출 대상: 해안선 경로, 산맥 영역, 숲 영역, 바다 영역, 평원, 강 경로
+  - 색상 기준: 파랑=바다, 짙은초록=숲, 갈색=산, 연두=평원, 청록=강
+  - 결과: worldbuilding.json의 terrain 섹션에 자동 반영
+  - 추출 후 세계 지도 에이전트가 지리적 합리성 검증
 
-자동 생성 트리거:
-- Flask 서버 시작 시 (app.py)
-- gm-update 호출 시 (세계관 변경 반영)
-- 수동: python -c "from core.map_generator import generate_world_map; generate_world_map()"
+[3단계] 자연 데이터 기반으로 문명 배치
+  - 추출된 지형 데이터를 보고 도시/항구/도로 등을 배치
+  - 세계관 에이전트 + 세계 지도 에이전트가 입지 조건 판단:
+    - 만/하구 → 항구
+    - 강 합류점 → 교역도시
+    - 산맥 고개 → 요새
+    - 비옥한 평야 → 농촌
+  - 결과: worldbuilding.json의 locations 섹션에 반영
 
-SD 배경 캐시:
-- static/maps/world/{세계관이름}/background_sd.webp에 SD 생성 배경을 세계관별 캐시
-- static/maps/world/{세계관이름}/background_cairo.webp에 Cairo 생성 배경 캐시
+[4단계] 백지도 + 마커 합성
+  - SD 백지도(배경 레이어) 위에 마커(오버레이 레이어) 합성
+  - 마커: 장소 아이콘, 라벨, 도로, 현재 위치, 테두리, 나침반, 제목
+  - 결과: static/maps/world/{세계관}/world_map.png
+
+Skia 역할:
+  - SD OFF 시 백지도 폴백 생성 (1단계 대체)
+  - 마커 오버레이 렌더링 (4단계)
+  - 지형 데이터 수정 후 재생성 시
+
+자동 생성 조건:
+- 새 시나리오/세계관 생성 시 (1~4단계 전체 실행)
+- 활동 지역이 다른 나라/권역으로 변경될 때
+- Flask 서버 시작 시 (4단계만 — 배경 캐시 재사용)
+- gm-update 호출 시 (4단계만 — 마커 갱신)
+
+캐시 구조 (static/maps/world/{세계관이름}/):
+- background_sd.webp — SD 생성 백지도 (있으면 우선 사용)
+- background_skia.webp — Skia 폴백 백지도
+- world_map.png — 최종 완성 지도 (배경 + 마커)
 - 세계관 전환 시 기존 캐시는 보존, 복귀 시 즉시 재사용
-- 좌표/지형 변경 시에도 배경 캐시는 보존 (오버레이만 재생성)
-- 배경 재생성이 필요한 경우에만 캐시 삭제: rm static/maps/world/{이름}/background_sd.webp
-- 좌표 변경 시 캐시를 삭제하지 않는다 — 오버레이만 재생성하면 충분
+- 좌표/지형 변경 시에도 배경 캐시는 보존 (마커만 재생성)
 
 AnimateDiff
 ===
@@ -161,8 +188,8 @@ AnimateDiff
 
 기본 배경 자동 표시:
 - 웹 UI는 현재 챕터에 맞는 배경을 자동 표시한다
-- 우선순위: GM 요청 장면 > SD 사전 생성 배경 > Cairo 폴백 배경
-- SD OFF 시에도 Cairo 배경이 항상 표시된다 (빈 화면 없음)
+- 우선순위: GM 요청 장면 > SD 사전 생성 배경 > Skia 폴백 배경
+- SD OFF 시에도 Skia 배경이 항상 표시된다 (빈 화면 없음)
 - app.py의 /api/illustration 엔드포인트가 default_bg (sd/pixel 경로)를 제공
 
 일러스트 생성 기준

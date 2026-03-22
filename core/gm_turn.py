@@ -19,6 +19,10 @@ GM 턴 추적기 — 실제 동작만 기록하고, 턴 종료 시 누락 경고
   worldbuilding — 세계관 검증 완료 (새 지역/세력/지리 반영 확인)
   rules — 룰 검증 완료 (판정/비용/사거리/상태이상 확인)
   scenario — 시나리오 검증 완료 (챕터 목표/퀘스트/이벤트 확인)
+
+순서 규칙:
+  gm-update → narration (나레이션 기록 후 출력, write-before-display)
+  gm-update가 없으면 narration 기록 시 경고 출력
 """
 
 import json
@@ -109,6 +113,14 @@ def log_step(tag, message):
         "agent:npc": "🤖💬",
         "agent:worldmap": "🤖🗺️",
     }
+    # narration 기록 시 gm-update가 먼저 되었는지 검증
+    if tag == "narration":
+        done_tags = {s["tag"] for s in tracker["steps"]}
+        if "gm-update" not in done_tags:
+            print("  ⚠️  경고: 나레이션 출력 전에 gm-update가 호출되지 않았습니다!")
+            print("     → 나레이션이 game_state.json events에 기록되지 않습니다.")
+            print("     → 세션 복원 시 이 턴의 내용이 사라집니다.")
+
     icon = icons.get(tag, "▸")
     print(f"  {icon} [{tag}] {message}")
 
@@ -127,6 +139,20 @@ def end_turn():
     for tag, desc in REQUIRED_STEPS.items():
         if tag not in done_tags:
             warnings.append(f"  ⚠️  누락: {desc}")
+
+    # 순서 검증: gm-update가 narration보다 먼저 기록되었는지
+    gm_update_time = None
+    narration_time = None
+    for s in tracker["steps"]:
+        if s["tag"] == "gm-update" and gm_update_time is None:
+            gm_update_time = s["time"]
+        if s["tag"] == "narration" and narration_time is None:
+            narration_time = s["time"]
+
+    if narration_time and not gm_update_time:
+        warnings.append("  ⚠️  순서 위반: 나레이션이 출력되었으나 gm-update가 호출되지 않음 → events 미기록")
+    elif narration_time and gm_update_time and narration_time < gm_update_time:
+        warnings.append("  ⚠️  순서 위반: 나레이션이 gm-update보다 먼저 출력됨 → write-before-display 위반")
 
     tracker["completed"] = True
     tracker["ended_at"] = datetime.now().isoformat()

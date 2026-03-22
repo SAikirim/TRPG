@@ -10,7 +10,7 @@
 | SD WebUI (launch.py) | :7860 | SD venv launch.py (옵션 포함) | 이미지 생성 API |
 
 - Flask 서버: 게임 진행 시 항상 실행 (웹 UI + API)
-- SD WebUI: 이미지 생성이 필요할 때만 실행. SD OFF 시 Cairo 폴백으로 동작하므로 필수는 아님
+- SD WebUI: 이미지 생성이 필요할 때만 실행. SD OFF 시 Skia 폴백으로 동작하므로 필수는 아님
 
 실행 경로 및 명령
 ===

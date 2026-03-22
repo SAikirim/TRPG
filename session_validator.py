@@ -380,7 +380,7 @@ def check_services():
         else:
             log("warn", f"SD WebUI 응답 코드: {resp.status}")
     except Exception:
-        log("warn", "SD WebUI (localhost:7860) 접속 불가 — 미실행 또는 Cairo 폴백 사용")
+        log("warn", "SD WebUI (localhost:7860) 접속 불가 — 미실행 또는 Skia 폴백 사용")
 
 
 def check_illustrations(state):
