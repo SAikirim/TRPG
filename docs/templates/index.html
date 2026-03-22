@@ -522,6 +522,11 @@
             color: #ffd700;
             border-color: #ffd700;
         }
+        .worldmap-btn.active {
+            background: #0f3460;
+            color: #ffd700;
+            border-color: #ffd700;
+        }
         /* Map zoom overlay — 적당한 크기 */
         .map-overlay {
             display: none;
@@ -773,7 +778,7 @@
             </div>
 
             <div class="panel">
-                <h3>이벤트 로그</h3>
+                <h3>이벤트 로그 <button class="worldmap-btn" onclick="toggleFullLog()">전체</button></h3>
                 <div id="events-list" class="events-list"></div>
             </div>
         </div>
@@ -1222,9 +1227,21 @@
             return text;
         }
 
+        let showFullLog = false;
+
+        function toggleFullLog() {
+            showFullLog = !showFullLog;
+            updateEventsList();
+            const btn = document.querySelector('.events-list')?.closest('.panel')?.querySelector('.worldmap-btn');
+            if (btn) {
+                btn.textContent = showFullLog ? '최근' : '전체';
+                btn.classList.toggle('active', showFullLog);
+            }
+        }
+
         function updateEventsList() {
             const container = document.getElementById('events-list');
-            const events = gameState.events.slice(-10).reverse();
+            const events = showFullLog ? [...gameState.events].reverse() : gameState.events.slice(-10).reverse();
             container.innerHTML = events.map(e => {
                 const message = filterNpcNames(e.message || '');
                 const narrative = e.narrative ? `<span class="narrative">${filterNpcNames(e.narrative)}</span>` : '';

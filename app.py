@@ -178,6 +178,15 @@ except Exception:
 update_map_image()
 restore_scene()
 
+# 초상화 배경 자동 제거 (투명 아닌 초상화 수정)
+try:
+    from core.sd_generator import remove_all_portrait_backgrounds
+    bg_result = remove_all_portrait_backgrounds()
+    if bg_result["processed"] > 0:
+        print(f"  [OK] 초상화 배경 제거: {bg_result['processed']}장")
+except Exception:
+    pass
+
 
 @app.route("/")
 def index():
@@ -443,6 +452,16 @@ def regenerate_world_map():
         return jsonify({"success": False, "reason": "No locations with world_pos"})
     except Exception as e:
         return jsonify({"success": False, "reason": str(e)})
+
+
+@app.route("/api/portraits/fix-backgrounds", methods=["POST"])
+def fix_portrait_backgrounds():
+    try:
+        from core.sd_generator import remove_all_portrait_backgrounds
+        results = remove_all_portrait_backgrounds()
+        return jsonify({"success": True, **results})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
 
 
 @app.route("/api/illustration", methods=["GET"])

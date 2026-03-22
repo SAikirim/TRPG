@@ -273,6 +273,23 @@
       "마나 포션": {"heal_mp": 8, "description": "MP 8 회복"}
     }
   },
+  "travel": {
+    "description": "월드맵 이동 속도. 이동 시간 = distance_km / speed_kmh. 하루 이동 가능 시간은 8시간.",
+    "speed_table": {
+      "walk": {"speed_kmh": 4, "description": "도보 이동"},
+      "cart": {"speed_kmh": 6, "description": "짐마차 (짐말/소가 끄는 수레)"},
+      "horse": {"speed_kmh": 8, "description": "기마 이동"},
+      "run": {"speed_kmh": 8, "description": "달리기 (1시간 제한, 이후 피로)"}
+    },
+    "modifiers": {
+      "injured": 0.7,
+      "heavy_load": 0.8,
+      "night": 0.5,
+      "rain": 0.7,
+      "mountain_road": 0.6
+    },
+    "daily_travel_hours": 8
+  },
   "level_up": {
     "enabled": true,
     "description": "경험치(XP) 획득 → 레벨업 → 능력치/HP/MP 성장 + 신규 스킬 해금",

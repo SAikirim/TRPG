@@ -1,7 +1,15 @@
 {
   "world_info": {
-    "name": "unnamed",
+    "name": "에르시아",
+    "name_origin": "고대어로 '넓은 땅'을 뜻한다. 학자들이 대륙을 부르는 이름.",
     "description": "검과 마법이 공존하는 중세 판타지 세계",
+    "grid": {
+      "description": "세계 지도 좌표 격자. 현재 데이터는 카렌델 권역(대륙 동부)만 상세하게 기록되어 있다.",
+      "known_range": {"x_min": 0, "x_max": 15, "y_min": 0, "y_max": 12},
+      "scale_note": "판타지 지도이므로 엄밀한 축척은 적용하지 않는다. 좌표 간 거리는 connections의 distance_km을 참고.",
+      "default_terrain": "grassland",
+      "north": "위쪽 (y 감소 방향)"
+    },
     "tech_level": "중세 (철기, 마법 공존)",
     "magic_system": "마나 기반. 지팡이/부적 등 매개체 사용. 마법사 길드가 마법을 관리."
   },
@@ -32,7 +40,9 @@
       {"type": "mountain", "description": "대륙 북쪽을 가로지르는 험준한 산맥. 만년설이 덮인 봉우리가 이어지며, 카렌 강의 수원지이다. 산맥 너머는 알려지지 않은 땅.", "name": "북벽 산맥", "coords": [[3,1],[4,1],[5,1],[6,1],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0]]},
       {"type": "sea", "description": "대륙 동쪽의 넓은 바다. 세렌 항구에서 해안을 따라 서쪽 도시들로 항해할 수 있다. 어부들이 생계를 이어간다.", "name": "동해", "coords": [[10,4],[11,4],[10,5],[11,5],[10,6],[11,6],[10,7],[11,7],[10,8],[11,8],[10,9],[11,9],[9,7],[9,8],[9,9]]},
       {"type": "river", "description": "북벽 산맥에서 발원하여 카렌델 평원을 지나 동해로 흐르는 강. 카렌델 교역도시의 이름이 이 강에서 유래했다.", "name": "카렌 강", "path": [[6,1],[6,2],[7,3],[7,4],[8,5],[8,6],[9,6],[9,7]]},
-      {"type": "plains", "description": "카렌델 교역도시를 둘러싼 비옥한 평원. 밀밭과 목초지가 펼쳐져 있으며, 교역로가 평원을 가로지른다.", "name": "카렌델 평원", "coords": [[6,2],[7,2],[8,2],[6,3],[7,3],[8,3],[9,3],[8,4],[9,4]]}
+      {"type": "plains", "description": "카렌델 교역도시를 둘러싼 비옥한 평원. 밀밭과 목초지가 펼쳐져 있으며, 교역로가 평원을 가로지른다.", "name": "카렌델 평원", "coords": [[6,2],[7,2],[8,2],[6,3],[7,3],[8,3],[9,3],[8,4],[9,4]]},
+      {"type": "coastline", "name": "동부 해안선", "description": "대륙 동쪽 해안. 카렌 강 하구에서 남북으로 이어진다.", "path": [[9,0],[10,1],[10,2],[10,3],[9,4],[9,5],[8,6],[8,7],[9,8],[9,9],[10,10],[10,11],[11,12]]},
+      {"type": "border", "name": "알려진 세계 경계", "description": "현재 탐험/기록된 세계의 경계. 이 너머는 미지의 영역.", "edges": {"north": "북벽 산맥 너머 — 미지의 땅. 간혹 산맥을 넘어온 여행자의 이야기만 전해진다.", "east": "동해 — 수평선 너머 대륙이 있다는 소문이 있으나 확인되지 않았다.", "south": "하룬 숲 남쪽으로 넓은 초원이 이어지고, 수일 거리에 남부 도시들이 있다고 한다.", "west": "서쪽으로 며칠 거리에 다른 왕국들이 있다. 세렌 항구에서 배편으로 갈 수 있다."}}
     ]
   },
   "locations": {
@@ -72,7 +82,7 @@
         "한트": "늙은 경비병. 마을 입구 근무."
       },
       "connections": {
-        "잃어버린 보물의 숲 던전": {"direction": "동쪽", "distance": "도보 반나절", "travel_hours": 4, "route": "숲 안쪽"}
+        "잃어버린 보물의 숲 던전": {"direction": "동쪽", "distance_km": 16, "route": "숲 안쪽"}
       }
     },
     "trade_road_karendel": {
@@ -91,8 +101,8 @@
         ]
       },
       "connections": {
-        "하룬 마을": {"direction": "남쪽", "distance": "도보 반나절", "travel_hours": 4},
-        "갈림길 쉼터": {"direction": "동쪽", "distance": "도보 반나절", "travel_hours": 4}
+        "하룬 마을": {"direction": "남쪽", "distance_km": 16},
+        "갈림길 쉼터": {"direction": "동쪽", "distance_km": 24}
       }
     },
     "karendel": {
@@ -120,7 +130,7 @@
         "볼프": "붉은 굴뚝 여관 주인. 에르네스의 옛 친구. 소개장 지참 시 하룻밤 무료 투숙. 무릎이 안 좋아 에르네스가 산약초를 구해 보내주는 사이."
       },
       "connections": {
-        "갈림길 쉼터": {"direction": "남쪽", "distance": "도보 반나절~1일", "travel_hours": 8}
+        "갈림길 쉼터": {"direction": "남쪽", "distance_km": 56}
       }
     },
     "lost_treasure_dungeon": {
@@ -129,7 +139,7 @@
       "world_pos": [7, 8],
       "description": "하룬 마을 동쪽 숲 깊은 곳의 고대 던전. 이미 클리어됨.",
       "connections": {
-        "하룬 마을": {"direction": "서쪽", "distance": "도보 반나절", "travel_hours": 4}
+        "하룬 마을": {"direction": "서쪽", "distance_km": 16}
       }
     },
     "crossroads_rest": {
@@ -138,9 +148,9 @@
       "type": "rest_area",
       "description": "교역로가 북쪽(카렌델)과 남쪽(세렌 항구)으로 갈라지는 지점. 여행자들이 야영하는 쉼터가 있다.",
       "connections": {
-        "카렌델": {"direction": "북쪽", "distance": "도보 반나절~1일", "travel_hours": 8},
-        "세렌 항구": {"direction": "남동쪽", "distance": "도보 반나절", "travel_hours": 5},
-        "교역로 (카렌델 방면)": {"direction": "서쪽", "distance": "도보 반나절", "travel_hours": 4}
+        "카렌델": {"direction": "북쪽", "distance_km": 56},
+        "세렌 항구": {"direction": "남동쪽", "distance_km": 20},
+        "교역로 (카렌델 방면)": {"direction": "서쪽", "distance_km": 24}
       }
     },
     "seren_port": {
@@ -149,7 +159,7 @@
       "type": "port_village",
       "description": "작은 어항. 해안을 따라 서쪽 도시들로 가는 배편이 있다.",
       "connections": {
-        "갈림길 쉼터": {"direction": "북서쪽", "distance": "도보 반나절", "travel_hours": 5}
+        "갈림길 쉼터": {"direction": "북서쪽", "distance_km": 20}
       }
     }
   },

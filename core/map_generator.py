@@ -2372,8 +2372,10 @@ class MapGenerator:
 
 
 def generate_world_map():
-    """worldbuilding.json 기반 Cairo 헥스 판타지 세계 지도 생성."""
+    """worldbuilding.json 기반 하이브리드 세계 지도 생성.
+    SD img2img(그라디언트→판타지) + Cairo 오버레이. SD 실패 시 Cairo 전체 폴백."""
     import math as _math
+    import random as _rng
 
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     wb_path = os.path.join(BASE_DIR, "data", "worldbuilding.json")
@@ -2414,265 +2416,304 @@ def generate_world_map():
     min_x, max_x = min(all_xs) - padding, max(all_xs) + padding
     min_y, max_y = min(all_ys) - padding, max(all_ys) + padding
 
-    # 헥스 크기
-    hex_size = 50  # 헥스 반지름
-    hex_w = hex_size * 2
-    hex_h = _math.sqrt(3) * hex_size
+    W, H = 1024, 1024
     cols = max_x - min_x + 1
     rows = max_y - min_y + 1
-    img_w = int(cols * hex_w * 0.75 + hex_w * 0.25 + 60)
-    img_h = int(rows * hex_h + hex_h * 0.5 + 80)
+    tw = W / cols
+    th = H / rows
 
-    # ─── Cairo 양피지 배경 ───
-    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, img_w, img_h)
-    ctx = cairo.Context(surface)
-    ctx.set_antialias(cairo.ANTIALIAS_BEST)
+    def to_pixel(wx, wy):
+        return (wx - min_x + 0.5) * tw, (wy - min_y + 0.5) * th
 
-    # 양피지 기본색
-    ctx.set_source_rgb(0.82, 0.75, 0.60)
-    ctx.rectangle(0, 0, img_w, img_h)
-    ctx.fill()
-
-    # 양피지 질감 (미세 노이즈)
-    import random as _rng
     _rng.seed(42)
-    for _ in range(img_w * img_h // 30):
-        nx = _rng.randint(0, img_w - 1)
-        ny = _rng.randint(0, img_h - 1)
-        v = _rng.uniform(-0.05, 0.05)
-        ctx.set_source_rgba(0.82 + v, 0.75 + v, 0.60 + v, 0.4)
-        ctx.rectangle(nx, ny, _rng.randint(1, 3), _rng.randint(1, 3))
-        ctx.fill()
-    # 가장자리 어둡게 (비네팅)
-    for edge_i in range(20):
-        alpha = 0.03 * (20 - edge_i) / 20
-        ctx.set_source_rgba(0.3, 0.25, 0.15, alpha)
-        ctx.rectangle(edge_i, edge_i, img_w - edge_i*2, img_h - edge_i*2)
-        ctx.stroke()
 
-    def hex_center(wx, wy):
-        """world 좌표 → 픽셀 중심"""
-        col = wx - min_x
-        row = wy - min_y
-        cx = 30 + col * hex_w * 0.75 + hex_size
-        cy = 50 + row * hex_h + (hex_h * 0.5 if col % 2 == 1 else 0) + hex_h * 0.5
-        return cx, cy
+    # ─── 1단계: Cairo 그라디언트 색상맵 ───
+    cm_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
+    cm_ctx = cairo.Context(cm_surface)
+    cm_ctx.set_antialias(cairo.ANTIALIAS_BEST)
+    cm_ctx.set_source_rgb(0.85, 0.78, 0.60)
+    cm_ctx.rectangle(0, 0, W, H)
+    cm_ctx.fill()
 
-    def draw_hex(ctx, cx, cy, size, fill=None, stroke=None, line_width=1):
-        """정육각형 그리기"""
-        for i in range(6):
-            angle = _math.pi / 180 * (60 * i - 30)
-            hx = cx + size * _math.cos(angle)
-            hy = cy + size * _math.sin(angle)
-            if i == 0:
-                ctx.move_to(hx, hy)
-            else:
-                ctx.line_to(hx, hy)
-        ctx.close_path()
-        if fill:
-            ctx.set_source_rgba(*fill)
-            ctx.fill_preserve()
-        if stroke:
-            ctx.set_source_rgba(*stroke)
-            ctx.set_line_width(line_width)
-            ctx.stroke()
-        else:
-            ctx.new_path()
-
-    # ─── 헥스 그리드 (기본 타일) ───
-    for gy in range(min_y, max_y + 1):
-        for gx in range(min_x, max_x + 1):
-            cx, cy = hex_center(gx, gy)
-            draw_hex(ctx, cx, cy, hex_size - 1,
-                     fill=(0.80, 0.73, 0.58, 0.3),
-                     stroke=(0.65, 0.58, 0.45, 0.4), line_width=0.5)
-
-    # ─── 지형 헥스 채우기 ───
-    terrain_hex_colors = {
-        "forest": (0.30, 0.50, 0.20, 0.6),
-        "mountain": (0.55, 0.48, 0.40, 0.7),
-        "sea": (0.25, 0.42, 0.65, 0.75),
-        "plains": (0.68, 0.72, 0.48, 0.4),
-        "swamp": (0.38, 0.45, 0.30, 0.5),
+    terrain_colors = {
+        "forest": (0.25, 0.50, 0.18),
+        "mountain": (0.55, 0.45, 0.35),
+        "sea": (0.20, 0.40, 0.65),
+        "plains": (0.72, 0.75, 0.45),
+        "swamp": (0.35, 0.42, 0.28),
     }
 
     for feat in terrain.get("features", []):
         ftype = feat.get("type", "")
-        hex_color = terrain_hex_colors.get(ftype)
-
+        color = terrain_colors.get(ftype)
+        if not color:
+            continue
         if ftype == "river" and "path" in feat:
-            # 강: 베지어 곡선으로 부드럽게
-            path_pts = [hex_center(c[0], c[1]) for c in feat["path"]]
-            if len(path_pts) >= 2:
-                # 메인 강줄기
-                ctx.set_source_rgba(0.20, 0.38, 0.62, 0.85)
-                ctx.set_line_width(5)
-                ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-                ctx.set_line_join(cairo.LINE_JOIN_ROUND)
-                ctx.move_to(*path_pts[0])
-                for i in range(1, len(path_pts)):
-                    # 이전 점과 현재 점의 중간을 제어점으로 사용
-                    prev = path_pts[i - 1]
-                    curr = path_pts[i]
-                    mid_x = (prev[0] + curr[0]) / 2
-                    mid_y = (prev[1] + curr[1]) / 2
-                    # 곡률 추가 (수직 방향으로 오프셋)
-                    dx = curr[0] - prev[0]
-                    dy = curr[1] - prev[1]
-                    offset = _rng.uniform(-15, 15)
-                    cp1x = mid_x - dy * 0.2 + offset
-                    cp1y = mid_y + dx * 0.2 + offset * 0.5
-                    ctx.curve_to(cp1x, cp1y, cp1x, cp1y, curr[0], curr[1])
-                ctx.stroke()
-                # 강 하이라이트 (얇은 밝은 선)
-                ctx.set_source_rgba(0.35, 0.55, 0.80, 0.3)
-                ctx.set_line_width(2)
-                ctx.move_to(path_pts[0][0] + 2, path_pts[0][1] - 1)
-                for i in range(1, len(path_pts)):
-                    prev = path_pts[i - 1]
-                    curr = path_pts[i]
-                    mid_x = (prev[0] + curr[0]) / 2
-                    mid_y = (prev[1] + curr[1]) / 2
-                    dx = curr[0] - prev[0]
-                    dy = curr[1] - prev[1]
-                    offset = _rng.uniform(-10, 10)
-                    cp1x = mid_x - dy * 0.15 + offset
-                    cp1y = mid_y + dx * 0.15 + offset * 0.3
-                    ctx.curve_to(cp1x, cp1y, cp1x, cp1y, curr[0] + 2, curr[1] - 1)
-                ctx.stroke()
-                # 강 이름
-                mid = path_pts[len(path_pts) // 2]
-                ctx.set_source_rgba(0.12, 0.25, 0.50, 0.95)
-                ctx.select_font_face("Malgun Gothic", cairo.FONT_SLANT_ITALIC, cairo.FONT_WEIGHT_BOLD)
-                ctx.set_font_size(14)
-                ctx.move_to(mid[0] + 10, mid[1] - 8)
-                ctx.show_text(feat.get("name", ""))
-
-        elif hex_color and "coords" in feat:
-            for coord in feat["coords"]:
-                cx, cy = hex_center(coord[0], coord[1])
-                draw_hex(ctx, cx, cy, hex_size - 1, fill=hex_color)
-
-                # 지형 장식
-                if ftype == "forest":
-                    for _ in range(3):
-                        ox = _rng.uniform(-20, 20)
-                        oy = _rng.uniform(-15, 15)
-                        sz = _rng.uniform(6, 12)
-                        ctx.set_source_rgba(0.22, 0.42, 0.15, 0.7)
-                        ctx.move_to(cx + ox, cy + oy - sz)
-                        ctx.line_to(cx + ox - sz * 0.5, cy + oy + sz * 0.3)
-                        ctx.line_to(cx + ox + sz * 0.5, cy + oy + sz * 0.3)
-                        ctx.close_path()
-                        ctx.fill()
-                        ctx.set_source_rgba(0.40, 0.32, 0.20, 0.6)
-                        ctx.rectangle(cx + ox - 1, cy + oy + sz * 0.3, 2, 4)
-                        ctx.fill()
-
-                elif ftype == "mountain":
-                    for _ in range(2):
-                        ox = _rng.uniform(-15, 15)
-                        oy = _rng.uniform(-10, 5)
-                        mh = _rng.uniform(16, 26)
-                        mw = _rng.uniform(12, 20)
-                        # 산체
-                        ctx.set_source_rgba(0.48, 0.42, 0.35, 0.8)
-                        ctx.move_to(cx + ox, cy + oy - mh)
-                        ctx.line_to(cx + ox - mw, cy + oy)
-                        ctx.line_to(cx + ox + mw, cy + oy)
-                        ctx.close_path()
-                        ctx.fill()
-                        # 눈
-                        ctx.set_source_rgba(0.92, 0.92, 0.95, 0.8)
-                        ctx.move_to(cx + ox, cy + oy - mh)
-                        ctx.line_to(cx + ox - mw * 0.3, cy + oy - mh + 8)
-                        ctx.line_to(cx + ox + mw * 0.3, cy + oy - mh + 8)
-                        ctx.close_path()
-                        ctx.fill()
-
-                elif ftype == "sea":
-                    # 물결 패턴
-                    for wy in range(int(cy - 18), int(cy + 18), 10):
-                        for wx in range(int(cx - 18), int(cx + 18), 14):
-                            ctx.set_source_rgba(0.30, 0.48, 0.70, 0.4)
-                            ctx.arc(wx, wy, 5, 0, _math.pi)
-                            ctx.stroke()
-
-            # 지형 이름
-            if feat.get("name") and feat.get("coords"):
-                avg_x = sum(c[0] for c in feat["coords"]) / len(feat["coords"])
-                avg_y = sum(c[1] for c in feat["coords"]) / len(feat["coords"])
-                tx, ty = hex_center(avg_x, avg_y)
-                name_colors = {
-                    "forest": (0.15, 0.30, 0.10, 0.9),
-                    "mountain": (0.35, 0.25, 0.15, 0.9),
-                    "sea": (0.10, 0.20, 0.50, 0.95),
-                    "plains": (0.40, 0.42, 0.25, 0.8),
-                    "swamp": (0.25, 0.32, 0.18, 0.8),
-                }
-                nc = name_colors.get(ftype, (0.4, 0.4, 0.4, 0.8))
-                ctx.select_font_face("Malgun Gothic", cairo.FONT_SLANT_ITALIC, cairo.FONT_WEIGHT_BOLD)
-                ctx.set_font_size(14)
-                te = ctx.text_extents(feat["name"])
-                # 배경
-                ctx.set_source_rgba(0.82, 0.75, 0.60, 0.7)
-                ctx.rectangle(tx - te.width / 2 - 4, ty - 8, te.width + 8, 18)
-                ctx.fill()
-                ctx.set_source_rgba(*nc)
-                ctx.move_to(tx - te.width / 2, ty + 5)
-                ctx.show_text(feat["name"])
-
-    # ─── 해안선 (바다와 육지 경계) ───
-    sea_coords = set()
-    for feat in terrain.get("features", []):
-        if feat.get("type") == "sea" and "coords" in feat:
+            cm_ctx.set_source_rgb(0.20, 0.40, 0.65)
+            cm_ctx.set_line_width(tw * 0.2)
+            cm_ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+            pts = feat["path"]
+            x0, y0 = to_pixel(pts[0][0], pts[0][1])
+            cm_ctx.move_to(x0, y0)
+            for i in range(1, len(pts)):
+                px, py = to_pixel(pts[i][0], pts[i][1])
+                prev_x, prev_y = to_pixel(pts[i-1][0], pts[i-1][1])
+                cpx = (prev_x + px) / 2 + (py - prev_y) * 0.15
+                cpy = (prev_y + py) / 2 - (px - prev_x) * 0.15
+                cm_ctx.curve_to(cpx, cpy, cpx, cpy, px, py)
+            cm_ctx.stroke()
+        elif "coords" in feat:
+            cm_ctx.set_source_rgb(*color)
             for c in feat["coords"]:
-                sea_coords.add((c[0], c[1]))
+                for offset in [(-2,-2), (2,-2), (-2,2), (2,2), (0,0)]:
+                    px = (c[0] - min_x) * tw + offset[0]
+                    py = (c[1] - min_y) * th + offset[1]
+                    cm_ctx.rectangle(px - 2, py - 2, tw + 4, th + 4)
+                    cm_ctx.fill()
 
-    if sea_coords:
-        ctx.set_source_rgba(0.18, 0.35, 0.58, 0.9)
-        ctx.set_line_width(2.5)
-        ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-        # 각 바다 헥스의 6변을 확인, 인접이 바다가 아니면 해안선
-        hex_neighbors = [
-            (1, 0), (-1, 0), (0, 1), (0, -1), (1, -1), (-1, 1)
-        ]
-        drawn_edges = set()
-        for sx, sy in sea_coords:
-            cx, cy = hex_center(sx, sy)
+    colormap_path = os.path.join(BASE_DIR, "static", "world_map_colormap.png")
+    cm_surface.write_to_png(colormap_path)
+
+    # PIL로 가우시안 블러
+    from PIL import ImageFilter
+    cm_img = Image.open(colormap_path).filter(ImageFilter.GaussianBlur(radius=8))
+    cm_img.save(colormap_path)
+
+    # ─── 2단계: SD img2img 시도 → Cairo 폴백 ───
+    sd_bg = None
+    sd_cache_path = os.path.join(BASE_DIR, "static", "world_map_bg.webp")
+
+    try:
+        from core.sd_generator import is_sd_enabled
+        if is_sd_enabled():
+            import requests
+            import base64
+            import io
+            SD_API_URL = "http://127.0.0.1:7860"
+            requests.get(f"{SD_API_URL}/sdapi/v1/options", timeout=5)
+
+            # 캐시 있으면 재사용
+            if os.path.exists(sd_cache_path):
+                sd_bg = Image.open(sd_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
+            else:
+                buffered = io.BytesIO()
+                cm_img.save(buffered, format="PNG")
+                img_b64 = base64.b64encode(buffered.getvalue()).decode()
+
+                payload = {
+                    "init_images": [img_b64],
+                    "prompt": "fantasy world map, top down view, detailed terrain textures, lush green forests with individual trees, snow-capped rocky mountains, deep blue ocean with foam waves, golden wheat plains, winding blue river, sandy coastline, medieval hand-painted cartography style, parchment paper, high detail, masterpiece, best quality",
+                    "negative_prompt": "text, words, labels, letters, UI, modern, blurry, low quality, 3d render, photo, people, buildings",
+                    "steps": 25,
+                    "sampler_name": "DPM++ 2M Karras",
+                    "width": W,
+                    "height": H,
+                    "cfg_scale": 7,
+                    "denoising_strength": 0.55,
+                }
+                resp = requests.post(f"{SD_API_URL}/sdapi/v1/img2img", json=payload, timeout=300)
+                resp.raise_for_status()
+                result = resp.json()
+                if result.get("images"):
+                    img_data = base64.b64decode(result["images"][0])
+                    sd_bg = Image.open(io.BytesIO(img_data)).convert("RGBA").resize((W, H), Image.LANCZOS)
+                    sd_bg.save(sd_cache_path, "WEBP", quality=90)
+    except Exception:
+        pass
+
+    # ─── 3단계: Cairo 최종 surface 구성 ───
+    final_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
+    ctx = cairo.Context(final_surface)
+    ctx.set_antialias(cairo.ANTIALIAS_BEST)
+
+    if sd_bg:
+        # SD 배경 사용
+        bg_data = sd_bg.tobytes("raw", "BGRa")
+        bg_surface = cairo.ImageSurface.create_for_data(
+            bytearray(bg_data), cairo.FORMAT_ARGB32, W, H, W * 4)
+        ctx.set_source_surface(bg_surface, 0, 0)
+        ctx.paint()
+    else:
+        # Cairo 폴백: 양피지 배경
+        ctx.set_source_rgb(0.82, 0.75, 0.60)
+        ctx.rectangle(0, 0, W, H)
+        ctx.fill()
+        for _ in range(W * H // 30):
+            nx = _rng.randint(0, W - 1)
+            ny = _rng.randint(0, H - 1)
+            v = _rng.uniform(-0.05, 0.05)
+            ctx.set_source_rgba(0.82 + v, 0.75 + v, 0.60 + v, 0.4)
+            ctx.rectangle(nx, ny, _rng.randint(1, 3), _rng.randint(1, 3))
+            ctx.fill()
+        for edge_i in range(20):
+            alpha = 0.03 * (20 - edge_i) / 20
+            ctx.set_source_rgba(0.3, 0.25, 0.15, alpha)
+            ctx.rectangle(edge_i, edge_i, W - edge_i*2, H - edge_i*2)
+            ctx.stroke()
+
+        # Cairo 폴백 시 헥스 그리드 + 지형 그리기
+        hex_size = 50
+        hex_w = hex_size * 2
+        hex_h = _math.sqrt(3) * hex_size
+
+        def hex_center(wx, wy):
+            col = wx - min_x
+            row = wy - min_y
+            cx = 30 + col * hex_w * 0.75 + hex_size
+            cy = 50 + row * hex_h + (hex_h * 0.5 if col % 2 == 1 else 0) + hex_h * 0.5
+            return cx, cy
+
+        def draw_hex(ctx, cx, cy, size, fill=None, stroke=None, line_width=1):
             for i in range(6):
-                angle1 = _math.pi / 180 * (60 * i - 30)
-                angle2 = _math.pi / 180 * (60 * (i + 1) - 30)
-                # 인접 헥스 좌표 계산 (홀짝 열에 따라 다름)
-                if sx % 2 == 0:
-                    adj_offsets = [(1, 0), (0, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
+                angle = _math.pi / 180 * (60 * i - 30)
+                hx = cx + size * _math.cos(angle)
+                hy = cy + size * _math.sin(angle)
+                if i == 0:
+                    ctx.move_to(hx, hy)
                 else:
-                    adj_offsets = [(1, 1), (0, 1), (-1, 1), (-1, 0), (0, -1), (1, 0)]
-                adj_x = sx + adj_offsets[i][0]
-                adj_y = sy + adj_offsets[i][1]
-                if (adj_x, adj_y) not in sea_coords:
-                    # 이 변은 해안선
-                    hx1 = cx + (hex_size - 1) * _math.cos(angle1)
-                    hy1 = cy + (hex_size - 1) * _math.sin(angle1)
-                    hx2 = cx + (hex_size - 1) * _math.cos(angle2)
-                    hy2 = cy + (hex_size - 1) * _math.sin(angle2)
-                    edge_key = (round(hx1), round(hy1), round(hx2), round(hy2))
-                    if edge_key not in drawn_edges:
-                        drawn_edges.add(edge_key)
-                        # 곡선으로 해안선 그리기
-                        mid_x = (hx1 + hx2) / 2
-                        mid_y = (hy1 + hy2) / 2
-                        # 육지 방향으로 약간 볼록하게
-                        dx = hx2 - hx1
-                        dy = hy2 - hy1
-                        bulge = _rng.uniform(2, 5)
-                        cpx = mid_x + dy * 0.15 * bulge / 3
-                        cpy = mid_y - dx * 0.15 * bulge / 3
-                        ctx.move_to(hx1, hy1)
-                        ctx.curve_to(cpx, cpy, cpx, cpy, hx2, hy2)
-                        ctx.stroke()
+                    ctx.line_to(hx, hy)
+            ctx.close_path()
+            if fill:
+                ctx.set_source_rgba(*fill)
+                ctx.fill_preserve()
+            if stroke:
+                ctx.set_source_rgba(*stroke)
+                ctx.set_line_width(line_width)
+                ctx.stroke()
+            else:
+                ctx.new_path()
 
-    # ─── 도로 연결선 (메인길/샛길 구분) ───
+        # 헥스 그리드
+        for gy in range(min_y, max_y + 1):
+            for gx in range(min_x, max_x + 1):
+                cx, cy = hex_center(gx, gy)
+                draw_hex(ctx, cx, cy, hex_size - 1,
+                         fill=(0.80, 0.73, 0.58, 0.3),
+                         stroke=(0.65, 0.58, 0.45, 0.4), line_width=0.5)
+
+        terrain_hex_colors = {
+            "forest": (0.30, 0.50, 0.20, 0.6),
+            "mountain": (0.55, 0.48, 0.40, 0.7),
+            "sea": (0.25, 0.42, 0.65, 0.75),
+            "plains": (0.68, 0.72, 0.48, 0.4),
+            "swamp": (0.38, 0.45, 0.30, 0.5),
+        }
+
+        for feat in terrain.get("features", []):
+            ftype = feat.get("type", "")
+            hex_color = terrain_hex_colors.get(ftype)
+            if ftype == "river" and "path" in feat:
+                path_pts = [hex_center(c[0], c[1]) for c in feat["path"]]
+                if len(path_pts) >= 2:
+                    ctx.set_source_rgba(0.20, 0.38, 0.62, 0.85)
+                    ctx.set_line_width(5)
+                    ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+                    ctx.move_to(*path_pts[0])
+                    for i in range(1, len(path_pts)):
+                        prev = path_pts[i-1]; curr = path_pts[i]
+                        cpx = (prev[0]+curr[0])/2 - (curr[1]-prev[1])*0.2 + _rng.uniform(-8,8)
+                        cpy = (prev[1]+curr[1])/2 + (curr[0]-prev[0])*0.2 + _rng.uniform(-4,4)
+                        ctx.curve_to(cpx, cpy, cpx, cpy, curr[0], curr[1])
+                    ctx.stroke()
+            elif hex_color and "coords" in feat:
+                for coord in feat["coords"]:
+                    cx, cy = hex_center(coord[0], coord[1])
+                    draw_hex(ctx, cx, cy, hex_size - 1, fill=hex_color)
+                    if ftype == "forest":
+                        for _ in range(3):
+                            ox = _rng.uniform(-20, 20); oy = _rng.uniform(-15, 15)
+                            sz = _rng.uniform(6, 12)
+                            ctx.set_source_rgba(0.22, 0.42, 0.15, 0.7)
+                            ctx.move_to(cx+ox, cy+oy-sz)
+                            ctx.line_to(cx+ox-sz*0.5, cy+oy+sz*0.3)
+                            ctx.line_to(cx+ox+sz*0.5, cy+oy+sz*0.3)
+                            ctx.close_path(); ctx.fill()
+                    elif ftype == "mountain":
+                        for _ in range(2):
+                            ox = _rng.uniform(-15, 15); oy = _rng.uniform(-10, 5)
+                            mh = _rng.uniform(16, 26); mw = _rng.uniform(12, 20)
+                            ctx.set_source_rgba(0.48, 0.42, 0.35, 0.8)
+                            ctx.move_to(cx+ox, cy+oy-mh)
+                            ctx.line_to(cx+ox-mw, cy+oy)
+                            ctx.line_to(cx+ox+mw, cy+oy)
+                            ctx.close_path(); ctx.fill()
+                            ctx.set_source_rgba(0.92, 0.92, 0.95, 0.8)
+                            ctx.move_to(cx+ox, cy+oy-mh)
+                            ctx.line_to(cx+ox-mw*0.3, cy+oy-mh+8)
+                            ctx.line_to(cx+ox+mw*0.3, cy+oy-mh+8)
+                            ctx.close_path(); ctx.fill()
+                    elif ftype == "sea":
+                        for wy in range(int(cy-18), int(cy+18), 10):
+                            for wx in range(int(cx-18), int(cx+18), 14):
+                                ctx.set_source_rgba(0.30, 0.48, 0.70, 0.4)
+                                ctx.arc(wx, wy, 5, 0, _math.pi)
+                                ctx.stroke()
+
+        # to_pixel을 hex_center로 대체 (Cairo 폴백 모드)
+        to_pixel = hex_center
+
+    # ─── 4단계: 공통 오버레이 (강/도로/마커/라벨) ───
+
+    # 강 (SD 모드에서만 — Cairo 폴백은 위에서 이미 그림)
+    if sd_bg:
+        for feat in terrain.get("features", []):
+            if feat.get("type") == "river" and "path" in feat:
+                path_pts = [to_pixel(c[0], c[1]) for c in feat["path"]]
+                if len(path_pts) >= 2:
+                    ctx.set_source_rgba(0.18, 0.35, 0.60, 0.7)
+                    ctx.set_line_width(4)
+                    ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+                    ctx.move_to(*path_pts[0])
+                    for i in range(1, len(path_pts)):
+                        prev = path_pts[i-1]; curr = path_pts[i]
+                        dx = curr[0]-prev[0]; dy = curr[1]-prev[1]
+                        cpx = (prev[0]+curr[0])/2 - dy*0.2 + _rng.uniform(-8,8)
+                        cpy = (prev[1]+curr[1])/2 + dx*0.2 + _rng.uniform(-4,4)
+                        ctx.curve_to(cpx, cpy, cpx, cpy, curr[0], curr[1])
+                    ctx.stroke()
+                    # 하이라이트
+                    ctx.set_source_rgba(0.30, 0.50, 0.78, 0.3)
+                    ctx.set_line_width(2)
+                    ctx.move_to(path_pts[0][0]+1, path_pts[0][1]-1)
+                    for i in range(1, len(path_pts)):
+                        prev = path_pts[i-1]; curr = path_pts[i]
+                        dx = curr[0]-prev[0]; dy = curr[1]-prev[1]
+                        cpx = (prev[0]+curr[0])/2 - dy*0.15 + _rng.uniform(-6,6)
+                        cpy = (prev[1]+curr[1])/2 + dx*0.15 + _rng.uniform(-3,3)
+                        ctx.curve_to(cpx, cpy, cpx, cpy, curr[0]+1, curr[1]-1)
+                    ctx.stroke()
+                    mid = path_pts[len(path_pts)//2]
+                    ctx.select_font_face("Malgun Gothic", cairo.FONT_SLANT_ITALIC, cairo.FONT_WEIGHT_BOLD)
+                    ctx.set_font_size(13)
+                    ctx.set_source_rgba(0.10, 0.22, 0.48, 0.9)
+                    ctx.move_to(mid[0]+10, mid[1]-8)
+                    ctx.show_text(feat.get("name", ""))
+
+    # 지형 이름 (Cairo 폴백에서도 표시)
+    for feat in terrain.get("features", []):
+        if feat.get("type") == "river":
+            continue
+        if feat.get("name") and feat.get("coords"):
+            avg_x = sum(c[0] for c in feat["coords"]) / len(feat["coords"])
+            avg_y = sum(c[1] for c in feat["coords"]) / len(feat["coords"])
+            tx, ty = to_pixel(avg_x, avg_y)
+            name_colors = {
+                "forest": (0.15, 0.30, 0.10), "mountain": (0.35, 0.25, 0.15),
+                "sea": (0.10, 0.20, 0.50), "plains": (0.40, 0.42, 0.25),
+                "swamp": (0.25, 0.32, 0.18),
+            }
+            nc = name_colors.get(feat["type"], (0.4, 0.4, 0.4))
+            ctx.select_font_face("Malgun Gothic", cairo.FONT_SLANT_ITALIC, cairo.FONT_WEIGHT_BOLD)
+            ctx.set_font_size(14)
+            te = ctx.text_extents(feat["name"])
+            ctx.set_source_rgba(0.82, 0.75, 0.60, 0.7)
+            ctx.rectangle(tx - te.width/2 - 4, ty - 8, te.width + 8, 18)
+            ctx.fill()
+            ctx.set_source_rgba(*nc, 0.9)
+            ctx.move_to(tx - te.width/2, ty + 5)
+            ctx.show_text(feat["name"])
+
+    # 도로 (메인길/샛길)
     main_types = {"village", "trade_city", "port_village"}
     drawn_connections = set()
     for loc_id, loc in placed.items():
@@ -2689,173 +2730,104 @@ def generate_world_map():
                 continue
             drawn_connections.add(pair)
 
-            x1, y1 = hex_center(loc["x"], loc["y"])
-            x2, y2 = hex_center(placed[target_id]["x"], placed[target_id]["y"])
+            x1, y1 = to_pixel(loc["x"], loc["y"])
+            x2, y2 = to_pixel(placed[target_id]["x"], placed[target_id]["y"])
+            is_main = (loc["type"] in main_types and placed[target_id]["type"] in main_types) or \
+                      loc["type"] == "trade_city" or placed[target_id]["type"] == "trade_city"
 
-            # 메인길: 양쪽 모두 주요 지역 (마을/도시/항구)
-            is_main = loc["type"] in main_types and placed[target_id]["type"] in main_types
-            # 또는 한쪽이라도 trade_city면 메인
-            if loc["type"] == "trade_city" or placed[target_id]["type"] == "trade_city":
-                is_main = True
-
-            # 곡선 도로 (직선 대신 약간 휘어지게)
-            mid_x = (x1 + x2) / 2
-            mid_y = (y1 + y2) / 2
-            dx = x2 - x1
-            dy = y2 - y1
-            curve_offset = _rng.uniform(-12, 12)
-            cpx = mid_x - dy * 0.08 + curve_offset
-            cpy = mid_y + dx * 0.08
+            mid_x = (x1+x2)/2; mid_y = (y1+y2)/2
+            dx = x2-x1; dy = y2-y1
+            offset = _rng.uniform(-10, 10)
+            cpx = mid_x - dy*0.08 + offset
+            cpy = mid_y + dx*0.08
 
             ctx.set_line_cap(cairo.LINE_CAP_ROUND)
             if is_main:
-                # 메인길: 굵고 진한 실선
-                ctx.set_source_rgba(0.40, 0.32, 0.22, 0.8)
+                ctx.set_source_rgba(0.22, 0.16, 0.08, 0.5)
+                ctx.set_line_width(6); ctx.set_dash([])
+                ctx.move_to(x1, y1); ctx.curve_to(cpx, cpy, cpx, cpy, x2, y2); ctx.stroke()
+                ctx.set_source_rgba(0.55, 0.45, 0.30, 0.85)
                 ctx.set_line_width(3.5)
-                ctx.set_dash([])
-                ctx.move_to(x1, y1)
-                ctx.curve_to(cpx, cpy, cpx, cpy, x2, y2)
-                ctx.stroke()
-                # 테두리
-                ctx.set_source_rgba(0.30, 0.24, 0.15, 0.4)
-                ctx.set_line_width(5)
-                ctx.move_to(x1, y1)
-                ctx.curve_to(cpx, cpy, cpx, cpy, x2, y2)
-                ctx.stroke()
-                # 메인 다시 (테두리 위에)
-                ctx.set_source_rgba(0.45, 0.38, 0.28, 0.85)
-                ctx.set_line_width(3)
-                ctx.move_to(x1, y1)
-                ctx.curve_to(cpx, cpy, cpx, cpy, x2, y2)
-                ctx.stroke()
+                ctx.move_to(x1, y1); ctx.curve_to(cpx, cpy, cpx, cpy, x2, y2); ctx.stroke()
             else:
-                # 샛길: 가늘고 옅은 점선
-                ctx.set_source_rgba(0.50, 0.42, 0.32, 0.5)
-                ctx.set_line_width(1.5)
-                ctx.set_dash([4, 6])
-                ctx.move_to(x1, y1)
-                ctx.curve_to(cpx, cpy, cpx, cpy, x2, y2)
-                ctx.stroke()
+                ctx.set_source_rgba(0.55, 0.48, 0.35, 0.7)
+                ctx.set_line_width(2.5); ctx.set_dash([8, 5])
+                ctx.move_to(x1, y1); ctx.curve_to(cpx, cpy, cpx, cpy, x2, y2); ctx.stroke()
                 ctx.set_dash([])
 
-    # ─── 지역 마커 ───
-    # 겹침 방지용
+    # 지역 마커 + 라벨
     label_rects = []
-
-    def find_label_pos(cx, cy, tw, th):
-        offsets = [(cx - tw/2, cy + 28), (cx - tw/2, cy - th - 28),
-                   (cx + 32, cy - th/2), (cx - tw - 32, cy - th/2),
-                   (cx - tw/2, cy + 44), (cx - tw/2, cy - th - 44)]
+    def find_label_pos(cx, cy, tw_l, th_l):
+        offsets = [(cx-tw_l/2, cy+26), (cx-tw_l/2, cy-th_l-26),
+                   (cx+28, cy-th_l/2), (cx-tw_l-28, cy-th_l/2),
+                   (cx-tw_l/2, cy+42), (cx-tw_l/2, cy-th_l-42)]
         for lx, ly in offsets:
-            rect = (lx - 2, ly - 2, lx + tw + 4, ly + th + 4)
-            overlap = any(not (rect[2] < r[0] or rect[0] > r[2] or rect[3] < r[1] or rect[1] > r[3]) for r in label_rects)
-            if not overlap:
+            rect = (lx-2, ly-2, lx+tw_l+4, ly+th_l+4)
+            if not any(not(rect[2]<r[0] or rect[0]>r[2] or rect[3]<r[1] or rect[1]>r[3]) for r in label_rects):
                 label_rects.append(rect)
                 return lx, ly
-        label_rects.append((offsets[0][0]-2, offsets[0][1]-2, offsets[0][0]+tw+4, offsets[0][1]+th+4))
+        label_rects.append((offsets[0][0]-2, offsets[0][1]-2, offsets[0][0]+tw_l+4, offsets[0][1]+th_l+4))
         return offsets[0]
 
     type_colors = {
-        "village": (0.63, 0.47, 0.24),
-        "trade_city": (0.72, 0.55, 0.18),
-        "road": (0.55, 0.47, 0.32),
-        "dungeon": (0.47, 0.32, 0.40),
-        "rest_area": (0.52, 0.56, 0.36),
-        "port_village": (0.32, 0.47, 0.60),
+        "village": (0.63, 0.47, 0.24), "trade_city": (0.72, 0.55, 0.18),
+        "road": (0.55, 0.47, 0.32), "dungeon": (0.47, 0.32, 0.40),
+        "rest_area": (0.52, 0.56, 0.36), "port_village": (0.32, 0.47, 0.60),
     }
 
     for loc_id, loc in placed.items():
-        cx, cy = hex_center(loc["x"], loc["y"])
+        cx, cy = to_pixel(loc["x"], loc["y"])
         color = type_colors.get(loc["type"], (0.6, 0.5, 0.4))
-
         if loc["type"] == "trade_city":
-            # 성벽 + 탑
-            r = 20
-            ctx.set_source_rgb(*color)
-            ctx.rectangle(cx-r, cy-r, r*2, r*2)
-            ctx.fill()
-            ctx.set_source_rgb(0.32, 0.24, 0.12)
-            ctx.set_line_width(2)
-            ctx.rectangle(cx-r, cy-r, r*2, r*2)
-            ctx.stroke()
-            # 탑
-            for tx_off in [-r, r-6]:
-                ctx.rectangle(cx+tx_off, cy-r-10, 6, 10)
-                ctx.fill()
-        elif loc["type"] in ("village", "port_village"):
-            r = 14
-            ctx.set_source_rgb(*color)
-            ctx.rectangle(cx-r, cy-3, r*2, r+3)
-            ctx.fill()
-            ctx.set_source_rgb(0.63, 0.40, 0.20)
-            ctx.move_to(cx-r-2, cy-3)
-            ctx.line_to(cx, cy-r-6)
-            ctx.line_to(cx+r+2, cy-3)
-            ctx.close_path()
-            ctx.fill()
-            ctx.set_source_rgb(0.32, 0.24, 0.12)
-            ctx.set_line_width(1.5)
-            ctx.rectangle(cx-r, cy-3, r*2, r+3)
-            ctx.stroke()
-        elif loc["type"] == "dungeon":
             r = 16
+            ctx.set_source_rgb(*color)
+            ctx.rectangle(cx-r, cy-r, r*2, r*2); ctx.fill()
+            ctx.set_source_rgb(0.32, 0.24, 0.12); ctx.set_line_width(2)
+            ctx.rectangle(cx-r, cy-r, r*2, r*2); ctx.stroke()
+            for tx_off in [-r, r-5]:
+                ctx.rectangle(cx+tx_off, cy-r-8, 5, 8); ctx.fill()
+        elif loc["type"] in ("village", "port_village"):
+            r = 11
+            ctx.set_source_rgb(*color)
+            ctx.rectangle(cx-r, cy-3, r*2, r+3); ctx.fill()
+            ctx.set_source_rgb(0.63, 0.40, 0.20)
+            ctx.move_to(cx-r-2, cy-3); ctx.line_to(cx, cy-r-5); ctx.line_to(cx+r+2, cy-3)
+            ctx.close_path(); ctx.fill()
+            ctx.set_source_rgb(0.32, 0.24, 0.12); ctx.set_line_width(1.5)
+            ctx.rectangle(cx-r, cy-3, r*2, r+3); ctx.stroke()
+        elif loc["type"] == "dungeon":
+            r = 13
             ctx.set_source_rgba(0.24, 0.20, 0.24, 0.9)
-            ctx.arc(cx, cy, r, 0, 2 * _math.pi)
-            ctx.fill()
-            ctx.set_source_rgb(0.40, 0.32, 0.32)
-            ctx.set_line_width(2)
-            ctx.arc(cx, cy, r, 0, 2 * _math.pi)
-            ctx.stroke()
-            # 해골
-            ctx.set_source_rgba(0.80, 0.72, 0.60, 0.9)
-            ctx.set_font_size(18)
-            te = ctx.text_extents("\u2620")
-            ctx.move_to(cx - te.width/2, cy + te.height/2)
-            ctx.show_text("\u2620")
+            ctx.arc(cx, cy, r, 0, 2*_math.pi); ctx.fill()
+            ctx.set_source_rgb(0.40, 0.32, 0.32); ctx.set_line_width(2)
+            ctx.arc(cx, cy, r, 0, 2*_math.pi); ctx.stroke()
         elif loc["type"] == "rest_area":
-            r = 12
+            r = 9
             ctx.set_source_rgb(*color)
-            ctx.move_to(cx, cy - r - 5)
-            ctx.line_to(cx - r - 5, cy + r)
-            ctx.line_to(cx + r + 5, cy + r)
-            ctx.close_path()
-            ctx.fill()
-            ctx.set_source_rgb(0.32, 0.24, 0.12)
-            ctx.set_line_width(1.5)
-            ctx.move_to(cx, cy - r - 5)
-            ctx.line_to(cx - r - 5, cy + r)
-            ctx.line_to(cx + r + 5, cy + r)
-            ctx.close_path()
-            ctx.stroke()
+            ctx.move_to(cx, cy-r-4); ctx.line_to(cx-r-4, cy+r); ctx.line_to(cx+r+4, cy+r)
+            ctx.close_path(); ctx.fill()
+            ctx.set_source_rgb(0.32, 0.24, 0.12); ctx.set_line_width(1.5)
+            ctx.move_to(cx, cy-r-4); ctx.line_to(cx-r-4, cy+r); ctx.line_to(cx+r+4, cy+r)
+            ctx.close_path(); ctx.stroke()
         else:
-            r = 14
-            ctx.set_source_rgb(*color)
-            ctx.arc(cx, cy, r, 0, 2 * _math.pi)
-            ctx.fill()
-            ctx.set_source_rgb(0.32, 0.24, 0.12)
-            ctx.set_line_width(1.5)
-            ctx.arc(cx, cy, r, 0, 2 * _math.pi)
-            ctx.stroke()
+            r = 11
+            ctx.set_source_rgb(*color); ctx.arc(cx, cy, r, 0, 2*_math.pi); ctx.fill()
+            ctx.set_source_rgb(0.32, 0.24, 0.12); ctx.set_line_width(1.5)
+            ctx.arc(cx, cy, r, 0, 2*_math.pi); ctx.stroke()
 
-        # 이름 라벨
+        # 라벨
         ctx.select_font_face("Malgun Gothic", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-        ctx.set_font_size(15)
+        ctx.set_font_size(14)
         te = ctx.text_extents(loc["name"])
-        lx, ly = find_label_pos(cx, cy, te.width + 8, 20)
-        # 배경 박스
-        ctx.set_source_rgba(0.75, 0.68, 0.52, 0.85)
-        ctx.rectangle(lx, ly, te.width + 8, 20)
-        ctx.fill()
-        ctx.set_source_rgba(0.45, 0.38, 0.25, 0.8)
-        ctx.set_line_width(1)
-        ctx.rectangle(lx, ly, te.width + 8, 20)
-        ctx.stroke()
-        # 텍스트
-        ctx.set_source_rgb(0.20, 0.12, 0.05)
-        ctx.move_to(lx + 4, ly + 15)
-        ctx.show_text(loc["name"])
+        lx, ly = find_label_pos(cx, cy, te.width+8, 18)
+        ctx.set_source_rgba(0.92, 0.88, 0.78, 0.85)
+        ctx.rectangle(lx, ly, te.width+8, 18); ctx.fill()
+        ctx.set_source_rgba(0.45, 0.38, 0.25, 0.7); ctx.set_line_width(1)
+        ctx.rectangle(lx, ly, te.width+8, 18); ctx.stroke()
+        ctx.set_source_rgb(0.18, 0.10, 0.04)
+        ctx.move_to(lx+4, ly+14); ctx.show_text(loc["name"])
 
-    # ─── 현재 위치 ───
+    # 현재 위치
     try:
         gs_path = os.path.join(BASE_DIR, "data", "game_state.json")
         if os.path.exists(gs_path):
@@ -2863,85 +2835,57 @@ def generate_world_map():
                 gs = json.load(f)
             cur_loc = gs.get("current_location", "")
             if cur_loc in placed:
-                px, py = hex_center(placed[cur_loc]["x"], placed[cur_loc]["y"])
-                # 빨간 깃발
-                ctx.set_source_rgb(0.72, 0.15, 0.15)
-                ctx.set_line_width(2.5)
-                ctx.move_to(px + 22, py - 2)
-                ctx.line_to(px + 22, py - 30)
-                ctx.stroke()
+                px, py = to_pixel(placed[cur_loc]["x"], placed[cur_loc]["y"])
+                ctx.set_source_rgb(0.72, 0.15, 0.15); ctx.set_line_width(2.5)
+                ctx.move_to(px+18, py-2); ctx.line_to(px+18, py-26); ctx.stroke()
                 ctx.set_source_rgba(0.82, 0.20, 0.20, 0.9)
-                ctx.move_to(px + 22, py - 30)
-                ctx.line_to(px + 38, py - 24)
-                ctx.line_to(px + 22, py - 18)
-                ctx.close_path()
-                ctx.fill()
-                # 라벨
+                ctx.move_to(px+18, py-26); ctx.line_to(px+32, py-20); ctx.line_to(px+18, py-14)
+                ctx.close_path(); ctx.fill()
                 ctx.select_font_face("Malgun Gothic", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-                ctx.set_font_size(13)
-                ctx.set_source_rgb(0.72, 0.15, 0.15)
-                ctx.move_to(px + 40, py - 22)
-                ctx.show_text("\ud604\uc7ac \uc704\uce58")
+                ctx.set_font_size(12); ctx.set_source_rgb(0.72, 0.15, 0.15)
+                ctx.move_to(px+34, py-20); ctx.show_text("현재 위치")
     except Exception:
         pass
 
-    # ─── 장식 테두리 ───
-    ctx.set_source_rgb(0.45, 0.35, 0.20)
-    ctx.set_line_width(4)
-    ctx.rectangle(6, 6, img_w - 12, img_h - 12)
-    ctx.stroke()
-    ctx.set_line_width(1)
-    ctx.rectangle(12, 12, img_w - 24, img_h - 24)
-    ctx.stroke()
+    # 장식 테두리
+    ctx.set_source_rgb(0.35, 0.28, 0.18)
+    ctx.set_line_width(4); ctx.rectangle(4, 4, W-8, H-8); ctx.stroke()
+    ctx.set_line_width(1); ctx.rectangle(10, 10, W-20, H-20); ctx.stroke()
 
-    # 제목 배너
-    ctx.set_source_rgba(0.68, 0.60, 0.45, 0.9)
-    ctx.rectangle(20, 14, 180, 38)
-    ctx.fill()
-    ctx.set_source_rgb(0.45, 0.35, 0.20)
-    ctx.set_line_width(2)
-    ctx.rectangle(20, 14, 180, 38)
-    ctx.stroke()
+    # 제목
+    ctx.set_source_rgba(0.88, 0.82, 0.70, 0.9)
+    ctx.rectangle(16, 12, 150, 32); ctx.fill()
+    ctx.set_source_rgb(0.35, 0.28, 0.18); ctx.set_line_width(1.5)
+    ctx.rectangle(16, 12, 150, 32); ctx.stroke()
     ctx.select_font_face("Malgun Gothic", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-    ctx.set_font_size(24)
-    ctx.set_source_rgb(0.22, 0.14, 0.06)
-    ctx.move_to(35, 42)
-    ctx.show_text("\uc138\uacc4 \uc9c0\ub3c4")
+    ctx.set_font_size(22); ctx.set_source_rgb(0.18, 0.12, 0.05)
+    ctx.move_to(28, 36); ctx.show_text("세계 지도")
 
-    # ─── 나침반 ───
-    ncx, ncy = img_w - 55, img_h - 55
-    nr = 28
-    ctx.set_source_rgba(0.75, 0.68, 0.52, 0.9)
-    ctx.arc(ncx, ncy, nr, 0, 2 * _math.pi)
-    ctx.fill()
-    ctx.set_source_rgb(0.45, 0.35, 0.20)
-    ctx.set_line_width(2)
-    ctx.arc(ncx, ncy, nr, 0, 2 * _math.pi)
-    ctx.stroke()
-    ctx.set_font_size(14)
+    # 나침반
+    ncx, ncy = W-45, H-45; nr = 22
+    ctx.set_source_rgba(0.88, 0.82, 0.70, 0.85)
+    ctx.arc(ncx, ncy, nr, 0, 2*_math.pi); ctx.fill()
+    ctx.set_source_rgb(0.35, 0.28, 0.18); ctx.set_line_width(1.5)
+    ctx.arc(ncx, ncy, nr, 0, 2*_math.pi); ctx.stroke()
+    ctx.set_font_size(12)
     ctx.set_source_rgb(0.72, 0.15, 0.15)
-    te = ctx.text_extents("N")
-    ctx.move_to(ncx - te.width/2, ncy - nr + 14)
-    ctx.show_text("N")
-    ctx.set_source_rgb(0.22, 0.14, 0.06)
+    ctx.move_to(ncx-4, ncy-nr+12); ctx.show_text("N")
+    ctx.set_source_rgb(0.18, 0.12, 0.05)
     for label, angle in [("E", 0), ("S", _math.pi/2), ("W", _math.pi)]:
         te = ctx.text_extents(label)
-        lx = ncx + (nr - 14) * _math.cos(angle - _math.pi/2) - te.width/2
-        ly = ncy + (nr - 14) * _math.sin(angle - _math.pi/2) + te.height/2
-        ctx.move_to(lx, ly)
-        ctx.show_text(label)
-    # 십자선
-    ctx.set_line_width(0.8)
-    ctx.move_to(ncx, ncy - nr + 16)
-    ctx.line_to(ncx, ncy + nr - 16)
-    ctx.stroke()
-    ctx.move_to(ncx - nr + 16, ncy)
-    ctx.line_to(ncx + nr - 16, ncy)
-    ctx.stroke()
+        lx = ncx + (nr-12)*_math.cos(angle-_math.pi/2) - te.width/2
+        ly = ncy + (nr-12)*_math.sin(angle-_math.pi/2) + te.height/2
+        ctx.move_to(lx, ly); ctx.show_text(label)
 
-    # ─── 저장 ───
+    # 임시 색상맵 삭제
+    try:
+        os.remove(colormap_path)
+    except Exception:
+        pass
+
+    # 저장
     output_path = os.path.join(BASE_DIR, "static", "world_map.png")
-    surface.write_to_png(output_path)
+    final_surface.write_to_png(output_path)
     return output_path
 
 

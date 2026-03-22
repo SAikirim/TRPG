@@ -5,6 +5,7 @@
   "race": "말",
   "known": true,
   "status": "alive",
+  "travel_speed": {"type": "cart", "speed_kmh": 6, "description": "짐마차 견인"},
   "location": "trade_road_karendel",
   "appearance": {
     "age": "성체",

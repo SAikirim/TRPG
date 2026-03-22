@@ -141,7 +141,7 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
                 try:
                     if Remover is not None:
                         import numpy as np
-                        remover = Remover(mode="base")
+                        remover = Remover()
                         result = remover.process(img, type="rgba")
                         if isinstance(result, np.ndarray):
                             img = Image.fromarray(result)
@@ -370,6 +370,60 @@ def _find_existing_image(illustration_type, name):
             if name_lower in fname_lower and (f.endswith(".webp") or f.endswith(".png")):
                 return os.path.join(search_dir, f)
     return None
+
+
+def remove_portrait_background(image_path):
+    """초상화/오브젝트 이미지의 배경을 제거한다. 이미 투명이면 스킵."""
+    try:
+        from PIL import Image
+        img = Image.open(image_path)
+        # 이미 RGBA이고 투명 픽셀이 있으면 스킵
+        if img.mode == "RGBA":
+            extrema = img.split()[3].getextrema()
+            if extrema[0] < 250:  # 알파 채널에 투명 부분이 있음
+                return {"skipped": True, "reason": "already transparent"}
+
+        img = img.convert("RGB")
+        try:
+            from transparent_background import Remover
+            import numpy as np
+            remover = Remover()
+            result = remover.process(img, type="rgba")
+            if isinstance(result, np.ndarray):
+                img = Image.fromarray(result)
+            else:
+                img = result
+            img.save(image_path, "WEBP", quality=90)
+            logger.info(f"Background removed: {image_path}")
+            return {"success": True, "path": image_path}
+        except ImportError:
+            return {"error": "transparent-background not installed"}
+        except Exception as e:
+            logger.warning(f"Background removal failed for {image_path}: {e}")
+            return {"error": str(e)}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def remove_all_portrait_backgrounds():
+    """static/portraits/sd/ 내 모든 초상화의 배경을 제거한다."""
+    results = {"processed": 0, "skipped": 0, "errors": []}
+    portrait_dir = os.path.join(BASE_DIR, "static", "portraits", "sd")
+    if not os.path.isdir(portrait_dir):
+        return results
+    for fname in os.listdir(portrait_dir):
+        if not (fname.endswith(".webp") or fname.endswith(".png")):
+            continue
+        fpath = os.path.join(portrait_dir, fname)
+        result = remove_portrait_background(fpath)
+        if result.get("success"):
+            results["processed"] += 1
+        elif result.get("skipped"):
+            results["skipped"] += 1
+        else:
+            results["errors"].append(f"{fname}: {result.get('error', '?')}")
+    logger.info(f"Background removal batch: {results}")
+    return results
 
 
 def request_illustration(illustration_type, prompt, negative_prompt="", turn_count=0, position="center", name="", distance=0, size_class="close"):
