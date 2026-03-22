@@ -32,29 +32,38 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 
 ## GM 턴 처리 순서 (엄격 준수)
 
-> 유저에게 보이는 나레이션은 반드시 모든 시스템 작업이 끝난 후 마지막에 출력한다.
+> 메인 GM은 3단계만 기억한다. 세부 처리는 하위 에이전트가 담당.
 
 ```
 유저 액션 선언
   ↓
-[Phase 1a — 에이전트 사전 호출] (나레이션 작성 전)
-  1. Agent [NPC:{name}] 병렬 호출 — 해당 장면 NPC의 대사/행동 생성
-  2. Agent [룰 심판] — 판정이 필요한 상황이면 주사위/DC 체크
-  3. Agent [세계관] — 나레이션에 포함할 지명/설정이 세계관과 정합한지 확인
-  4. Agent [시나리오] — 챕터 목표/퀘스트 진행 상태 확인
-  5. Agent [세계 지도] — 위치 변경/새 지역 언급 시 좌표/지리 확인
+[1단계 — 에이전트에게 물어본다]
+  관련 에이전트를 병렬 호출하여 결과를 받는다:
+  - Agent [NPC:{name}] → 해당 NPC 대사/행동 생성
+  - Agent [룰 심판]   → 판정 필요 여부 + 주사위 결과
+  - Agent [세계관]    → 지명/설정 정합성 확인
+  - Agent [시나리오]  → 챕터/퀘스트 상태 확인
+  - Agent [세계 지도] → 위치/지리 확인 (위치 변경 시)
   ↓
-  GM이 에이전트 결과를 종합하여 나레이션 작성
+[2단계 — 나레이션 작성]
+  에이전트 결과를 종합하여 나레이션을 작성한다.
+  - show_dice_result가 false면 판정 수치 노출 금지
+  - 유저 캐릭터(controlled_by: "user")의 대사/감정/판단을 GM이 만들지 않는다
   ↓
-[Phase 1b — 시스템 반영] (나레이션 확정 후)
-  6. game_state.json + entities/ 업데이트
-  7. gm-update API 호출 (웹 UI 반영 + 사후 자동 검증)
-  8. docs/ 동기화 + git commit (매 턴)
-  8b. git push (3턴마다 또는 유저 "저장" 명시 시, 백그라운드 실행)
+[3단계 — 시스템 반영 (Agent [시스템]에게 넘긴다)]
+  Agent [시스템 반영]이 다음을 자동 처리:
+  - game_state.json + entities/ 업데이트
+  - gm-update API 호출 (나레이션 + 웹 UI 반영)
+  - 위치 변경 시 current_location 갱신 + 배경 일러스트 교체
+  - 시간대 변경 시 배경에 시간대 반영
+  - 나레이션에 등장한 NPC 등록 확인
+  - 사후 자동 검증 (안전망): 세계관/룰/시나리오/NPC/세계지도
+  - gm_turn.py 로그 기록
+  - git commit (매 턴), push (3턴마다/명시 시)
   ↓
-[Phase 2 — 나레이션 출력]
-  9. 터미널에 나레이션 텍스트 출력
-  10. 맵 표시 + 유저 다음 행동 대기
+[나레이션 출력]
+  터미널에 나레이션 텍스트 출력
+  맵 표시 + 유저 다음 행동 대기
 ```
 
 > 상세: guides/gm_rules.txt 참조
@@ -73,8 +82,8 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
   ├── Agent [NPC:{name}] → entities/{id}/npcs/npc_{id}.json (NPC 1명당 1개)
   ├── Agent [플레이어]  → entities/{id}/players/player_{id}.json
   ├── Agent [오브젝트]  → entities/{id}/objects/obj_{id}.json
-  ├── Agent [웹 반영]   → gm-update API 호출 + 일러스트 생성
-  └── Agent [세계 지도] → worldbuildings/{id}.json 지리 검증 + 지도 갱신
+  ├── Agent [세계 지도] → worldbuildings/{id}.json 지리 검증 + 지도 갱신
+  └── Agent [시스템 반영] → game_state 업데이트 + gm-update + 일러스트 + NPC 등록 + 로그 + git
   ↓
 결과 종합 → 나레이션 + 맵 출력 + game_state.json 업데이트 + 저장(git push)
 ```

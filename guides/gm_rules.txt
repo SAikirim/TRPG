@@ -53,6 +53,13 @@ current_session.json의 show_dice_result 확인:
 - quiet 모드: 터미널에 "판정 완료"만 표시, 수치는 .last_result.json에만 저장
 - GM은 .last_result.json을 읽어 나레이션 작성 (유저에게 수치 노출 금지)
 
+GM 나레이션 출력 시 판정 표시 규칙:
+- show_dice_result 확인은 Phase 1b에서 자동으로 수행하지 않으므로, GM이 반드시 수동 확인해야 한다
+- 나레이션에 판정 수치를 포함하기 전에 current_session.json의 show_dice_result를 확인한다
+- false인 경우: 나레이션에 수치를 절대 포함하지 않는다. "사이키가 주위를 살폈다. 위험한 기척은 없었다." 식으로만 전달
+- true인 경우: "1d20 → [17] + INT(+4) = 21 vs DC 10 → 성공!" 수치를 모두 보여준다
+- GM이 터미널에 나레이션을 쓸 때, 판정 결과 배너(🎲 ...)도 show_dice_result가 true일 때만 표시한다
+
 나레이션 순서: 상황 묘사 -> 주사위 굴림 표시 -> 결과를 나레이션으로 이어간다
 
 맵 표시 전략
@@ -140,6 +147,24 @@ push (3턴마다 또는 유저 명시):
 - 챕터 전환, 전투 종료 등 중요 이벤트 시 즉시 push
 - push는 반드시 백그라운드(Agent run_in_background=true)로 실행 — 나레이션을 블로킹하지 않는다
 - push 실패 시 다음 push 시점에 재시도 (게임 진행을 중단하지 않는다)
+
+NPC 등장 시 등록 규칙
+===
+나레이션에 개별적으로 묘사된 NPC는 반드시 game_state에 등록해야 한다.
+
+등록 기준:
+- 외형/행동이 구체적으로 묘사됨 → 등록 (이름 모르면 known: false, "???"으로 표시)
+- "상인들이 모여있다" 같은 집단 묘사 → 등록 불필요 (배경 묘사)
+- 대화 가능한 개별 NPC → 반드시 등록
+- 위치가 특정됨 → 맵에 위치 표시
+
+등록 시:
+- game_state.npcs에 추가 (known: false, type, position, location)
+- 엔티티 파일 자동 생성 (check_npcs)
+- 맵에 "???" 이름으로 표시
+
+나쁜 예: 나레이션에 "가죽 외투를 걸친 중년 남자가 술을 마시고 있다"고 썼는데 NPC 미등록
+좋은 예: 상인 3명을 개별 묘사하지 않고 "모닥불 주위에 여행자 몇 명이 쉬고 있었다"로 배경 처리
 
 NPC 이름 공개 규칙
 ===
@@ -282,6 +307,42 @@ GM 턴 Phase 1에서 worldmap 태그로 기록해야 한다:
 - "새 지역 없음" — 세계 지도 변경 없음
 - "세렌 항구 좌표 검증 — 해안 확인 OK" — 검증 통과
 - "새 지역 '폐광' 등록 — 좌표 [6,9] 숲 내부, 지리 합리" — 신규 등록
+
+시스템 반영 에이전트 역할
+===
+GM이 나레이션을 확정한 후, 시스템 반영 에이전트에게 넘기면 다음을 자동 처리한다.
+메인 GM이 개별 항목을 직접 챙기지 않아도 된다.
+
+시스템 반영 에이전트가 처리하는 항목:
+1. game_state.json 업데이트 (turn_count, events, 플레이어/NPC 상태)
+2. entities/ 파일 동기화
+3. gm-update API 호출:
+   - narration 텍스트 전달
+   - 위치 변경 시 player_updates/npc_updates (position, location)
+   - 배경 일러스트 교체 (위치/시간대 변경 감지)
+   - NPC 등장 시 new_npcs 또는 npc_updates
+4. current_location 갱신 (위치 변경 시)
+5. 배경 일러스트:
+   - 위치 변경 → 새 배경 생성 요청 (illustration 필드)
+   - 시간대 변경 → 시간대 반영 프롬프트 (night, dawn 등)
+   - 기존 이미지 재사용 우선 (_find_existing_image)
+6. NPC 등록 확인:
+   - 나레이션에 개별 묘사된 NPC가 game_state에 있는지
+   - 없으면 GM에게 경고 반환
+7. show_dice_result 확인:
+   - false인데 나레이션에 수치가 포함되어 있으면 경고
+8. gm_turn.py 로그 기록 (gm-update, state, entity 태그)
+9. git commit (매 턴)
+10. git push (3턴마다 또는 유저 명시 시, 백그라운드)
+
+GM이 시스템 반영 에이전트에게 전달해야 하는 정보:
+- 나레이션 텍스트
+- 위치 변경 여부 + 새 위치
+- 시간대 변경 여부 (낮/밤/새벽)
+- NPC 상태 변경 (HP, position, status 등)
+- 플레이어 상태 변경 (HP, MP, position, inventory 등)
+
+이 에이전트는 Agent 툴(run_in_background=true)로 호출한다.
 
 에이전트 검토 필수 규칙
 ===
