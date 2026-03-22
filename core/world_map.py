@@ -746,6 +746,13 @@ def generate_world_map():
     # ─── 2단계: 지형 패턴 렌더링 ───
 
     # ── 2단계-A: 해안선 폴리곤으로 바다 영역 채우기 ──
+    # sea 타입 좌표 수집 (바다 방향 판단용)
+    _all_sea_pixels = []
+    for _sf in terrain.get("features", []):
+        if _sf.get("type") == "sea" and "coords" in _sf:
+            for _sc in _sf["coords"]:
+                _all_sea_pixels.append(to_pixel(_sc[0], _sc[1]))
+
     _has_coastline_path = False
     for feat in terrain.get("features", []):
         if feat.get("type") == "coastline" and "path" in feat and len(feat["path"]) >= 2:
@@ -765,10 +772,77 @@ def generate_world_map():
                 cpx = (prev_x + px) / 2 + (py - prev_y) * 0.1
                 cpy = (prev_y + py) / 2 - (px - prev_x) * 0.1
                 sea_path.quadTo(cpx, cpy, px, py)
-            sea_path.lineTo(W + 10, last_py)
-            sea_path.lineTo(W + 10, H + 10)
-            sea_path.lineTo(W + 10, -10)
-            sea_path.lineTo(first_px, -10)
+
+            # sea coords 기반 바다 방향 판단 → 해안선 끝점에서 올바른 캔버스 변으로 확장
+            _corners = [(-10, -10), (W + 10, -10), (W + 10, H + 10), (-10, H + 10)]
+            if _all_sea_pixels:
+                _sea_cx = sum(p[0] for p in _all_sea_pixels) / len(_all_sea_pixels)
+                _sea_cy = sum(p[1] for p in _all_sea_pixels) / len(_all_sea_pixels)
+            else:
+                # sea coords 없으면 해안선 반대편(캔버스 중심 대비)으로 추정
+                _coast_cx = sum(p[0] for p in coast_pixels) / len(coast_pixels)
+                _coast_cy = sum(p[1] for p in coast_pixels) / len(coast_pixels)
+                _sea_cx = W - _coast_cx
+                _sea_cy = H - _coast_cy
+
+            # 해안선 끝점 → 바다 방향 캔버스 코너들 → 해안선 시작점 순서로 폴리곤 닫기
+            # 4코너를 sea 중심에 가까운 순서로 정렬, 끝점/시작점에서 자연스럽게 연결
+            def _corner_dist_to_sea(c):
+                return (c[0] - _sea_cx) ** 2 + (c[1] - _sea_cy) ** 2
+
+            _sea_corners = sorted(_corners, key=_corner_dist_to_sea)
+
+            # 끝점 → 가장 가까운 코너 → 바다쪽 코너들 → 시작점에 가장 가까운 코너 → 시작점
+            # 바다쪽 코너: sea 중심까지 거리가 해안선 중심까지 거리보다 짧은 코너
+            _coast_cx2 = sum(p[0] for p in coast_pixels) / len(coast_pixels)
+            _coast_cy2 = sum(p[1] for p in coast_pixels) / len(coast_pixels)
+            _coast_dist_threshold = (_coast_cx2 - _sea_cx) ** 2 + (_coast_cy2 - _sea_cy) ** 2
+            _sea_side_corners = [c for c in _corners if _corner_dist_to_sea(c) < _coast_dist_threshold]
+            if not _sea_side_corners:
+                # 모든 코너가 해안선 쪽 → sea 중심에 가장 가까운 2개 사용
+                _sea_side_corners = _sea_corners[:2]
+
+            # 끝점에서 시작점까지 바다쪽 코너를 경유하여 연결
+            # 코너 순서: 캔버스 외곽을 시계방향으로 순회 (끝점 → 시작점)
+            _corner_order = [(-10, -10), (W + 10, -10), (W + 10, H + 10), (-10, H + 10)]
+            _sea_set = set((int(c[0]), int(c[1])) for c in _sea_side_corners)
+
+            # 끝점에 가장 가까운 바다쪽 코너에서 시작, 시계방향으로 순회
+            def _dist(a, b):
+                return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
+
+            _start_corner = min(_sea_side_corners, key=lambda c: _dist(c, (last_px, last_py)))
+            _end_corner = min(_sea_side_corners, key=lambda c: _dist(c, (first_px, first_py)))
+
+            # 시계방향 순회로 바다쪽 코너 경유
+            _si = _corner_order.index(_start_corner)
+            _ei = _corner_order.index(_end_corner)
+            _path_corners = []
+            _ci = _si
+            while True:
+                _path_corners.append(_corner_order[_ci])
+                if _ci == _ei:
+                    break
+                _ci = (_ci + 1) % 4
+
+            # 반시계방향도 시도, 더 짧은 경로 선택
+            _path_corners_ccw = []
+            _ci = _si
+            while True:
+                _path_corners_ccw.append(_corner_order[_ci])
+                if _ci == _ei:
+                    break
+                _ci = (_ci - 1) % 4
+
+            # 바다쪽 코너를 더 많이 포함하는 경로 선택 (같으면 짧은 쪽)
+            _cw_sea = sum(1 for c in _path_corners if (int(c[0]), int(c[1])) in _sea_set)
+            _ccw_sea = sum(1 for c in _path_corners_ccw if (int(c[0]), int(c[1])) in _sea_set)
+            if _ccw_sea > _cw_sea or (_ccw_sea == _cw_sea and len(_path_corners_ccw) < len(_path_corners)):
+                _path_corners = _path_corners_ccw
+
+            for _pc in _path_corners:
+                sea_path.lineTo(_pc[0], _pc[1])
+            sea_path.lineTo(first_px, first_py)
             sea_path.close()
 
             # 바다 영역을 진한 남색으로 채우기
@@ -792,10 +866,19 @@ def generate_world_map():
                                            cpx_c + tw * 3, cpy_c + tw * 3), p)
 
             # 파도 텍스처 (바다 영역 내, clip 안에서)
-            sea_min_x = min(p[0] for p in coast_pixels)
-            sea_max_x = W + 10
-            sea_min_y = min(-10, min(p[1] for p in coast_pixels) - tw)
-            sea_max_y = max(H + 10, max(p[1] for p in coast_pixels) + tw)
+            # 바다 방향에 따라 파도 영역 범위 결정
+            _coast_min_x = min(p[0] for p in coast_pixels)
+            _coast_max_x = max(p[0] for p in coast_pixels)
+            _coast_min_y = min(p[1] for p in coast_pixels)
+            _coast_max_y = max(p[1] for p in coast_pixels)
+            if _sea_cx < _coast_cx2:
+                sea_min_x = -10
+                sea_max_x = _coast_max_x
+            else:
+                sea_min_x = _coast_min_x
+                sea_max_x = W + 10
+            sea_min_y = min(-10, _coast_min_y - tw)
+            sea_max_y = max(H + 10, _coast_max_y + tw)
             sea_area_h = sea_max_y - sea_min_y
             wave_count = max(20, int(sea_area_h / 3))
             for wi in range(wave_count):
