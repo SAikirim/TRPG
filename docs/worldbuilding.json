@@ -25,6 +25,16 @@
     },
     "notes": "일상 거래는 동화/은화. 금화는 고액 거래에만 사용. 시골 마을에서 금화를 꺼내면 눈에 띈다."
   },
+  "terrain": {
+    "description": "세계 지도 지형. world_pos 좌표 기반. 타입: forest, mountain, river, sea, plains, swamp",
+    "features": [
+      {"type": "forest", "name": "하룬 숲", "coords": [[3,6],[4,6],[5,6],[6,6],[4,7],[5,7],[6,7],[7,7],[3,8],[4,8],[6,8],[7,9],[8,9]]},
+      {"type": "mountain", "name": "북벽 산맥", "coords": [[3,1],[4,1],[5,1],[6,1],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0]]},
+      {"type": "sea", "name": "동해", "coords": [[10,4],[11,4],[10,5],[11,5],[10,6],[11,6],[10,7],[11,7],[10,8],[11,8],[10,9],[11,9],[9,7],[9,8],[9,9]]},
+      {"type": "river", "name": "카렌 강", "path": [[6,1],[6,2],[7,3],[7,4],[8,5],[8,6],[9,6],[9,7]]},
+      {"type": "plains", "name": "카렌델 평원", "coords": [[6,2],[7,2],[8,2],[6,3],[7,3],[8,3],[9,3],[8,4],[9,4]]}
+    ]
+  },
   "locations": {
     "harun_village": {
       "name": "하룬 마을",
@@ -62,8 +72,8 @@
         "한트": "늙은 경비병. 마을 입구 근무."
       },
       "connections": {
-        "카렌델": {"direction": "북쪽", "distance": "도보 2일", "route": "숲을 지나 교역로"},
-        "잃어버린 보물의 숲 던전": {"direction": "동쪽", "distance": "도보 반나절", "route": "숲 안쪽"}
+        "카렌델": {"direction": "북쪽", "distance": "도보 2일", "travel_hours": 36, "route": "숲을 지나 교역로"},
+        "잃어버린 보물의 숲 던전": {"direction": "동쪽", "distance": "도보 반나절", "travel_hours": 4, "route": "숲 안쪽"}
       }
     },
     "trade_road_karendel": {
@@ -82,14 +92,14 @@
         ]
       },
       "connections": {
-        "하룬 마을": {"direction": "남쪽", "distance": "도보 반나절"},
-        "카렌델": {"direction": "북쪽", "distance": "도보 1.5일"},
-        "갈림길 쉼터": {"direction": "동쪽", "distance": "도보 반나절"}
+        "하룬 마을": {"direction": "남쪽", "distance": "도보 반나절", "travel_hours": 4},
+        "카렌델": {"direction": "북쪽", "distance": "도보 1.5일", "travel_hours": 24},
+        "갈림길 쉼터": {"direction": "동쪽", "distance": "도보 반나절", "travel_hours": 4}
       }
     },
     "karendel": {
       "name": "카렌델",
-      "world_pos": [5, 2],
+      "world_pos": [7, 2],
       "type": "trade_city",
       "description": "북쪽의 교역 도시. 다양한 종족과 상인이 모이는 곳.",
       "features": ["마법사 길드", "모험가 조합", "감정사", "대장간", "시장", "여관 거리"],
@@ -112,16 +122,16 @@
         "볼프": "붉은 굴뚝 여관 주인. 에르네스의 옛 친구. 소개장 지참 시 하룻밤 무료 투숙. 무릎이 안 좋아 에르네스가 산약초를 구해 보내주는 사이."
       },
       "connections": {
-        "하룬 마을": {"direction": "남쪽", "distance": "도보 2일"}
+        "하룬 마을": {"direction": "남쪽", "distance": "도보 2일", "travel_hours": 36}
       }
     },
     "lost_treasure_dungeon": {
       "name": "잃어버린 보물의 숲 던전",
       "type": "dungeon",
-      "world_pos": [8, 8],
+      "world_pos": [7, 8],
       "description": "하룬 마을 동쪽 숲 깊은 곳의 고대 던전. 이미 클리어됨.",
       "connections": {
-        "하룬 마을": {"direction": "서쪽", "distance": "도보 반나절"}
+        "하룬 마을": {"direction": "서쪽", "distance": "도보 반나절", "travel_hours": 4}
       }
     },
     "crossroads_rest": {
@@ -130,18 +140,18 @@
       "type": "rest_area",
       "description": "교역로가 북쪽(카렌델)과 남쪽(세렌 항구)으로 갈라지는 지점. 여행자들이 야영하는 쉼터가 있다.",
       "connections": {
-        "카렌델": {"direction": "북쪽", "distance": "도보 반나절~1일"},
-        "세렌 항구": {"direction": "남쪽", "distance": "도보 반나절"},
-        "교역로 (카렌델 방면)": {"direction": "서쪽", "distance": "도보 반나절"}
+        "카렌델": {"direction": "북쪽", "distance": "도보 반나절~1일", "travel_hours": 8},
+        "세렌 항구": {"direction": "남동쪽", "distance": "도보 반나절", "travel_hours": 5},
+        "교역로 (카렌델 방면)": {"direction": "서쪽", "distance": "도보 반나절", "travel_hours": 4}
       }
     },
     "seren_port": {
       "name": "세렌 항구",
-      "world_pos": [7, 8],
+      "world_pos": [9, 6],
       "type": "port_village",
       "description": "작은 어항. 해안을 따라 서쪽 도시들로 가는 배편이 있다.",
       "connections": {
-        "갈림길 쉼터": {"direction": "북쪽", "distance": "도보 반나절"}
+        "갈림길 쉼터": {"direction": "북서쪽", "distance": "도보 반나절", "travel_hours": 5}
       }
     }
   },

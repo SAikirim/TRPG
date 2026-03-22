@@ -23,6 +23,7 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - ✅ SD 실패 시 Cairo 폴백 (빈 화면 없음)
 - ✅ 이미지 재활용 (이름 매칭 → 기존 고퀄 우선)
 - ✅ 초상화 배경 자동 제거 (transparent-background)
+- ✅ 이미지 생성 폴백: SD WebUI 우선 → Cairo 폴백 (빈 화면 없음)
 - ✅ 저장 시 docs/ 자동 동기화 (GitHub Pages) — build_static.py가 HTML 복사 + 데이터(JSON, 이미지) 동기화
 - ✅ NPC 엔티티 자동 생성 (check_npcs)
 - ✅ 맵 장소별 자동 전환 (current_location → worldbuilding.json)

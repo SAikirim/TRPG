@@ -1,6 +1,39 @@
 일러스트 시스템 상세
 ===
 
+이미지 생성 폴백 규칙 (최우선)
+===
+모든 이미지 생성은 SD WebUI를 우선 사용한다. SD가 동작하지 않으면 Cairo로 폴백한다.
+
+우선순위:
+1. SD WebUI API (http://127.0.0.1:7860) — 고품질, GPU 필요
+2. Cairo (pycairo) — 벡터 렌더링, CPU만으로 동작, 안티앨리어싱
+3. PIL (Pillow) — 최종 폴백, 기본 래스터 렌더링
+
+적용 대상:
+| 이미지 종류 | SD 사용 | Cairo 폴백 | PIL 폴백 |
+| 배경 일러스트 | O (txt2img) | O (그라디언트+도형) | X |
+| 캐릭터 초상화 | O (txt2img + 배경제거) | O (클래스별 실루엣) | X |
+| 게임 맵 (미니맵/전체맵) | X | O (타일 렌더링) | X |
+| 세계 지도 | O (배경 텍스처) | O (헥스 그리드) | X |
+| 오브젝트 | O (txt2img) | O (도형) | X |
+
+SD 동작 확인:
+- current_session.json의 sd_illustration 값으로 ON/OFF 제어
+- sd_generator.py의 is_sd_enabled()로 확인
+- SD WebUI 미응답 시 자동으로 Cairo 폴백 (ConnectionError → _cairo_fallback)
+
+Cairo 사용 원칙:
+- 직선보다 곡선(베지어) 우선 사용 — 판타지 느낌
+- 안티앨리어싱 항상 활성화 (cairo.ANTIALIAS_BEST)
+- 벡터 기반이므로 해상도 자유롭게 설정 가능
+- 그라디언트, 투명도, 그림자 적극 활용
+
+SD 시작/종료:
+- 게임 세션 시작 시 SD WebUI 자동 확인 (guides/process.txt 참조)
+- sd_illustration이 true이면 SD가 동작 중이어야 한다
+- SD 미실행 시 Cairo 폴백으로 게임 진행에 영향 없음
+
 SD 일러스트 연동 시스템 (sd_generator.py)
 ===
 
