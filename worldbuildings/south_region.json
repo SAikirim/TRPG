@@ -19,7 +19,13 @@
       "north": "위쪽 (y 감소 방향)"
     },
     "tech_level": "중세 (철기, 마법 공존, 에르시아보다 농업/목축 발달)",
-    "magic_system": "마나 기반. 에르시아와 동일 체계이나, 남부에서는 정령술이 더 일반적."
+    "magic_system": "마나 기반. 에르시아와 동일 체계이나, 남부에서는 정령술이 더 일반적.",
+    "neighbors": {
+      "north": {"name": "에르시아", "border_terrain": "forest", "note": "하룬 숲과 연결"},
+      "east": {"feature": "sea", "name": "남동해", "note": "에르시아 동해의 연장"},
+      "south": {"feature": "swamp", "name": "남부 건조지대", "note": "사바나와 사막 경계"},
+      "west": {"feature": "mountain", "name": "서부 구릉", "note": "완만한 구릉지대"}
+    }
   },
   "currency": {
     "system": "에르시아 동화/은화/금화 통용 + 아렌티아 고유 '태양화'",
