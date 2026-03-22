@@ -43,6 +43,34 @@ def get_scene_state():
         return dict(_scene_state)
 
 
+def set_scene_state(background=None, layers=None):
+    """외부에서 저장된 scene 정보로 복원할 때 사용"""
+    with _lock:
+        if background is not None:
+            _scene_state["background"] = background
+        if layers is not None:
+            _scene_state["layers"] = layers
+        _scene_state["generating"]["status"] = "idle"
+
+
+def _sync_scene_to_game_state():
+    """_scene_state를 game_state.json의 current_scene에 동기화"""
+    try:
+        with _lock:
+            scene_snapshot = {
+                "background": _scene_state.get("background"),
+                "layers": list(_scene_state.get("layers", [])),
+            }
+        gs_path = os.path.join(BASE_DIR, "data", "game_state.json")
+        with open(gs_path, "r", encoding="utf-8") as f:
+            state = json.load(f)
+        state["current_scene"] = scene_snapshot
+        with open(gs_path, "w", encoding="utf-8") as f:
+            json.dump(state, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.warning(f"Failed to sync scene to game_state: {e}")
+
+
 def clear_scene():
     """Clear all layers and background."""
     with _lock:
@@ -179,6 +207,8 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
                 _scene_state["generating"]["status"] = "idle"
                 _scene_state["generating"]["error"] = None
             logger.info(f"Illustration generated: {filename}")
+            # game_state.json의 current_scene 갱신
+            _sync_scene_to_game_state()
         else:
             with _lock:
                 _scene_state["generating"].update({
@@ -207,6 +237,7 @@ def _cairo_fallback(illustration_type, name, position, turn_count, distance=0, s
                 _scene_state["background"] = image_url
                 _scene_state["layers"] = []
                 _scene_state["generating"]["status"] = "idle"
+            _sync_scene_to_game_state()
             return {"started": True, "type": illustration_type, "source": "cairo"}
 
         elif illustration_type in ("portrait", "object"):
@@ -224,6 +255,7 @@ def _cairo_fallback(illustration_type, name, position, turn_count, distance=0, s
                     "size_class": size_class,
                 })
                 _scene_state["generating"]["status"] = "idle"
+            _sync_scene_to_game_state()
             return {"started": True, "type": illustration_type, "source": "cairo"}
     except Exception as e:
         logger.error(f"Cairo fallback failed: {e}")

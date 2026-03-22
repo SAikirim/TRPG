@@ -6,7 +6,7 @@ from flask import Flask, jsonify, render_template, request
 
 from core.map_generator import MapGenerator
 from core.save_manager import SaveManager
-from core.sd_generator import request_illustration, get_scene_state, is_sd_enabled, clear_scene, remove_layer
+from core.sd_generator import request_illustration, get_scene_state, set_scene_state, is_sd_enabled, clear_scene, remove_layer
 import core.game_mechanics as gm
 from core.worldbuilding_agent import check_and_warn as wb_check
 from core.rules_agent import check_and_warn as rules_check
@@ -110,6 +110,15 @@ def save_game_state(state):
     save_manager.save_game(scenario_id, slot=1, description=f"자동 저장 (턴 {turn})")
 
 
+def _save_scene_to_state(state):
+    """현재 scene_state를 game_state에 저장"""
+    scene = get_scene_state()
+    state["current_scene"] = {
+        "background": scene.get("background"),
+        "layers": scene.get("layers", []),
+    }
+
+
 def update_map_image():
     gen = MapGenerator()
     gen.save_map()
@@ -118,49 +127,29 @@ def update_map_image():
 def restore_scene():
     """Restore web UI scene from current game state. Called on startup and game load."""
     state = load_game_state()
-    chapter = state.get("game_info", {}).get("current_chapter", 1)
-    events = state.get("events", [])
+    saved_scene = state.get("current_scene")
 
-    # Determine scene name from latest context
-    scene_name = None
-    # Check recent events for location hints
-    for e in reversed(events[-10:]):
-        msg = (e.get("message", "") + " " + e.get("narrative", "")).lower()
-        if any(k in msg for k in ["마을", "village", "집", "home", "cottage"]):
-            scene_name = "village"
-            break
-        elif any(k in msg for k in ["교역", "road", "길", "여행", "travel"]):
-            scene_name = "trade_road"
-            break
-        elif any(k in msg for k in ["시장", "market", "상점"]):
-            scene_name = "market"
-            break
-        elif any(k in msg for k in ["던전", "dungeon", "동굴"]):
-            scene_name = "dungeon"
-            break
-        elif any(k in msg for k in ["숲", "forest", "나무"]):
-            scene_name = "forest"
-            break
-        elif any(k in msg for k in ["보물", "treasure", "황금"]):
-            scene_name = "treasure"
-            break
-
-    # Fallback to chapter-based scene
-    if not scene_name:
+    if saved_scene and saved_scene.get("background"):
+        # 저장된 장면 정보에서 직접 복원
+        set_scene_state(
+            background=saved_scene["background"],
+            layers=saved_scene.get("layers", [])
+        )
+        _add_npc_layers(state)
+    else:
+        # current_scene이 없으면 기존 폴백: 챕터 기반
+        chapter = state.get("game_info", {}).get("current_chapter", 1)
         chapter_scenes = {1: "forest", 2: "dungeon", 3: "treasure", 4: "village"}
         scene_name = chapter_scenes.get(chapter, "default")
+        request_illustration(
+            illustration_type="background",
+            prompt="",
+            turn_count=state.get("turn_count", 0),
+            name=scene_name,
+        )
+        _add_npc_layers(state)
 
-    # Request illustration (will reuse existing or generate Cairo fallback)
-    request_illustration(
-        illustration_type="background",
-        prompt="",
-        turn_count=state.get("turn_count", 0),
-        name=scene_name,
-    )
-
-    _add_npc_layers(state)
-
-    # docs/ 동기화 (정적 웹 반영)
+    # docs/ 동기화
     try:
         save_manager._sync_docs(state)
     except Exception:
@@ -196,6 +185,20 @@ def index():
 @app.route("/api/game-state", methods=["GET"])
 def get_game_state():
     state = load_game_state()
+    # objects 로드 (entities/{scenario_id}/objects/)
+    objects = []
+    scenario_id = state.get("game_info", {}).get("scenario_id", "")
+    if scenario_id:
+        obj_dir = os.path.join(BASE_DIR, "entities", scenario_id, "objects")
+        if os.path.isdir(obj_dir):
+            for fname in sorted(os.listdir(obj_dir)):
+                if fname.endswith(".json"):
+                    try:
+                        with open(os.path.join(obj_dir, fname), "r", encoding="utf-8") as f:
+                            objects.append(json.load(f))
+                    except Exception:
+                        pass
+    state["objects"] = objects
     return jsonify(state)
 
 
@@ -269,6 +272,8 @@ def gm_update():
     description = data.get("description", "")
     narrative = data.get("narrative", "")
 
+    mechanics_results = []
+
     # Apply player updates
     for pu in data.get("player_updates", []):
         for p in state["players"]:
@@ -277,6 +282,11 @@ def gm_update():
                     if key != "id":
                         if key == "position" and isinstance(val, list):
                             p["position"] = val
+                            # 위험 타일 체크
+                            from core.game_mechanics import check_hazard_tile
+                            hazard = check_hazard_tile(p["id"], val, state)
+                            if hazard.get("hazard"):
+                                mechanics_results.append(hazard)
                         elif key in ("hp", "mp"):
                             p[key] = max(0, min(val, p[f"max_{key}"]))
                         elif key == "status_effects":
@@ -297,6 +307,11 @@ def gm_update():
                                 n["status"] = "dead"
                         elif key == "position" and isinstance(val, list):
                             n["position"] = val
+                            # 위험 타일 체크
+                            from core.game_mechanics import check_hazard_tile
+                            hazard = check_hazard_tile(n["id"], val, state)
+                            if hazard.get("hazard"):
+                                mechanics_results.append(hazard)
                         elif key == "status":
                             n["status"] = val
                         elif key == "known":
@@ -320,12 +335,13 @@ def gm_update():
             "turn": state["turn_count"],
             "message": f"[GM] {description}" if description else "",
             "narrative": narrative,
+            "user_input": data.get("user_input", ""),
+            "dialogues": data.get("dialogues", []),
             "timestamp": datetime.now().strftime("%H:%M:%S"),
         }
         state["events"].append(event)
 
     # Process mechanics requests (자동 판정/회복/전투)
-    mechanics_results = []
     for mreq in data.get("mechanics", []):
         mtype = mreq.get("type", "")
         if mtype == "long_rest":
@@ -351,6 +367,8 @@ def gm_update():
                 mreq["player"], mreq["item"], state))
         elif mtype == "tick_status":
             mechanics_results.append(gm.tick_status_effects(state))
+        elif mtype == "turn_start":
+            mechanics_results.append(gm.turn_start_check(state))
         elif mtype == "grant_xp":
             mechanics_results.append(gm.grant_xp(
                 mreq["player"], mreq["amount"],
@@ -366,19 +384,7 @@ def gm_update():
     if "game_status" in data:
         state["game_info"]["status"] = data["game_status"]
 
-    save_game_state(state)
-    gm.sync_all_players(state)
-    gm._log_to_tracker("state", "game_state 저장 + 엔티티 동기화")
-    update_map_image()
-
-    # 월드맵 갱신 (세계관 변경 반영)
-    try:
-        from core.map_generator import generate_world_map
-        generate_world_map()
-    except Exception:
-        pass
-
-    # Handle illustration request
+    # Handle illustration request (재활용 체크 우선 — 즉시 적용)
     illustration_req = data.get("illustration")
     ill_result = None
     if illustration_req:
@@ -396,6 +402,21 @@ def gm_update():
         clear_scene()
     if data.get("remove_layer"):
         remove_layer(data["remove_layer"])
+
+    # scene_state를 game_state에 저장
+    _save_scene_to_state(state)
+
+    save_game_state(state)
+    gm.sync_all_players(state)
+    gm._log_to_tracker("state", "game_state 저장 + 엔티티 동기화")
+    update_map_image()
+
+    # 월드맵 갱신 (세계관 변경 반영)
+    try:
+        from core.map_generator import generate_world_map
+        generate_world_map()
+    except Exception:
+        pass
 
     _add_npc_layers(state)
 
@@ -448,7 +469,11 @@ def regenerate_world_map():
         from core.map_generator import generate_world_map
         path = generate_world_map()
         if path:
-            return jsonify({"success": True, "path": "/static/world_map.png"})
+            # 경로에서 static/ 이하 상대경로 추출
+            rel = path.replace("\\", "/")
+            idx = rel.find("static/")
+            web_path = "/" + rel[idx:] if idx >= 0 else "/static/maps/world/world_map.png"
+            return jsonify({"success": True, "path": web_path})
         return jsonify({"success": False, "reason": "No locations with world_pos"})
     except Exception as e:
         return jsonify({"success": False, "reason": str(e)})
@@ -543,6 +568,14 @@ def update_settings():
         save_game_state(state)
 
     return jsonify({"success": True})
+
+
+@app.route("/api/worldbuilding", methods=["GET"])
+def get_worldbuilding():
+    wb_path = os.path.join(BASE_DIR, "data", "worldbuilding.json")
+    with open(wb_path, "r", encoding="utf-8") as f:
+        wb = json.load(f)
+    return jsonify(wb)
 
 
 @app.route("/api/items", methods=["GET"])

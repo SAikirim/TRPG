@@ -35,6 +35,19 @@ gm-update 파라미터
   "game_status": "in_progress",
   "scene_update": {"chapter": 3, "narrative_title": "보물실 진입"},
   "illustration": {"type": "background", "prompt": "..."},
+  "user_input": "유저의 원문 입력 (이벤트에 기록됨)",
+  "dialogues": [{"speaker": "캐릭터이름", "line": "대사 텍스트"}],
   "clear_scene": true,
   "remove_layer": "오크"
 }
+
+gm-update 대화 기록 필드
+===
+  user_input (string, optional): 유저의 원문 입력. 이벤트에 기록됨.
+  dialogues (array, optional): 해당 턴 대사 목록. 각 항목의 필드:
+    - speaker (string, 필수): 캐릭터 이름
+    - target (string, 선택): 대화 상대 (없으면 전체/독백)
+    - line (string, 필수): 실제 대사 텍스트
+    - tone (string, 선택): 감정/어조 (장난, 진지, 화남, 걱정, 냉정 등)
+    - action (string, 선택): 동반 행동 (손가락을 튕기며 등)
+    - type (string, 선택): 대화/독백/외침/속삭임 (기본: 대화)

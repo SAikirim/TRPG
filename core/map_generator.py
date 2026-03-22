@@ -5,6 +5,51 @@ import cairo
 import math
 
 
+# ─── 이모지 지원 검증 ───
+_EMOJI_SUPPORT_CACHE = {}
+
+def _is_emoji_supported(emoji_char, font, threshold=150):
+    """seguiemj.ttf에서 이모지가 컬러 글리프로 렌더링되는지 검증.
+    윤곽선만 있는 이모지(pixels < threshold)는 미지원으로 판정."""
+    if emoji_char in _EMOJI_SUPPORT_CACHE:
+        return _EMOJI_SUPPORT_CACHE[emoji_char]
+    try:
+        from PIL import Image as _Img, ImageDraw as _Draw
+        import numpy as _np
+        img = _Img.new('RGBA', (30, 30), (0,0,0,0))
+        draw = _Draw.Draw(img)
+        try:
+            draw.text((2, 2), emoji_char, font=font, embedded_color=True)
+        except TypeError:
+            draw.text((2, 2), emoji_char, font=font)
+        arr = _np.array(img)
+        pixels = int(_np.count_nonzero(arr[:,:,3]))
+        supported = pixels >= threshold
+        _EMOJI_SUPPORT_CACHE[emoji_char] = supported
+        return supported
+    except Exception:
+        _EMOJI_SUPPORT_CACHE[emoji_char] = False
+        return False
+
+
+# 미지원 이모지 → 지원 이모지 폴백 매핑
+EMOJI_FALLBACK = {
+    '🪧': '📌',  # 이정표 → pushpin
+    '🪣': '💦',  # 물통 → droplets
+    '🪵': '🔶',  # 장작 → orange diamond
+    '🫙': '📦',  # 항아리 → package
+    '🫗': '💧',  # 붓기 → water
+    '🧱': '🟫',  # 벽돌 → brown square
+}
+
+
+def safe_emoji(emoji_char, font):
+    """지원되는 이모지를 반환. 미지원이면 폴백."""
+    if _is_emoji_supported(emoji_char, font):
+        return emoji_char
+    return EMOJI_FALLBACK.get(emoji_char, '❓')
+
+
 font_paths_global = [
     "C:/Windows/Fonts/malgun.ttf",
     "C:/Windows/Fonts/gulim.ttc",
@@ -144,6 +189,89 @@ class MapGenerator:
         # 1) 모든 엔티티 아이콘 위치 수집
         entity_icons = []  # [(cx, cy, r)] 아이콘 중심과 반경
 
+        # === 단일 타일 랜드마크 아이콘 ===
+        landmark_positions = set()  # 아이콘으로 표시된 단일 타일 위치
+        LANDMARK_EMOJI = {
+            '우물': '\U0001f4a7',     # 💧
+            '모닥불': '\U0001f525',    # 🔥
+            '이정표': '\U0001f4cc',    # 📌
+            '제단': '\u26e9\ufe0f',    # ⛩️
+            '샘': '\U0001f4a7',       # 💧
+        }
+        for loc in locations:
+            area = loc["area"] if isinstance(loc.get("area"), dict) else loc
+            if area.get("x1") == area.get("x2") and area.get("y1") == area.get("y2"):
+                name = loc.get("name", "")
+                for keyword, emoji_char in LANDMARK_EMOJI.items():
+                    if keyword in name:
+                        lx, ly = area["x1"], area["y1"]
+                        if 0 <= lx < map_w and 0 <= ly < map_h:
+                            cx = lx * self.tile_size + self.tile_size // 2 + margin_left
+                            cy = ly * self.tile_size + self.tile_size // 2 + margin_top
+                            landmark_positions.add((lx, ly))
+                            # 배경 원
+                            draw.ellipse([cx - 10, cy - 10, cx + 10, cy + 10], fill="#00000066")
+                            if emoji_font:
+                                safe = safe_emoji(emoji_char, emoji_font)
+                                try:
+                                    draw.text((cx - 10, cy - 10), safe, font=emoji_font, embedded_color=True)
+                                except TypeError:
+                                    draw.text((cx - 10, cy - 10), safe, font=emoji_font)
+                            entity_icons.append({"cx": cx, "cy": cy, "r": 10, "name": "", "color": "#aaaaaa", "type": "landmark"})
+                        break
+
+        # === 오브젝트 엔티티 아이콘 ===
+        OBJ_EMOJI = {
+            'vehicle': '\U0001f6d2',    # 🛒
+            'container': '\U0001f4a6',   # 💦
+            'resource': '\U0001f536',    # 🔶
+            'shelter': '\u26fa',         # ⛺
+        }
+        scenario_id = state.get("game_info", {}).get("scenario_id", "")
+        if scenario_id:
+            obj_dir = os.path.join(self.base_dir, "entities", scenario_id, "objects")
+            if os.path.isdir(obj_dir):
+                for fname in sorted(os.listdir(obj_dir)):
+                    if not fname.endswith(".json"):
+                        continue
+                    try:
+                        with open(os.path.join(obj_dir, fname), "r", encoding="utf-8") as f:
+                            obj = json.load(f)
+                        pos = obj.get("position")
+                        if not (pos and len(pos) == 2):
+                            continue
+                        # 같은 위치(current_location)에 있는 오브젝트만 표시
+                        obj_loc = obj.get("location", "")
+                        if current_loc and obj_loc and obj_loc != current_loc:
+                            continue
+                        ox, oy = int(pos[0]), int(pos[1])
+                        if not (0 <= ox < map_w and 0 <= oy < map_h):
+                            continue
+                        obj_type = obj.get("type", "")
+                        # 오브젝트 JSON에 icon 필드가 있으면 그걸 사용
+                        emoji_char = obj.get("icon", OBJ_EMOJI.get(obj_type, "\U0001f4e6"))  # 📦 fallback
+                        obj_size = obj.get("size", [1, 1])
+                        for dy in range(obj_size[1]):
+                            for dx in range(obj_size[0]):
+                                tx, ty = ox + dx, oy + dy
+                                if not (0 <= tx < map_w and 0 <= ty < map_h):
+                                    continue
+                                cx = tx * self.tile_size + self.tile_size // 2 + margin_left
+                                cy = ty * self.tile_size + self.tile_size // 2 + margin_top
+                                draw.ellipse([cx - 9, cy - 9, cx + 9, cy + 9], fill="#33333388")
+                                if emoji_font:
+                                    safe = safe_emoji(emoji_char, emoji_font)
+                                    try:
+                                        draw.text((cx - 10, cy - 10), safe, font=emoji_font, embedded_color=True)
+                                    except TypeError:
+                                        draw.text((cx - 10, cy - 10), safe, font=emoji_font)
+                        # entity_icons는 기준 위치(좌상단)에만 등록
+                        cx0 = ox * self.tile_size + self.tile_size // 2 + margin_left
+                        cy0 = oy * self.tile_size + self.tile_size // 2 + margin_top
+                        entity_icons.append({"cx": cx0, "cy": cy0, "r": 9, "name": "", "color": "#888888", "type": "object"})
+                    except Exception:
+                        pass
+
         # NPC 아이콘 그리기 + 위치 수집
         r = 12
         for npc in state["npcs"]:
@@ -176,10 +304,11 @@ class MapGenerator:
 
             if emoji_font:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color + "88", outline="white" if not is_dead else "#666", width=2)
+                safe = safe_emoji(emoji_char, emoji_font)
                 try:
-                    draw.text((cx - 10, cy - 10), emoji_char, font=emoji_font, embedded_color=True)
+                    draw.text((cx - 10, cy - 10), safe, font=emoji_font, embedded_color=True)
                 except TypeError:
-                    draw.text((cx - 10, cy - 10), emoji_char, font=emoji_font)
+                    draw.text((cx - 10, cy - 10), safe, font=emoji_font)
             else:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
 
@@ -197,10 +326,12 @@ class MapGenerator:
             color = player_colors.get(player["class"], "white")
             if emoji_font:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color + "88", outline="white", width=2)
+                player_emoji = player_emojis.get(player["class"], "\u2694\ufe0f")
+                safe = safe_emoji(player_emoji, emoji_font)
                 try:
-                    draw.text((cx - 10, cy - 10), player_emojis.get(player["class"], "\u2694\ufe0f"), font=emoji_font, embedded_color=True)
+                    draw.text((cx - 10, cy - 10), safe, font=emoji_font, embedded_color=True)
                 except TypeError:
-                    draw.text((cx - 10, cy - 10), player_emojis.get(player["class"], "\u2694\ufe0f"), font=emoji_font)
+                    draw.text((cx - 10, cy - 10), safe, font=emoji_font)
             else:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=3)
             entity_icons.append({"cx": cx, "cy": cy, "r": r, "name": player["name"][:3], "color": "white", "type": "player"})
@@ -220,6 +351,10 @@ class MapGenerator:
         label_font = font_name
         for loc in locations:
             area = loc["area"]
+            # 단일 타일이고 랜드마크 아이콘으로 이미 표시된 경우 라벨 스킵
+            if (area["x1"] == area["x2"] and area["y1"] == area["y2"] and
+                (area["x1"], area["y1"]) in landmark_positions):
+                continue
             text = loc["name"]
             tw = len(text) * 8 + 4
             label_cx = ((area["x1"] + area["x2"]) / 2) * self.tile_size + margin_left
@@ -268,11 +403,92 @@ class MapGenerator:
         draw.rectangle([0, 0, max(250, len(info_text) * 9), 22], fill="#00000088")
         draw.text((4, 3), info_text, fill="yellow", font=font)
 
+        # === 범례 (하단) ===
+        legend_items = []
+
+        # 현재 맵에 존재하는 플레이어 클래스
+        for p in state["players"]:
+            cls = p.get("class", "")
+            emoji = player_emojis.get(cls, "")
+            if emoji:
+                legend_items.append((emoji, p["name"]))
+
+        # 현재 맵에 존재하는 NPC
+        for npc in state["npcs"]:
+            if npc.get("status") == "fled":
+                continue
+            npc_loc = npc.get("location", "")
+            if current_loc and npc_loc and npc_loc != current_loc:
+                continue
+            npc_type = npc.get("type", "neutral")
+            emoji = npc_emojis.get(npc_type, "\U0001f464")
+            npc_name = npc["name"][:4] if npc.get("known", False) else "???"
+            legend_items.append((emoji, npc_name))
+
+        # 랜드마크
+        for pos_tuple in landmark_positions:
+            for loc in locations:
+                area = loc["area"]
+                if (area["x1"], area["y1"]) == pos_tuple:
+                    name = loc.get("name", "")
+                    for kw, em in LANDMARK_EMOJI.items():
+                        if kw in name:
+                            legend_items.append((em, name[:6]))
+                            break
+                    break
+
+        # 오브젝트
+        if scenario_id:
+            obj_dir_leg = os.path.join(self.base_dir, "entities", scenario_id, "objects")
+            if os.path.isdir(obj_dir_leg):
+                for fname in sorted(os.listdir(obj_dir_leg)):
+                    if not fname.endswith(".json"):
+                        continue
+                    try:
+                        with open(os.path.join(obj_dir_leg, fname), "r", encoding="utf-8") as f:
+                            obj_leg = json.load(f)
+                        obj_loc = obj_leg.get("location", "")
+                        if current_loc and obj_loc and obj_loc != current_loc:
+                            continue
+                        obj_type = obj_leg.get("type", "")
+                        emoji = obj_leg.get("icon", OBJ_EMOJI.get(obj_type, ""))
+                        if emoji:
+                            legend_items.append((emoji, obj_leg.get("name", "?")[:6]))
+                    except Exception:
+                        pass
+
+        if legend_items:
+            legend_h = 28
+            # 이미지 하단에 범례 공간 확장
+            from PIL import Image as PILImage
+            new_img = PILImage.new("RGB", (img_w, img_h + legend_h), "#1a1a1a")
+            new_img.paste(img, (0, 0))
+            img = new_img
+            draw = ImageDraw.Draw(img)
+
+            legend_y = img_h  # 원래 이미지 하단부터
+            draw.rectangle([0, legend_y, img_w, img_h + legend_h], fill="#000000cc")
+
+            # 아이템 배치
+            lx = 8
+            for emoji_char, label in legend_items:
+                # 이모지
+                if emoji_font:
+                    safe = safe_emoji(emoji_char, emoji_font)
+                    try:
+                        draw.text((lx, legend_y + 3), safe, font=emoji_font, embedded_color=True)
+                    except TypeError:
+                        draw.text((lx, legend_y + 3), safe, font=emoji_font)
+                lx += 22
+                # 라벨
+                draw.text((lx, legend_y + 7), label, fill="#cccccc", font=font_small)
+                lx += len(label) * 8 + 12
+
         return img
 
     def save_map(self):
         img = self.generate_map()
-        out_dir = os.path.join(self.base_dir, "static")
+        out_dir = os.path.join(self.base_dir, "static", "maps", "local")
         os.makedirs(out_dir, exist_ok=True)
 
         # 전체 맵 (확대용)
@@ -368,7 +584,7 @@ class MapGenerator:
             new_h = int(cropped.height * ratio)
             cropped = cropped.resize((sidebar_width, new_h), Image.LANCZOS)
 
-        mini_path = os.path.join(self.base_dir, "static", "map_mini.png")
+        mini_path = os.path.join(self.base_dir, "static", "maps", "local", "map_mini.png")
         cropped.save(mini_path, "PNG")
 
     def generate_portraits(self, force=False):
@@ -2371,9 +2587,256 @@ class MapGenerator:
         ctx.fill()
 
 
+def _switch_sd_model(model_name):
+    """SD WebUI 모델 전환 + 로딩 완료 대기"""
+    try:
+        import requests
+        import time
+        SD_API = "http://127.0.0.1:7860"
+
+        # 현재 모델 확인 — 이미 같으면 스킵
+        try:
+            current = requests.get(f"{SD_API}/sdapi/v1/options", timeout=10).json()
+            if model_name in current.get("sd_model_checkpoint", ""):
+                return True
+        except Exception:
+            pass
+
+        # 모델 전환 요청
+        requests.post(
+            f"{SD_API}/sdapi/v1/options",
+            json={"sd_model_checkpoint": model_name},
+            timeout=180,
+        )
+
+        # 로딩 완료 대기 (최대 120초)
+        for _ in range(60):
+            time.sleep(2)
+            try:
+                opts = requests.get(f"{SD_API}/sdapi/v1/options", timeout=10).json()
+                if model_name in opts.get("sd_model_checkpoint", ""):
+                    return True
+            except Exception:
+                continue
+
+        return False
+    except Exception:
+        return False
+
+
+def _draw_parchment_bg(ctx, W, H, _rng):
+    """양피지 배경 텍스처 (세피아톤 + 노이즈 + 비네팅)"""
+    # 기본 세피아톤
+    ctx.set_source_rgb(0.88, 0.82, 0.68)
+    ctx.rectangle(0, 0, W, H)
+    ctx.fill()
+
+    # 노이즈 (종이 질감) — 작은 반투명 점들
+    _rng.seed(42)
+    noise_count = max(3000, W * H // 200)
+    for _ in range(noise_count):
+        x = _rng.random() * W
+        y = _rng.random() * H
+        ctx.set_source_rgba(0.6, 0.5, 0.35, _rng.random() * 0.15)
+        ctx.arc(x, y, 1 + _rng.random() * 2, 0, 2 * 3.14159)
+        ctx.fill()
+
+    # 얼룩 (커피 자국 같은 불규칙 얼룩)
+    for _ in range(8):
+        sx = _rng.random() * W
+        sy = _rng.random() * H
+        sr = 20 + _rng.random() * 60
+        ctx.set_source_rgba(0.55, 0.45, 0.30, _rng.random() * 0.08)
+        ctx.arc(sx, sy, sr, 0, 2 * 3.14159)
+        ctx.fill()
+
+    # 가장자리 어둡게 (비네팅) — RadialGradient
+    vignette = cairo.RadialGradient(W/2, H/2, min(W, H)*0.3, W/2, H/2, max(W, H)*0.7)
+    vignette.add_color_stop_rgba(0, 0, 0, 0, 0)
+    vignette.add_color_stop_rgba(1, 0.3, 0.2, 0.1, 0.3)
+    ctx.set_source(vignette)
+    ctx.paint()
+
+
+def _draw_terrain_pattern(ctx, coords, terrain_type, to_pixel_fn, tw, th, _rng):
+    """지형별 판타지 스타일 패턴 — 영역 단위로 렌더링"""
+    if not coords:
+        return
+    PI2 = 2 * 3.14159
+
+    # 영역 bounding box (픽셀 기준)
+    pixels = [to_pixel_fn(c[0], c[1]) for c in coords]
+    min_px = min(p[0] for p in pixels) - tw
+    max_px = max(p[0] for p in pixels) + tw
+    min_py = min(p[1] for p in pixels) - th
+    max_py = max(p[1] for p in pixels) + th
+    area_w = max_px - min_px
+    area_h = max_py - min_py
+
+    if terrain_type == "forest":
+        # 숲 영역 바탕
+        ctx.set_source_rgba(0.18, 0.42, 0.14, 0.75)
+        for c in coords:
+            px, py = to_pixel_fn(c[0], c[1])
+            ctx.rectangle(px - tw*0.5, py - th*0.5, tw, th)
+        ctx.fill()
+
+        # 나무 심볼 (영역 전체에 분포) — 밀도 2배, 크기 1.5배
+        tree_count = max(30, int(area_w * area_h / 150))
+        for _ in range(tree_count):
+            tx = min_px + _rng.random() * area_w
+            ty = min_py + _rng.random() * area_h
+            # 해당 위치가 coords 영역 안인지 대략 확인 (가장 가까운 coord까지 거리)
+            close_enough = any(abs(tx - p[0]) < tw and abs(ty - p[1]) < th for p in pixels)
+            if not close_enough:
+                continue
+            s = 15 + _rng.random() * 12  # 15~27px 크기 (기존 10~18)
+            # 기둥
+            ctx.set_source_rgba(0.35, 0.25, 0.12, 0.6)
+            ctx.rectangle(tx - 1, ty + s*0.2, 2, s*0.4)
+            ctx.fill()
+            # 수관 (삼각형)
+            ctx.set_source_rgba(0.08 + _rng.random()*0.1, 0.30 + _rng.random()*0.12, 0.05, 0.85)
+            ctx.move_to(tx, ty - s*0.5)
+            ctx.line_to(tx - s*0.5, ty + s*0.2)
+            ctx.line_to(tx + s*0.5, ty + s*0.2)
+            ctx.close_path()
+            ctx.fill()
+
+    elif terrain_type == "mountain":
+        # 산맥 영역 바탕
+        ctx.set_source_rgba(0.48, 0.38, 0.28, 0.65)
+        for c in coords:
+            px, py = to_pixel_fn(c[0], c[1])
+            ctx.rectangle(px - tw*0.5, py - th*0.5, tw, th)
+        ctx.fill()
+
+        # 봉우리 심볼 — 밀도 2배, 크기 1.5배
+        peak_count = max(16, int(area_w * area_h / 300))
+        for _ in range(peak_count):
+            tx = min_px + _rng.random() * area_w
+            ty = min_py + _rng.random() * area_h
+            close_enough = any(abs(tx - p[0]) < tw and abs(ty - p[1]) < th for p in pixels)
+            if not close_enough:
+                continue
+            s = 22 + _rng.random() * 18  # 22~40px (기존 15~27)
+            # 산 몸체
+            ctx.set_source_rgba(0.50 + _rng.random()*0.1, 0.42, 0.32, 0.85)
+            ctx.move_to(tx, ty - s)
+            ctx.line_to(tx - s*0.8, ty + s*0.3)
+            ctx.line_to(tx + s*0.8, ty + s*0.3)
+            ctx.close_path()
+            ctx.fill()
+            # 눈
+            ctx.set_source_rgba(0.95, 0.95, 0.97, 0.7)
+            ctx.move_to(tx, ty - s)
+            ctx.line_to(tx - s*0.2, ty - s*0.55)
+            ctx.line_to(tx + s*0.2, ty - s*0.55)
+            ctx.close_path()
+            ctx.fill()
+            # 그림자
+            ctx.set_source_rgba(0.30, 0.22, 0.15, 0.3)
+            ctx.move_to(tx, ty - s)
+            ctx.line_to(tx - s*0.8, ty + s*0.3)
+            ctx.line_to(tx, ty + s*0.3)
+            ctx.close_path()
+            ctx.fill()
+
+    elif terrain_type == "sea":
+        # 바다 영역 바탕
+        ctx.set_source_rgba(0.15, 0.35, 0.58, 0.85)
+        for c in coords:
+            px, py = to_pixel_fn(c[0], c[1])
+            ctx.rectangle(px - tw*0.5, py - th*0.5, tw, th)
+        ctx.fill()
+
+        # 파도 라인 — 밀도 2배, 선 굵기 증가
+        wave_count = max(20, int(area_h / 3))
+        ctx.set_line_width(2.0)
+        for wi in range(wave_count):
+            wy = min_py + wi * (area_h / wave_count)
+            phase = _rng.random() * 20
+            ctx.set_source_rgba(0.25, 0.45, 0.70, 0.25 + _rng.random()*0.15)
+            ctx.move_to(min_px, wy)
+            for wx in range(int(min_px), int(max_px), 15):
+                import math
+                dy = math.sin((wx + phase) * 0.15) * 5
+                ctx.line_to(wx, wy + dy)
+            ctx.stroke()
+
+    elif terrain_type == "plains":
+        # 평원 영역 바탕
+        ctx.set_source_rgba(0.58, 0.65, 0.32, 0.55)
+        for c in coords:
+            px, py = to_pixel_fn(c[0], c[1])
+            ctx.rectangle(px - tw*0.5, py - th*0.5, tw, th)
+        ctx.fill()
+
+        # 풀 점/줄기 — 밀도 2배, 크기 증가
+        grass_count = max(60, int(area_w * area_h / 100))
+        for _ in range(grass_count):
+            gx = min_px + _rng.random() * area_w
+            gy = min_py + _rng.random() * area_h
+            close_enough = any(abs(gx - p[0]) < tw and abs(gy - p[1]) < th for p in pixels)
+            if not close_enough:
+                continue
+            ctx.set_source_rgba(0.45 + _rng.random()*0.15, 0.55 + _rng.random()*0.1, 0.20, 0.4)
+            ctx.arc(gx, gy, 2.5, 0, PI2)  # 기존 1.5
+            ctx.fill()
+
+    elif terrain_type == "swamp":
+        # 늪/건조지대
+        ctx.set_source_rgba(0.50, 0.45, 0.30, 0.60)
+        for c in coords:
+            px, py = to_pixel_fn(c[0], c[1])
+            ctx.rectangle(px - tw*0.5, py - th*0.5, tw, th)
+        ctx.fill()
+
+        # 빗금 — 밀도 2배, 선 굵기 증가
+        ctx.set_source_rgba(0.40, 0.35, 0.20, 0.30)
+        ctx.set_line_width(0.8)
+        for i in range(int(min_px), int(max_px), 3):
+            ctx.move_to(i, min_py)
+            ctx.line_to(i + area_h*0.2, max_py)
+            ctx.stroke()
+
+    elif terrain_type == "coastline":
+        # 해안 모래색
+        ctx.set_source_rgba(0.70, 0.62, 0.42, 0.65)
+        for c in coords:
+            px, py = to_pixel_fn(c[0], c[1])
+            ctx.rectangle(px - tw*0.5, py - th*0.5, tw, th)
+        ctx.fill()
+
+
+def _draw_coastline_hatching(ctx, path, to_pixel_fn, tw, _math):
+    """해안선 전통 지도 스타일 빗금 (해안선 안쪽으로 짧은 빗금)"""
+    ctx.set_source_rgba(0.35, 0.28, 0.18, 0.45)
+    ctx.set_line_width(0.5)
+    for i in range(len(path) - 1):
+        x1, y1 = to_pixel_fn(path[i][0], path[i][1])
+        x2, y2 = to_pixel_fn(path[i+1][0], path[i+1][1])
+        dx = x2 - x1
+        dy = y2 - y1
+        length = _math.sqrt(dx*dx + dy*dy)
+        if length < 1:
+            continue
+        # 법선 벡터 (왼쪽 방향 = 육지 쪽)
+        nx = -dy / length
+        ny = dx / length
+        num_hatches = max(1, int(length / 5))
+        for j in range(num_hatches):
+            t = j / max(1, num_hatches - 1)
+            hx = x1 + dx * t
+            hy = y1 + dy * t
+            ctx.move_to(hx, hy)
+            ctx.line_to(hx + nx * tw * 0.12, hy + ny * tw * 0.12)
+            ctx.stroke()
+
+
 def generate_world_map():
-    """worldbuilding.json 기반 하이브리드 세계 지도 생성.
-    SD img2img(그라디언트→판타지) + Cairo 오버레이. SD 실패 시 Cairo 전체 폴백."""
+    """worldbuilding.json 기반 판타지 스타일 세계 지도 생성.
+    Cairo만으로 고퀄리티 판타지 백지도를 생성. SD img2img는 선택적."""
     import math as _math
     import random as _rng
 
@@ -2412,7 +2875,9 @@ def generate_world_map():
         for c in feat.get("coords", []) + feat.get("path", []):
             all_xs.append(c[0]); all_ys.append(c[1])
 
-    padding = 2
+    # 좌표 범위에 비례하는 패딩 (10x 확장 좌표 대응)
+    raw_range = max(max(all_xs) - min(all_xs), max(all_ys) - min(all_ys), 1)
+    padding = max(2, round(raw_range * 0.15))
     min_x, max_x = min(all_xs) - padding, max(all_xs) + padding
     min_y, max_y = min(all_ys) - padding, max(all_ys) + padding
 
@@ -2427,269 +2892,208 @@ def generate_world_map():
 
     _rng.seed(42)
 
-    # ─── 1단계: Cairo 그라디언트 색상맵 ───
-    cm_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
-    cm_ctx = cairo.Context(cm_surface)
-    cm_ctx.set_antialias(cairo.ANTIALIAS_BEST)
-    cm_ctx.set_source_rgb(0.85, 0.78, 0.60)
-    cm_ctx.rectangle(0, 0, W, H)
-    cm_ctx.fill()
+    # 세계관 ID 기반 캐시 파일명 (Cairo/SD 분리)
+    world_name = wb.get("world_info", {}).get("name", "default")
+    safe_world_name = world_name.replace(" ", "_")
+    world_map_dir = os.path.join(BASE_DIR, "static", "maps", "world", safe_world_name)
+    os.makedirs(world_map_dir, exist_ok=True)
+    cairo_bg_cache_path = os.path.join(world_map_dir, "background_cairo.webp")
+    sd_cache_path = os.path.join(world_map_dir, "background_sd.webp")
 
-    terrain_colors = {
-        "forest": (0.25, 0.50, 0.18),
-        "mountain": (0.55, 0.45, 0.35),
-        "sea": (0.20, 0.40, 0.65),
-        "plains": (0.72, 0.75, 0.45),
-        "swamp": (0.35, 0.42, 0.28),
-    }
+    # 배경 우선순위: SD 캐시 > Cairo 캐시 > 새로 생성
+    cached_bg = None
+    if os.path.exists(sd_cache_path):
+        cached_bg = Image.open(sd_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
+    elif os.path.exists(cairo_bg_cache_path):
+        cached_bg = Image.open(cairo_bg_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
 
-    for feat in terrain.get("features", []):
-        ftype = feat.get("type", "")
-        color = terrain_colors.get(ftype)
-        if not color:
-            continue
-        if ftype == "river" and "path" in feat:
-            cm_ctx.set_source_rgb(0.20, 0.40, 0.65)
-            cm_ctx.set_line_width(tw * 0.2)
-            cm_ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-            pts = feat["path"]
-            x0, y0 = to_pixel(pts[0][0], pts[0][1])
-            cm_ctx.move_to(x0, y0)
-            for i in range(1, len(pts)):
-                px, py = to_pixel(pts[i][0], pts[i][1])
-                prev_x, prev_y = to_pixel(pts[i-1][0], pts[i-1][1])
-                cpx = (prev_x + px) / 2 + (py - prev_y) * 0.15
-                cpy = (prev_y + py) / 2 - (px - prev_x) * 0.15
-                cm_ctx.curve_to(cpx, cpy, cpx, cpy, px, py)
-            cm_ctx.stroke()
-        elif "coords" in feat:
-            cm_ctx.set_source_rgb(*color)
-            for c in feat["coords"]:
-                for offset in [(-2,-2), (2,-2), (-2,2), (2,2), (0,0)]:
-                    px = (c[0] - min_x) * tw + offset[0]
-                    py = (c[1] - min_y) * th + offset[1]
-                    cm_ctx.rectangle(px - 2, py - 2, tw + 4, th + 4)
-                    cm_ctx.fill()
-
-    colormap_path = os.path.join(BASE_DIR, "static", "world_map_colormap.png")
-    cm_surface.write_to_png(colormap_path)
-
-    # PIL로 가우시안 블러
-    from PIL import ImageFilter
-    cm_img = Image.open(colormap_path).filter(ImageFilter.GaussianBlur(radius=8))
-    cm_img.save(colormap_path)
-
-    # ─── 2단계: SD img2img 시도 → Cairo 폴백 ───
-    sd_bg = None
-    sd_cache_path = os.path.join(BASE_DIR, "static", "world_map_bg.webp")
-
-    try:
-        from core.sd_generator import is_sd_enabled
-        if is_sd_enabled():
-            import requests
-            import base64
-            import io
-            SD_API_URL = "http://127.0.0.1:7860"
-            requests.get(f"{SD_API_URL}/sdapi/v1/options", timeout=5)
-
-            # 캐시 있으면 재사용
-            if os.path.exists(sd_cache_path):
-                sd_bg = Image.open(sd_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
-            else:
-                buffered = io.BytesIO()
-                cm_img.save(buffered, format="PNG")
-                img_b64 = base64.b64encode(buffered.getvalue()).decode()
-
-                payload = {
-                    "init_images": [img_b64],
-                    "prompt": "fantasy world map, top down view, detailed terrain textures, lush green forests with individual trees, snow-capped rocky mountains, deep blue ocean with foam waves, golden wheat plains, winding blue river, sandy coastline, medieval hand-painted cartography style, parchment paper, high detail, masterpiece, best quality",
-                    "negative_prompt": "text, words, labels, letters, UI, modern, blurry, low quality, 3d render, photo, people, buildings",
-                    "steps": 25,
-                    "sampler_name": "DPM++ 2M Karras",
-                    "width": W,
-                    "height": H,
-                    "cfg_scale": 7,
-                    "denoising_strength": 0.55,
-                }
-                resp = requests.post(f"{SD_API_URL}/sdapi/v1/img2img", json=payload, timeout=300)
-                resp.raise_for_status()
-                result = resp.json()
-                if result.get("images"):
-                    img_data = base64.b64decode(result["images"][0])
-                    sd_bg = Image.open(io.BytesIO(img_data)).convert("RGBA").resize((W, H), Image.LANCZOS)
-                    sd_bg.save(sd_cache_path, "WEBP", quality=90)
-    except Exception:
-        pass
-
-    # ─── 3단계: Cairo 최종 surface 구성 ───
+    # ─── 1단계: Cairo 판타지 스타일 배경 ───
     final_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
     ctx = cairo.Context(final_surface)
     ctx.set_antialias(cairo.ANTIALIAS_BEST)
 
+    # 양피지 배경
+    _draw_parchment_bg(ctx, W, H, _rng)
+    _rng.seed(42)  # 시드 재설정 (일관성)
+
+    # ─── 2단계: 지형 패턴 렌더링 ───
+    # 먼저 영역형 지형 (sea, plains, forest, mountain, swamp, coastline)
+    render_order = ["sea", "plains", "coastline", "swamp", "forest", "mountain"]
+    for target_type in render_order:
+        for feat in terrain.get("features", []):
+            ftype = feat.get("type", "")
+            if ftype != target_type:
+                continue
+            if "coords" in feat:
+                _draw_terrain_pattern(ctx, feat["coords"], ftype, to_pixel, tw, th, _rng)
+
+    # 지형 경계 부드럽게 — 약한 가우시안 블러 (PIL 통해 적용)
+    # Cairo surface → PIL → blur → Cairo surface
+    from PIL import ImageFilter
+    _temp_path = os.path.join(world_map_dir, "world_map_temp_blur.tmp.png")
+    final_surface.write_to_png(_temp_path)
+    _blur_img = Image.open(_temp_path).filter(ImageFilter.GaussianBlur(radius=1.2))
+    _blur_img.save(_temp_path)
+    # 블러된 이미지를 다시 Cairo에 로드
+    _blurred_surface = cairo.ImageSurface.create_from_png(_temp_path)
+    ctx.set_source_surface(_blurred_surface, 0, 0)
+    ctx.paint()
+    try:
+        os.remove(_temp_path)
+    except Exception:
+        pass
+
+    # 해안선 (path 기반) — 굵은 곡선 + 빗금
+    for feat in terrain.get("features", []):
+        if feat.get("type") == "coastline" and "path" in feat:
+            pts = feat["path"]
+            if len(pts) >= 2:
+                # 굵은 해안선
+                ctx.set_source_rgba(0.40, 0.32, 0.20, 0.7)
+                ctx.set_line_width(tw * 0.25)
+                ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+                x0, y0 = to_pixel(pts[0][0], pts[0][1])
+                ctx.move_to(x0, y0)
+                for i in range(1, len(pts)):
+                    px, py = to_pixel(pts[i][0], pts[i][1])
+                    prev_x, prev_y = to_pixel(pts[i-1][0], pts[i-1][1])
+                    cpx = (prev_x + px) / 2 + (py - prev_y) * 0.1
+                    cpy = (prev_y + py) / 2 - (px - prev_x) * 0.1
+                    ctx.curve_to(cpx, cpy, cpx, cpy, px, py)
+                ctx.stroke()
+                # 빗금
+                _draw_coastline_hatching(ctx, pts, to_pixel, tw, _math)
+
+    # 강: 파란 곡선, 하류로 갈수록 굵어짐
+    for feat in terrain.get("features", []):
+        if feat.get("type") == "river" and "path" in feat:
+            path_pts = [to_pixel(c[0], c[1]) for c in feat["path"]]
+            if len(path_pts) >= 2:
+                # 하류로 갈수록 굵어지는 강
+                base_width = max(2, tw * 0.08)
+                max_width = max(5, tw * 0.22)
+                ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+                for i in range(1, len(path_pts)):
+                    progress = i / max(1, len(path_pts) - 1)
+                    line_w = base_width + (max_width - base_width) * progress
+                    prev = path_pts[i-1]; curr = path_pts[i]
+                    dx = curr[0]-prev[0]; dy = curr[1]-prev[1]
+                    cpx = (prev[0]+curr[0])/2 - dy*0.2 + _rng.uniform(-6,6)
+                    cpy = (prev[1]+curr[1])/2 + dx*0.2 + _rng.uniform(-3,3)
+                    # 어두운 외곽
+                    ctx.set_source_rgba(0.12, 0.25, 0.50, 0.6)
+                    ctx.set_line_width(line_w + 1.5)
+                    ctx.move_to(*prev)
+                    ctx.curve_to(cpx, cpy, cpx, cpy, *curr)
+                    ctx.stroke()
+                    # 메인 강
+                    ctx.set_source_rgba(0.20, 0.40, 0.65, 0.8)
+                    ctx.set_line_width(line_w)
+                    ctx.move_to(*prev)
+                    ctx.curve_to(cpx, cpy, cpx, cpy, *curr)
+                    ctx.stroke()
+                    # 하이라이트
+                    ctx.set_source_rgba(0.35, 0.55, 0.80, 0.3)
+                    ctx.set_line_width(max(1, line_w * 0.4))
+                    ctx.move_to(prev[0]+1, prev[1]-1)
+                    ctx.curve_to(cpx+1, cpy-1, cpx+1, cpy-1, curr[0]+1, curr[1]-1)
+                    ctx.stroke()
+                # 강 이름
+                mid = path_pts[len(path_pts)//2]
+                ctx.select_font_face("Malgun Gothic", cairo.FONT_SLANT_ITALIC, cairo.FONT_WEIGHT_BOLD)
+                ctx.set_font_size(13)
+                ctx.set_source_rgba(0.10, 0.22, 0.48, 0.9)
+                ctx.move_to(mid[0]+10, mid[1]-8)
+                ctx.show_text(feat.get("name", ""))
+
+    # Cairo 배경을 webp로 캐시 저장
+    try:
+        _cache_tmp = os.path.join(world_map_dir, "world_map_temp_cache.tmp.png")
+        final_surface.write_to_png(_cache_tmp)
+        _cache_img = Image.open(_cache_tmp).convert("RGBA")
+        _cache_img.save(cairo_bg_cache_path, "WEBP", quality=90)
+        try:
+            os.remove(_cache_tmp)
+        except Exception:
+            pass
+    except Exception:
+        pass
+
+    # ─── SD 캐시 배경 적용 (SD 캐시가 있으면 Cairo 배경 위에 오버레이) ───
+    use_sd_enhancement = False
+    sd_bg = None
+    # sd_cache_path는 함수 상단에서 이미 정의됨 (world_map_bg_{name}_sd.webp)
+
+    # SD 캐시가 이미 있으면 바로 사용 (use_sd_enhancement와 무관)
+    if cached_bg is not None and os.path.exists(sd_cache_path):
+        sd_bg = cached_bg
+
+    if use_sd_enhancement and sd_bg is None:
+        try:
+            from core.sd_generator import is_sd_enabled
+            if is_sd_enabled():
+                import requests
+                import base64
+                import io
+                SD_API_URL = "http://127.0.0.1:7860"
+
+                if os.path.exists(sd_cache_path):
+                    sd_bg = Image.open(sd_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
+                else:
+                    # dreamshaper 모델 그대로 사용 (모델 전환 없음)
+                    # Cairo 배경을 SD img2img 입력으로 사용
+                    _sd_input = Image.open(cairo_bg_cache_path).convert("RGB")
+                    buffered = io.BytesIO()
+                    _sd_input.save(buffered, format="PNG")
+                    img_b64 = base64.b64encode(buffered.getvalue()).decode()
+
+                    prompt = (
+                        "fantasy map, <lora:AZovyaRPGArtistToolsLORAV2art:0.6>, "
+                        "medieval cartography style, parchment texture, hand painted, "
+                        "watercolor terrain, top down birds eye view, aged paper"
+                    )
+                    negative_prompt = (
+                        "animals, birds, people, characters, faces, 3d render, "
+                        "realistic photo, modern, text, labels, blurry, low quality, close up"
+                    )
+
+                    payload = {
+                        "init_images": [img_b64],
+                        "prompt": prompt,
+                        "negative_prompt": negative_prompt,
+                        "steps": 25,
+                        "sampler_name": "DPM++ 2M Karras",
+                        "width": 768,
+                        "height": 768,
+                        "cfg_scale": 8,
+                        "denoising_strength": 0.45,
+                    }
+
+                    resp = requests.post(f"{SD_API_URL}/sdapi/v1/img2img", json=payload, timeout=300)
+                    resp.raise_for_status()
+
+                    result = resp.json()
+                    if result.get("images"):
+                        img_data = base64.b64decode(result["images"][0])
+                        sd_bg = Image.open(io.BytesIO(img_data)).convert("RGBA").resize((W, H), Image.LANCZOS)
+                        sd_bg.save(sd_cache_path, "WEBP", quality=90)
+        except Exception:
+            pass
+
+        # (SD 향상 완료 — 오버레이는 아래에서 공통 처리)
+
+    # SD 배경을 Cairo surface 위에 오버레이 (캐시 로드 또는 새로 생성한 것 모두 적용)
     if sd_bg:
-        # SD 배경 사용
         bg_data = sd_bg.tobytes("raw", "BGRa")
         bg_surface = cairo.ImageSurface.create_for_data(
             bytearray(bg_data), cairo.FORMAT_ARGB32, W, H, W * 4)
         ctx.set_source_surface(bg_surface, 0, 0)
         ctx.paint()
-    else:
-        # Cairo 폴백: 양피지 배경
-        ctx.set_source_rgb(0.82, 0.75, 0.60)
-        ctx.rectangle(0, 0, W, H)
-        ctx.fill()
-        for _ in range(W * H // 30):
-            nx = _rng.randint(0, W - 1)
-            ny = _rng.randint(0, H - 1)
-            v = _rng.uniform(-0.05, 0.05)
-            ctx.set_source_rgba(0.82 + v, 0.75 + v, 0.60 + v, 0.4)
-            ctx.rectangle(nx, ny, _rng.randint(1, 3), _rng.randint(1, 3))
-            ctx.fill()
-        for edge_i in range(20):
-            alpha = 0.03 * (20 - edge_i) / 20
-            ctx.set_source_rgba(0.3, 0.25, 0.15, alpha)
-            ctx.rectangle(edge_i, edge_i, W - edge_i*2, H - edge_i*2)
-            ctx.stroke()
 
-        # Cairo 폴백 시 헥스 그리드 + 지형 그리기
-        hex_size = 50
-        hex_w = hex_size * 2
-        hex_h = _math.sqrt(3) * hex_size
+    # ─── 3단계: 공통 오버레이 (도로/마커/라벨) ───
+    # (강과 해안선은 2단계에서 이미 렌더링됨)
 
-        def hex_center(wx, wy):
-            col = wx - min_x
-            row = wy - min_y
-            cx = 30 + col * hex_w * 0.75 + hex_size
-            cy = 50 + row * hex_h + (hex_h * 0.5 if col % 2 == 1 else 0) + hex_h * 0.5
-            return cx, cy
-
-        def draw_hex(ctx, cx, cy, size, fill=None, stroke=None, line_width=1):
-            for i in range(6):
-                angle = _math.pi / 180 * (60 * i - 30)
-                hx = cx + size * _math.cos(angle)
-                hy = cy + size * _math.sin(angle)
-                if i == 0:
-                    ctx.move_to(hx, hy)
-                else:
-                    ctx.line_to(hx, hy)
-            ctx.close_path()
-            if fill:
-                ctx.set_source_rgba(*fill)
-                ctx.fill_preserve()
-            if stroke:
-                ctx.set_source_rgba(*stroke)
-                ctx.set_line_width(line_width)
-                ctx.stroke()
-            else:
-                ctx.new_path()
-
-        # 헥스 그리드
-        for gy in range(min_y, max_y + 1):
-            for gx in range(min_x, max_x + 1):
-                cx, cy = hex_center(gx, gy)
-                draw_hex(ctx, cx, cy, hex_size - 1,
-                         fill=(0.80, 0.73, 0.58, 0.3),
-                         stroke=(0.65, 0.58, 0.45, 0.4), line_width=0.5)
-
-        terrain_hex_colors = {
-            "forest": (0.30, 0.50, 0.20, 0.6),
-            "mountain": (0.55, 0.48, 0.40, 0.7),
-            "sea": (0.25, 0.42, 0.65, 0.75),
-            "plains": (0.68, 0.72, 0.48, 0.4),
-            "swamp": (0.38, 0.45, 0.30, 0.5),
-        }
-
-        for feat in terrain.get("features", []):
-            ftype = feat.get("type", "")
-            hex_color = terrain_hex_colors.get(ftype)
-            if ftype == "river" and "path" in feat:
-                path_pts = [hex_center(c[0], c[1]) for c in feat["path"]]
-                if len(path_pts) >= 2:
-                    ctx.set_source_rgba(0.20, 0.38, 0.62, 0.85)
-                    ctx.set_line_width(5)
-                    ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-                    ctx.move_to(*path_pts[0])
-                    for i in range(1, len(path_pts)):
-                        prev = path_pts[i-1]; curr = path_pts[i]
-                        cpx = (prev[0]+curr[0])/2 - (curr[1]-prev[1])*0.2 + _rng.uniform(-8,8)
-                        cpy = (prev[1]+curr[1])/2 + (curr[0]-prev[0])*0.2 + _rng.uniform(-4,4)
-                        ctx.curve_to(cpx, cpy, cpx, cpy, curr[0], curr[1])
-                    ctx.stroke()
-            elif hex_color and "coords" in feat:
-                for coord in feat["coords"]:
-                    cx, cy = hex_center(coord[0], coord[1])
-                    draw_hex(ctx, cx, cy, hex_size - 1, fill=hex_color)
-                    if ftype == "forest":
-                        for _ in range(3):
-                            ox = _rng.uniform(-20, 20); oy = _rng.uniform(-15, 15)
-                            sz = _rng.uniform(6, 12)
-                            ctx.set_source_rgba(0.22, 0.42, 0.15, 0.7)
-                            ctx.move_to(cx+ox, cy+oy-sz)
-                            ctx.line_to(cx+ox-sz*0.5, cy+oy+sz*0.3)
-                            ctx.line_to(cx+ox+sz*0.5, cy+oy+sz*0.3)
-                            ctx.close_path(); ctx.fill()
-                    elif ftype == "mountain":
-                        for _ in range(2):
-                            ox = _rng.uniform(-15, 15); oy = _rng.uniform(-10, 5)
-                            mh = _rng.uniform(16, 26); mw = _rng.uniform(12, 20)
-                            ctx.set_source_rgba(0.48, 0.42, 0.35, 0.8)
-                            ctx.move_to(cx+ox, cy+oy-mh)
-                            ctx.line_to(cx+ox-mw, cy+oy)
-                            ctx.line_to(cx+ox+mw, cy+oy)
-                            ctx.close_path(); ctx.fill()
-                            ctx.set_source_rgba(0.92, 0.92, 0.95, 0.8)
-                            ctx.move_to(cx+ox, cy+oy-mh)
-                            ctx.line_to(cx+ox-mw*0.3, cy+oy-mh+8)
-                            ctx.line_to(cx+ox+mw*0.3, cy+oy-mh+8)
-                            ctx.close_path(); ctx.fill()
-                    elif ftype == "sea":
-                        for wy in range(int(cy-18), int(cy+18), 10):
-                            for wx in range(int(cx-18), int(cx+18), 14):
-                                ctx.set_source_rgba(0.30, 0.48, 0.70, 0.4)
-                                ctx.arc(wx, wy, 5, 0, _math.pi)
-                                ctx.stroke()
-
-        # to_pixel을 hex_center로 대체 (Cairo 폴백 모드)
-        to_pixel = hex_center
-
-    # ─── 4단계: 공통 오버레이 (강/도로/마커/라벨) ───
-
-    # 강 (SD 모드에서만 — Cairo 폴백은 위에서 이미 그림)
-    if sd_bg:
-        for feat in terrain.get("features", []):
-            if feat.get("type") == "river" and "path" in feat:
-                path_pts = [to_pixel(c[0], c[1]) for c in feat["path"]]
-                if len(path_pts) >= 2:
-                    ctx.set_source_rgba(0.18, 0.35, 0.60, 0.7)
-                    ctx.set_line_width(4)
-                    ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-                    ctx.move_to(*path_pts[0])
-                    for i in range(1, len(path_pts)):
-                        prev = path_pts[i-1]; curr = path_pts[i]
-                        dx = curr[0]-prev[0]; dy = curr[1]-prev[1]
-                        cpx = (prev[0]+curr[0])/2 - dy*0.2 + _rng.uniform(-8,8)
-                        cpy = (prev[1]+curr[1])/2 + dx*0.2 + _rng.uniform(-4,4)
-                        ctx.curve_to(cpx, cpy, cpx, cpy, curr[0], curr[1])
-                    ctx.stroke()
-                    # 하이라이트
-                    ctx.set_source_rgba(0.30, 0.50, 0.78, 0.3)
-                    ctx.set_line_width(2)
-                    ctx.move_to(path_pts[0][0]+1, path_pts[0][1]-1)
-                    for i in range(1, len(path_pts)):
-                        prev = path_pts[i-1]; curr = path_pts[i]
-                        dx = curr[0]-prev[0]; dy = curr[1]-prev[1]
-                        cpx = (prev[0]+curr[0])/2 - dy*0.15 + _rng.uniform(-6,6)
-                        cpy = (prev[1]+curr[1])/2 + dx*0.15 + _rng.uniform(-3,3)
-                        ctx.curve_to(cpx, cpy, cpx, cpy, curr[0]+1, curr[1]-1)
-                    ctx.stroke()
-                    mid = path_pts[len(path_pts)//2]
-                    ctx.select_font_face("Malgun Gothic", cairo.FONT_SLANT_ITALIC, cairo.FONT_WEIGHT_BOLD)
-                    ctx.set_font_size(13)
-                    ctx.set_source_rgba(0.10, 0.22, 0.48, 0.9)
-                    ctx.move_to(mid[0]+10, mid[1]-8)
-                    ctx.show_text(feat.get("name", ""))
-
-    # 지형 이름 (Cairo 폴백에서도 표시)
+    # 지형 이름
     for feat in terrain.get("features", []):
         if feat.get("type") == "river":
             continue
@@ -2870,22 +3274,65 @@ def generate_world_map():
     ctx.arc(ncx, ncy, nr, 0, 2*_math.pi); ctx.stroke()
     ctx.set_font_size(12)
     ctx.set_source_rgb(0.72, 0.15, 0.15)
-    ctx.move_to(ncx-4, ncy-nr+12); ctx.show_text("N")
+    # N (위)
+    te = ctx.text_extents("N")
+    ctx.move_to(ncx - te.width/2, ncy - nr + 14); ctx.show_text("N")
     ctx.set_source_rgb(0.18, 0.12, 0.05)
-    for label, angle in [("E", 0), ("S", _math.pi/2), ("W", _math.pi)]:
-        te = ctx.text_extents(label)
-        lx = ncx + (nr-12)*_math.cos(angle-_math.pi/2) - te.width/2
-        ly = ncy + (nr-12)*_math.sin(angle-_math.pi/2) + te.height/2
-        ctx.move_to(lx, ly); ctx.show_text(label)
+    # S (아래)
+    te = ctx.text_extents("S")
+    ctx.move_to(ncx - te.width/2, ncy + nr - 5); ctx.show_text("S")
+    # E (오른쪽)
+    te = ctx.text_extents("E")
+    ctx.move_to(ncx + nr - 14, ncy + te.height/2); ctx.show_text("E")
+    # W (왼쪽)
+    te = ctx.text_extents("W")
+    ctx.move_to(ncx - nr + 5, ncy + te.height/2); ctx.show_text("W")
 
-    # 임시 색상맵 삭제
-    try:
-        os.remove(colormap_path)
-    except Exception:
-        pass
+    # === 월드맵 범례 ===
+    legend_h = 30
+    map_W = final_surface.get_width()
+    map_H = final_surface.get_height()
+
+    new_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, map_W, map_H + legend_h)
+    new_ctx = cairo.Context(new_surface)
+    new_ctx.set_source_surface(final_surface, 0, 0)
+    new_ctx.paint()
+
+    # 범례 배경 (반투명 검정)
+    new_ctx.set_source_rgba(0, 0, 0, 0.8)
+    new_ctx.rectangle(0, map_H, map_W, legend_h)
+    new_ctx.fill()
+
+    # 범례 항목: (색상 hex, 라벨)
+    legend_text_items = [
+        ("#2d5a1e", "숲"), ("#8B7355", "산맥"), ("#2a6fa0", "바다"),
+        ("#6a9a30", "평원"), ("#d2b48c", "해안"), ("#e63946", "현재 위치"),
+        ("#c8a82a", "마을/도시"),
+    ]
+
+    new_ctx.select_font_face("Malgun Gothic", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+    new_ctx.set_font_size(12)
+
+    lx = 10
+    for color_hex, label in legend_text_items:
+        r = int(color_hex[1:3], 16) / 255
+        g = int(color_hex[3:5], 16) / 255
+        b = int(color_hex[5:7], 16) / 255
+        # 색상 점
+        new_ctx.set_source_rgb(r, g, b)
+        new_ctx.arc(lx + 6, map_H + 15, 5, 0, 2 * _math.pi)
+        new_ctx.fill()
+        # 라벨
+        new_ctx.set_source_rgb(0.8, 0.8, 0.8)
+        new_ctx.move_to(lx + 15, map_H + 20)
+        new_ctx.show_text(label)
+        ext = new_ctx.text_extents(label)
+        lx += ext.x_advance + 30
+
+    final_surface = new_surface
 
     # 저장
-    output_path = os.path.join(BASE_DIR, "static", "world_map.png")
+    output_path = os.path.join(world_map_dir, "world_map.png")
     final_surface.write_to_png(output_path)
     return output_path
 

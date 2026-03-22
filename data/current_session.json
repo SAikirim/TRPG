@@ -51,16 +51,16 @@
     }
   ],
   "progress_notes": [
-    "[GM] 사이키가 \"실험할게 있어\"라며 루체나와 다시 자리를 바꾼다.",
-    "[GM] 사이키가 카렌델까지의 거리를 물었다. 할란이 지형을 보며 설명한다.",
-    "[GM] 사이키가 방향을 물었다. 할란이 갈림길 지리를 상세히 설명한다.",
-    "[GM] 사이키가 수레 위에서 짧은 휴식. MP 37→40 회복.",
-    "[GM] 사이키가 갈림길 쉼터 정차 여부를 물었다. 할란이 현실적인 이유를 설명한다.",
-    "[GM] 사이키가 하룬 마을에서의 출발 전날을 떠올린다.",
-    "[GM] 사이키가 할란에게 하룬 마을 경유 여부를 물었다. 할란이 교역로 사정을 설명한다.",
-    "[GM] 갈림길 쉼터 도착. 일행이 야영을 준비한다.",
     "[GM] 사이키가 루체나, 노을에게 말을 건다. 갈림길 쉼터 모닥불 대화.",
-    "[GM] 갈림길 쉼터 야영. 사이키가 주변을 살폈다. 위험한 기척 없음."
+    "[GM] 갈림길 쉼터 야영. 사이키가 주변을 살폈다. 위험한 기척 없음.",
+    "[GM] 세션 복원: 턴 25, 갈림길 쉼터 야영 (밤)",
+    "[GM] scene persistence test",
+    "[GM] scene sync test",
+    "[GM] map object icon added, refresh map",
+    "[GM] map refresh: 2-tile wagon, objects, NPC positions",
+    "[GM] map render fix",
+    "[GM] legend added",
+    "[GM] map refresh"
   ],
   "next_objective": "",
   "display_mode": "mobile",

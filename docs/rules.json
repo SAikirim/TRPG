@@ -101,11 +101,33 @@
     "flee": {
       "formula": "1d20 + DEX_modifier >= flee_dc",
       "description": "도주 판정. 실패 시 도주 불가 + 적에게 기회 공격 허용."
+    },
+    "cover": {
+      "description": "오브젝트 뒤에 숨어 엄폐. 원거리 공격에 대한 방어 보너스 제공.",
+      "types": {
+        "none": {"defense_bonus": 0, "description": "엄폐 없음"},
+        "half": {"defense_bonus": 2, "description": "반 엄폐. AC +2 (원거리만)"},
+        "full": {"defense_bonus": 5, "description": "완전 엄폐. AC +5 또는 원거리 차단"}
+      },
+      "rules": [
+        "엄폐는 공격자 방향에 엄폐물이 있을 때만 적용",
+        "근거리(인접 타일) 공격에는 엄폐 미적용",
+        "full cover로 원거리 차단 시 공격 자동 빗나감",
+        "가연성 엄폐물은 화염 공격으로 파괴 가능",
+        "폭발성 오브젝트는 파괴 시 주변 피해",
+        "파괴된 오브젝트는 엄폐 효과 소멸"
+      ]
+    }
+  },
+  "tile_scale": {
+    "local_map": {
+      "tile_meters": 2,
+      "note": "로컬 맵 1타일 = 약 2m. 이동, 사거리, 범위 효과 계산에 사용."
     }
   },
   "distance": {
     "description": "좌표 기반 거리 계산. 맨하탄 거리(|x1-x2| + |y1-y2|) 사용.",
-    "unit": "칸 (1칸 = 약 1.5m)",
+    "unit": "칸 (1칸 = 약 2m)",
     "melee_range": 1,
     "short_range": 3,
     "medium_range": 6,

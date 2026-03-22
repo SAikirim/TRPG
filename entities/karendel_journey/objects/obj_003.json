@@ -1,0 +1,21 @@
+{
+  "id": "obj_003",
+  "name": "장작더미",
+  "type": "resource",
+  "status": "available",
+  "position": [13, 13],
+  "location": "crossroads_rest",
+  "description": "노을이 모은 장작 한 아름. 모닥불 옆에 쌓여 있다.",
+  "interactable": true,
+  "interaction": "모닥불에 장작을 추가할 수 있다.",
+  "icon": "🔶",
+  "tactical": {
+    "cover": "half",
+    "defense_bonus": 2,
+    "blocks_ranged": false,
+    "destructible": true,
+    "hp": 8,
+    "flammable": true,
+    "description": "장작더미 뒤에 반 엄폐. 가연성 — 불 붙으면 주변에 화상 피해."
+  }
+}

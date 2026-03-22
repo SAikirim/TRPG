@@ -187,8 +187,9 @@ entities/{scenario_id}/   - npcs/ players/ objects/ 엔티티 파일
 rulesets/ / scenarios/    - 룰셋/시나리오 카탈로그
 worldbuildings/           - 세계관 파일 카탈로그 (시나리오에서 참조)
 static/                   - 맵, 초상화, 일러스트 이미지
-  map.png                 - 전체 맵 (클릭 확대용, ~1000x1000px)
-  map_mini.png            - 미니맵 (플레이어 중심 크롭, 사이드바용)
+  maps/local/map.png      - 전체 맵 (클릭 확대용, ~1000x1000px)
+  maps/local/map_mini.png - 미니맵 (플레이어 중심 크롭, 사이드바용)
+  maps/world/{세계관}/     - 월드맵 (world_map.png, background_cairo.webp, background_sd.webp)
 templates/                - 웹 UI (동적/정적 자동 감지) + 캐릭터 클래스 템플릿
 docs/index.html           - templates/index.html 복사본 (build_static.py가 자동 복사)
 saves/                    - 세이브 데이터

@@ -1,0 +1,20 @@
+{
+  "id": "obj_005",
+  "name": "여행자 텐트",
+  "type": "shelter",
+  "status": "set_up",
+  "position": [15, 12],
+  "location": "crossroads_rest",
+  "description": "다른 여행자가 설치한 간이 텐트. 낡은 천으로 만들어져 있다.",
+  "interactable": false,
+  "icon": "⛺",
+  "tactical": {
+    "cover": "half",
+    "defense_bonus": 1,
+    "blocks_ranged": false,
+    "destructible": true,
+    "hp": 5,
+    "flammable": true,
+    "description": "텐트 뒤에 약한 엄폐. 쉽게 파괴됨."
+  }
+}

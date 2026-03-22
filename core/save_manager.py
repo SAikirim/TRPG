@@ -310,11 +310,10 @@ class SaveManager:
                 os.path.join(BASE_DIR, rel),
                 os.path.join(docs_dir, rel))
 
-        # 단일 파일 (맵)
-        for fname in ["static/map.png", "static/map_mini.png", "static/world_map.png"]:
-            self._copy_if_changed(
-                os.path.join(BASE_DIR, fname),
-                os.path.join(docs_dir, fname))
+        # 맵 디렉토리 (maps/local + maps/world)
+        self._sync_dir_incremental(
+            os.path.join(BASE_DIR, "static", "maps"),
+            os.path.join(docs_dir, "static", "maps"))
 
         # 4. 엔티티/템플릿/룰셋 — 증분 동기화 (rmtree 제거)
         for src_rel in ["entities", "templates", "rulesets"]:

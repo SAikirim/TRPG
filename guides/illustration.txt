@@ -118,9 +118,12 @@ generate_world_map() 함수가 세계 지도를 자동 생성한다.
 - 수동: python -c "from core.map_generator import generate_world_map; generate_world_map()"
 
 SD 배경 캐시:
-- static/world_map_bg.webp에 SD 생성 배경을 캐시
-- 좌표/지형이 변경되면 캐시를 삭제해야 재생성됨
-- 캐시 삭제: rm static/world_map_bg.webp
+- static/maps/world/{세계관이름}/background_sd.webp에 SD 생성 배경을 세계관별 캐시
+- static/maps/world/{세계관이름}/background_cairo.webp에 Cairo 생성 배경 캐시
+- 세계관 전환 시 기존 캐시는 보존, 복귀 시 즉시 재사용
+- 좌표/지형 변경 시에도 배경 캐시는 보존 (오버레이만 재생성)
+- 배경 재생성이 필요한 경우에만 캐시 삭제: rm static/maps/world/{이름}/background_sd.webp
+- 좌표 변경 시 캐시를 삭제하지 않는다 — 오버레이만 재생성하면 충분
 
 AnimateDiff
 ===
@@ -213,6 +216,16 @@ NPC 초상화 생성 시 필수 사항
 - portrait_할란_injured.webp (부상 상태)
 - portrait_미라.webp (기본)
 - portrait_미라_angry.webp (화난 표정)
+
+이모지 렌더링 규칙
+===
+- 맵 PNG 이미지에서 사용하는 이모지는 Windows seguiemj.ttf 호환이어야 한다
+- map_generator.py의 safe_emoji() 함수가 자동으로 미지원 이모지를 폴백 처리
+- 미지원 판정 기준: 30x30px 렌더링 시 alpha 채널 픽셀 < 150개 (컬러 글리프 없음)
+- 새 이모지 추가 시 반드시 safe_emoji()를 거쳐야 한다
+- 폴백 매핑: EMOJI_FALLBACK 딕셔너리에 등록
+- HTML 웹 UI에서는 브라우저가 렌더링하므로 이 제한 없음 (PNG 맵 전용)
+- 오브젝트 엔티티 JSON의 icon 필드는 원본 이모지 유지 가능 — 렌더링 시 safe_emoji가 처리
 
 이미지 품질 관리
 ===

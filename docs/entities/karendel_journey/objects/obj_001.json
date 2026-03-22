@@ -1,0 +1,23 @@
+{
+  "id": "obj_001",
+  "name": "할란의 마차",
+  "type": "vehicle",
+  "status": "parked",
+  "position": [10, 13],
+  "size": [2, 1],
+  "location": "crossroads_rest",
+  "description": "할란과 미라의 교역용 마차. 직물과 건어물이 실려 있다. 짐말이 끌고 왔다.",
+  "interactable": true,
+  "interaction": "조사하면 교역 물품을 확인할 수 있다.",
+  "icon": "🛒",
+  "tactical": {
+    "cover": "full",
+    "defense_bonus": 5,
+    "blocks_ranged": true,
+    "destructible": true,
+    "hp": 30,
+    "flammable": true,
+    "climbable": true,
+    "description": "마차 뒤에 숨으면 원거리 공격을 완전히 차단. 가연성."
+  }
+}

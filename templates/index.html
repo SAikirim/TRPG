@@ -959,7 +959,7 @@
                 updatePlayersList();
                 updateEventsList();
                 updateLegend();
-                document.getElementById('game-map').src = STATIC_PREFIX + 'map_mini.png?t=' + Date.now();
+                document.getElementById('game-map').src = STATIC_PREFIX + 'maps/local/map_mini.png?t=' + Date.now();
             } catch (e) {
                 if (!isStatic) {
                     const connEl = document.getElementById('connection-status');
@@ -1280,6 +1280,27 @@
             if (npcTypes.has('friendly')) html += '<div class="legend-item"><div class="legend-dot" style="background:#f1c40f"></div> NPC</div>';
             if (npcTypes.has('neutral')) html += '<div class="legend-item"><div class="legend-dot" style="background:#95a5a6"></div> 중립</div>';
             if (deadNpcs.length > 0) html += '<div class="legend-item"><div class="legend-dot" style="background:#555"></div> 시체</div>';
+            // 단일 타일 랜드마크 범례
+            const landmarkEmoji = {'우물': '💧', '모닥불': '🔥', '이정표': '📌', '제단': '⛩️'};
+            const landmarkSeen = new Set();
+            (gameState.map?.locations || []).forEach(loc => {
+                const a = loc.area;
+                if (a && a.x1 === a.x2 && a.y1 === a.y2) {
+                    for (const [kw, emoji] of Object.entries(landmarkEmoji)) {
+                        if (loc.name.includes(kw) && !landmarkSeen.has(kw)) {
+                            landmarkSeen.add(kw);
+                            html += `<div class="legend-item">${emoji} ${loc.name}</div>`;
+                            break;
+                        }
+                    }
+                }
+            });
+            // 오브젝트 범례
+            (gameState.objects || []).forEach(obj => {
+                if (obj.status === 'destroyed') return;
+                const icon = obj.icon || '📦';
+                html += `<div class="legend-item">${icon} ${obj.name}</div>`;
+            });
             container.innerHTML = html;
         }
 
@@ -1469,7 +1490,30 @@
         }
 
         // 초기 맵 이미지 설정
-        document.getElementById('game-map').src = STATIC_PREFIX + 'map_mini.png';
+        document.getElementById('game-map').src = STATIC_PREFIX + 'maps/local/map_mini.png';
+
+        // 세계관 이름 로드 (월드맵 경로용)
+        (async function() {
+            try {
+                const wbUrl = isStatic ? 'worldbuilding.json' : '/api/worldbuilding';
+                let wb;
+                if (isStatic) {
+                    const r = await fetch(wbUrl);
+                    wb = await r.json();
+                } else {
+                    // 동적 모드: data/worldbuilding.json은 API가 없으므로 직접 fetch 시도
+                    try {
+                        const r = await fetch('/api/worldbuilding');
+                        wb = await r.json();
+                    } catch(e) {
+                        // 폴백: static prefix에서 직접 시도하지 않음
+                    }
+                }
+                if (wb && wb.world_info && wb.world_info.name) {
+                    window._worldMapName = wb.world_info.name;
+                }
+            } catch(e) { /* 폴백: 에르시아 */ }
+        })();
 
         loadRules();
         loadItems();
@@ -1481,11 +1525,11 @@
         }
         function openMapZoom() {
             document.getElementById('map-overlay').classList.add('active');
-            document.getElementById('map-zoom-img').src = STATIC_PREFIX + 'map.png?t=' + Date.now();
+            document.getElementById('map-zoom-img').src = STATIC_PREFIX + 'maps/local/map.png?t=' + Date.now();
         }
         function openWorldMap() {
             document.getElementById('map-overlay').classList.add('active');
-            document.getElementById('map-zoom-img').src = STATIC_PREFIX + 'world_map.png?t=' + Date.now();
+            document.getElementById('map-zoom-img').src = STATIC_PREFIX + 'maps/world/' + (window._worldMapName || '에르시아') + '/world_map.png?t=' + Date.now();
         }
 
         function openPortraitZoom(src) {

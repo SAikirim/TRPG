@@ -22,6 +22,15 @@ SD WebUI 환경
 - CLIP skip: 2
 - 모델 37개, LoRA 152개, 임베딩 3개 (bad_prompt_version2, badhandv4, EasyNegativeV2)
 
+SDXL 모델 (월드맵 전용)
+===
+- 체크포인트: sd_xl_base_1.0.safetensors (SDXL 1.0)
+- LoRA: fantasy map-heavy.safetensors (Fantasy Map Heavy, 218MB)
+- 트리거: "fantasy map"
+- 용도: 월드맵 배경 생성 시에만 사용. 생성 후 dreamshaper_8로 자동 복귀.
+- 해상도: 1024x1024 (VRAM 부족 시 768x768 폴백)
+- denoising_strength: 0.65
+
 확장 (활성 17개):
 ControlNet, ADetailer, DDSD, Dynamic Thresholding, Dynamic Prompts, TagComplete, Random, Civitai Helper, multidiffusion-upscaler, haku-img, localization-ko, easy-prompt-selector, two-shot, ebsynth, AR, infinity-grid, AnimateDiff
 

@@ -1430,6 +1430,485 @@ def get_last_result():
     return None
 
 
+# ─── 위험 타일 시스템 ───
+
+def check_hazard_tile(entity_id, new_position, state):
+    """엔티티가 위험 타일 위로 이동했는지 확인하고 상태이상 적용"""
+    HAZARD_TILES = {
+        '모닥불': '화상',
+        '용암': '화상',
+        '독늪': '중독',
+    }
+
+    map_info = state.get('map', {})
+    locations = map_info.get('locations', [])
+
+    for loc in locations:
+        area = loc.get('area', {})
+        # 단일 타일만 체크
+        if area.get('x1') != area.get('x2') or area.get('y1') != area.get('y2'):
+            continue
+        if [area['x1'], area['y1']] != list(new_position):
+            continue
+
+        name = loc.get('name', '')
+        for keyword, effect_name in HAZARD_TILES.items():
+            if keyword in name:
+                return {
+                    'hazard': True,
+                    'tile': name,
+                    'effect': effect_name,
+                    'entity_id': entity_id,
+                    'message': f'{name} 위로 이동! {effect_name} 상태이상 적용.'
+                }
+
+    return {'hazard': False}
+
+
+# ─── 턴 시작 환경 체크 ───
+
+def turn_start_check(state=None):
+    """매 턴 시작 시 환경 효과 + 상태이상 틱을 통합 처리.
+    Agent [룰 심판]이 GM 턴 1단계에서 호출한다.
+
+    주의: 이 함수는 내부에서 tick_status_effects()를 호출하므로,
+    turn_start_check를 호출한 턴에서는 tick_status를 별도로 호출하면 안 된다.
+    GM은 turn_start OR tick_status 중 하나만 호출해야 한다.
+
+    처리 순서:
+    1. 환경 효과: 모든 엔티티의 현재 위치 → 위험 타일 체크 → 상태이상 자동 적용
+    2. 상태이상 tick: 기존 상태이상 지속 피해 + 지속시간 감소
+    3. HP 0 이하 체크: 전투불능 판정
+    """
+    owned = state is None
+    if owned:
+        state = load_game_state()
+
+    results = {
+        "action": "turn_start_check",
+        "hazards": [],
+        "status_ticks": [],
+        "knockouts": [],
+    }
+
+    # 1. 환경 효과: 플레이어 위치 → 위험 타일 체크
+    for p in state["players"]:
+        pos = p.get("position")
+        if not pos:
+            continue
+        hazard = check_hazard_tile(p["id"], pos, state)
+        if hazard.get("hazard"):
+            # 상태이상 적용 (중복 체크)
+            effect_name = hazard["effect"]
+            existing = [e.get("name") if isinstance(e, dict) else e
+                       for e in p.get("status_effects", [])]
+            if effect_name not in existing:
+                # status_effects.json에서 기본 지속시간 가져오기
+                try:
+                    se_path = os.path.join(BASE_DIR, "data", "status_effects.json")
+                    se_data = _load_json(se_path)
+                    duration = se_data.get("effects", {}).get(effect_name, {}).get("duration", 2)
+                except Exception:
+                    duration = 2
+                _apply_status(p, effect_name, duration)
+                hazard["applied"] = True
+                hazard["entity_name"] = p["name"]
+            else:
+                hazard["applied"] = False
+                hazard["entity_name"] = p["name"]
+                hazard["message"] = f'{p["name"]}이(가) 이미 {effect_name} 상태.'
+            results["hazards"].append(hazard)
+
+    # NPC도 동일하게 체크
+    for n in state.get("npcs", []):
+        if n.get("status") == "dead":
+            continue
+        pos = n.get("position")
+        if not pos:
+            continue
+        hazard = check_hazard_tile(n["id"], pos, state)
+        if hazard.get("hazard"):
+            effect_name = hazard["effect"]
+            existing = [e.get("name") if isinstance(e, dict) else e
+                       for e in n.get("status_effects", [])]
+            if effect_name not in existing:
+                try:
+                    se_path = os.path.join(BASE_DIR, "data", "status_effects.json")
+                    se_data = _load_json(se_path)
+                    duration = se_data.get("effects", {}).get(effect_name, {}).get("duration", 2)
+                except Exception:
+                    duration = 2
+                if "status_effects" not in n:
+                    n["status_effects"] = []
+                _apply_status(n, effect_name, duration)
+                hazard["applied"] = True
+                hazard["entity_name"] = n["name"]
+            else:
+                hazard["applied"] = False
+                hazard["entity_name"] = n["name"]
+            results["hazards"].append(hazard)
+
+    # 2. 상태이상 tick (기존 tick_status_effects 로직 재활용)
+    tick_result = tick_status_effects(state)
+    results["status_ticks"] = tick_result.get("results", [])
+
+    # 3. HP 0 이하 체크
+    for p in state["players"]:
+        if p["hp"] <= 0:
+            results["knockouts"].append({
+                "name": p["name"],
+                "type": "player",
+                "message": f'{p["name"]}이(가) 전투불능 상태!'
+            })
+    for n in state.get("npcs", []):
+        if n.get("hp", 0) <= 0 and n.get("status") != "dead":
+            n["status"] = "dead"
+            results["knockouts"].append({
+                "name": n["name"],
+                "type": "npc",
+                "message": f'{n["name"]}이(가) 쓰러졌다!'
+            })
+
+    if owned:
+        save_game_state(state)
+        sync_all_players(state)
+
+    return results
+
+
+# ─── 대화 이력 검색 ───
+
+def get_dialogue_history(character_name, state=None, last_n=20):
+    """특정 캐릭터의 최근 대화 이력을 반환.
+    모순적 언행 검출, NPC 기억 참조 등에 사용.
+
+    Args:
+        character_name: 캐릭터 이름 (예: "사이키", "루체나")
+        state: game_state (None이면 파일에서 로드)
+        last_n: 최근 N개 이벤트에서 검색
+
+    Returns:
+        list of {"turn": int, "speaker": str, "line": str, "target": str, "tone": str, "action": str, "type": str, "timestamp": str}
+    """
+    if state is None:
+        state = load_game_state()
+
+    events = state.get("events", [])
+    history = []
+
+    for event in events[-last_n:]:
+        # dialogues 배열에서 검색
+        for d in event.get("dialogues", []):
+            if d.get("speaker") == character_name:
+                history.append({
+                    "turn": event.get("turn", 0),
+                    "speaker": d["speaker"],
+                    "line": d.get("line", ""),
+                    "target": d.get("target", ""),
+                    "tone": d.get("tone", ""),
+                    "action": d.get("action", ""),
+                    "type": d.get("type", "대화"),
+                    "timestamp": event.get("timestamp", ""),
+                })
+
+        # user_input도 유저 캐릭터 발언으로 기록
+        user_input = event.get("user_input", "")
+        if user_input and character_name == _get_user_character_name(state):
+            history.append({
+                "turn": event.get("turn", 0),
+                "speaker": character_name,
+                "line": user_input,
+                "timestamp": event.get("timestamp", ""),
+                "source": "user_input",
+            })
+
+    return history
+
+
+def _get_user_character_name(state):
+    """controlled_by: 'user'인 캐릭터 이름 반환"""
+    for p in state.get("players", []):
+        if p.get("controlled_by") == "user":
+            return p.get("name", "")
+    return ""
+
+
+def check_dialogue_consistency(character_name, new_line, state=None, last_n=10, new_tone=""):
+    """새 대사가 최근 발언과 모순되는지 간단 체크.
+    직접적인 모순 감지는 GM/NPC 에이전트가 판단하지만,
+    이 함수는 키워드 기반 경고를 제공한다.
+    new_tone이 주어지면 최근 대사의 tone과 비교하여 감정 모순도 검출한다.
+
+    Returns:
+        {"consistent": True/False, "warnings": [...], "recent_lines": [...]}
+    """
+    history = get_dialogue_history(character_name, state, last_n)
+    recent_lines = [h["line"] for h in history]
+
+    warnings = []
+
+    # 간단한 모순 패턴 체크 (키워드 반전)
+    CONTRADICTIONS = [
+        (["싫", "안 ", "못 ", "거부", "반대"], ["좋", "할게", "그래", "동의", "찬성"]),
+        (["믿", "신뢰"], ["의심", "못 믿", "거짓"]),
+        (["가자", "출발", "떠나"], ["머물", "쉬자", "기다"]),
+    ]
+
+    new_lower = new_line.lower() if new_line else ""
+    for neg_words, pos_words in CONTRADICTIONS:
+        new_has_neg = any(w in new_lower for w in neg_words)
+        new_has_pos = any(w in new_lower for w in pos_words)
+
+        for prev_line in recent_lines[-5:]:
+            prev_lower = prev_line.lower() if prev_line else ""
+            prev_has_neg = any(w in prev_lower for w in neg_words)
+            prev_has_pos = any(w in prev_lower for w in pos_words)
+
+            if (new_has_neg and prev_has_pos) or (new_has_pos and prev_has_neg):
+                warnings.append(f"최근 발언 '{prev_line[:30]}...'과 모순 가능성: '{new_line[:30]}...'")
+
+    # tone 모순 체크
+    if new_tone:
+        TONE_CONTRADICTIONS = [
+            ({"화남", "분노", "적대"}, {"친근", "장난", "다정"}),
+            ({"공포", "두려움"}, {"용감", "대담", "도발"}),
+            ({"슬픔", "절망"}, {"기쁨", "흥분", "쾌활"}),
+        ]
+        recent_tones = [h.get("tone", "") for h in history[-5:] if h.get("tone")]
+        for neg_set, pos_set in TONE_CONTRADICTIONS:
+            new_in_neg = new_tone in neg_set
+            new_in_pos = new_tone in pos_set
+            for prev_tone in recent_tones:
+                prev_in_neg = prev_tone in neg_set
+                prev_in_pos = prev_tone in pos_set
+                if (new_in_neg and prev_in_pos) or (new_in_pos and prev_in_neg):
+                    warnings.append(f"감정 변화 감지: 최근 '{prev_tone}' → 현재 '{new_tone}'")
+
+    return {
+        "consistent": len(warnings) == 0,
+        "warnings": warnings,
+        "recent_lines": recent_lines[-5:],
+    }
+
+
+# ─── 전술 엄폐 시스템 ───
+
+# 랜드마크 전술 속성 (맵 locations 기반)
+LANDMARK_TACTICAL = {
+    '우물': {"cover": "half", "defense_bonus": 3, "blocks_ranged": False, "destructible": False, "description": "돌 우물 뒤 반 엄폐."},
+    '모닥불': {"cover": "none", "defense_bonus": 0, "hazard": "화상", "description": "엄폐 불가. 진입 시 화상."},
+    '이정표': {"cover": "none", "defense_bonus": 0, "description": "엄폐 불가."},
+}
+
+
+def get_cover_at(position, state=None):
+    """특정 위치에서 사용 가능한 엄폐물 확인.
+    인접 타일(상하좌우 + 대각선)의 오브젝트/랜드마크를 검색하여 엄폐 가능 여부 반환.
+
+    Args:
+        position: [x, y] 엔티티 현재 위치
+        state: game_state
+
+    Returns:
+        list of {"name": str, "direction": str, "cover": str, "defense_bonus": int, ...}
+    """
+    if state is None:
+        state = load_game_state()
+
+    px, py = int(position[0]), int(position[1])
+    covers = []
+
+    # 인접 8방향
+    directions = {
+        (-1, -1): "북서", (0, -1): "북", (1, -1): "북동",
+        (-1,  0): "서",                  (1,  0): "동",
+        (-1,  1): "남서", (0,  1): "남", (1,  1): "남동",
+    }
+
+    # 1. 오브젝트 엔티티 체크
+    scenario_id = state.get("game_info", {}).get("scenario_id", "")
+    objects = []
+    if scenario_id:
+        obj_dir = os.path.join(BASE_DIR, "entities", scenario_id, "objects")
+        if os.path.isdir(obj_dir):
+            for fname in sorted(os.listdir(obj_dir)):
+                if not fname.endswith(".json"):
+                    continue
+                try:
+                    with open(os.path.join(obj_dir, fname), "r", encoding="utf-8") as f:
+                        objects.append(json.load(f))
+                except Exception:
+                    pass
+
+    for obj in objects:
+        obj_pos = obj.get("position")
+        if not obj_pos:
+            continue
+        obj_size = obj.get("size", [1, 1])
+        tactical = obj.get("tactical", {})
+        if not tactical or tactical.get("cover", "none") == "none":
+            continue
+
+        # 오브젝트가 차지하는 모든 타일 체크
+        for dx_obj in range(obj_size[0]):
+            for dy_obj in range(obj_size[1]):
+                ox = int(obj_pos[0]) + dx_obj
+                oy = int(obj_pos[1]) + dy_obj
+                diff_x = ox - px
+                diff_y = oy - py
+                if (diff_x, diff_y) in directions:
+                    covers.append({
+                        "name": obj.get("name", "?"),
+                        "direction": directions[(diff_x, diff_y)],
+                        "cover": tactical.get("cover", "none"),
+                        "defense_bonus": tactical.get("defense_bonus", 0),
+                        "blocks_ranged": tactical.get("blocks_ranged", False),
+                        "flammable": tactical.get("flammable", False),
+                        "destructible": tactical.get("destructible", False),
+                        "obj_hp": tactical.get("hp", 0),
+                    })
+
+    # 2. 랜드마크 체크 (map.locations 단일 타일)
+    for loc in state.get("map", {}).get("locations", []):
+        area = loc.get("area", {})
+        if area.get("x1") != area.get("x2") or area.get("y1") != area.get("y2"):
+            continue
+        lx, ly = area["x1"], area["y1"]
+        diff_x = lx - px
+        diff_y = ly - py
+        if (diff_x, diff_y) in directions:
+            name = loc.get("name", "")
+            for keyword, tac in LANDMARK_TACTICAL.items():
+                if keyword in name and tac.get("cover", "none") != "none":
+                    covers.append({
+                        "name": name,
+                        "direction": directions[(diff_x, diff_y)],
+                        **tac,
+                    })
+                    break
+
+    return covers
+
+
+def apply_cover(attacker_pos, defender_pos, state=None):
+    """원거리 공격 시 방어자의 엄폐 보너스 계산.
+    공격 방향과 엄폐물 방향이 일치하면 엄폐 적용.
+
+    Args:
+        attacker_pos: [x, y] 공격자 위치
+        defender_pos: [x, y] 방어자 위치
+        state: game_state
+
+    Returns:
+        {"has_cover": bool, "cover_type": str, "defense_bonus": int,
+         "blocked": bool, "cover_name": str}
+    """
+    if state is None:
+        state = load_game_state()
+
+    covers = get_cover_at(defender_pos, state)
+    if not covers:
+        return {"has_cover": False, "cover_type": "none", "defense_bonus": 0, "blocked": False}
+
+    # 공격 방향 계산
+    ax, ay = int(attacker_pos[0]), int(attacker_pos[1])
+    dx, dy = int(defender_pos[0]), int(defender_pos[1])
+
+    # 공격이 오는 방향 (공격자→방어자의 반대 방향이 엄폐 방향)
+    attack_dx = 0 if ax == dx else (1 if ax > dx else -1)
+    attack_dy = 0 if ay == dy else (1 if ay > dy else -1)
+    # 엄폐물이 공격자 방향에 있어야 유효
+    cover_direction = (attack_dx, attack_dy)
+
+    DIRECTION_MAP = {
+        "북서": (-1, -1), "북": (0, -1), "북동": (1, -1),
+        "서": (-1, 0), "동": (1, 0),
+        "남서": (-1, 1), "남": (0, 1), "남동": (1, 1),
+    }
+
+    best_cover = {"has_cover": False, "cover_type": "none", "defense_bonus": 0, "blocked": False}
+
+    for c in covers:
+        c_dir = DIRECTION_MAP.get(c["direction"], (0, 0))
+        if c_dir == cover_direction:
+            if c.get("defense_bonus", 0) > best_cover["defense_bonus"]:
+                best_cover = {
+                    "has_cover": True,
+                    "cover_type": c.get("cover", "half"),
+                    "defense_bonus": c.get("defense_bonus", 0),
+                    "blocked": c.get("blocks_ranged", False),
+                    "cover_name": c.get("name", "?"),
+                    "flammable": c.get("flammable", False),
+                }
+
+    return best_cover
+
+
+def damage_object(obj_name, damage, state=None):
+    """오브젝트에 피해를 주어 파괴. 파괴 시 엄폐 소멸.
+
+    Returns:
+        {"destroyed": bool, "remaining_hp": int, "name": str, "explosion": dict or None}
+    """
+    if state is None:
+        state = load_game_state()
+
+    scenario_id = state.get("game_info", {}).get("scenario_id", "")
+    if not scenario_id:
+        return {"error": "scenario_id 없음"}
+
+    obj_dir = os.path.join(BASE_DIR, "entities", scenario_id, "objects")
+    for fname in sorted(os.listdir(obj_dir)):
+        if not fname.endswith(".json"):
+            continue
+        fpath = os.path.join(obj_dir, fname)
+        try:
+            with open(fpath, "r", encoding="utf-8") as f:
+                obj = json.load(f)
+            if obj.get("name") != obj_name:
+                continue
+
+            tactical = obj.get("tactical", {})
+            if not tactical.get("destructible", False):
+                return {"destroyed": False, "name": obj_name, "message": "파괴 불가능한 오브젝트."}
+
+            current_hp = tactical.get("hp", 0)
+            new_hp = max(0, current_hp - damage)
+            tactical["hp"] = new_hp
+
+            explosion = None
+            destroyed = new_hp <= 0
+
+            if destroyed:
+                obj["status"] = "destroyed"
+                tactical["cover"] = "none"
+                tactical["defense_bonus"] = 0
+                tactical["blocks_ranged"] = False
+
+                if tactical.get("explosive", False):
+                    explosion = {
+                        "damage": tactical.get("explosion_damage", 0),
+                        "radius": tactical.get("explosion_radius", 0),
+                        "position": obj.get("position"),
+                        "message": f"{obj_name} 폭발! 반경 {tactical.get('explosion_radius', 0)}타일에 {tactical.get('explosion_damage', 0)} 피해!"
+                    }
+
+            obj["tactical"] = tactical
+            with open(fpath, "w", encoding="utf-8") as f:
+                json.dump(obj, f, ensure_ascii=False, indent=2)
+
+            return {
+                "destroyed": destroyed,
+                "remaining_hp": new_hp,
+                "name": obj_name,
+                "explosion": explosion,
+            }
+        except Exception:
+            continue
+
+    return {"error": f"오브젝트 '{obj_name}' 찾을 수 없음"}
+
+
 # ─── CLI 인터페이스 ───
 
 def _print_result(result):
@@ -1460,6 +1939,7 @@ def main():
         print("  damage <tid> <amount>   직접 데미지")
         print("  initiative             이니셔티브 굴림")
         print("  tick                   상태이상 턴 처리")
+        print("  turn_start             턴 시작 환경 체크 (위험 타일 + 상태이상 tick + KO 판정)")
         print()
         print()
         print("  [NPC]")
@@ -1543,6 +2023,9 @@ def main():
 
     elif cmd == "tick":
         _print_result(tick_status_effects())
+
+    elif cmd == "turn_start":
+        output(turn_start_check())
 
     elif cmd == "npcs":
         for n in list_npc_entities():
