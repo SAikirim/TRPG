@@ -163,6 +163,66 @@
             color: #ffd700;
             border-color: #ffd700;
         }
+        .stats-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .stats-row .stats {
+            flex: 1;
+            margin-top: 0;
+        }
+        .toggle-all-btn {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            color: #aaa;
+            font-size: 0.65em;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .toggle-all-btn:hover,
+        .toggle-all-btn.active {
+            background: #0f3460;
+            color: #ffd700;
+            border-color: #ffd700;
+        }
+        .detail-grid {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .detail-col {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .detail-col-btn {
+            width: 100%;
+            background: #1a1a2e;
+            border: 1px solid #333;
+            color: #aaa;
+            font-size: 0.7em;
+            padding: 3px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .detail-col-btn:hover,
+        .detail-col-btn.active {
+            background: #0f3460;
+            color: #ffd700;
+            border-color: #ffd700;
+        }
+        .detail-col .detail-content.open {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 4px;
+        }
         .detail-content {
             max-height: 0;
             overflow: hidden;
@@ -414,7 +474,7 @@
         }
         /* Events */
         .events-list {
-            max-height: 300px;
+            max-height: 500px;
             overflow-y: auto;
             font-size: 0.85em;
         }
@@ -608,13 +668,16 @@
                 border-radius: 8px;
             }
             .events-list {
-                max-height: 200px;
+                max-height: 350px;
             }
             .settings-dropdown {
                 max-width: 100%;
             }
             .detail-content.open {
-                max-height: 150px;
+                max-height: 200px;
+            }
+            .detail-grid {
+                flex-direction: column;
             }
             .map-overlay img {
                 max-width: 98vw;
@@ -682,8 +745,8 @@
                 </div>
             </div>
             <div class="panel">
-                <h3>이벤트 로그</h3>
-                <div id="events-list" class="events-list"></div>
+                <h3>플레이어 정보</h3>
+                <div id="players-list"></div>
             </div>
         </div>
 
@@ -695,8 +758,8 @@
             </div>
 
             <div class="panel">
-                <h3>플레이어 정보</h3>
-                <div id="players-list"></div>
+                <h3>이벤트 로그</h3>
+                <div id="events-list" class="events-list"></div>
             </div>
         </div>
     </div>
@@ -890,17 +953,9 @@
         // Cache for player detail data (from entity files)
         const playerDetailCache = {};
 
-        // Track which detail panels are open
-        const openDetails = {};
-
         function updatePlayersList() {
             const container = document.getElementById('players-list');
             const classMap = { '전사': 'warrior', '마법사': 'mage', '도적': 'rogue' };
-
-            // Save open state before re-render
-            container.querySelectorAll('.detail-content.open').forEach(el => {
-                openDetails[el.id] = true;
-            });
 
             container.innerHTML = gameState.players.map(p => {
                 const cls = classMap[p.class] || 'warrior';
@@ -926,7 +981,10 @@
                     <div class="player-info">
                         <div class="name">
                         ${p.name}
-                        <span class="class-badge class-${cls}">${p.class}</span>
+                        ${(p.classes || [{"name": p.class}]).map(c => {
+                            const ccls = classMap[c.name] || 'warrior';
+                            return '<span class="class-badge class-' + ccls + '">' + c.name + (c.level ? ' ' + c.level : '') + '</span>';
+                        }).join('')}
                         <span class="level-badge">LV ${lv}</span>
                         <span style="float:right;font-size:0.75em;color:#aaa">위치: [${p.position}]</span>
                     </div>
@@ -942,26 +1000,35 @@
                         <div class="bar bar-xp" style="width:${xpPct}%"></div>
                         <div class="bar-label" style="font-size:0.6em;line-height:10px">XP ${xp}/${xpNext}</div>
                     </div>
-                    <div class="stats">
-                        <span>STR ${p.stats.STR}<span class="stat-mod">(${statMod(p.stats.STR)})</span></span>
-                        <span>DEX ${p.stats.DEX}<span class="stat-mod">(${statMod(p.stats.DEX)})</span></span>
-                        <span>INT ${p.stats.INT}<span class="stat-mod">(${statMod(p.stats.INT)})</span></span>
-                        <span>CON ${p.stats.CON}<span class="stat-mod">(${statMod(p.stats.CON)})</span></span>
+                    <div class="stats-row">
+                        <div class="stats">
+                            <span>STR ${p.stats.STR}<span class="stat-mod">(${statMod(p.stats.STR)})</span></span>
+                            <span>DEX ${p.stats.DEX}<span class="stat-mod">(${statMod(p.stats.DEX)})</span></span>
+                            <span>INT ${p.stats.INT}<span class="stat-mod">(${statMod(p.stats.INT)})</span></span>
+                            <span>CON ${p.stats.CON}<span class="stat-mod">(${statMod(p.stats.CON)})</span></span>
+                        </div>
+                        <button class="toggle-all-btn" onclick="toggleAllDetails(${p.id}, this)">전체</button>
                     </div>
                     ${effects}
-                    <div class="detail-toggle">
-                        <button onclick="toggleDetail(${p.id}, 'inv', this)">소지품 (${(p.inventory||[]).length})</button>
-                        <button onclick="toggleDetail(${p.id}, 'skill', this)">스킬</button>
-                        <button onclick="toggleDetail(${p.id}, 'equip', this)">장비</button>
-                    </div>
-                    <div id="detail-inv-${p.id}" class="detail-content">
-                        ${invItems || '<div class="detail-item" style="color:#666">없음</div>'}
-                    </div>
-                    <div id="detail-skill-${p.id}" class="detail-content">
-                        <ul><li style="color:#666">로딩 중...</li></ul>
-                    </div>
-                    <div id="detail-equip-${p.id}" class="detail-content">
-                        <ul><li style="color:#666">로딩 중...</li></ul>
+                    <div class="detail-grid">
+                        <div class="detail-col">
+                            <button class="detail-col-btn" onclick="toggleDetail(${p.id}, 'equip', this)">장비</button>
+                            <div id="detail-equip-${p.id}" class="detail-content">
+                                <ul><li style="color:#666">로딩 중...</li></ul>
+                            </div>
+                        </div>
+                        <div class="detail-col">
+                            <button class="detail-col-btn" onclick="toggleDetail(${p.id}, 'inv', this)">소지품 (${(p.inventory||[]).length})</button>
+                            <div id="detail-inv-${p.id}" class="detail-content">
+                                ${invItems || '<div class="detail-item" style="color:#666">없음</div>'}
+                            </div>
+                        </div>
+                        <div class="detail-col">
+                            <button class="detail-col-btn" onclick="toggleDetail(${p.id}, 'skill', this)">스킬</button>
+                            <div id="detail-skill-${p.id}" class="detail-content">
+                                <ul><li style="color:#666">로딩 중...</li></ul>
+                            </div>
+                        </div>
                     </div>
                     </div>
                 </div>`;
@@ -972,7 +1039,6 @@
                 const el = document.getElementById(id);
                 if (el) {
                     el.classList.add('open');
-                    // Also activate the corresponding button
                     const type = id.split('-')[1];
                     const playerId = id.split('-')[2];
                     const card = el.closest('.player-card');
@@ -984,20 +1050,18 @@
             });
         }
 
+        const openDetails = {};
+
         async function toggleDetail(playerId, type, btn) {
             const el = document.getElementById(`detail-${type}-${playerId}`);
             const isOpen = el.classList.contains('open');
 
-            // Close all details for this player
-            ['inv', 'skill', 'equip'].forEach(t => {
-                const d = document.getElementById(`detail-${t}-${playerId}`);
-                if (d) d.classList.remove('open');
-                delete openDetails[`detail-${t}-${playerId}`];
-            });
-            // Deactivate all buttons in same toggle group
-            btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-
-            if (isOpen) return; // Was open, now closed
+            if (isOpen) {
+                el.classList.remove('open');
+                btn.classList.remove('active');
+                delete openDetails[`detail-${type}-${playerId}`];
+                return;
+            }
 
             el.classList.add('open');
             btn.classList.add('active');
@@ -1014,10 +1078,10 @@
             }
 
             if (type === 'skill') {
-                const playerObj = gameState.players.find(p => p.id === playerId);
+                const skillEl = document.getElementById(`detail-skill-${playerId}`);
                 const actions = playerDetailCache[playerId]?.available_actions || [];
                 if (actions.length) {
-                    el.innerHTML = actions.map(name => {
+                    skillEl.innerHTML = actions.map(name => {
                         const info = skillsData[name] || {};
                         const stat = info.stat || '';
                         const desc = info.desc || name;
@@ -1025,15 +1089,16 @@
                         return `<div class="detail-item"><span class="item-name">${name}</span><span class="item-stat">${stat}</span><div class="tooltip">${desc}${lvl ? ' (' + lvl + ')' : ''}</div></div>`;
                     }).join('');
                 } else {
-                    el.innerHTML = '<div class="detail-item" style="color:#666">없음</div>';
+                    skillEl.innerHTML = '<div class="detail-item" style="color:#666">없음</div>';
                 }
             }
             if (type === 'equip') {
+                const equipEl = document.getElementById(`detail-equip-${playerId}`);
                 const detail = playerDetailCache[playerId] || {};
                 const equip = detail.equipment || {};
                 const slots = ['weapon', 'armor', 'accessory'];
                 const slotNames = { weapon: '무기', armor: '방어구', accessory: '장신구' };
-                el.innerHTML = slots.map(slot => {
+                equipEl.innerHTML = slots.map(slot => {
                     const item = equip[slot];
                     if (!item) return `<div class="detail-item"><span class="item-name">${slotNames[slot]}: —</span></div>`;
                     if (typeof item === 'string') {
@@ -1042,12 +1107,9 @@
                     }
                     const rarity = item.rarity || 'common';
                     const emoji = rarityEmoji[rarity] || '⬜';
+                    const info = getItemInfo(item.name);
+                    const statStr = info.stat || '';
                     const props = item.properties || {};
-                    const wDef = rulesData?.combat?.weapons?.[item.name];
-                    let statStr = wDef ? 'DMG ' + wDef.dice : '';
-                    const aDef = rulesData?.combat?.armor?.[item.name];
-                    if (aDef) statStr = 'DEF +' + aDef.bonus;
-                    // 마법 속성 표시
                     let propParts = [];
                     if (props.attack_bonus) propParts.push('명중+' + props.attack_bonus);
                     if (props.damage_bonus) propParts.push('데미지+' + props.damage_bonus);
@@ -1055,9 +1117,82 @@
                     if (props.element) propParts.push('🔮' + props.element);
                     if (props.on_hit) propParts.push('⚡' + (props.on_hit.type || ''));
                     const propStr = propParts.length ? ' [' + propParts.join(', ') + ']' : '';
-                    const desc = (wDef?.description || aDef?.description || item.name) + propStr;
-                    return `<div class="detail-item"><span class="item-name rarity-${rarity}">${slotNames[slot]}: ${emoji} ${item.name}</span><span class="item-stat">${statStr}${propStr}</span><div class="tooltip">${desc}</div></div>`;
+                    return `<div class="detail-item"><span class="item-name rarity-${rarity}">${slotNames[slot]}: ${emoji} ${item.name}</span><span class="item-stat">${statStr}${propStr}</span><div class="tooltip">${info.desc}${propStr}</div></div>`;
                 }).join('');
+            }
+        }
+
+        async function toggleAllDetails(playerId, btn) {
+            const types = ['inv', 'skill', 'equip'];
+            const allOpen = types.every(t => document.getElementById(`detail-${t}-${playerId}`)?.classList.contains('open'));
+
+            if (allOpen) {
+                types.forEach(t => {
+                    const el = document.getElementById(`detail-${t}-${playerId}`);
+                    if (el) el.classList.remove('open');
+                    delete openDetails[`detail-${t}-${playerId}`];
+                });
+                btn.closest('.player-card').querySelectorAll('.detail-col-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.remove('active');
+            } else {
+                // Lazy load
+                if (!playerDetailCache[playerId]) {
+                    try {
+                        const res = await fetch(playerStatsUrl(playerId));
+                        playerDetailCache[playerId] = await res.json();
+                    } catch(e) {
+                        playerDetailCache[playerId] = {};
+                    }
+                }
+                types.forEach(t => {
+                    const el = document.getElementById(`detail-${t}-${playerId}`);
+                    if (el) el.classList.add('open');
+                    openDetails[`detail-${t}-${playerId}`] = true;
+                });
+                btn.closest('.player-card').querySelectorAll('.detail-col-btn').forEach(b => b.classList.add('active'));
+                btn.classList.add('active');
+                // Update skill
+                const skillEl = document.getElementById(`detail-skill-${playerId}`);
+                if (skillEl) {
+                    const actions = playerDetailCache[playerId]?.available_actions || [];
+                    if (actions.length) {
+                        skillEl.innerHTML = actions.map(name => {
+                            const info = skillsData[name] || {};
+                            return `<div class="detail-item"><span class="item-name">${name}</span><span class="item-stat">${info.stat || ''}</span><div class="tooltip">${info.desc || name}</div></div>`;
+                        }).join('');
+                    } else {
+                        skillEl.innerHTML = '<div class="detail-item" style="color:#666">없음</div>';
+                    }
+                }
+                // Update equip
+                const equipEl = document.getElementById(`detail-equip-${playerId}`);
+                if (equipEl) {
+                    const detail = playerDetailCache[playerId] || {};
+                    const equip = detail.equipment || {};
+                    const slots = ['weapon', 'armor', 'accessory'];
+                    const slotNames = { weapon: '무기', armor: '방어구', accessory: '장신구' };
+                    equipEl.innerHTML = slots.map(slot => {
+                        const item = equip[slot];
+                        if (!item) return `<div class="detail-item"><span class="item-name">${slotNames[slot]}: —</span></div>`;
+                        if (typeof item === 'string') {
+                            const info = getItemInfo(item);
+                            return `<div class="detail-item"><span class="item-name">${slotNames[slot]}: ⬜ ${item}</span><span class="item-stat">${info.stat}</span><div class="tooltip">${info.desc}</div></div>`;
+                        }
+                        const rarity = item.rarity || 'common';
+                        const emoji = rarityEmoji[rarity] || '⬜';
+                        const info = getItemInfo(item.name);
+                        const statStr = info.stat || '';
+                        const props = item.properties || {};
+                        let propParts = [];
+                        if (props.attack_bonus) propParts.push('명중+' + props.attack_bonus);
+                        if (props.damage_bonus) propParts.push('데미지+' + props.damage_bonus);
+                        if (props.defense_bonus) propParts.push('방어+' + props.defense_bonus);
+                        if (props.element) propParts.push('🔮' + props.element);
+                        if (props.on_hit) propParts.push('⚡' + (props.on_hit.type || ''));
+                        const propStr = propParts.length ? ' [' + propParts.join(', ') + ']' : '';
+                        return `<div class="detail-item"><span class="item-name rarity-${rarity}">${slotNames[slot]}: ${emoji} ${item.name}</span><span class="item-stat">${statStr}${propStr}</span><div class="tooltip">${info.desc}${propStr}</div></div>`;
+                    }).join('');
+                }
             }
         }
 

@@ -945,13 +945,22 @@ def grant_xp_party(amount, source="", state=None):
 
 
 def _check_level_up(entity, growth, state):
-    """XP 확인 후 레벨업 처리. 다중 레벨업도 지원."""
+    """XP 확인 후 레벨업 처리. 다중 레벨업 + 멀티 클래스 지원."""
     xp_table = _xp_table()
-    class_name = entity.get("class", "")
-    cg = _class_growth(class_name)
     rules = load_rules()
     stat_points_per_level = rules.get("level_up", {}).get("per_level", {}).get("stat_points", 2)
     leveled_info = []
+
+    # 멀티 클래스 지원: classes 배열이 있으면 사용, 없으면 단일 class
+    classes = entity.get("classes")
+    if not classes:
+        # 하위 호환: 단일 class → classes 배열로 변환
+        class_name = entity.get("class", "")
+        classes = [{"name": class_name, "level": growth.get("level", 1)}]
+
+    # 레벨업할 클래스 결정 (GM이 level_up_class로 지정, 없으면 주 클래스)
+    level_up_class_name = growth.pop("level_up_class", None) or classes[0]["name"]
+    cg = _class_growth(level_up_class_name)
 
     while True:
         next_level = growth["level"] + 1
@@ -962,21 +971,29 @@ def _check_level_up(entity, growth, state):
         growth["level"] = next_level
         growth["stat_points_available"] += stat_points_per_level
 
-        # HP/MP 증가
+        # 해당 클래스의 레벨 증가
+        for c in classes:
+            if c["name"] == level_up_class_name:
+                c["level"] = c.get("level", 0) + 1
+                break
+
+        # HP/MP 증가 (레벨업한 클래스 기준)
         hp_gain = cg.get("hp_per_level", 3)
         mp_gain = cg.get("mp_per_level", 2)
         entity["stats"]["max_hp"] += hp_gain
-        entity["stats"]["hp"] += hp_gain  # 레벨업 시 증가분만큼 현재 HP도 회복
+        entity["stats"]["hp"] += hp_gain
         entity["stats"]["max_mp"] += mp_gain
         entity["stats"]["mp"] += mp_gain
 
-        # 신규 스킬 해금 체크
-        new_skill = cg.get("skills", {}).get(str(next_level))
+        # 신규 스킬 해금 (해당 클래스의 레벨 기준)
+        class_level = next(
+            (c["level"] for c in classes if c["name"] == level_up_class_name), next_level)
+        new_skill = cg.get("skills", {}).get(str(class_level))
         skill_name = None
         if new_skill:
             skill_name = new_skill["name"]
+            growth.setdefault("learned_skills", [])
             growth["learned_skills"].append(skill_name)
-            # available_actions에도 추가
             actions = entity.get("available_actions", [])
             if skill_name not in actions:
                 actions.append(skill_name)
@@ -984,16 +1001,96 @@ def _check_level_up(entity, growth, state):
 
         leveled_info.append({
             "new_level": next_level,
+            "class_leveled": level_up_class_name,
+            "class_level": class_level,
             "hp_gain": hp_gain, "mp_gain": mp_gain,
             "stat_points": stat_points_per_level,
             "new_skill": skill_name,
         })
+
+    # classes 배열 업데이트
+    entity["classes"] = classes
 
     # 다음 레벨 XP 갱신
     next_next = growth["level"] + 1
     growth["xp_to_next"] = xp_table.get(next_next, 99999)
 
     return leveled_info if leveled_info else None
+
+
+def add_class(player_id, new_class_name, state=None):
+    """플레이어에게 새 클래스를 추가 (멀티 클래스).
+    요구조건: 총 레벨 3 이상, 해당 클래스의 주 스탯 12 이상, 최대 3개 클래스."""
+    owned = state is None
+    if owned:
+        state = load_game_state()
+
+    entity, epath = _load_entity(state, player_id)
+    if not entity:
+        return {"error": f"엔티티 {player_id} 없음"}
+
+    rules = load_rules()
+    mc_rules = rules.get("level_up", {}).get("multiclass", {})
+    if not mc_rules.get("enabled"):
+        return {"error": "멀티 클래스가 비활성화되어 있습니다"}
+
+    growth = entity.get("growth", {})
+    total_level = growth.get("level", 1)
+
+    # 최소 레벨 체크
+    min_level = mc_rules.get("min_level_to_multiclass", 3)
+    if total_level < min_level:
+        return {"error": f"총 레벨 {min_level} 이상이어야 멀티 클래스 가능 (현재: {total_level})"}
+
+    # 최대 클래스 수 체크
+    classes = entity.get("classes", [{"name": entity.get("class", ""), "level": total_level}])
+    max_classes = mc_rules.get("max_classes", 3)
+    if len(classes) >= max_classes:
+        return {"error": f"최대 {max_classes}개 클래스까지 가능 (현재: {len(classes)}개)"}
+
+    # 이미 보유한 클래스인지 체크
+    if any(c["name"] == new_class_name for c in classes):
+        return {"error": f"이미 '{new_class_name}' 클래스를 보유하고 있습니다"}
+
+    # 스탯 요구조건 체크
+    requirements = mc_rules.get("requirements", {}).get(new_class_name, {})
+    for stat, req_val in requirements.items():
+        current_val = entity.get("stats", {}).get(stat, 0)
+        if current_val < req_val:
+            return {"error": f"'{new_class_name}' 클래스 요구조건 미충족: {stat} {req_val} 필요 (현재: {current_val})"}
+
+    # 새 클래스 추가
+    classes.append({"name": new_class_name, "level": 0})
+    entity["classes"] = classes
+
+    # 새 클래스의 기본 스킬 해금
+    cg = _class_growth(new_class_name)
+    classes_data_path = os.path.join(BASE_DIR, "templates", "character_classes.json")
+    if os.path.exists(classes_data_path):
+        classes_data = _load_json(classes_data_path)
+        class_def = classes_data.get("classes", {}).get(new_class_name, {})
+        starting_actions = class_def.get("available_actions", [])
+        current_actions = entity.get("available_actions", [])
+        for action in starting_actions:
+            if action not in current_actions:
+                current_actions.append(action)
+        entity["available_actions"] = current_actions
+
+    if epath:
+        _save_json(epath, entity)
+
+    result = {
+        "action": "add_class",
+        "player": entity.get("name", ""),
+        "new_class": new_class_name,
+        "classes": classes,
+        "total_level": total_level,
+    }
+
+    if owned:
+        save_game_state(state)
+
+    return result
 
 
 def allocate_stats(player_id, stat_increases, state=None):
@@ -1113,13 +1210,16 @@ def _sync_level_to_state(state, player_id, growth):
     if player:
         player["level"] = growth["level"]
         player["xp"] = growth["xp"]
-        # 엔티티에서 max_hp/max_mp도 동기화
+        # 엔티티에서 max_hp/max_mp + classes도 동기화
         entity, _ = _load_entity(state, player_id)
         if entity:
             player["max_hp"] = entity["stats"]["max_hp"]
             player["hp"] = min(player["hp"], player["max_hp"])
             player["max_mp"] = entity["stats"]["max_mp"]
             player["mp"] = min(player["mp"], player["max_mp"])
+            # 멀티 클래스 동기화
+            if "classes" in entity:
+                player["classes"] = entity["classes"]
 
 
 def growth_status(state=None):

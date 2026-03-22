@@ -23,7 +23,8 @@
       "mp_per_int": 0,
       "starting_equipment": ["철검", "가죽 방패"],
       "available_actions": ["공격", "방어"],
-      "passive": "방어 시 방어력 +4 (1턴)"
+      "passive": "방어 시 방어력 +4 (1턴)",
+      "multiclass_requirement": {"STR": 12}
     },
     "마법사": {
       "description": "강력한 마법으로 적을 쓸어버리는 원거리 마법 전문가. 체력이 약하다.",
@@ -35,7 +36,8 @@
       "mp_per_int": 1,
       "starting_equipment": ["마법 지팡이", "마나 포션"],
       "available_actions": ["파이어볼", "힐"],
-      "passive": "파이어볼 범위 공격 가능 (같은 위치 적 전체)"
+      "passive": "파이어볼 범위 공격 가능 (같은 위치 적 전체)",
+      "multiclass_requirement": {"INT": 12}
     },
     "도적": {
       "description": "빠른 몸놀림과 은밀한 기습으로 적의 급소를 노리는 전문가.",
@@ -47,7 +49,8 @@
       "mp_per_int": 0.5,
       "starting_equipment": ["단검 x2", "도둑 도구"],
       "available_actions": ["습격", "도주"],
-      "passive": "은신 성공 시 다음 공격 자동 명중 + 추가 피해 4"
+      "passive": "은신 성공 시 다음 공격 자동 명중 + 추가 피해 4",
+      "multiclass_requirement": {"DEX": 12}
     },
     "성직자": {
       "description": "신의 축복으로 아군을 치유하고 언데드를 물리치는 신앙 전사.",
@@ -59,7 +62,8 @@
       "mp_per_int": 0.8,
       "starting_equipment": ["철퇴", "성스러운 부적"],
       "available_actions": ["치유의 빛", "정화"],
-      "passive": "치유 마법 효과 +2"
+      "passive": "치유 마법 효과 +2",
+      "multiclass_requirement": {"INT": 12}
     },
     "궁수": {
       "description": "먼 거리에서 정확한 화살을 날리는 원거리 물리 전문가.",
@@ -72,7 +76,8 @@
       "mp_per_int": 0.3,
       "starting_equipment": ["장궁", "화살통 (20발)"],
       "available_actions": ["정밀 사격", "연속 사격"],
-      "passive": "5칸 이상 거리에서 공격 시 명중 +2"
+      "passive": "5칸 이상 거리에서 공격 시 명중 +2",
+      "multiclass_requirement": {"DEX": 12}
     }
   },
   "auto_generate": {

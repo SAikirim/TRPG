@@ -20,6 +20,8 @@
         "id": 1,
         "name": "",
         "class": "마법사",
+        "race": "인간",
+        "appearance": {"age": "20대 초반", "build": "마른 체형", "skin": "창백한 흰 피부", "hair": "긴 은회색 머리, 느슨하게 묶음", "face": "지적인 눈빛, 날카로운 이목구비", "outfit": "남색 로브, 허리띠에 매달린 마법 부적", "notable": "손에 항상 마법 지팡이를 들고 있음"},
         "level": 3,
         "xp": 300,
         "stats": {"STR": 8, "DEX": 14, "INT": 18, "CON": 10},
@@ -32,6 +34,8 @@
         "id": 2,
         "name": "",
         "class": "도적",
+        "race": "인간",
+        "appearance": {"age": "20대 중반", "build": "날씬하고 민첩한 체형", "skin": "약간 그을린 살구색", "hair": "짧은 검은 머리, 한쪽으로 넘김", "face": "날카로운 눈매, 약삭빠른 인상", "outfit": "검은 가죽 갑옷, 허리에 단검 두 자루", "notable": "그림자 속에 녹아드는 듯한 움직임"},
         "level": 3,
         "xp": 300,
         "stats": {"STR": 8, "DEX": 18, "INT": 10, "CON": 14},
@@ -44,6 +48,8 @@
         "id": 3,
         "name": "",
         "class": "전사",
+        "race": "인간",
+        "appearance": {"age": "20대 후반", "build": "근육질의 건장한 체형", "skin": "구릿빛 피부", "hair": "짧게 깎은 갈색 머리", "face": "강인한 턱선, 투박하지만 믿음직한 인상", "outfit": "쇠사슬 갑옷, 등에 철검, 왼팔에 가죽 방패", "notable": "팔뚝에 오래된 전투 흉터"},
         "level": 3,
         "xp": 300,
         "stats": {"STR": 16, "DEX": 12, "INT": 8, "CON": 14},
@@ -55,8 +61,8 @@
     ]
   },
   "default_npcs": [
-    {"id": 300, "name": "할란", "type": "friendly", "stats": {"STR": 10, "DEX": 8, "INT": 14, "CON": 10}, "hp": 8, "max_hp": 12, "mp": 3, "max_mp": 3, "position": [9, 5], "status": "alive", "location": "trade_road_karendel"},
-    {"id": 301, "name": "미라", "type": "friendly", "stats": {"STR": 8, "DEX": 14, "INT": 12, "CON": 10}, "hp": 10, "max_hp": 10, "mp": 5, "max_mp": 5, "position": [10, 5], "status": "alive", "location": "trade_road_karendel"}
+    {"id": 300, "name": "할란", "type": "friendly", "race": "인간", "appearance": {"age": "40대 중반", "build": "보통 체형, 약간 배가 나옴", "skin": "햇볕에 그을린 구릿빛", "hair": "짧은 갈색 머리, 군데군데 흰머리", "face": "온순한 인상, 잔주름이 있는 넉넉한 얼굴", "outfit": "낡은 여행용 외투, 가죽 조끼, 넓은 허리띠", "notable": "왼팔에 늑대에게 물린 붕대 자국"}, "stats": {"STR": 10, "DEX": 8, "INT": 14, "CON": 10}, "hp": 8, "max_hp": 12, "mp": 3, "max_mp": 3, "position": [9, 5], "status": "alive", "location": "trade_road_karendel"},
+    {"id": 301, "name": "미라", "type": "friendly", "race": "인간", "appearance": {"age": "20대 중반", "build": "날씬하고 민첩한 체형", "skin": "밝은 살구색", "hair": "어깨까지 오는 검은 머리, 뒤로 묶음", "face": "날카로운 눈매, 경계심 있는 표정", "outfit": "가벼운 가죽 여행복, 허리에 단검집", "notable": "손목에 작은 부적 팔찌"}, "stats": {"STR": 8, "DEX": 14, "INT": 12, "CON": 10}, "hp": 10, "max_hp": 10, "mp": 5, "max_mp": 5, "position": [10, 5], "status": "alive", "location": "trade_road_karendel"}
   ],
   "chapters": [
     {"id": 1, "name": "교역로", "description": "하룬 마을에서 카렌델로 이어지는 교역로. 상인 할란과 미라와 동행 중.", "map_area": "trade_road_karendel"},

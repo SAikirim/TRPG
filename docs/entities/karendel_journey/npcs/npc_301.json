@@ -28,8 +28,8 @@
     "INT": 12,
     "CON": 10
   },
-  "hp": 10,
-  "max_hp": 10,
+  "hp": 14,
+  "max_hp": 14,
   "mp": 5,
   "max_mp": 5,
   "relationships": {

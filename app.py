@@ -291,14 +291,21 @@ def gm_update():
         state["npcs"].append(new_npc)
         gm.create_npc_entity(new_npc, state)
 
-    state["turn_count"] += 1
-    event = {
-        "turn": state["turn_count"],
-        "message": f"[GM] {description}",
-        "narrative": narrative,
-        "timestamp": datetime.now().strftime("%H:%M:%S"),
-    }
-    state["events"].append(event)
+    # turn_count 증가는 GM이 직접 관리 — API에서 자동 증가하지 않음
+    # 단, turn이 명시적으로 제공된 경우 해당 값으로 설정
+    if "turn" in data:
+        state["turn_count"] = data["turn"]
+
+    # 이벤트는 description 또는 narrative가 있을 때만 추가
+    event = None
+    if description or narrative:
+        event = {
+            "turn": state["turn_count"],
+            "message": f"[GM] {description}" if description else "",
+            "narrative": narrative,
+            "timestamp": datetime.now().strftime("%H:%M:%S"),
+        }
+        state["events"].append(event)
 
     # Process mechanics requests (자동 판정/회복/전투)
     mechanics_results = []
@@ -399,7 +406,7 @@ def gm_update():
     else:
         gm._log_to_tracker("npc", "NPC 정합성 확인")
 
-    return jsonify({"success": True, "event": event, "turn": state["turn_count"],
+    return jsonify({"success": True, "event": event or {}, "turn": state["turn_count"],
                      "illustration": ill_result, "mechanics": mechanics_results,
                      "agent_warnings": agent_warnings})
 

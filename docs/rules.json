@@ -35,10 +35,10 @@
     },
     "weapons": {
       "맨손": {"dice": "1d2", "type": "melee", "stat": "STR", "description": "주먹과 발. 무기 없이 싸울 때 사용."},
-      "마법 지팡이": {"dice": "1d4", "type": "melee", "stat": "STR", "description": "근접 타격용"},
+      "마법 지팡이": {"dice": "1d8", "type": "magic", "stat": "INT", "description": "마법사의 기본 무기. 마법 공격 매개체", "range": 8},
       "단검": {"dice": "1d6", "type": "melee", "stat": "DEX", "description": "가볍고 빠른 단검"},
       "단검 x2": {"dice": "2d6", "type": "melee", "stat": "DEX", "description": "쌍단검 이도류"},
-      "오크의 도끼": {"dice": "1d8", "type": "melee", "stat": "STR", "description": "무겁고 강력한 전투 도끼"},
+      "오크의 도끼": {"dice": "1d8+2", "type": "melee", "stat": "STR", "description": "어두운 오크에게서 획득한 전투 도끼. 묵직하고 강력하다"},
       "장검": {"dice": "1d8", "type": "melee", "stat": "STR", "description": "표준 한손검"},
       "대검": {"dice": "1d10", "type": "melee", "stat": "STR", "description": "양손 대검"},
       "활": {"dice": "1d6", "type": "ranged", "stat": "DEX", "description": "표준 단궁"}
@@ -331,6 +331,28 @@
           "7": {"name": "방패 돌진", "type": "combat", "description": "방패로 돌진. 1d10+STR 피해 + 밀어내기 2칸.", "roll": "1d10 + STR_modifier", "cost": {"mp": 2}, "effect": {"knockback": 2}},
           "9": {"name": "불굴의 의지", "type": "passive", "description": "HP가 25% 이하일 때 방어력 +4, 공격력 +2 자동 적용."}
         }
+      }
+    },
+    "multiclass": {
+      "enabled": true,
+      "description": "레벨업 시 기존 클래스를 올리거나 새 클래스를 추가할 수 있다. 새 클래스 추가 시 해당 클래스의 주 스탯 요구치를 충족해야 한다.",
+      "min_level_to_multiclass": 3,
+      "max_classes": 3,
+      "requirements": {
+        "전사": {"STR": 12},
+        "마법사": {"INT": 12},
+        "도적": {"DEX": 12},
+        "성직자": {"INT": 12},
+        "궁수": {"DEX": 12}
+      },
+      "on_add_class": {
+        "description": "새 클래스 추가 시 해당 클래스의 레벨 1 스킬을 획득한다. HP/MP 증가는 새 클래스 기준.",
+        "starting_skills": true,
+        "hp_mp_gain": "new_class"
+      },
+      "level_up_rule": {
+        "description": "레벨업 시 어느 클래스를 올릴지 선택한다. 선택한 클래스의 hp/mp_per_level로 성장하고, 해당 클래스의 스킬을 해금한다.",
+        "stat_points": "기존과 동일 (per_level.stat_points)"
       }
     }
   },

@@ -41,7 +41,8 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
   2. 룰 판정 (주사위, DC 체크)
   3. game_state.json + entities/ 업데이트
   4. gm-update API 호출 (웹 UI 반영 + 일러스트)
-  5. docs/ 동기화 + git commit + push
+  5. docs/ 동기화 + git commit (매 턴)
+  5b. git push (3턴마다 또는 유저 "저장" 명시 시, 백그라운드 실행)
   ↓
 [Phase 2 — 나레이션 출력] (시스템 작업 완료 후)
   6. 터미널에 나레이션 텍스트 출력
@@ -187,3 +188,4 @@ python ascii_map.py    # 터미널 맵 확인
 | `guides/entities.txt` | NPC 엔티티 규칙, JSON 구조, 자동 생성, Agent 연속성, 세계관/웹 반영 Agent 상세 |
 | `guides/api.txt` | 전체 API 엔드포인트 목록, gm-update 파라미터 |
 | `guides/scenario.txt` | 시나리오/룰셋 추가 방법, 구성 요소, 게임 시작 플로우 |
+| `guides/process.txt` | 프로세스 관리, 실행/종료, 중복 방지, 상태 확인 |

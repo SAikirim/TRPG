@@ -429,3 +429,146 @@ def request_illustration(illustration_type, prompt, negative_prompt="", turn_cou
     thread.start()
 
     return {"started": True, "type": illustration_type}
+
+
+def pre_generate_images(scenario_id):
+    """시나리오 사전 이미지 생성 — 새 게임 시작 시 호출.
+    챕터 배경 + 주요 NPC/플레이어 초상화를 미리 생성한다.
+    SD OFF 시에도 Cairo 폴백으로 생성.
+    """
+    import time
+
+    scenario_path = os.path.join(BASE_DIR, "data", "scenario.json")
+    game_state_path = os.path.join(BASE_DIR, "data", "game_state.json")
+
+    try:
+        with open(scenario_path, "r", encoding="utf-8") as f:
+            scenario = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        logger.warning("pre_generate_images: scenario.json not found")
+        return {"generated": 0, "skipped": 0, "errors": []}
+
+    try:
+        with open(game_state_path, "r", encoding="utf-8") as f:
+            game_state = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        game_state = {}
+
+    results = {"generated": 0, "skipped": 0, "errors": []}
+
+    # 1. 챕터 배경 생성
+    chapters = scenario.get("chapters", [])
+    chapter_themes = scenario.get("chapter_themes", {})
+    for ch in chapters:
+        ch_name = ch.get("map_area", ch.get("name", f"chapter_{ch.get('id', 0)}"))
+        bg_name = ch_name.replace(" ", "_")
+
+        # 이미 존재하면 스킵
+        if _find_existing_image("background", bg_name):
+            results["skipped"] += 1
+            logger.info(f"Pre-gen skip (exists): background_{bg_name}")
+            continue
+
+        # 챕터 테마에서 프롬프트 힌트
+        theme = chapter_themes.get(str(ch.get("id", 0)), {})
+        bg_type = theme.get("bg_type", "")
+        ch_desc = ch.get("description", "")
+
+        prompt = f"fantasy landscape, {bg_type}, {ch_desc}, wide angle, landscape orientation, masterpiece, best quality"
+        prompt = prompt.replace(",,", ",").strip(", ")
+
+        logger.info(f"Pre-gen background: {bg_name}")
+        result = request_illustration("background", prompt, name=bg_name)
+
+        # 생성 대기 (SD는 비동기이므로 완료까지 대기)
+        if result.get("started"):
+            _wait_for_generation(timeout=120)
+            results["generated"] += 1
+        elif result.get("reused"):
+            results["skipped"] += 1
+        else:
+            results["errors"].append(f"background_{bg_name}: {result}")
+
+    # 2. NPC 초상화 생성
+    entities_dir = os.path.join(BASE_DIR, "entities", scenario_id, "npcs")
+    if os.path.isdir(entities_dir):
+        for fname in sorted(os.listdir(entities_dir)):
+            if not fname.endswith(".json"):
+                continue
+            filepath = os.path.join(entities_dir, fname)
+            try:
+                with open(filepath, "r", encoding="utf-8") as f:
+                    npc = json.load(f)
+            except Exception:
+                continue
+
+            npc_name = npc.get("name", "")
+            if not npc_name:
+                continue
+
+            if _find_existing_image("portrait", npc_name):
+                results["skipped"] += 1
+                logger.info(f"Pre-gen skip (exists): portrait_{npc_name}")
+                continue
+
+            # prompt는 빈 문자열 — request_illustration이 엔티티에서 자동 생성
+            logger.info(f"Pre-gen portrait: {npc_name}")
+            result = request_illustration("portrait", "", name=npc_name)
+
+            if result.get("started"):
+                _wait_for_generation(timeout=120)
+                results["generated"] += 1
+            elif result.get("reused"):
+                results["skipped"] += 1
+            else:
+                results["errors"].append(f"portrait_{npc_name}: {result}")
+
+    # 3. 플레이어 초상화 생성
+    players_dir = os.path.join(BASE_DIR, "entities", scenario_id, "players")
+    if os.path.isdir(players_dir):
+        for fname in sorted(os.listdir(players_dir)):
+            if not fname.endswith(".json"):
+                continue
+            filepath = os.path.join(players_dir, fname)
+            try:
+                with open(filepath, "r", encoding="utf-8") as f:
+                    player = json.load(f)
+            except Exception:
+                continue
+
+            player_name = player.get("name", "")
+            if not player_name:
+                continue
+
+            if _find_existing_image("portrait", player_name):
+                results["skipped"] += 1
+                logger.info(f"Pre-gen skip (exists): portrait_{player_name}")
+                continue
+
+            logger.info(f"Pre-gen portrait: {player_name}")
+            result = request_illustration("portrait", "", name=player_name)
+
+            if result.get("started"):
+                _wait_for_generation(timeout=120)
+                results["generated"] += 1
+            elif result.get("reused"):
+                results["skipped"] += 1
+            else:
+                results["errors"].append(f"portrait_{player_name}: {result}")
+
+    logger.info(f"Pre-generation complete: {results}")
+    return results
+
+
+def _wait_for_generation(timeout=120):
+    """SD 생성 완료 대기."""
+    import time
+    start = time.time()
+    while time.time() - start < timeout:
+        with _lock:
+            status = _scene_state["generating"]["status"]
+        if status != "generating":
+            return True
+        time.sleep(1)
+    logger.warning(f"Pre-gen timeout after {timeout}s")
+    return False

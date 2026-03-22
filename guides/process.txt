@@ -1,0 +1,84 @@
+프로세스 관리 규칙
+===
+
+필수 프로세스 목록
+===
+게임 진행에 필요한 프로세스는 아래 2개뿐이다. 각각 1개씩만 실행해야 한다.
+
+| 프로세스 | 포트 | 실행 명령 | 용도 |
+| Flask 서버 (app.py) | :5000 | SD venv Python app.py | 웹 UI, gm-update API |
+| SD WebUI (launch.py) | :7860 | SD venv launch.py (옵션 포함) | 이미지 생성 API |
+
+- Flask 서버: 게임 진행 시 항상 실행 (웹 UI + API)
+- SD WebUI: 이미지 생성이 필요할 때만 실행. SD OFF 시 Cairo 폴백으로 동작하므로 필수는 아님
+
+실행 경로 및 명령
+===
+SD venv Python: C:\git\WebUI\stable-diffusion-webui\venv\Scripts\Python.exe
+
+Flask 서버 시작:
+  cd C:\git\trpg
+  C:\git\WebUI\stable-diffusion-webui\venv\Scripts\Python.exe app.py
+
+SD WebUI 시작:
+  cd C:\git\WebUI\stable-diffusion-webui
+  ./venv/Scripts/Python.exe launch.py --theme dark --xformers --xformers-flash-attention --deepdanbooru --no-half-vae --api --cors-allow-origins="http://127.0.0.1:7860" --listen --enable-insecure-extension-access
+
+편의 스크립트: start_server.bat (Windows)
+
+중복 실행 방지
+===
+동일 프로세스가 2개 이상 실행되면 포트 충돌, 메모리 낭비, 상태 불일치가 발생한다.
+
+시작 전 확인 절차:
+1. netstat -ano | grep -E ":5000 |:7860 " | grep LISTEN 으로 포트 점유 확인
+2. 이미 실행 중이면 새로 시작하지 않는다
+3. 재시작이 필요하면 기존 프로세스를 먼저 종료한 뒤 시작한다
+
+종료 방법:
+  taskkill //PID <pid> //F
+
+중복 감지 시 처리:
+1. wmic process where "name='python.exe'" get ProcessId,CommandLine 으로 전체 Python 프로세스 확인
+2. netstat -ano | grep ":포트 " | grep LISTEN 으로 실제 포트를 점유하는 PID 확인
+3. 포트를 점유하지 않는 중복 프로세스는 종료한다
+4. 포트를 점유하는 프로세스 1개만 남긴다
+
+프로세스 상태 확인
+===
+| 확인 대상 | 명령 |
+| Flask 동작 확인 | curl -s http://localhost:5000/api/game-state --max-time 3 |
+| SD WebUI 동작 확인 | curl -s http://127.0.0.1:7860/sdapi/v1/options --max-time 5 |
+| 포트 점유 확인 | netstat -ano | grep -E ":5000 |:7860 " | grep LISTEN |
+| Python 프로세스 목록 | wmic process where "name='python.exe'" get ProcessId,CommandLine |
+
+세션 시작 시 프로세스 체크
+===
+게임 세션 시작 시 (session_validator.py 실행 후) 다음을 확인해야 한다:
+
+1. Flask 서버 동작 확인 — 미실행 시 시작
+2. SD WebUI 동작 확인 — current_session.json의 sd_illustration이 true이면 확인
+3. 중복 프로세스 없는지 확인 — 있으면 정리
+
+Flask 재시작 절차
+===
+코드 수정 후 Flask 서버를 재시작해야 하는 경우:
+
+1. netstat -ano | grep ":5000 " | grep LISTEN 으로 현재 PID 확인
+2. taskkill //PID <pid> //F 로 종료
+3. 포트 해제 확인 (netstat)
+4. SD venv Python app.py 로 재시작
+5. curl로 동작 확인
+
+주의: Flask의 debug=True 모드에서는 자식 프로세스가 생성된다. 부모를 종료하면 자식도 함께 종료될 수 있고, 반대로 자식만 남을 수도 있다. 반드시 포트 해제를 확인한 뒤 재시작해야 한다.
+
+불필요한 프로세스
+===
+다음 프로세스는 일시적으로만 실행되며, 작업 완료 후 자동 종료된다:
+- python session_validator.py (세션 검증)
+- python game_start.py (게임 시작)
+- python build_static.py (docs 동기화)
+- python game_mechanics.py (판정 실행)
+- python gm_turn.py (턴 추적)
+
+이들이 좀비 프로세스로 남아있으면 종료해야 한다.

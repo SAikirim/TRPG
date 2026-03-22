@@ -104,6 +104,8 @@ def create_entities(scenario_id, players, npcs):
             },
             "conditions": {"alive": True, "conscious": True, "death_save_turns": 0},
             "controlled_by": p.get("controlled_by", "agent"),
+            "race": p.get("race", "인간"),
+            "appearance": p.get("appearance", {}),
         }
         save_json(f"entities/{scenario_id}/players/player_{p['id']}.json", entity)
 
@@ -138,6 +140,11 @@ def create_entities(scenario_id, players, npcs):
         for key in ("conditions", "equipment", "inventory", "attack", "defense", "threat_level"):
             if key in n:
                 entity[key] = n[key]
+        # 외형 (SD 초상화 자동 생성용)
+        if n.get("race"):
+            entity["race"] = n["race"]
+        if n.get("appearance"):
+            entity["appearance"] = n["appearance"]
 
         save_json(f"entities/{scenario_id}/npcs/npc_{n['id']}.json", entity)
 
@@ -213,6 +220,8 @@ def new_game(scenario_id):
             "status_effects": [],
             "inventory": p.get("starting_inventory", []),
             "controlled_by": p.get("controlled_by", "agent"),
+            "race": p.get("race", "인간"),
+            "appearance": p.get("appearance", {}),
         }
         players.append(player)
         ctrl = "USER" if player["controlled_by"] == "user" else "AI"
@@ -289,6 +298,18 @@ def new_game(scenario_id):
         print(f"  [OK] 맵 생성 완료")
     except Exception as e:
         print(f"  [WARN] 맵 생성 실패 (수동 실행 필요): {e}")
+
+    # 사전 이미지 생성 (SD 또는 Cairo)
+    try:
+        from core.sd_generator import pre_generate_images
+        print("\n=== 사전 이미지 생성 ===")
+        gen_result = pre_generate_images(scenario_id)
+        print(f"  [OK] 생성: {gen_result['generated']}장, 재활용: {gen_result['skipped']}장")
+        if gen_result['errors']:
+            for err in gen_result['errors']:
+                print(f"  [WARN] {err}")
+    except Exception as e:
+        print(f"  [WARN] 사전 이미지 생성 실패 (게임 진행에 영향 없음): {e}")
 
     # Flask 장면 복원 시도
     _try_restore_scene()

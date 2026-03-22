@@ -300,7 +300,7 @@ class MapGenerator:
 
         # 주변 반경 (타일 단위) — 가로세로 다르게
         radius_x = 7
-        radius_y = 4
+        radius_y = 7
         margin_left = 22
         margin_top = 16
 

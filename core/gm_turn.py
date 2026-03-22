@@ -158,6 +158,21 @@ def show_status():
         print(f"  [{mark}] {desc}")
 
 
+def should_push(push_interval=3):
+    """현재 턴에서 git push가 필요한지 판단.
+    push_interval 턴마다 True 반환."""
+    try:
+        game_state_path = os.path.join(BASE_DIR, "data", "game_state.json")
+        with open(game_state_path, "r", encoding="utf-8") as f:
+            state = json.load(f)
+        turn = state.get("turn_count", 0)
+        if turn == 0:
+            return False
+        return turn % push_interval == 0
+    except Exception:
+        return False
+
+
 def main():
     if len(sys.argv) < 2:
         print("사용법: python gm_turn.py <start|log|end|status>")
@@ -165,6 +180,7 @@ def main():
         print("  log <tag> <msg>    작업 기록")
         print("  end                턴 종료 검증")
         print("  status             진행 상황")
+        print("  should_push [N]    N턴마다 push 필요 여부 (기본 3)")
         return
 
     cmd = sys.argv[1]
@@ -177,6 +193,12 @@ def main():
         end_turn()
     elif cmd == "status":
         show_status()
+    elif cmd == "should_push":
+        interval = int(sys.argv[2]) if len(sys.argv) >= 3 else 3
+        if should_push(interval):
+            print("PUSH")
+        else:
+            print("SKIP")
     else:
         print(f"알 수 없는 명령: {cmd}")
 

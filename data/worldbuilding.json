@@ -83,7 +83,8 @@
       },
       "connections": {
         "하룬 마을": {"direction": "남쪽", "distance": "도보 반나절"},
-        "카렌델": {"direction": "북쪽", "distance": "도보 1.5일"}
+        "카렌델": {"direction": "북쪽", "distance": "도보 1.5일"},
+        "갈림길 쉼터": {"direction": "동쪽", "distance": "도보 반나절"}
       }
     },
     "karendel": {
@@ -123,14 +124,24 @@
         "하룬 마을": {"direction": "서쪽", "distance": "도보 반나절"}
       }
     },
-    "crossroads_shelter": {
+    "crossroads_rest": {
       "name": "갈림길 쉼터",
+      "world_pos": [7, 4],
       "type": "rest_area",
-      "world_pos": [5, 4],
-      "description": "교역로 중간 지점의 갈림길. 남쪽으로 항구, 북쪽으로 카렌델.",
+      "description": "교역로가 북쪽(카렌델)과 남쪽(세렌 항구)으로 갈라지는 지점. 여행자들이 야영하는 쉼터가 있다.",
       "connections": {
-        "카렌델": {"direction": "북쪽", "distance": "도보 1일"},
-        "교역로 (카렌델 방면)": {"direction": "남쪽", "distance": "도보 수시간"}
+        "카렌델": {"direction": "북쪽", "distance": "도보 반나절~1일"},
+        "세렌 항구": {"direction": "남쪽", "distance": "도보 반나절"},
+        "교역로 (카렌델 방면)": {"direction": "서쪽", "distance": "도보 반나절"}
+      }
+    },
+    "seren_port": {
+      "name": "세렌 항구",
+      "world_pos": [7, 8],
+      "type": "port_village",
+      "description": "작은 어항. 해안을 따라 서쪽 도시들로 가는 배편이 있다.",
+      "connections": {
+        "갈림길 쉼터": {"direction": "북쪽", "distance": "도보 반나절"}
       }
     }
   },
