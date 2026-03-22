@@ -333,7 +333,7 @@ class SaveManager:
             os.path.join(docs_dir, "index.html"))
 
     def _build_illustration_state(self, game_state, docs_dir):
-        """정적 웹용 illustration_state.json 생성"""
+        """정적 웹용 illustration_state.json 생성 — 동적 웹의 scene_state를 반영"""
         try:
             chapter = game_state.get("game_info", {}).get("current_chapter", 1)
             chapter_bgs = {
@@ -344,13 +344,26 @@ class SaveManager:
                 3: {"sd": "static/illustrations/sd/ch3_treasure.png",
                     "pixel": "static/illustrations/pixel/treasure.png"},
             }
+
+            # sd_generator의 실시간 scene_state 참조 (동적 웹과 동일한 소스)
             background = None
-            sd_bgs = sorted(
-                glob.glob(os.path.join(
-                    BASE_DIR, "static", "illustrations", "sd", "background_*")),
-                key=os.path.getmtime, reverse=True)
-            if sd_bgs:
-                background = "static/illustrations/sd/" + os.path.basename(sd_bgs[0])
+            live_layers = []
+            try:
+                from core.sd_generator import get_scene_state
+                scene = get_scene_state()
+                if scene.get("background"):
+                    bg = scene["background"]
+                    # /static/ 접두사 제거 (정적 웹은 상대경로 사용)
+                    background = bg.lstrip("/")
+                live_layers = scene.get("layers", [])
+            except Exception:
+                # sd_generator를 import할 수 없는 경우 (CLI 실행 등) 폴백
+                sd_bgs = sorted(
+                    glob.glob(os.path.join(
+                        BASE_DIR, "static", "illustrations", "sd", "background_*")),
+                    key=os.path.getmtime, reverse=True)
+                if sd_bgs:
+                    background = "static/illustrations/sd/" + os.path.basename(sd_bgs[0])
 
             ill_state = {
                 "background": background,
@@ -363,65 +376,79 @@ class SaveManager:
                 "current_chapter": chapter,
             }
 
-            # NPC 레이어 추가 (초상화 파일이 존재하는 NPC만)
-            player1 = next((p for p in game_state.get("players", []) if p.get("id") == 1), None)
-            p1_x = player1["position"][0] if player1 else 0
-            p1_y = player1["position"][1] if player1 else 0
-            current_loc = game_state.get("current_location", "")
+            # sd_generator에서 가져온 라이브 레이어가 있으면 우선 사용
+            if live_layers:
+                for layer in live_layers:
+                    img_path = layer.get("image", "")
+                    ill_state["layers"].append({
+                        "type": layer.get("type", "portrait"),
+                        "image": img_path.lstrip("/"),
+                        "position": layer.get("position", "center"),
+                        "name": layer.get("name", ""),
+                        "distance": layer.get("distance", 0),
+                        "size_class": layer.get("size_class", "d2"),
+                    })
 
-            npcs_to_add = []
-            for npc in game_state.get("npcs", []):
-                if npc.get("status") not in ("alive", "idle", "active"):
-                    continue
-                npc_loc = npc.get("location", "")
-                if current_loc and npc_loc and npc_loc != current_loc:
-                    continue
-                npc_name = npc.get("name", "")
-                portrait_path = None
-                for ext in [".webp", ".png"]:
-                    for prefix in ["portrait_", ""]:
-                        check = os.path.join(BASE_DIR, "static", "portraits", "sd", f"{prefix}{npc_name}{ext}")
-                        if os.path.exists(check):
-                            portrait_path = f"static/portraits/sd/{prefix}{npc_name}{ext}"
+            if not live_layers:
+                # NPC 레이어 추가 (초상화 파일이 존재하는 NPC만)
+                player1 = next((p for p in game_state.get("players", []) if p.get("id") == 1), None)
+                p1_x = player1["position"][0] if player1 else 0
+                p1_y = player1["position"][1] if player1 else 0
+                current_loc = game_state.get("current_location", "")
+
+                npcs_to_add = []
+                for npc in game_state.get("npcs", []):
+                    if npc.get("status") not in ("alive", "idle", "active"):
+                        continue
+                    npc_loc = npc.get("location", "")
+                    if current_loc and npc_loc and npc_loc != current_loc:
+                        continue
+                    npc_name = npc.get("name", "")
+                    portrait_path = None
+                    for ext in [".webp", ".png"]:
+                        for prefix in ["portrait_", ""]:
+                            check = os.path.join(BASE_DIR, "static", "portraits", "sd", f"{prefix}{npc_name}{ext}")
+                            if os.path.exists(check):
+                                portrait_path = f"static/portraits/sd/{prefix}{npc_name}{ext}"
+                                break
+                        if portrait_path:
                             break
-                    if portrait_path:
-                        break
-                if not portrait_path:
-                    continue
-                npc_pos = npc.get("position", [0, 0])
-                sort_key = -(npc_pos[0] - p1_x)
-                distance = max(abs(npc_pos[0] - p1_x), abs(npc_pos[1] - p1_y))
-                if distance <= 1:
-                    size_class = "d1"
-                elif distance <= 2:
-                    size_class = "d2"
-                elif distance <= 4:
-                    size_class = "d3"
-                else:
-                    size_class = "d4"
-                npcs_to_add.append((sort_key, npc_name, portrait_path, distance, size_class))
+                    if not portrait_path:
+                        continue
+                    npc_pos = npc.get("position", [0, 0])
+                    sort_key = -(npc_pos[0] - p1_x)
+                    distance = max(abs(npc_pos[0] - p1_x), abs(npc_pos[1] - p1_y))
+                    if distance <= 1:
+                        size_class = "d1"
+                    elif distance <= 2:
+                        size_class = "d2"
+                    elif distance <= 4:
+                        size_class = "d3"
+                    else:
+                        size_class = "d4"
+                    npcs_to_add.append((sort_key, npc_name, portrait_path, distance, size_class))
 
-            npcs_to_add.sort(key=lambda x: x[0])
-            for idx, (sort_key, name, path, dist, size) in enumerate(npcs_to_add[:4]):
-                if sort_key > 1:
-                    pos_name = "far-right"
-                elif sort_key == 1:
-                    pos_name = "right"
-                elif sort_key == 0:
-                    pos_name = "center"
-                elif sort_key == -1:
-                    pos_name = "left"
-                else:
-                    pos_name = "far-left"
+                npcs_to_add.sort(key=lambda x: x[0])
+                for idx, (sort_key, name, path, dist, size) in enumerate(npcs_to_add[:4]):
+                    if sort_key > 1:
+                        pos_name = "far-right"
+                    elif sort_key == 1:
+                        pos_name = "right"
+                    elif sort_key == 0:
+                        pos_name = "center"
+                    elif sort_key == -1:
+                        pos_name = "left"
+                    else:
+                        pos_name = "far-left"
 
-                ill_state["layers"].append({
-                    "type": "portrait",
-                    "image": path,
-                    "position": pos_name,
-                    "name": name,
-                    "distance": dist,
-                    "size_class": size,
-                })
+                    ill_state["layers"].append({
+                        "type": "portrait",
+                        "image": path,
+                        "position": pos_name,
+                        "name": name,
+                        "distance": dist,
+                        "size_class": size,
+                    })
 
             with open(os.path.join(docs_dir, "illustration_state.json"),
                        "w", encoding="utf-8") as f:

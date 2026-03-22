@@ -166,6 +166,13 @@ def restore_scene():
         pass
 
 
+# Generate world map on startup
+try:
+    from core.map_generator import generate_world_map
+    generate_world_map()
+except Exception:
+    pass
+
 # Generate initial map and restore scene on startup
 update_map_image()
 restore_scene()
@@ -354,6 +361,13 @@ def gm_update():
     gm._log_to_tracker("state", "game_state 저장 + 엔티티 동기화")
     update_map_image()
 
+    # 월드맵 갱신 (세계관 변경 반영)
+    try:
+        from core.map_generator import generate_world_map
+        generate_world_map()
+    except Exception:
+        pass
+
     # Handle illustration request
     illustration_req = data.get("illustration")
     ill_result = None
@@ -409,6 +423,18 @@ def gm_update():
     return jsonify({"success": True, "event": event or {}, "turn": state["turn_count"],
                      "illustration": ill_result, "mechanics": mechanics_results,
                      "agent_warnings": agent_warnings})
+
+
+@app.route("/api/world-map", methods=["POST"])
+def regenerate_world_map():
+    try:
+        from core.map_generator import generate_world_map
+        path = generate_world_map()
+        if path:
+            return jsonify({"success": True, "path": "/static/world_map.png"})
+        return jsonify({"success": False, "reason": "No locations with world_pos"})
+    except Exception as e:
+        return jsonify({"success": False, "reason": str(e)})
 
 
 @app.route("/api/illustration", methods=["GET"])

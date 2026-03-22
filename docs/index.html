@@ -507,6 +507,21 @@
             cursor: pointer;
         }
         .sidebar-map img:hover { border-color: #e94560; }
+        .worldmap-btn {
+            font-size: 0.7em;
+            background: #1a1a2e;
+            border: 1px solid #555;
+            color: #aaa;
+            padding: 1px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            float: right;
+        }
+        .worldmap-btn:hover {
+            background: #0f3460;
+            color: #ffd700;
+            border-color: #ffd700;
+        }
         /* Map zoom overlay — 적당한 크기 */
         .map-overlay {
             display: none;
@@ -752,7 +767,7 @@
 
         <div class="sidebar">
             <div class="panel sidebar-map">
-                <h3>게임 맵</h3>
+                <h3>게임 맵 <button class="worldmap-btn" onclick="openWorldMap()">월드맵</button></h3>
                 <img id="game-map" src="" alt="Game Map" onclick="openMapZoom()">
                 <div id="map-legend" class="legend"></div>
             </div>
@@ -1450,6 +1465,10 @@
         function openMapZoom() {
             document.getElementById('map-overlay').classList.add('active');
             document.getElementById('map-zoom-img').src = STATIC_PREFIX + 'map.png?t=' + Date.now();
+        }
+        function openWorldMap() {
+            document.getElementById('map-overlay').classList.add('active');
+            document.getElementById('map-zoom-img').src = STATIC_PREFIX + 'world_map.png?t=' + Date.now();
         }
 
         function openPortraitZoom(src) {
