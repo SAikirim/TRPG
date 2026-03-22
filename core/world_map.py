@@ -873,111 +873,124 @@ def generate_world_map():
                 canvas.restore()
 
     # ── 2단계-B: 대륙 지형색 채우기 (blob, 아이콘 제외) ──
-    render_order = ["plains", "coastline", "swamp", "forest", "mountain"]
-    if not _has_coastline_path:
-        render_order = ["sea"] + render_order
-    for target_type in render_order:
+    # SD 배경이 있으면 Skia 지형 렌더링 전체 스킵 (SD가 배경을 완전히 대체)
+    if _has_sd_bg:
+        # SD 배경을 양피지 위에 바로 올리고 마커 단계로 점프
+        import numpy
+        sd_array = numpy.array(cached_bg)
+        sd_image = skia.Image.fromarray(sd_array)
+        canvas.drawImage(sd_image, 0, 0)
+        # 마커 단계(3단계)로 바로 이동하기 위해 아래 지형 렌더링 건너뛰기
+        _skip_terrain_rendering = True
+    else:
+        _skip_terrain_rendering = False
+
+    if not _skip_terrain_rendering:
+        render_order = ["plains", "coastline", "swamp", "forest", "mountain"]
+        if not _has_coastline_path:
+            render_order = ["sea"] + render_order
+        for target_type in render_order:
+            for feat in terrain.get("features", []):
+                ftype = feat.get("type", "")
+                if ftype != target_type:
+                    continue
+                if "coords" in feat:
+                    _draw_terrain_pattern(canvas, feat["coords"], ftype, to_pixel, tw, th, _rng,
+                                          fill_only=True)
+
+        # 지형 경계 부드럽게 — 가우시안 블러 (Skia 네이티브)
+        image_snap = final_surface.makeImageSnapshot()
+        blur_surface = skia.Surface(W, H)
+        blur_canvas = blur_surface.getCanvas()
+        blur_paint = skia.Paint()
+        blur_paint.setImageFilter(skia.ImageFilters.Blur(1.2, 1.2))
+        blur_canvas.drawImage(image_snap, 0, 0, skia.SamplingOptions(), blur_paint)
+        # 블러 결과를 새 surface로 교체
+        final_surface = skia.Surface(W, H)
+        canvas = final_surface.getCanvas()
+        canvas.drawImage(blur_surface.makeImageSnapshot(), 0, 0)
+
+        # ── 2단계-C: 지형 아이콘 그리기 (블러 후 선명하게) ──
+        icon_types = ["forest", "mountain", "plains", "swamp"]
+        for target_type in icon_types:
+            for feat in terrain.get("features", []):
+                ftype = feat.get("type", "")
+                if ftype != target_type:
+                    continue
+                if "coords" in feat:
+                    _draw_terrain_pattern(canvas, feat["coords"], ftype, to_pixel, tw, th, _rng,
+                                          icons_only=True)
+
+        # 해안선 곡선 + 빗금 (블러 후 선명하게)
         for feat in terrain.get("features", []):
-            ftype = feat.get("type", "")
-            if ftype != target_type:
-                continue
-            if "coords" in feat:
-                _draw_terrain_pattern(canvas, feat["coords"], ftype, to_pixel, tw, th, _rng,
-                                      fill_only=True)
-
-    # 지형 경계 부드럽게 — 가우시안 블러 (Skia 네이티브)
-    image_snap = final_surface.makeImageSnapshot()
-    blur_surface = skia.Surface(W, H)
-    blur_canvas = blur_surface.getCanvas()
-    blur_paint = skia.Paint()
-    blur_paint.setImageFilter(skia.ImageFilters.Blur(1.2, 1.2))
-    blur_canvas.drawImage(image_snap, 0, 0, skia.SamplingOptions(), blur_paint)
-    # 블러 결과를 새 surface로 교체
-    final_surface = skia.Surface(W, H)
-    canvas = final_surface.getCanvas()
-    canvas.drawImage(blur_surface.makeImageSnapshot(), 0, 0)
-
-    # ── 2단계-C: 지형 아이콘 그리기 (블러 후 선명하게) ──
-    icon_types = ["forest", "mountain", "plains", "swamp"]
-    for target_type in icon_types:
-        for feat in terrain.get("features", []):
-            ftype = feat.get("type", "")
-            if ftype != target_type:
-                continue
-            if "coords" in feat:
-                _draw_terrain_pattern(canvas, feat["coords"], ftype, to_pixel, tw, th, _rng,
-                                      icons_only=True)
-
-    # 해안선 곡선 + 빗금 (블러 후 선명하게)
-    for feat in terrain.get("features", []):
-        if feat.get("type") == "coastline" and "path" in feat:
-            pts = feat["path"]
-            if len(pts) >= 2:
-                # 굵은 해안선
-                coast_path = skia.Path()
-                x0, y0 = to_pixel(pts[0][0], pts[0][1])
-                coast_path.moveTo(x0, y0)
-                for i in range(1, len(pts)):
-                    px, py = to_pixel(pts[i][0], pts[i][1])
-                    prev_x, prev_y = to_pixel(pts[i-1][0], pts[i-1][1])
-                    cpx = (prev_x + px) / 2 + (py - prev_y) * 0.1
-                    cpy = (prev_y + py) / 2 - (px - prev_x) * 0.1
-                    coast_path.quadTo(cpx, cpy, px, py)
-                p = _skia_paint(0.40, 0.32, 0.20, 0.7,
-                                style=skia.Paint.kStroke_Style, stroke_width=tw * 0.25)
-                p.setStrokeCap(skia.Paint.kRound_Cap)
-                canvas.drawPath(coast_path, p)
-                # 빗금
-                _draw_coastline_hatching(canvas, pts, to_pixel, tw, math)
-
-    # 강: 파란 곡선, 하류로 갈수록 굵어짐
-    for feat in terrain.get("features", []):
-        if feat.get("type") == "river" and "path" in feat:
-            path_pts = [to_pixel(c[0], c[1]) for c in feat["path"]]
-            if len(path_pts) >= 2:
-                base_width = max(2, tw * 0.08)
-                max_width = max(5, tw * 0.22)
-                for i in range(1, len(path_pts)):
-                    progress = i / max(1, len(path_pts) - 1)
-                    line_w = base_width + (max_width - base_width) * progress
-                    prev = path_pts[i-1]; curr = path_pts[i]
-                    dx = curr[0]-prev[0]; dy = curr[1]-prev[1]
-                    cpx = (prev[0]+curr[0])/2 - dy*0.2 + _rng.uniform(-6,6)
-                    cpy = (prev[1]+curr[1])/2 + dx*0.2 + _rng.uniform(-3,3)
-                    # 어두운 외곽
-                    rp = skia.Path()
-                    rp.moveTo(*prev); rp.quadTo(cpx, cpy, *curr)
-                    p = _skia_paint(0.12, 0.25, 0.50, 0.6,
-                                    style=skia.Paint.kStroke_Style, stroke_width=line_w + 1.5)
+            if feat.get("type") == "coastline" and "path" in feat:
+                pts = feat["path"]
+                if len(pts) >= 2:
+                    # 굵은 해안선
+                    coast_path = skia.Path()
+                    x0, y0 = to_pixel(pts[0][0], pts[0][1])
+                    coast_path.moveTo(x0, y0)
+                    for i in range(1, len(pts)):
+                        px, py = to_pixel(pts[i][0], pts[i][1])
+                        prev_x, prev_y = to_pixel(pts[i-1][0], pts[i-1][1])
+                        cpx = (prev_x + px) / 2 + (py - prev_y) * 0.1
+                        cpy = (prev_y + py) / 2 - (px - prev_x) * 0.1
+                        coast_path.quadTo(cpx, cpy, px, py)
+                    p = _skia_paint(0.40, 0.32, 0.20, 0.7,
+                                    style=skia.Paint.kStroke_Style, stroke_width=tw * 0.25)
                     p.setStrokeCap(skia.Paint.kRound_Cap)
-                    canvas.drawPath(rp, p)
-                    # 메인 강
-                    rp2 = skia.Path()
-                    rp2.moveTo(*prev); rp2.quadTo(cpx, cpy, *curr)
-                    p2 = _skia_paint(0.20, 0.40, 0.65, 0.8,
-                                     style=skia.Paint.kStroke_Style, stroke_width=line_w)
-                    p2.setStrokeCap(skia.Paint.kRound_Cap)
-                    canvas.drawPath(rp2, p2)
-                    # 하이라이트
-                    rp3 = skia.Path()
-                    rp3.moveTo(prev[0]+1, prev[1]-1); rp3.quadTo(cpx+1, cpy-1, curr[0]+1, curr[1]-1)
-                    p3 = _skia_paint(0.35, 0.55, 0.80, 0.3,
-                                     style=skia.Paint.kStroke_Style, stroke_width=max(1, line_w * 0.4))
-                    p3.setStrokeCap(skia.Paint.kRound_Cap)
-                    canvas.drawPath(rp3, p3)
+                    canvas.drawPath(coast_path, p)
+                    # 빗금
+                    _draw_coastline_hatching(canvas, pts, to_pixel, tw, math)
 
-    # Skia 배경을 webp로 캐시 저장
-    try:
-        _cache_tmp = os.path.join(world_map_dir, "world_map_temp_cache.tmp.png")
-        final_surface.makeImageSnapshot().save(_cache_tmp, skia.kPNG)
-        _cache_img = Image.open(_cache_tmp).convert("RGBA")
-        _cache_img.save(skia_bg_cache_path, "WEBP", quality=90)
+        # 강: 파란 곡선, 하류로 갈수록 굵어짐
+        for feat in terrain.get("features", []):
+            if feat.get("type") == "river" and "path" in feat:
+                path_pts = [to_pixel(c[0], c[1]) for c in feat["path"]]
+                if len(path_pts) >= 2:
+                    base_width = max(2, tw * 0.08)
+                    max_width = max(5, tw * 0.22)
+                    for i in range(1, len(path_pts)):
+                        progress = i / max(1, len(path_pts) - 1)
+                        line_w = base_width + (max_width - base_width) * progress
+                        prev = path_pts[i-1]; curr = path_pts[i]
+                        dx = curr[0]-prev[0]; dy = curr[1]-prev[1]
+                        cpx = (prev[0]+curr[0])/2 - dy*0.2 + _rng.uniform(-6,6)
+                        cpy = (prev[1]+curr[1])/2 + dx*0.2 + _rng.uniform(-3,3)
+                        # 어두운 외곽
+                        rp = skia.Path()
+                        rp.moveTo(*prev); rp.quadTo(cpx, cpy, *curr)
+                        p = _skia_paint(0.12, 0.25, 0.50, 0.6,
+                                        style=skia.Paint.kStroke_Style, stroke_width=line_w + 1.5)
+                        p.setStrokeCap(skia.Paint.kRound_Cap)
+                        canvas.drawPath(rp, p)
+                        # 메인 강
+                        rp2 = skia.Path()
+                        rp2.moveTo(*prev); rp2.quadTo(cpx, cpy, *curr)
+                        p2 = _skia_paint(0.20, 0.40, 0.65, 0.8,
+                                         style=skia.Paint.kStroke_Style, stroke_width=line_w)
+                        p2.setStrokeCap(skia.Paint.kRound_Cap)
+                        canvas.drawPath(rp2, p2)
+                        # 하이라이트
+                        rp3 = skia.Path()
+                        rp3.moveTo(prev[0]+1, prev[1]-1); rp3.quadTo(cpx+1, cpy-1, curr[0]+1, curr[1]-1)
+                        p3 = _skia_paint(0.35, 0.55, 0.80, 0.3,
+                                         style=skia.Paint.kStroke_Style, stroke_width=max(1, line_w * 0.4))
+                        p3.setStrokeCap(skia.Paint.kRound_Cap)
+                        canvas.drawPath(rp3, p3)
+
+        # Skia 배경을 webp로 캐시 저장
         try:
-            os.remove(_cache_tmp)
+            _cache_tmp = os.path.join(world_map_dir, "world_map_temp_cache.tmp.png")
+            final_surface.makeImageSnapshot().save(_cache_tmp, skia.kPNG)
+            _cache_img = Image.open(_cache_tmp).convert("RGBA")
+            _cache_img.save(skia_bg_cache_path, "WEBP", quality=90)
+            try:
+                os.remove(_cache_tmp)
+            except Exception:
+                pass
         except Exception:
             pass
-    except Exception:
-        pass
 
     # ─── SD 캐시 배경 적용 (SD 캐시가 있으면 배경 위에 오버레이) ───
     use_sd_enhancement = False
