@@ -34,9 +34,9 @@ REQUIRED_STEPS = {
     "gm-update": "gm-update API 호출 (웹 UI 반영)",
     "state": "game_state.json 저장",
     "narration": "나레이션 출력",
-    "worldbuilding": "세계관 검증 (새 지역/세력/지리 → worldbuilding.json 반영 확인)",
-    "rules": "룰 검증 (판정/비용/사거리/상태이상 규칙 준수 확인)",
-    "scenario": "시나리오 검증 (챕터 목표/퀘스트/이벤트 트리거 확인)",
+    "agent:worldbuilding": "세계관 에이전트 자동 검증",
+    "agent:rules": "룰 에이전트 자동 검증",
+    "agent:scenario": "시나리오 에이전트 자동 검증",
 }
 
 # 조건부 필수 (판정이 있었으면 dice 필요 등)
@@ -100,6 +100,12 @@ def log_step(tag, message):
         "rules": "⚖️",
         "scenario": "📜",
         "worldmap": "🗺️",
+        # 자동 에이전트 검증 (app.py gm-update에서 자동 실행)
+        "agent:worldbuilding": "🤖🌍",
+        "agent:rules": "🤖⚖️",
+        "agent:scenario": "🤖📜",
+        "agent:npc": "🤖💬",
+        "agent:worldmap": "🤖🗺️",
     }
     icon = icons.get(tag, "▸")
     print(f"  {icon} [{tag}] {message}")

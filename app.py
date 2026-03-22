@@ -404,38 +404,38 @@ def gm_update():
 
     wb_w = wb_check(narrative=f"{description} {narrative}", game_state=state)
     if wb_w:
-        gm._log_to_tracker("worldbuilding", f"⚠ 미등록 {len(wb_w)}건 감지")
+        gm._log_to_tracker("agent:worldbuilding", f"⚠ 미등록 {len(wb_w)}건 감지")
         agent_warnings["worldbuilding"] = wb_w
     else:
-        gm._log_to_tracker("worldbuilding", "세계관 정합성 확인")
+        gm._log_to_tracker("agent:worldbuilding", "세계관 정합성 확인")
 
     rules_w = rules_check(game_state=state, mechanics_results=mechanics_results)
     if rules_w:
-        gm._log_to_tracker("rules", f"⚠ 룰 위반 {len(rules_w)}건 감지")
+        gm._log_to_tracker("agent:rules", f"⚠ 룰 위반 {len(rules_w)}건 감지")
         agent_warnings["rules"] = rules_w
     else:
-        gm._log_to_tracker("rules", "룰 정합성 확인")
+        gm._log_to_tracker("agent:rules", "룰 정합성 확인")
 
     scenario_w = scenario_check(game_state=state)
     if scenario_w:
-        gm._log_to_tracker("scenario", f"📜 시나리오 감지 {len(scenario_w)}건")
+        gm._log_to_tracker("agent:scenario", f"📜 시나리오 감지 {len(scenario_w)}건")
         agent_warnings["scenario"] = scenario_w
     else:
-        gm._log_to_tracker("scenario", "시나리오 정합성 확인")
+        gm._log_to_tracker("agent:scenario", "시나리오 정합성 확인")
 
     npc_w = npc_check(game_state=state)
     if npc_w:
-        gm._log_to_tracker("npc", f"⚠ NPC 문제 {len(npc_w)}건 감지")
+        gm._log_to_tracker("agent:npc", f"⚠ NPC 문제 {len(npc_w)}건 감지")
         agent_warnings["npc"] = npc_w
     else:
-        gm._log_to_tracker("npc", "NPC 정합성 확인")
+        gm._log_to_tracker("agent:npc", "NPC 정합성 확인")
 
     worldmap_w = worldmap_check(game_state=state)
     if worldmap_w:
-        gm._log_to_tracker("worldmap", f"🗺️ 세계지도 문제 {len(worldmap_w)}건 감지")
+        gm._log_to_tracker("agent:worldmap", f"🗺️ 세계지도 문제 {len(worldmap_w)}건 감지")
         agent_warnings["worldmap"] = worldmap_w
     else:
-        gm._log_to_tracker("worldmap", "세계 지도 정합성 확인")
+        gm._log_to_tracker("agent:worldmap", "세계 지도 정합성 확인")
 
     return jsonify({"success": True, "event": event or {}, "turn": state["turn_count"],
                      "illustration": ill_result, "mechanics": mechanics_results,

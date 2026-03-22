@@ -10,7 +10,7 @@
     "ending": null,
     "current_chapter": 1
   },
-  "current_location": "trade_road_karendel",
+  "current_location": "crossroads_rest",
   "players": [
     {
       "id": 1,
@@ -29,7 +29,7 @@
         "CON": 10
       },
       "position": [
-        13,
+        12,
         12
       ],
       "status_effects": [],
@@ -68,7 +68,7 @@
         "CON": 15
       },
       "position": [
-        14,
+        13,
         12
       ],
       "status_effects": [],
@@ -97,7 +97,7 @@
         "CON": 17
       },
       "position": [
-        12,
+        11,
         12
       ],
       "status_effects": [],
@@ -128,12 +128,12 @@
       "attack": 3,
       "defense": 2,
       "position": [
-        13,
+        12,
         13
       ],
       "threat_level": "none",
       "status": "alive",
-      "location": "trade_road_karendel",
+      "location": "crossroads_rest",
       "known": true
     },
     {
@@ -153,12 +153,12 @@
       "attack": 2,
       "defense": 2,
       "position": [
-        14,
+        13,
         13
       ],
       "threat_level": "none",
       "status": "alive",
-      "location": "trade_road_karendel",
+      "location": "crossroads_rest",
       "known": true
     },
     {
@@ -178,11 +178,11 @@
       "mp": 0,
       "max_mp": 0,
       "position": [
-        12,
+        11,
         13
       ],
       "status": "alive",
-      "location": "trade_road_karendel"
+      "location": "crossroads_rest"
     }
   ],
   "map": {
@@ -197,27 +197,67 @@
           "x1": 0,
           "y1": 0,
           "x2": 24,
-          "y2": 7
+          "y2": 6
         }
       },
       {
-        "name": "교역로",
+        "name": "교역로 (북쪽, 카렌델 방면)",
         "type": "road",
         "area": {
-          "x1": 0,
-          "y1": 8,
-          "x2": 24,
+          "x1": 10,
+          "y1": 0,
+          "x2": 14,
+          "y2": 9
+        }
+      },
+      {
+        "name": "갈림길 쉼터",
+        "type": "village",
+        "area": {
+          "x1": 8,
+          "y1": 10,
+          "x2": 16,
           "y2": 16
         }
       },
       {
-        "name": "수레 정차 지점",
+        "name": "우물",
         "type": "village",
         "area": {
-          "x1": 10,
-          "y1": 12,
-          "x2": 14,
+          "x1": 12,
+          "y1": 11,
+          "x2": 12,
+          "y2": 11
+        }
+      },
+      {
+        "name": "모닥불",
+        "type": "village",
+        "area": {
+          "x1": 12,
+          "y1": 13,
+          "x2": 12,
           "y2": 13
+        }
+      },
+      {
+        "name": "이정표",
+        "type": "village",
+        "area": {
+          "x1": 12,
+          "y1": 10,
+          "x2": 12,
+          "y2": 10
+        }
+      },
+      {
+        "name": "교역로 (남동쪽, 세렌 방면)",
+        "type": "road",
+        "area": {
+          "x1": 15,
+          "y1": 15,
+          "x2": 24,
+          "y2": 24
         }
       },
       {
@@ -232,7 +272,7 @@
       }
     ]
   },
-  "turn_count": 23,
+  "turn_count": 24,
   "events": [
     {
       "turn": 0,
@@ -364,6 +404,12 @@
       "message": "[GM] 사이키가 할란에게 하룬 마을 경유 여부를 물었다. 할란이 교역로 사정을 설명한다.",
       "narrative": "할란이 어깨를 으쓱했다.\n\"하룬 마을? 아, 그 작은 마을 말인가. 우린 남쪽에서 올라왔거든. 교역로가 마을 서쪽 외곽을 스쳐 지나가지만, 마을 안까지 들어가진 않았지.\"\n\n미라가 고개를 갸웃했다.\n\"거기 사는 분들이었어요? 그럼 늑대가 나타났을 때 우리를 도와준 게...\"\n\n할란이 짧게 끄덕였다.\n\"...운이 좋았지. 교역로에서 만난 거니까. 마을에서 조금만 더 북쪽이었으면 늑대한테 당했을 거다.\"\n\n그가 잠시 뜸을 들이다 덧붙였다.\n\"남쪽 해안 마을에서 직물과 건어물을 싣고 올라왔다. 카렌델 시장에서 팔면 괜찮은 값을 받을 수 있거든. 원래는 더 큰 상단이랑 같이 올라왔는데, 교역로 입구에서 갈라졌지. 큰 상단은 빨라서 먼저 가버렸고, 우린 좀 느려서.\"",
       "timestamp": "19:05:50"
+    },
+    {
+      "turn": 23,
+      "message": "[GM] 갈림길 쉼터 도착. 일행이 야영을 준비한다.",
+      "narrative": "해가 기울 무렵, 수레가 갈림길 쉼터에 도착했다.\n\n교역로가 북쪽과 남동쪽으로 갈라지는 넓은 터. 이미 상인 몇 명이 모닥불 주위에 자리를 잡고 있었다. 우물 하나와 낡은 이정표가 서 있었다.\n\n할란이 수레를 세우며 말했다.\n\"...여기다. 짐말도 쉬어야 하고.\"\n\n미라가 재빨리 수레에서 뛰어내려 우물 쪽으로 갔다.\n\"물통부터 채울게요!\"\n\n노을이 주변을 둘러보며 장작을 모으기 시작했다. 루체나는 이미 모닥불 옆 상인들에게 다가가 말을 걸고 있었다.\n\n갈림길 쉼터의 밤이 시작되었다.",
+      "timestamp": "19:37:25"
     }
   ]
 }
