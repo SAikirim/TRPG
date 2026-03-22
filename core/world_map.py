@@ -27,6 +27,14 @@ def _skia_paint(r=0, g=0, b=0, a=1.0, style=None, stroke_width=None, anti_alias=
     return p
 
 
+def _pil_to_skia_image(pil_img):
+    """PIL Image → Skia Image 변환 (RGBA→BGRA 채널 스왑)"""
+    import numpy
+    arr = numpy.array(pil_img.convert("RGBA"))
+    arr = arr[:, :, [2, 1, 0, 3]].copy()  # RGBA → BGRA
+    return skia.Image.fromarray(arr)
+
+
 def _switch_sd_model(model_name):
     """SD WebUI 모델 전환 + 로딩 완료 대기"""
     try:
@@ -666,7 +674,6 @@ def generate_world_map():
     """worldbuilding.json 기반 판타지 스타일 세계 지도 생성.
     Skia로 고퀄리티 판타지 백지도를 생성. SD img2img는 선택적."""
     import random as _rng
-    import numpy
 
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     wb_path = os.path.join(BASE_DIR, "data", "worldbuilding.json")
@@ -732,7 +739,10 @@ def generate_world_map():
     cached_bg = None
     _has_sd_bg = False
     if os.path.exists(sd_cache_path):
-        cached_bg = Image.open(sd_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
+        # RGB로 로드 후 불투명 RGBA로 변환 (알파 255) — 반투명 방지
+        _sd_img = Image.open(sd_cache_path).convert("RGB").resize((W, H), Image.LANCZOS)
+        from PIL import ImageOps
+        cached_bg = _sd_img.convert("RGBA")  # RGB→RGBA: 알파가 자동으로 255(불투명)
         _has_sd_bg = True
     elif os.path.exists(skia_bg_cache_path):
         cached_bg = Image.open(skia_bg_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
@@ -876,10 +886,7 @@ def generate_world_map():
     # SD 배경이 있으면 Skia 지형 렌더링 전체 스킵 (SD가 배경을 완전히 대체)
     if _has_sd_bg:
         # SD 배경을 양피지 위에 바로 올리고 마커 단계로 점프
-        import numpy
-        sd_array = numpy.array(cached_bg)
-        sd_image = skia.Image.fromarray(sd_array)
-        canvas.drawImage(sd_image, 0, 0)
+        canvas.drawImage(_pil_to_skia_image(cached_bg), 0, 0)
         # 마커 단계(3단계)로 바로 이동하기 위해 아래 지형 렌더링 건너뛰기
         _skip_terrain_rendering = True
     else:
@@ -993,10 +1000,11 @@ def generate_world_map():
             pass
 
     # ─── SD 캐시 배경 적용 (SD 캐시가 있으면 배경 위에 오버레이) ───
+    # _has_sd_bg=True이면 이미 877행에서 SD를 그렸으므로 스킵
     use_sd_enhancement = False
     sd_bg = None
 
-    if cached_bg is not None and os.path.exists(sd_cache_path):
+    if not _has_sd_bg and cached_bg is not None and os.path.exists(sd_cache_path):
         sd_bg = cached_bg
 
     if use_sd_enhancement and sd_bg is None:
@@ -1051,9 +1059,7 @@ def generate_world_map():
 
     # SD 배경을 Skia surface 위에 오버레이
     if sd_bg:
-        sd_array = numpy.array(sd_bg)
-        sd_image = skia.Image.fromarray(sd_array)
-        canvas.drawImage(sd_image, 0, 0)
+        canvas.drawImage(_pil_to_skia_image(sd_bg), 0, 0)
 
     # ─── 3단계: 공통 오버레이 (도로/마커/라벨) ───
 
