@@ -720,10 +720,24 @@ def generate_world_map():
     except Exception:
         _sd_enabled = False
 
-    # 배경 우선순위: SD 캐시(SD ON일 때만) > Skia 캐시 > 새로 생성
+    # 배경 우선순위: custom > SD 캐시(SD ON일 때만) > Skia 캐시 > 새로 생성
+    custom_bg_dir = os.path.join(world_map_dir, "custom")
+    custom_bg_path = None
+    if os.path.isdir(custom_bg_dir):
+        for ext in ["webp", "png", "jpg", "jpeg"]:
+            _p = os.path.join(custom_bg_dir, f"background.{ext}")
+            if os.path.exists(_p):
+                custom_bg_path = _p
+                break
+
     cached_bg = None
     _has_sd_bg = False
-    if _sd_enabled and os.path.exists(sd_cache_path):
+    _has_custom_bg = False
+    if custom_bg_path:
+        cached_bg = Image.open(custom_bg_path).convert("RGB").resize((W, H), Image.LANCZOS).convert("RGBA")
+        _has_custom_bg = True
+        _has_sd_bg = True  # custom도 SD와 같은 취급 (Skia 렌더링 스킵)
+    elif _sd_enabled and os.path.exists(sd_cache_path):
         # RGB로 로드 후 불투명 RGBA로 변환 (알파 255) — 반투명 방지
         _sd_img = Image.open(sd_cache_path).convert("RGB").resize((W, H), Image.LANCZOS)
         cached_bg = _sd_img.convert("RGBA")  # RGB→RGBA: 알파가 자동으로 255(불투명)
@@ -1662,6 +1676,19 @@ def generate_world_map_pipeline(force_regenerate=False):
 
     guide_path = os.path.join(output_dir, "color_guide.png")
     sd_path = os.path.join(output_dir, "background_sd.webp")
+
+    # custom 배경 체크 — 있으면 색 가이드/SD 생성 스킵
+    custom_bg_dir = os.path.join(output_dir, "custom")
+    _has_custom = False
+    if os.path.isdir(custom_bg_dir):
+        for ext in ["webp", "png", "jpg", "jpeg"]:
+            if os.path.exists(os.path.join(custom_bg_dir, f"background.{ext}")):
+                _has_custom = True
+                break
+
+    if _has_custom and not force_regenerate:
+        # custom 배경 사용 — 마커만 합성
+        return generate_world_map()
 
     # ── 1단계: 색 가이드 (캐시 없거나 force면 재생성) ──
     if force_regenerate or not os.path.exists(guide_path):

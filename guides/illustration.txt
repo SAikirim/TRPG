@@ -104,53 +104,55 @@ Skia 플레이스홀더 (SD OFF 시)
 
 세계 지도 생성 규칙
 ===
-세계 지도는 4단계로 생성한다.
 
-[1단계] 대륙 이미지 생성 (SD)
-  - 세계관의 지형 설명을 기반으로 SD txt2img/img2img로 백지도 이미지 생성
-  - 프롬프트에 지형 특징 반영 (해안, 산맥, 숲, 강, 사막 등)
-  - 텍스트/마커/라벨 없이 순수 지형만 생성
-  - 결과: static/maps/world/{세계관}/background_sd.webp
-  - SD OFF 시 Skia가 폴백 백지도 생성
+배경 이미지 생성:
+  자연 데이터(terrain)를 기반으로 항상 두 가지 배경을 생성한다:
+  1. Skia 백지도 (즉시) → background_skia.webp
+  2. 색 블롭 가이드 → SD img2img → background_sd.webp (백그라운드)
 
-[2단계] 이미지에서 자연 데이터 자동 추출
-  - 백지도 이미지의 색상을 분석하여 지형 데이터를 자동 추출
-  - 추출 대상: 해안선 경로, 산맥 영역, 숲 영역, 바다 영역, 평원, 강 경로
-  - 색상 기준: 파랑=바다, 짙은초록=숲, 갈색=산, 연두=평원, 청록=강
-  - 결과: worldbuilding.json의 terrain 섹션에 자동 반영
-  - 추출 후 세계 지도 에이전트가 지리적 합리성 검증
+배경 표시 우선순위:
+  1순위: custom/background.webp — 사용자가 첨부한 백지도 (있으면 무조건 사용)
+  2순위: background_sd.webp — SD 보정 배경 (sd_illustration=true일 때)
+  3순위: background_skia.webp — Skia 폴백 (sd_illustration=false이거나 SD 미생성 시)
 
-[3단계] 자연 데이터 기반으로 문명 배치
-  - 추출된 지형 데이터를 보고 도시/항구/도로 등을 배치
-  - 세계관 에이전트 + 세계 지도 에이전트가 입지 조건 판단:
-    - 만/하구 → 항구
-    - 강 합류점 → 교역도시
-    - 산맥 고개 → 요새
-    - 비옥한 평야 → 농촌
-  - 결과: worldbuilding.json의 locations 섹션에 반영
+자연 데이터 생성:
+  [사용자 이미지 제공 시]
+    사용자 백지도 → terrain_extractor가 자동 추출 → worldbuilding.json terrain 반영
+  [사용자 이미지 없음 — 새 시나리오/세계관]
+    세계관 에이전트: 지형 설계 (대륙 형태, 기후, 식생 컨셉)
+    세계 지도 에이전트: 좌표 배치 + 지리 검증 (해안선, 산맥, 강 흐름)
+    → worldbuilding.json terrain 섹션에 저장
+  [권역 추가 시]
+    기존 세계 지도 참고 (인접 권역 경계, 해안선 연속)
+    neighbors 정보로 일관성 보장
 
-[4단계] 백지도 + 마커 합성
-  - SD 백지도(배경 레이어) 위에 마커(오버레이 레이어) 합성
-  - 마커: 장소 아이콘, 라벨, 도로, 현재 위치, 테두리, 나침반, 제목
-  - 결과: static/maps/world/{세계관}/world_map.png
+문명 배치 (자연 데이터 확정 후):
+  세계관 에이전트 + 세계 지도 에이전트가 지형에 맞춰 위치 배치:
+    만/하구 → 항구, 강 합류점 → 교역도시, 산맥 고개 → 요새, 비옥한 평야 → 농촌
 
-Skia 역할:
-  - SD OFF 시 백지도 폴백 생성 (1단계 대체)
-  - 마커 오버레이 렌더링 (4단계)
-  - 지형 데이터 수정 후 재생성 시
+최종 지도 합성:
+  배경(위 우선순위) + 마커 오버레이(장소, 도로, 라벨, 현재 위치, 나침반, 제목, 범례)
+  → world_map.png
+
+폴더 구조 (static/maps/world/{세계관}/):
+  custom/background.webp  — 사용자 첨부 원본 (선택)
+  background_sd.webp      — SD img2img 보정 배경
+  background_skia.webp    — Skia 폴백 백지도
+  color_guide.png         — 색 블롭 가이드 (SD 입력용)
+  world_map.png           — 최종 완성 지도 (배경 + 마커)
 
 자동 생성 조건:
-- 새 시나리오/세계관 생성 시 (1~4단계 전체 실행)
-- 활동 지역이 다른 나라/권역으로 변경될 때
-- Flask 서버 시작 시 (4단계만 — 배경 캐시 재사용)
-- gm-update 호출 시 (4단계만 — 마커 갱신)
+  - 새 시나리오/세계관 생성 시 (전체 파이프라인)
+  - 활동 지역이 다른 나라/권역으로 변경될 때
+  - Flask 서버 시작 시 (마커만 재합성, 배경 캐시 재사용)
+  - gm-update 호출 시 (마커만 재합성)
+  - /api/world-map/regenerate (전체 강제 재실행)
 
-캐시 구조 (static/maps/world/{세계관이름}/):
-- background_sd.webp — SD 생성 백지도 (있으면 우선 사용)
-- background_skia.webp — Skia 폴백 백지도
-- world_map.png — 최종 완성 지도 (배경 + 마커)
-- 세계관 전환 시 기존 캐시는 보존, 복귀 시 즉시 재사용
-- 좌표/지형 변경 시에도 배경 캐시는 보존 (마커만 재생성)
+캐시 정책:
+  - 사용자 이미지, SD 배경, Skia 배경은 캐시 보존
+  - terrain 변경 시에만 색 가이드 + Skia 재생성
+  - 마커 변경 시에만 world_map.png 재합성
+  - 세계관 전환 시 기존 캐시 보존 (폴더가 다름)
 
 AnimateDiff
 ===
