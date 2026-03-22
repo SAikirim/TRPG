@@ -730,8 +730,10 @@ def generate_world_map():
 
     # 배경 우선순위: SD 캐시 > Skia 캐시 > 새로 생성
     cached_bg = None
+    _has_sd_bg = False
     if os.path.exists(sd_cache_path):
         cached_bg = Image.open(sd_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
+        _has_sd_bg = True
     elif os.path.exists(skia_bg_cache_path):
         cached_bg = Image.open(skia_bg_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
 
@@ -746,127 +748,129 @@ def generate_world_map():
     # ─── 2단계: 지형 패턴 렌더링 ───
 
     # ── 2단계-A: 해안선 폴리곤으로 바다 영역 채우기 ──
-    # sea 타입 좌표 수집 (바다 방향 판단용)
+    # SD 배경이 있으면 SD가 바다를 포함하므로 Skia 바다 채우기 스킵
     _all_sea_pixels = []
-    for _sf in terrain.get("features", []):
-        if _sf.get("type") == "sea" and "coords" in _sf:
-            for _sc in _sf["coords"]:
-                _all_sea_pixels.append(to_pixel(_sc[0], _sc[1]))
-
     _has_coastline_path = False
-    for feat in terrain.get("features", []):
-        if feat.get("type") == "coastline" and "path" in feat and len(feat["path"]) >= 2:
-            _has_coastline_path = True
-            coast_pts = feat["path"]
-            coast_pixels = [to_pixel(c[0], c[1]) for c in coast_pts]
+    if not _has_sd_bg:
+        # sea 타입 좌표 수집 (바다 방향 판단용)
+        for _sf in terrain.get("features", []):
+            if _sf.get("type") == "sea" and "coords" in _sf:
+                for _sc in _sf["coords"]:
+                    _all_sea_pixels.append(to_pixel(_sc[0], _sc[1]))
 
-            first_px, first_py = coast_pixels[0]
-            last_px, last_py = coast_pixels[-1]
+        for feat in terrain.get("features", []):
+            if feat.get("type") == "coastline" and "path" in feat and len(feat["path"]) >= 2:
+                _has_coastline_path = True
+                coast_pts = feat["path"]
+                coast_pixels = [to_pixel(c[0], c[1]) for c in coast_pts]
 
-            # 바다 폴리곤 구성
-            sea_path = skia.Path()
-            sea_path.moveTo(first_px, first_py)
-            for i in range(1, len(coast_pixels)):
-                px, py = coast_pixels[i]
-                prev_x, prev_y = coast_pixels[i-1]
-                cpx = (prev_x + px) / 2 + (py - prev_y) * 0.1
-                cpy = (prev_y + py) / 2 - (px - prev_x) * 0.1
-                sea_path.quadTo(cpx, cpy, px, py)
+                first_px, first_py = coast_pixels[0]
+                last_px, last_py = coast_pixels[-1]
 
-            # sea coords 평균 vs 해안선 평균으로 바다 방향 판단
-            coast_avg_x = sum(p[0] for p in coast_pixels) / len(coast_pixels)
+                # 바다 폴리곤 구성
+                sea_path = skia.Path()
+                sea_path.moveTo(first_px, first_py)
+                for i in range(1, len(coast_pixels)):
+                    px, py = coast_pixels[i]
+                    prev_x, prev_y = coast_pixels[i-1]
+                    cpx = (prev_x + px) / 2 + (py - prev_y) * 0.1
+                    cpy = (prev_y + py) / 2 - (px - prev_x) * 0.1
+                    sea_path.quadTo(cpx, cpy, px, py)
 
-            if _all_sea_pixels:
-                sea_avg_x = sum(p[0] for p in _all_sea_pixels) / len(_all_sea_pixels)
-            else:
-                sea_avg_x = W  # 기본: 오른쪽에 바다
+                # sea coords 평균 vs 해안선 평균으로 바다 방향 판단
+                coast_avg_x = sum(p[0] for p in coast_pixels) / len(coast_pixels)
 
-            sea_is_right = sea_avg_x > coast_avg_x
+                if _all_sea_pixels:
+                    sea_avg_x = sum(p[0] for p in _all_sea_pixels) / len(_all_sea_pixels)
+                else:
+                    sea_avg_x = W  # 기본: 오른쪽에 바다
 
-            if sea_is_right:
-                # 해안선 끝 → 우측 하단 → 우측 상단 → 해안선 시작
-                sea_path.lineTo(W + 10, last_py)
-                sea_path.lineTo(W + 10, H + 10)
-                sea_path.lineTo(W + 10, -10)
-                sea_path.lineTo(first_px, -10)
-            else:
-                # 해안선 끝 → 좌측 하단 → 좌측 상단 → 해안선 시작
-                sea_path.lineTo(-10, last_py)
-                sea_path.lineTo(-10, H + 10)
-                sea_path.lineTo(-10, -10)
-                sea_path.lineTo(first_px, -10)
-            sea_path.close()
+                sea_is_right = sea_avg_x > coast_avg_x
 
-            # 바다 영역을 진한 남색으로 채우기
-            canvas.drawPath(sea_path, _skia_paint(0.10, 0.30, 0.57, 0.85))
+                if sea_is_right:
+                    # 해안선 끝 → 우측 하단 → 우측 상단 → 해안선 시작
+                    sea_path.lineTo(W + 10, last_py)
+                    sea_path.lineTo(W + 10, H + 10)
+                    sea_path.lineTo(W + 10, -10)
+                    sea_path.lineTo(first_px, -10)
+                else:
+                    # 해안선 끝 → 좌측 하단 → 좌측 상단 → 해안선 시작
+                    sea_path.lineTo(-10, last_py)
+                    sea_path.lineTo(-10, H + 10)
+                    sea_path.lineTo(-10, -10)
+                    sea_path.lineTo(first_px, -10)
+                sea_path.close()
 
-            # 해안 근처 밝은 청록 그라디언트 오버레이 (clip)
-            canvas.save()
-            canvas.clipPath(sea_path)
-            for i in range(len(coast_pixels)):
-                cpx_c, cpy_c = coast_pixels[i]
-                p = skia.Paint()
-                p.setAntiAlias(True)
-                p.setShader(skia.GradientShader.MakeRadial(
-                    center=(cpx_c, cpy_c), radius=tw * 3.0,
-                    colors=[_skia_rgba(0.28, 0.58, 0.72, 0.55),
-                            _skia_rgba(0.18, 0.42, 0.62, 0.25),
-                            _skia_rgba(0, 0, 0, 0)],
-                    positions=[0, 0.4, 1.0],
-                ))
-                canvas.drawRect(skia.Rect(cpx_c - tw * 3, cpy_c - tw * 3,
-                                           cpx_c + tw * 3, cpy_c + tw * 3), p)
+                # 바다 영역을 진한 남색으로 채우기
+                canvas.drawPath(sea_path, _skia_paint(0.10, 0.30, 0.57, 0.85))
 
-            # 파도 텍스처 (바다 영역 내, clip 안에서)
-            # 바다 방향에 따라 파도 영역 범위 결정
-            _coast_min_x = min(p[0] for p in coast_pixels)
-            _coast_max_x = max(p[0] for p in coast_pixels)
-            _coast_min_y = min(p[1] for p in coast_pixels)
-            _coast_max_y = max(p[1] for p in coast_pixels)
-            if not sea_is_right:
-                sea_min_x = -10
-                sea_max_x = _coast_max_x
-            else:
-                sea_min_x = _coast_min_x
-                sea_max_x = W + 10
-            sea_min_y = min(-10, _coast_min_y - tw)
-            sea_max_y = max(H + 10, _coast_max_y + tw)
-            sea_area_h = sea_max_y - sea_min_y
-            wave_count = max(20, int(sea_area_h / 3))
-            for wi in range(wave_count):
-                wy = sea_min_y + wi * (sea_area_h / wave_count)
-                phase1 = _rng.random() * 20
-                phase2 = _rng.random() * 40
-                phase3 = _rng.random() * 10
-                amp1 = 3 + _rng.random() * 3
-                amp2 = 1.5 + _rng.random() * 2
-                amp3 = 0.5 + _rng.random() * 1
-                alpha = 0.15 + _rng.random() * 0.15
-                wave_path = skia.Path()
-                wave_path.moveTo(sea_min_x, wy)
-                for wx in range(int(sea_min_x), int(sea_max_x), 8):
-                    dy = (math.sin((wx + phase1) * 0.12) * amp1
-                          + math.sin((wx + phase2) * 0.25) * amp2
-                          + math.sin((wx + phase3) * 0.06) * amp3)
-                    wave_path.lineTo(wx, wy + dy)
-                p = _skia_paint(0.35, 0.55, 0.78, alpha,
-                                style=skia.Paint.kStroke_Style,
-                                stroke_width=1.0 + _rng.random() * 1.2)
-                canvas.drawPath(wave_path, p)
-            # 파도 하이라이트
-            for wi in range(0, wave_count, 3):
-                wy = sea_min_y + wi * (sea_area_h / wave_count) + 2
-                phase = _rng.random() * 15
-                wave_path = skia.Path()
-                wave_path.moveTo(sea_min_x, wy)
-                for wx in range(int(sea_min_x), int(sea_max_x), 10):
-                    dy = math.sin((wx + phase) * 0.10) * 4
-                    wave_path.lineTo(wx, wy + dy)
-                p = _skia_paint(0.50, 0.65, 0.85, 0.10 + _rng.random() * 0.08,
-                                style=skia.Paint.kStroke_Style, stroke_width=0.6)
-                canvas.drawPath(wave_path, p)
+                # 해안 근처 밝은 청록 그라디언트 오버레이 (clip)
+                canvas.save()
+                canvas.clipPath(sea_path)
+                for i in range(len(coast_pixels)):
+                    cpx_c, cpy_c = coast_pixels[i]
+                    p = skia.Paint()
+                    p.setAntiAlias(True)
+                    p.setShader(skia.GradientShader.MakeRadial(
+                        center=(cpx_c, cpy_c), radius=tw * 3.0,
+                        colors=[_skia_rgba(0.28, 0.58, 0.72, 0.55),
+                                _skia_rgba(0.18, 0.42, 0.62, 0.25),
+                                _skia_rgba(0, 0, 0, 0)],
+                        positions=[0, 0.4, 1.0],
+                    ))
+                    canvas.drawRect(skia.Rect(cpx_c - tw * 3, cpy_c - tw * 3,
+                                               cpx_c + tw * 3, cpy_c + tw * 3), p)
 
-            canvas.restore()
+                # 파도 텍스처 (바다 영역 내, clip 안에서)
+                # 바다 방향에 따라 파도 영역 범위 결정
+                _coast_min_x = min(p[0] for p in coast_pixels)
+                _coast_max_x = max(p[0] for p in coast_pixels)
+                _coast_min_y = min(p[1] for p in coast_pixels)
+                _coast_max_y = max(p[1] for p in coast_pixels)
+                if not sea_is_right:
+                    sea_min_x = -10
+                    sea_max_x = _coast_max_x
+                else:
+                    sea_min_x = _coast_min_x
+                    sea_max_x = W + 10
+                sea_min_y = min(-10, _coast_min_y - tw)
+                sea_max_y = max(H + 10, _coast_max_y + tw)
+                sea_area_h = sea_max_y - sea_min_y
+                wave_count = max(20, int(sea_area_h / 3))
+                for wi in range(wave_count):
+                    wy = sea_min_y + wi * (sea_area_h / wave_count)
+                    phase1 = _rng.random() * 20
+                    phase2 = _rng.random() * 40
+                    phase3 = _rng.random() * 10
+                    amp1 = 3 + _rng.random() * 3
+                    amp2 = 1.5 + _rng.random() * 2
+                    amp3 = 0.5 + _rng.random() * 1
+                    alpha = 0.15 + _rng.random() * 0.15
+                    wave_path = skia.Path()
+                    wave_path.moveTo(sea_min_x, wy)
+                    for wx in range(int(sea_min_x), int(sea_max_x), 8):
+                        dy = (math.sin((wx + phase1) * 0.12) * amp1
+                              + math.sin((wx + phase2) * 0.25) * amp2
+                              + math.sin((wx + phase3) * 0.06) * amp3)
+                        wave_path.lineTo(wx, wy + dy)
+                    p = _skia_paint(0.35, 0.55, 0.78, alpha,
+                                    style=skia.Paint.kStroke_Style,
+                                    stroke_width=1.0 + _rng.random() * 1.2)
+                    canvas.drawPath(wave_path, p)
+                # 파도 하이라이트
+                for wi in range(0, wave_count, 3):
+                    wy = sea_min_y + wi * (sea_area_h / wave_count) + 2
+                    phase = _rng.random() * 15
+                    wave_path = skia.Path()
+                    wave_path.moveTo(sea_min_x, wy)
+                    for wx in range(int(sea_min_x), int(sea_max_x), 10):
+                        dy = math.sin((wx + phase) * 0.10) * 4
+                        wave_path.lineTo(wx, wy + dy)
+                    p = _skia_paint(0.50, 0.65, 0.85, 0.10 + _rng.random() * 0.08,
+                                    style=skia.Paint.kStroke_Style, stroke_width=0.6)
+                    canvas.drawPath(wave_path, p)
+
+                canvas.restore()
 
     # ── 2단계-B: 대륙 지형색 채우기 (blob, 아이콘 제외) ──
     render_order = ["plains", "coastline", "swamp", "forest", "mountain"]
