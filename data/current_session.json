@@ -2,7 +2,7 @@
   "active_scenario": "karendel_journey",
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
-  "turn": 21,
+  "turn": 20,
   "chapter": 1,
   "chapter_name": "교역로",
   "party_summary": [
@@ -60,7 +60,7 @@
     "[GM] 사이키가 카렌델까지의 거리를 물었다. 할란이 지형을 보며 설명한다.",
     "[GM] 사이키가 방향을 물었다. 할란이 갈림길 지리를 상세히 설명한다.",
     "[GM] 사이키가 수레 위에서 짧은 휴식. MP 37→40 회복.",
-    "[GM] "
+    "[GM] 사이키가 갈림길 쉼터 정차 여부를 물었다. 할란이 현실적인 이유를 설명한다."
   ],
   "next_objective": "",
   "display_mode": "mobile",
