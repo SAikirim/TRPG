@@ -15,7 +15,8 @@
       "setting": "중세 판타지 숲 던전",
       "estimated_turns": "20~40",
       "tags": ["던전 탐험", "보물 사냥", "몬스터 전투"],
-      "standalone": true
+      "standalone": true,
+      "worldbuilding": "karendel_world"
     },
     {
       "id": "karendel_journey",
@@ -34,7 +35,8 @@
       "tags": ["여행", "교역도시", "보물 감정", "NPC 교류"],
       "standalone": true,
       "prerequisite": "lost_treasure",
-      "prerequisite_required": false
+      "prerequisite_required": false,
+      "worldbuilding": "karendel_world"
     }
   ],
   "default_scenario": "lost_treasure"

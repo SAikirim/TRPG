@@ -66,7 +66,8 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
   ├── Agent [NPC:{name}] → entities/{id}/npcs/npc_{id}.json (NPC 1명당 1개)
   ├── Agent [플레이어]  → entities/{id}/players/player_{id}.json
   ├── Agent [오브젝트]  → entities/{id}/objects/obj_{id}.json
-  └── Agent [웹 반영]   → gm-update API 호출 + 일러스트 생성
+  ├── Agent [웹 반영]   → gm-update API 호출 + 일러스트 생성
+  └── Agent [세계 지도] → worldbuildings/{id}.json 지리 검증 + 지도 갱신
   ↓
 결과 종합 → 나레이션 + 맵 출력 + game_state.json 업데이트 + 저장(git push)
 ```
@@ -113,6 +114,7 @@ data/                     - JSON 데이터 파일
   game_state_initial.json - 초기 게임 상태 템플릿
 entities/{scenario_id}/   - npcs/ players/ objects/ 엔티티 파일
 rulesets/ / scenarios/    - 룰셋/시나리오 카탈로그
+worldbuildings/           - 세계관 파일 카탈로그 (시나리오에서 참조)
 static/                   - 맵, 초상화, 일러스트 이미지
   map.png                 - 전체 맵 (클릭 확대용, ~1000x1000px)
   map_mini.png            - 미니맵 (플레이어 중심 크롭, 사이드바용)
@@ -148,7 +150,7 @@ build_static.py는 HTML 복사 + 데이터 동기화를 수행한다.
 
 ### 세션 로드 상세
 1. `CLAUDE.md` → 2. `python session_validator.py` (상태 검증 + 엔티티 누락 자동 생성)
-3. `data/current_session.json` → 4. `data/worldbuilding.json` → 5. `data/game_state.json`
+3. `data/current_session.json` → 4. `data/worldbuilding.json` (활성 세계관 — worldbuildings/에서 복사됨) → 5. `data/game_state.json`
 6. `entities/{scenario_id}/` (players, npcs, objects)
 7. `data/scenario.json` + `data/rules.json`
 8. Flask 서버 확인 → gm-update로 현재 장면 복원 (배경+NPC 레이어)

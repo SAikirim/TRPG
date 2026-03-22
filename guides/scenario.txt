@@ -3,10 +3,14 @@
 
 새 시나리오 추가
 ===
-1. scenarios/ 에 {scenario_id}.json 파일 생성
-2. scenarios/index.json 에 메타데이터 등록
-3. entities/{scenario_id}/ 디렉토리 생성 후 npcs/players/objects/ 파일 작성
-4. 게임 시작 시 game_state.json 에 scenario_id 지정
+1. 세계관 설계 (세계 지도 먼저):
+   - worldbuildings/ 에 세계관 파일 생성 (terrain + locations + world_pos)
+   - 세계 지도 이미지 생성 (generate_world_map)
+   - 지역/지형 배치를 확정한 뒤 시나리오 작업 시작
+2. scenarios/ 에 {scenario_id}.json 파일 생성
+3. scenarios/index.json 에 메타데이터 등록 (worldbuilding, ruleset 필드 포함)
+4. entities/{scenario_id}/ 디렉토리 생성 후 npcs/players/objects/ 파일 작성
+5. 게임 시작 시 game_state.json 에 scenario_id 지정
 
 새 룰셋 추가
 ===
@@ -106,6 +110,7 @@ default_party 구조
   "recommended_level": 1,
   "recommended_players": 3,
   "ruleset": "fantasy_basic",
+  "worldbuilding": "karendel_world",
   "scenario_file": "scenario.json",
   "initial_state": "game_state_initial.json",
   "available_classes": ["전사", "마법사", "도적", "성직자", "궁수"],

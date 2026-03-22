@@ -12,6 +12,7 @@ from core.worldbuilding_agent import check_and_warn as wb_check
 from core.rules_agent import check_and_warn as rules_check
 from core.scenario_agent import check_and_warn as scenario_check
 from core.npc_agent import check_and_warn as npc_check
+from core.worldmap_agent import check_and_warn as worldmap_check
 
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -419,6 +420,13 @@ def gm_update():
         agent_warnings["npc"] = npc_w
     else:
         gm._log_to_tracker("npc", "NPC 정합성 확인")
+
+    worldmap_w = worldmap_check(game_state=state)
+    if worldmap_w:
+        gm._log_to_tracker("worldmap", f"🗺️ 세계지도 문제 {len(worldmap_w)}건 감지")
+        agent_warnings["worldmap"] = worldmap_w
+    else:
+        gm._log_to_tracker("worldmap", "세계 지도 정합성 확인")
 
     return jsonify({"success": True, "event": event or {}, "turn": state["turn_count"],
                      "illustration": ill_result, "mechanics": mechanics_results,

@@ -266,6 +266,7 @@ def new_game(scenario_id):
         "active_scenario": scenario_id,
         "active_save_slot": 1,
         "ruleset": scenario["scenario_info"].get("ruleset", scenario_entry.get("ruleset", "fantasy_basic")),
+        "worldbuilding": scenario_entry.get("worldbuilding", ""),
         "turn": 0,
         "chapter": 1,
         "chapter_name": chapter_name,
@@ -290,6 +291,9 @@ def new_game(scenario_id):
 
     # 활성 시나리오/룰셋 파일 복사 (scenario.json, rules.json)
     _activate_scenario_files(scenario_entry, scenario_file)
+
+    # 세계관 활성화 (worldbuildings/ → data/worldbuilding.json)
+    _activate_worldbuilding(scenario_entry)
 
     # 맵 생성
     try:
@@ -530,6 +534,36 @@ def _activate_scenario_files(scenario_entry, scenario_file):
     if os.path.exists(ruleset_src):
         shutil.copy2(ruleset_src, rules_dst)
         print(f"  [OK] data/rules.json <- {ruleset_file}")
+
+
+def _activate_worldbuilding(scenario_entry):
+    """시나리오의 세계관 파일을 data/worldbuilding.json에 복사."""
+    wb_id = scenario_entry.get("worldbuilding")
+    if not wb_id:
+        print(f"  [INFO] worldbuilding 미지정 — 기존 data/worldbuilding.json 유지")
+        return
+
+    # worldbuildings/index.json에서 파일 경로 찾기
+    wb_index_path = os.path.join(BASE_DIR, "worldbuildings", "index.json")
+    if os.path.exists(wb_index_path):
+        wb_index = load_json(wb_index_path)
+        wb_entry = next((w for w in wb_index.get("worldbuildings", []) if w["id"] == wb_id), None)
+        if wb_entry:
+            wb_file = wb_entry["file"]
+        else:
+            wb_file = f"worldbuildings/{wb_id}.json"
+    else:
+        wb_file = f"worldbuildings/{wb_id}.json"
+
+    wb_src = os.path.join(BASE_DIR, wb_file)
+    wb_dst = os.path.join(BASE_DIR, "data", "worldbuilding.json")
+
+    if os.path.exists(wb_src):
+        if os.path.abspath(wb_src) != os.path.abspath(wb_dst):
+            shutil.copy2(wb_src, wb_dst)
+            print(f"  [OK] data/worldbuilding.json <- {wb_file}")
+    else:
+        print(f"  [WARN] 세계관 파일 없음: {wb_file}")
 
 
 def _try_restore_scene():

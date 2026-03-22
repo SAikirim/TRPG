@@ -42,7 +42,31 @@ def load_worldbuilding():
 
 
 def save_worldbuilding(wb):
+    """활성 세계관 저장 + 원본 파일 동기화."""
     _save_json(WB_PATH, wb)
+    # 원본 worldbuildings/ 파일에도 동기화
+    try:
+        session_path = os.path.join(BASE_DIR, "data", "current_session.json")
+        if os.path.exists(session_path):
+            session = _load_json(session_path)
+            scenario_id = session.get("active_scenario", "")
+            if scenario_id:
+                index_path = os.path.join(BASE_DIR, "scenarios", "index.json")
+                if os.path.exists(index_path):
+                    index = _load_json(index_path)
+                    entry = next((s for s in index.get("scenarios", []) if s["id"] == scenario_id), None)
+                    if entry and entry.get("worldbuilding"):
+                        wb_id = entry["worldbuilding"]
+                        wb_index_path = os.path.join(BASE_DIR, "worldbuildings", "index.json")
+                        if os.path.exists(wb_index_path):
+                            wb_index = _load_json(wb_index_path)
+                            wb_entry = next((w for w in wb_index.get("worldbuildings", []) if w["id"] == wb_id), None)
+                            if wb_entry:
+                                orig_path = os.path.join(BASE_DIR, wb_entry["file"])
+                                if os.path.exists(os.path.dirname(orig_path)):
+                                    _save_json(orig_path, wb)
+    except Exception:
+        pass  # 동기화 실패해도 활성 파일은 이미 저장됨
 
 
 # ─── 텍스트에서 세계관 요소 감지 ───

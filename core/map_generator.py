@@ -2423,25 +2423,32 @@ def generate_world_map():
     img_w = int(cols * hex_w * 0.75 + hex_w * 0.25 + 60)
     img_h = int(rows * hex_h + hex_h * 0.5 + 80)
 
-    # Cairo surface
+    # ─── Cairo 양피지 배경 ───
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, img_w, img_h)
     ctx = cairo.Context(surface)
     ctx.set_antialias(cairo.ANTIALIAS_BEST)
 
-    # ─── 양피지 배경 ───
+    # 양피지 기본색
     ctx.set_source_rgb(0.82, 0.75, 0.60)
     ctx.rectangle(0, 0, img_w, img_h)
     ctx.fill()
-    # 질감 노이즈 (간단한 점)
+
+    # 양피지 질감 (미세 노이즈)
     import random as _rng
     _rng.seed(42)
-    for _ in range(img_w * img_h // 40):
+    for _ in range(img_w * img_h // 30):
         nx = _rng.randint(0, img_w - 1)
         ny = _rng.randint(0, img_h - 1)
-        v = _rng.uniform(-0.04, 0.04)
-        ctx.set_source_rgba(0.82 + v, 0.75 + v, 0.60 + v, 0.5)
-        ctx.rectangle(nx, ny, 2, 2)
+        v = _rng.uniform(-0.05, 0.05)
+        ctx.set_source_rgba(0.82 + v, 0.75 + v, 0.60 + v, 0.4)
+        ctx.rectangle(nx, ny, _rng.randint(1, 3), _rng.randint(1, 3))
         ctx.fill()
+    # 가장자리 어둡게 (비네팅)
+    for edge_i in range(20):
+        alpha = 0.03 * (20 - edge_i) / 20
+        ctx.set_source_rgba(0.3, 0.25, 0.15, alpha)
+        ctx.rectangle(edge_i, edge_i, img_w - edge_i*2, img_h - edge_i*2)
+        ctx.stroke()
 
     def hex_center(wx, wy):
         """world 좌표 → 픽셀 중심"""
@@ -2494,23 +2501,51 @@ def generate_world_map():
         hex_color = terrain_hex_colors.get(ftype)
 
         if ftype == "river" and "path" in feat:
-            # 강: 부드러운 곡선
+            # 강: 베지어 곡선으로 부드럽게
             path_pts = [hex_center(c[0], c[1]) for c in feat["path"]]
             if len(path_pts) >= 2:
-                ctx.set_source_rgba(0.22, 0.40, 0.65, 0.8)
-                ctx.set_line_width(4)
+                # 메인 강줄기
+                ctx.set_source_rgba(0.20, 0.38, 0.62, 0.85)
+                ctx.set_line_width(5)
                 ctx.set_line_cap(cairo.LINE_CAP_ROUND)
                 ctx.set_line_join(cairo.LINE_JOIN_ROUND)
                 ctx.move_to(*path_pts[0])
-                for pt in path_pts[1:]:
-                    ctx.line_to(*pt)
+                for i in range(1, len(path_pts)):
+                    # 이전 점과 현재 점의 중간을 제어점으로 사용
+                    prev = path_pts[i - 1]
+                    curr = path_pts[i]
+                    mid_x = (prev[0] + curr[0]) / 2
+                    mid_y = (prev[1] + curr[1]) / 2
+                    # 곡률 추가 (수직 방향으로 오프셋)
+                    dx = curr[0] - prev[0]
+                    dy = curr[1] - prev[1]
+                    offset = _rng.uniform(-15, 15)
+                    cp1x = mid_x - dy * 0.2 + offset
+                    cp1y = mid_y + dx * 0.2 + offset * 0.5
+                    ctx.curve_to(cp1x, cp1y, cp1x, cp1y, curr[0], curr[1])
+                ctx.stroke()
+                # 강 하이라이트 (얇은 밝은 선)
+                ctx.set_source_rgba(0.35, 0.55, 0.80, 0.3)
+                ctx.set_line_width(2)
+                ctx.move_to(path_pts[0][0] + 2, path_pts[0][1] - 1)
+                for i in range(1, len(path_pts)):
+                    prev = path_pts[i - 1]
+                    curr = path_pts[i]
+                    mid_x = (prev[0] + curr[0]) / 2
+                    mid_y = (prev[1] + curr[1]) / 2
+                    dx = curr[0] - prev[0]
+                    dy = curr[1] - prev[1]
+                    offset = _rng.uniform(-10, 10)
+                    cp1x = mid_x - dy * 0.15 + offset
+                    cp1y = mid_y + dx * 0.15 + offset * 0.3
+                    ctx.curve_to(cp1x, cp1y, cp1x, cp1y, curr[0] + 2, curr[1] - 1)
                 ctx.stroke()
                 # 강 이름
                 mid = path_pts[len(path_pts) // 2]
-                ctx.set_source_rgba(0.15, 0.30, 0.55, 0.9)
+                ctx.set_source_rgba(0.12, 0.25, 0.50, 0.95)
                 ctx.select_font_face("Malgun Gothic", cairo.FONT_SLANT_ITALIC, cairo.FONT_WEIGHT_BOLD)
-                ctx.set_font_size(13)
-                ctx.move_to(mid[0] + 8, mid[1] - 6)
+                ctx.set_font_size(14)
+                ctx.move_to(mid[0] + 10, mid[1] - 8)
                 ctx.show_text(feat.get("name", ""))
 
         elif hex_color and "coords" in feat:
@@ -2587,7 +2622,58 @@ def generate_world_map():
                 ctx.move_to(tx - te.width / 2, ty + 5)
                 ctx.show_text(feat["name"])
 
-    # ─── 도로 연결선 (점선) ───
+    # ─── 해안선 (바다와 육지 경계) ───
+    sea_coords = set()
+    for feat in terrain.get("features", []):
+        if feat.get("type") == "sea" and "coords" in feat:
+            for c in feat["coords"]:
+                sea_coords.add((c[0], c[1]))
+
+    if sea_coords:
+        ctx.set_source_rgba(0.18, 0.35, 0.58, 0.9)
+        ctx.set_line_width(2.5)
+        ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+        # 각 바다 헥스의 6변을 확인, 인접이 바다가 아니면 해안선
+        hex_neighbors = [
+            (1, 0), (-1, 0), (0, 1), (0, -1), (1, -1), (-1, 1)
+        ]
+        drawn_edges = set()
+        for sx, sy in sea_coords:
+            cx, cy = hex_center(sx, sy)
+            for i in range(6):
+                angle1 = _math.pi / 180 * (60 * i - 30)
+                angle2 = _math.pi / 180 * (60 * (i + 1) - 30)
+                # 인접 헥스 좌표 계산 (홀짝 열에 따라 다름)
+                if sx % 2 == 0:
+                    adj_offsets = [(1, 0), (0, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
+                else:
+                    adj_offsets = [(1, 1), (0, 1), (-1, 1), (-1, 0), (0, -1), (1, 0)]
+                adj_x = sx + adj_offsets[i][0]
+                adj_y = sy + adj_offsets[i][1]
+                if (adj_x, adj_y) not in sea_coords:
+                    # 이 변은 해안선
+                    hx1 = cx + (hex_size - 1) * _math.cos(angle1)
+                    hy1 = cy + (hex_size - 1) * _math.sin(angle1)
+                    hx2 = cx + (hex_size - 1) * _math.cos(angle2)
+                    hy2 = cy + (hex_size - 1) * _math.sin(angle2)
+                    edge_key = (round(hx1), round(hy1), round(hx2), round(hy2))
+                    if edge_key not in drawn_edges:
+                        drawn_edges.add(edge_key)
+                        # 곡선으로 해안선 그리기
+                        mid_x = (hx1 + hx2) / 2
+                        mid_y = (hy1 + hy2) / 2
+                        # 육지 방향으로 약간 볼록하게
+                        dx = hx2 - hx1
+                        dy = hy2 - hy1
+                        bulge = _rng.uniform(2, 5)
+                        cpx = mid_x + dy * 0.15 * bulge / 3
+                        cpy = mid_y - dx * 0.15 * bulge / 3
+                        ctx.move_to(hx1, hy1)
+                        ctx.curve_to(cpx, cpy, cpx, cpy, hx2, hy2)
+                        ctx.stroke()
+
+    # ─── 도로 연결선 (메인길/샛길 구분) ───
+    main_types = {"village", "trade_city", "port_village"}
     drawn_connections = set()
     for loc_id, loc in placed.items():
         for target_name, conn in loc["connections"].items():
@@ -2605,13 +2691,52 @@ def generate_world_map():
 
             x1, y1 = hex_center(loc["x"], loc["y"])
             x2, y2 = hex_center(placed[target_id]["x"], placed[target_id]["y"])
-            ctx.set_source_rgba(0.45, 0.38, 0.28, 0.7)
-            ctx.set_line_width(2)
-            ctx.set_dash([6, 4])
-            ctx.move_to(x1, y1)
-            ctx.line_to(x2, y2)
-            ctx.stroke()
-            ctx.set_dash([])
+
+            # 메인길: 양쪽 모두 주요 지역 (마을/도시/항구)
+            is_main = loc["type"] in main_types and placed[target_id]["type"] in main_types
+            # 또는 한쪽이라도 trade_city면 메인
+            if loc["type"] == "trade_city" or placed[target_id]["type"] == "trade_city":
+                is_main = True
+
+            # 곡선 도로 (직선 대신 약간 휘어지게)
+            mid_x = (x1 + x2) / 2
+            mid_y = (y1 + y2) / 2
+            dx = x2 - x1
+            dy = y2 - y1
+            curve_offset = _rng.uniform(-12, 12)
+            cpx = mid_x - dy * 0.08 + curve_offset
+            cpy = mid_y + dx * 0.08
+
+            ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+            if is_main:
+                # 메인길: 굵고 진한 실선
+                ctx.set_source_rgba(0.40, 0.32, 0.22, 0.8)
+                ctx.set_line_width(3.5)
+                ctx.set_dash([])
+                ctx.move_to(x1, y1)
+                ctx.curve_to(cpx, cpy, cpx, cpy, x2, y2)
+                ctx.stroke()
+                # 테두리
+                ctx.set_source_rgba(0.30, 0.24, 0.15, 0.4)
+                ctx.set_line_width(5)
+                ctx.move_to(x1, y1)
+                ctx.curve_to(cpx, cpy, cpx, cpy, x2, y2)
+                ctx.stroke()
+                # 메인 다시 (테두리 위에)
+                ctx.set_source_rgba(0.45, 0.38, 0.28, 0.85)
+                ctx.set_line_width(3)
+                ctx.move_to(x1, y1)
+                ctx.curve_to(cpx, cpy, cpx, cpy, x2, y2)
+                ctx.stroke()
+            else:
+                # 샛길: 가늘고 옅은 점선
+                ctx.set_source_rgba(0.50, 0.42, 0.32, 0.5)
+                ctx.set_line_width(1.5)
+                ctx.set_dash([4, 6])
+                ctx.move_to(x1, y1)
+                ctx.curve_to(cpx, cpy, cpx, cpy, x2, y2)
+                ctx.stroke()
+                ctx.set_dash([])
 
     # ─── 지역 마커 ───
     # 겹침 방지용

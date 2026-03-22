@@ -99,6 +99,7 @@ def log_step(tag, message):
         "worldbuilding": "🌍",
         "rules": "⚖️",
         "scenario": "📜",
+        "worldmap": "🗺️",
     }
     icon = icons.get(tag, "▸")
     print(f"  {icon} [{tag}] {message}")
