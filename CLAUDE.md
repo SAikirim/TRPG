@@ -17,6 +17,8 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - ❌ 나레이션과 시스템 로그가 섞이는 것 (Phase 분리 필수)
 - ❌ 배경 위 인물 레이어에 불투명 배경 사용
 - ❌ 동일 인물의 외형이 장면마다 바뀌는 것
+- ❌ GM이 에이전트를 거치지 않고 직접 판단하는 것 (세계관/룰/NPC 관련)
+- ❌ show_dice_result: false인데 나레이션에 판정 수치를 노출하는 것
 
 ### 필수 자동화 (코드로 동작)
 - ✅ Flask 시작/로드 시 `restore_scene()` → 배경 자동 복원
@@ -27,6 +29,16 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - ✅ 저장 시 docs/ 자동 동기화 (GitHub Pages) — build_static.py가 HTML 복사 + 데이터(JSON, 이미지) 동기화
 - ✅ NPC 엔티티 자동 생성 (check_npcs)
 - ✅ 맵 장소별 자동 전환 (current_location → worldbuilding.json)
+
+### 매 턴 필수 (GM이 반드시 지켜야 함)
+- ❗ NPC 대사는 NPC Agent가 생성한다 — GM이 직접 쓰지 않는다
+- ❗ 판정은 룰 Agent가 처리한다 — GM이 직접 주사위를 굴리지 않는다
+- ❗ show_dice_result가 false면 나레이션에 판정 수치를 절대 노출하지 않는다
+- ❗ 위치 변경 시 배경 일러스트를 반드시 교체한다 (시간대도 반영: 낮/밤/새벽)
+- ❗ 나레이션에 개별 묘사된 NPC는 game_state에 등록한다 (또는 배경 묘사로 처리)
+- ❗ 나레이션과 시스템 출력을 섞지 않는다 — 나레이션은 굵게 구분하여 출력
+- ❗ 새 설정(지명/NPC/경로)은 에이전트에 확인 후 나레이션에 포함한다
+- ❗ 이벤트 로그에 잘못된 정보가 발견되면 즉시 수정한다
 
 ---
 
