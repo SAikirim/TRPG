@@ -735,13 +735,21 @@ def generate_world_map():
     skia_bg_cache_path = os.path.join(world_map_dir, "background_skia.webp")
     sd_cache_path = os.path.join(world_map_dir, "background_sd.webp")
 
-    # 배경 우선순위: SD 캐시 > Skia 캐시 > 새로 생성
+    # SD 설정 확인
+    try:
+        _session_path = os.path.join(BASE_DIR, "data", "current_session.json")
+        with open(_session_path, "r", encoding="utf-8") as f:
+            _session = json.load(f)
+        _sd_enabled = _session.get("sd_illustration", True)
+    except Exception:
+        _sd_enabled = True
+
+    # 배경 우선순위: SD 캐시(SD ON일 때만) > Skia 캐시 > 새로 생성
     cached_bg = None
     _has_sd_bg = False
-    if os.path.exists(sd_cache_path):
+    if _sd_enabled and os.path.exists(sd_cache_path):
         # RGB로 로드 후 불투명 RGBA로 변환 (알파 255) — 반투명 방지
         _sd_img = Image.open(sd_cache_path).convert("RGB").resize((W, H), Image.LANCZOS)
-        from PIL import ImageOps
         cached_bg = _sd_img.convert("RGBA")  # RGB→RGBA: 알파가 자동으로 255(불투명)
         _has_sd_bg = True
     elif os.path.exists(skia_bg_cache_path):
@@ -999,15 +1007,11 @@ def generate_world_map():
         except Exception:
             pass
 
-    # ─── SD 캐시 배경 적용 (SD 캐시가 있으면 배경 위에 오버레이) ───
-    # _has_sd_bg=True이면 이미 877행에서 SD를 그렸으므로 스킵
-    use_sd_enhancement = False
-    sd_bg = None
-
-    if not _has_sd_bg and cached_bg is not None and os.path.exists(sd_cache_path):
-        sd_bg = cached_bg
-
-    if use_sd_enhancement and sd_bg is None:
+    # ─── SD 새 생성 (캐시 없고 SD ON일 때) ───
+    # _has_sd_bg=True → 이미 895행에서 SD 캐시를 그렸으므로 패스
+    # _has_sd_bg=False, _sd_enabled=True → SD 새 생성 시도
+    # _has_sd_bg=False, _sd_enabled=False → 패스
+    if not _has_sd_bg and _sd_enabled:
         try:
             from core.sd_generator import is_sd_enabled
             if is_sd_enabled():
@@ -1016,50 +1020,44 @@ def generate_world_map():
                 import io
                 SD_API_URL = "http://127.0.0.1:7860"
 
-                if os.path.exists(sd_cache_path):
-                    sd_bg = Image.open(sd_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
-                else:
-                    _sd_input = Image.open(skia_bg_cache_path).convert("RGB")
-                    buffered = io.BytesIO()
-                    _sd_input.save(buffered, format="PNG")
-                    img_b64 = base64.b64encode(buffered.getvalue()).decode()
+                _sd_input = Image.open(skia_bg_cache_path).convert("RGB")
+                buffered = io.BytesIO()
+                _sd_input.save(buffered, format="PNG")
+                img_b64 = base64.b64encode(buffered.getvalue()).decode()
 
-                    prompt = (
-                        "fantasy map, <lora:AZovyaRPGArtistToolsLORAV2art:0.6>, "
-                        "medieval cartography style, parchment texture, hand painted, "
-                        "watercolor terrain, top down birds eye view, aged paper"
-                    )
-                    negative_prompt = (
-                        "animals, birds, people, characters, faces, 3d render, "
-                        "realistic photo, modern, text, labels, blurry, low quality, close up"
-                    )
+                prompt = (
+                    "fantasy map, <lora:AZovyaRPGArtistToolsLORAV2art:0.6>, "
+                    "medieval cartography style, parchment texture, hand painted, "
+                    "watercolor terrain, top down birds eye view, aged paper"
+                )
+                negative_prompt = (
+                    "animals, birds, people, characters, faces, 3d render, "
+                    "realistic photo, modern, text, labels, blurry, low quality, close up"
+                )
 
-                    payload = {
-                        "init_images": [img_b64],
-                        "prompt": prompt,
-                        "negative_prompt": negative_prompt,
-                        "steps": 25,
-                        "sampler_name": "DPM++ 2M Karras",
-                        "width": 768,
-                        "height": 768,
-                        "cfg_scale": 8,
-                        "denoising_strength": 0.45,
-                    }
+                payload = {
+                    "init_images": [img_b64],
+                    "prompt": prompt,
+                    "negative_prompt": negative_prompt,
+                    "steps": 25,
+                    "sampler_name": "DPM++ 2M Karras",
+                    "width": 768,
+                    "height": 768,
+                    "cfg_scale": 8,
+                    "denoising_strength": 0.45,
+                }
 
-                    resp = requests.post(f"{SD_API_URL}/sdapi/v1/img2img", json=payload, timeout=300)
-                    resp.raise_for_status()
+                resp = requests.post(f"{SD_API_URL}/sdapi/v1/img2img", json=payload, timeout=300)
+                resp.raise_for_status()
 
-                    result = resp.json()
-                    if result.get("images"):
-                        img_data = base64.b64decode(result["images"][0])
-                        sd_bg = Image.open(io.BytesIO(img_data)).convert("RGBA").resize((W, H), Image.LANCZOS)
-                        sd_bg.save(sd_cache_path, "WEBP", quality=90)
+                result = resp.json()
+                if result.get("images"):
+                    img_data = base64.b64decode(result["images"][0])
+                    sd_bg = Image.open(io.BytesIO(img_data)).convert("RGBA").resize((W, H), Image.LANCZOS)
+                    sd_bg.save(sd_cache_path, "WEBP", quality=90)
+                    canvas.drawImage(_pil_to_skia_image(sd_bg), 0, 0)
         except Exception:
             pass
-
-    # SD 배경을 Skia surface 위에 오버레이
-    if sd_bg:
-        canvas.drawImage(_pil_to_skia_image(sd_bg), 0, 0)
 
     # ─── 3단계: 공통 오버레이 (도로/마커/라벨) ───
 
