@@ -190,6 +190,99 @@ def check_and_warn(narrative="", game_state=None):
     # 방향 충돌 등 세계관 경고
     warnings.extend(result.get("warnings", []))
 
+    # ─── NPC 경로 합리성 검증 ───
+    if game_state:
+        import math as _math
+        wb = load_worldbuilding()
+        locations = wb.get("locations", {})
+        loc_names = {v.get("name", ""): k for k, v in locations.items()}
+
+        scenario_id = game_state.get("game_info", {}).get("scenario_id", "")
+        npcs_dir = os.path.join(BASE_DIR, "entities", scenario_id, "npcs")
+        if os.path.isdir(npcs_dir):
+            for fname in os.listdir(npcs_dir):
+                if not fname.endswith(".json"):
+                    continue
+                try:
+                    npc = _load_json(os.path.join(npcs_dir, fname))
+                except Exception:
+                    continue
+                if not npc:
+                    continue
+                travel = npc.get("travel")
+                if not travel:
+                    continue
+
+                origin = travel.get("origin", "")
+                destination = travel.get("destination", "")
+                met_at = travel.get("met_party_at", "")
+                route = travel.get("route", [])
+                npc_name = npc.get("name", fname)
+
+                if not origin or not destination:
+                    continue
+
+                # 검증 1: origin이 등록 지역인지
+                if origin not in loc_names:
+                    warnings.append(
+                        f"🌍 NPC '{npc_name}' 출발지 '{origin}'이 "
+                        f"worldbuilding에 미등록 — 등록 필요")
+
+                # 검증 2: destination이 등록 지역인지
+                if destination not in loc_names:
+                    warnings.append(
+                        f"🌍 NPC '{npc_name}' 목적지 '{destination}'이 "
+                        f"worldbuilding에 미등록 — 등록 필요")
+
+                # 검증 3: route 각 구간이 connections로 연결되어 있는지
+                if len(route) >= 2:
+                    for i in range(len(route) - 1):
+                        from_name = route[i]
+                        to_name = route[i + 1]
+                        from_id = loc_names.get(from_name)
+                        if from_id:
+                            from_loc = locations.get(from_id, {})
+                            conn_names = set(from_loc.get("connections", {}).keys())
+                            if to_name not in conn_names:
+                                warnings.append(
+                                    f"🌍 NPC '{npc_name}' 경로 끊김: "
+                                    f"'{from_name}' → '{to_name}' 연결(connection)이 없음")
+
+                # 검증 4: met_party_at이 route에 포함되는지
+                if met_at and route and met_at not in route:
+                    warnings.append(
+                        f"🌍 NPC '{npc_name}'의 경로 모순: "
+                        f"출발지 '{origin}' → 목적지 '{destination}' "
+                        f"경로 {route}에 만남 장소 '{met_at}'이 포함되지 않음 — "
+                        f"경유 이유 확인 또는 출발지/경로 수정 필요")
+
+                # 검증 5: 우회율 (met_at 경유가 직선 대비 과도한지)
+                if met_at and destination and met_at != destination:
+                    origin_id = loc_names.get(origin)
+                    met_id = loc_names.get(met_at)
+                    dest_id = loc_names.get(destination)
+
+                    if origin_id and met_id and dest_id:
+                        origin_wp = locations.get(origin_id, {}).get("world_pos")
+                        met_wp = locations.get(met_id, {}).get("world_pos")
+                        dest_wp = locations.get(dest_id, {}).get("world_pos")
+
+                        if origin_wp and met_wp and dest_wp:
+                            direct_dist = _math.sqrt(
+                                (dest_wp[0]-origin_wp[0])**2 + (dest_wp[1]-origin_wp[1])**2)
+                            to_met_dist = _math.sqrt(
+                                (met_wp[0]-origin_wp[0])**2 + (met_wp[1]-origin_wp[1])**2)
+                            met_to_dest = _math.sqrt(
+                                (dest_wp[0]-met_wp[0])**2 + (dest_wp[1]-met_wp[1])**2)
+
+                            detour_ratio = (to_met_dist + met_to_dest) / direct_dist if direct_dist > 0 else 1
+                            if detour_ratio > 1.8:
+                                warnings.append(
+                                    f"🌍 NPC '{npc_name}' 경로 우회 의심: "
+                                    f"'{origin}'→'{destination}' 직선 {direct_dist:.1f}칸인데 "
+                                    f"'{met_at}' 경유 시 {to_met_dist + met_to_dest:.1f}칸 "
+                                    f"(우회율 {detour_ratio:.1f}배) — 경유 사유 확인 필요")
+
     return warnings
 
 

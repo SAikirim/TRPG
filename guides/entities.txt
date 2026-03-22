@@ -114,6 +114,23 @@ Agent [세계관] 상세
   - GM 나레이션 시: 새 설정이 언급되면 자동 감지 -> 등록
   - 세션 시작 시: worldbuilding.json 읽어 세계관 컨텍스트 복원
 
+NPC travel (이동 정보)
+===
+NPC가 여행 중인 경우 travel 필드를 추가한다. 세계관 에이전트가 경로 합리성을 자동 검증한다.
+
+필드:
+- origin: 출발지 이름 (worldbuilding.json의 location name)
+- destination: 목적지 이름
+- route: 계획된 경로 (경유지 이름 배열)
+- current_segment: 현재 이동 중인 구간
+- met_party_at: 파티와 만난 장소
+- travel_mode: 이동 수단 (walk/cart/horse)
+
+검증 항목:
+- met_party_at이 route에 포함되는지 (경로상에서 만났는지)
+- origin→destination 경로가 connections상 존재하는지
+- 우회율이 1.8배를 초과하면 경고
+
 Agent [웹 반영] 상세
 ===
 - GM 나레이션 시 자동으로 gm-update API 호출 (백그라운드)

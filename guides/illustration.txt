@@ -96,6 +96,32 @@ Cairo 폴백 (SD OFF 시)
 - 배경: static/illustrations/pixel/ (forest.png, dungeon.png, treasure.png)
 - 초상화: static/portraits/pixel/ (player_1.png ~ player_3.png)
 
+세계 지도 생성 규칙
+===
+generate_world_map() 함수가 세계 지도를 자동 생성한다.
+
+생성 흐름:
+1. worldbuilding.json에서 terrain + locations + world_info 로드
+2. Cairo로 지형별 그라디언트 색상맵 생성 (가우시안 블러 적용)
+3. SD img2img로 판타지 텍스처 변환 시도 (캐시: world_map_bg.webp)
+4. SD 실패 시 Cairo 양피지 + 헥스 그리드 폴백
+5. Cairo 오버레이: 강(베지어 곡선) + 도로(메인/샛길) + 지역 마커 + 라벨 + 현재 위치
+6. 장식: 세계 이름 + 테두리 + 나침반
+
+세계 지도 제목:
+- worldbuilding.json의 world_info.name을 읽어 "{이름} 세계 지도"로 표시
+- name이 없으면 "세계 지도"로 폴백
+
+자동 생성 트리거:
+- Flask 서버 시작 시 (app.py)
+- gm-update 호출 시 (세계관 변경 반영)
+- 수동: python -c "from core.map_generator import generate_world_map; generate_world_map()"
+
+SD 배경 캐시:
+- static/world_map_bg.webp에 SD 생성 배경을 캐시
+- 좌표/지형이 변경되면 캐시를 삭제해야 재생성됨
+- 캐시 삭제: rm static/world_map_bg.webp
+
 AnimateDiff
 ===
 - 모션 모듈: extensions/sd-webui-animatediff/model/mm_sd_v15_v2.ckpt (1.7GB)

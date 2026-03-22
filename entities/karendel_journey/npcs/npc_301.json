@@ -36,6 +36,15 @@
     "할란": "아버지. 걱정되지만 존경한다.",
     "사이키": "구해준 모험가. 호감."
   },
+  "travel": {
+    "origin": "남쪽 해안 마을 (맵 외곽)",
+    "destination": "카렌델",
+    "route": ["교역로 (카렌델 방면)", "갈림길 쉼터", "카렌델"],
+    "current_segment": "교역로 (카렌델 방면)",
+    "met_party_at": "교역로 (카렌델 방면)",
+    "travel_mode": "cart",
+    "origin_note": "에르시아 남쪽 해안의 작은 항구 마을. 현재 지도 범위 밖. 직물과 건어물을 싣고 교역로를 따라 북상."
+  },
   "memory": {
     "dialogue_history": [],
     "key_events": [

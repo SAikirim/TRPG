@@ -2854,12 +2854,13 @@ def generate_world_map():
 
     # 제목
     ctx.set_source_rgba(0.88, 0.82, 0.70, 0.9)
-    ctx.rectangle(16, 12, 150, 32); ctx.fill()
+    ctx.rectangle(16, 12, 220, 32); ctx.fill()
     ctx.set_source_rgb(0.35, 0.28, 0.18); ctx.set_line_width(1.5)
-    ctx.rectangle(16, 12, 150, 32); ctx.stroke()
+    ctx.rectangle(16, 12, 220, 32); ctx.stroke()
     ctx.select_font_face("Malgun Gothic", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
     ctx.set_font_size(22); ctx.set_source_rgb(0.18, 0.12, 0.05)
-    ctx.move_to(28, 36); ctx.show_text("세계 지도")
+    world_name = wb.get("world_info", {}).get("name", "세계 지도")
+    ctx.move_to(28, 36); ctx.show_text(f"{world_name} 세계 지도")
 
     # 나침반
     ncx, ncy = W-45, H-45; nr = 22
