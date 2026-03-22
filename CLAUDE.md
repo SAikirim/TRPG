@@ -80,6 +80,31 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 
 > 상세: guides/gm_rules.txt 참조
 
+### GM 턴 템플릿 (매 턴 이 순서를 따른다)
+
+```
+[1단계] 에이전트 호출
+  → Agent [NPC:{이름}] 대사 생성 (해당 NPC마다 병렬)
+  → Agent [룰] 판정 필요? (필요 시 game_mechanics.py 실행)
+  → Agent [세계관/시나리오/세계지도] 필요 시 확인
+  → 결과 수집 대기
+
+[2단계] 나레이션 작성
+  → show_dice_result 확인 (false면 수치 노출 금지)
+  → 에이전트 결과를 종합하여 나레이션 작성
+  → 유저 캐릭터 대사/감정 작성 금지
+
+[3단계] Agent [시스템 반영]에게 전달 (백그라운드)
+  전달 내용:
+  - 나레이션 텍스트
+  - 위치 변경 여부 + 새 위치
+  - 시간대 (낮/밤/새벽)
+  - NPC/플레이어 상태 변경
+  - 배경 일러스트 교체 필요 여부
+
+[나레이션 출력] — 굵게 구분하여 터미널에 출력
+```
+
 ---
 
 ## Agent 분담 구조
@@ -168,11 +193,12 @@ build_static.py는 HTML 복사 + 데이터 동기화를 수행한다.
 ---
 
 ## 세션 시작 체크리스트
-1. CLAUDE.md 읽기 (이 파일)
+1. CLAUDE.md 읽기 (이 파일) — 특히 "핵심 규칙 요약" + "매 턴 필수" + "GM 턴 템플릿" 숙지
 2. `python session_validator.py` 실행 — 상태 검증 + 자동 수정
 3. `data/current_session.json` → `data/worldbuilding.json` → `data/game_state.json` 읽기
-4. Flask 서버 확인 → 웹 UI 장면 복원 (자동: `restore_scene`)
-5. 유저에게 현재 상황 요약 → 게임 이어가기
+4. `guides/gm_rules.txt` 읽기 — 주사위 표시, NPC 등록, 에이전트 규칙 확인
+5. Flask 서버 확인 → 웹 UI 장면 복원 (자동: `restore_scene`)
+6. 유저에게 현재 상황 요약 → 게임 이어가기
 
 > 상세 로드 절차: 아래 "세션 로드 상세" 참조
 
