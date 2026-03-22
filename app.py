@@ -94,8 +94,11 @@ def _add_npc_layers(state):
 
 
 def load_game_state():
-    with open(GAME_STATE_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(GAME_STATE_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        return {"error": str(e), "players": [], "npcs": [], "map": {}, "events": [], "current_scene": {}}
 
 
 save_manager = SaveManager()
@@ -156,25 +159,27 @@ def restore_scene():
         pass
 
 
-# Generate world map on startup
-try:
-    from core.map_generator import generate_world_map
-    generate_world_map()
-except Exception:
-    pass
+def _startup_init():
+    """서버 시작 시 초기화 — import만으로는 실행되지 않음."""
+    # Generate world map on startup (4단계 파이프라인)
+    try:
+        from core.world_map import generate_world_map_pipeline
+        generate_world_map_pipeline()
+    except Exception:
+        pass
 
-# Generate initial map and restore scene on startup
-update_map_image()
-restore_scene()
+    # Generate initial map and restore scene on startup
+    update_map_image()
+    restore_scene()
 
-# 초상화 배경 자동 제거 (투명 아닌 초상화 수정)
-try:
-    from core.sd_generator import remove_all_portrait_backgrounds
-    bg_result = remove_all_portrait_backgrounds()
-    if bg_result["processed"] > 0:
-        print(f"  [OK] 초상화 배경 제거: {bg_result['processed']}장")
-except Exception:
-    pass
+    # 초상화 배경 자동 제거 (투명 아닌 초상화 수정)
+    try:
+        from core.sd_generator import remove_all_portrait_backgrounds
+        bg_result = remove_all_portrait_backgrounds()
+        if bg_result["processed"] > 0:
+            print(f"  [OK] 초상화 배경 제거: {bg_result['processed']}장")
+    except Exception:
+        pass
 
 
 @app.route("/")
@@ -411,10 +416,10 @@ def gm_update():
     gm._log_to_tracker("state", "game_state 저장 + 엔티티 동기화")
     update_map_image()
 
-    # 월드맵 갱신 (세계관 변경 반영)
+    # 월드맵 갱신 (세계관 변경 반영 — 파이프라인)
     try:
-        from core.map_generator import generate_world_map
-        generate_world_map()
+        from core.world_map import generate_world_map_pipeline
+        generate_world_map_pipeline()
     except Exception:
         pass
 
@@ -466,10 +471,26 @@ def gm_update():
 @app.route("/api/world-map", methods=["POST"])
 def regenerate_world_map():
     try:
-        from core.map_generator import generate_world_map
-        path = generate_world_map()
+        from core.world_map import generate_world_map_pipeline
+        path = generate_world_map_pipeline()
         if path:
             # 경로에서 static/ 이하 상대경로 추출
+            rel = path.replace("\\", "/")
+            idx = rel.find("static/")
+            web_path = "/" + rel[idx:] if idx >= 0 else "/static/maps/world/world_map.png"
+            return jsonify({"success": True, "path": web_path})
+        return jsonify({"success": False, "reason": "No locations with world_pos"})
+    except Exception as e:
+        return jsonify({"success": False, "reason": str(e)})
+
+
+@app.route("/api/world-map/regenerate", methods=["POST"])
+def regenerate_world_map_full():
+    """전체 파이프라인 강제 재실행 (모든 캐시 무시)."""
+    try:
+        from core.world_map import generate_world_map_pipeline
+        path = generate_world_map_pipeline(force_regenerate=True)
+        if path:
             rel = path.replace("\\", "/")
             idx = rel.find("static/")
             web_path = "/" + rel[idx:] if idx >= 0 else "/static/maps/world/world_map.png"
@@ -573,41 +594,66 @@ def update_settings():
 @app.route("/api/worldbuilding", methods=["GET"])
 def get_worldbuilding():
     wb_path = os.path.join(BASE_DIR, "data", "worldbuilding.json")
-    with open(wb_path, "r", encoding="utf-8") as f:
-        wb = json.load(f)
-    return jsonify(wb)
+    try:
+        with open(wb_path, "r", encoding="utf-8") as f:
+            wb = json.load(f)
+        return jsonify(wb)
+    except FileNotFoundError:
+        return jsonify({"error": "파일 없음"}), 404
+    except json.JSONDecodeError:
+        return jsonify({"error": "JSON 파싱 실패"}), 500
 
 
 @app.route("/api/items", methods=["GET"])
 def get_items():
     items_path = os.path.join(BASE_DIR, "data", "items.json")
-    with open(items_path, "r", encoding="utf-8") as f:
-        items = json.load(f)
-    return jsonify(items)
+    try:
+        with open(items_path, "r", encoding="utf-8") as f:
+            items = json.load(f)
+        return jsonify(items)
+    except FileNotFoundError:
+        return jsonify({"error": "파일 없음"}), 404
+    except json.JSONDecodeError:
+        return jsonify({"error": "JSON 파싱 실패"}), 500
 
 
 @app.route("/api/skills", methods=["GET"])
 def get_skills():
     skills_path = os.path.join(BASE_DIR, "data", "skills.json")
-    with open(skills_path, "r", encoding="utf-8") as f:
-        skills = json.load(f)
-    return jsonify(skills)
+    try:
+        with open(skills_path, "r", encoding="utf-8") as f:
+            skills = json.load(f)
+        return jsonify(skills)
+    except FileNotFoundError:
+        return jsonify({"error": "파일 없음"}), 404
+    except json.JSONDecodeError:
+        return jsonify({"error": "JSON 파싱 실패"}), 500
 
 
 @app.route("/api/rules", methods=["GET"])
 def get_rules():
     rules_path = os.path.join(BASE_DIR, "data", "rules.json")
-    with open(rules_path, "r", encoding="utf-8") as f:
-        rules = json.load(f)
-    return jsonify(rules)
+    try:
+        with open(rules_path, "r", encoding="utf-8") as f:
+            rules = json.load(f)
+        return jsonify(rules)
+    except FileNotFoundError:
+        return jsonify({"error": "파일 없음"}), 404
+    except json.JSONDecodeError:
+        return jsonify({"error": "JSON 파싱 실패"}), 500
 
 
 @app.route("/api/scenario", methods=["GET"])
 def get_scenario():
     scenario_path = os.path.join(BASE_DIR, "data", "scenario.json")
-    with open(scenario_path, "r", encoding="utf-8") as f:
-        scenario = json.load(f)
-    return jsonify(scenario)
+    try:
+        with open(scenario_path, "r", encoding="utf-8") as f:
+            scenario = json.load(f)
+        return jsonify(scenario)
+    except FileNotFoundError:
+        return jsonify({"error": "파일 없음"}), 404
+    except json.JSONDecodeError:
+        return jsonify({"error": "JSON 파싱 실패"}), 500
 
 
 @app.route("/api/reset-game", methods=["POST"])
@@ -670,29 +716,49 @@ def get_progress(scenario_id):
 @app.route("/api/status-effects", methods=["GET"])
 def get_status_effects():
     path = os.path.join(BASE_DIR, "data", "status_effects.json")
-    with open(path, "r", encoding="utf-8") as f:
-        return jsonify(json.load(f))
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return jsonify(json.load(f))
+    except FileNotFoundError:
+        return jsonify({"error": "파일 없음"}), 404
+    except json.JSONDecodeError:
+        return jsonify({"error": "JSON 파싱 실패"}), 500
 
 
 @app.route("/api/creatures", methods=["GET"])
 def get_creatures():
     path = os.path.join(BASE_DIR, "data", "creature_templates.json")
-    with open(path, "r", encoding="utf-8") as f:
-        return jsonify(json.load(f))
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return jsonify(json.load(f))
+    except FileNotFoundError:
+        return jsonify({"error": "파일 없음"}), 404
+    except json.JSONDecodeError:
+        return jsonify({"error": "JSON 파싱 실패"}), 500
 
 
 @app.route("/api/shops", methods=["GET"])
 def get_shops():
     path = os.path.join(BASE_DIR, "data", "shops.json")
-    with open(path, "r", encoding="utf-8") as f:
-        return jsonify(json.load(f))
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return jsonify(json.load(f))
+    except FileNotFoundError:
+        return jsonify({"error": "파일 없음"}), 404
+    except json.JSONDecodeError:
+        return jsonify({"error": "JSON 파싱 실패"}), 500
 
 
 @app.route("/api/quests", methods=["GET"])
 def get_quests():
     path = os.path.join(BASE_DIR, "data", "quests.json")
-    with open(path, "r", encoding="utf-8") as f:
-        return jsonify(json.load(f))
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return jsonify(json.load(f))
+    except FileNotFoundError:
+        return jsonify({"error": "파일 없음"}), 404
+    except json.JSONDecodeError:
+        return jsonify({"error": "JSON 파싱 실패"}), 500
 
 
 @app.route("/api/npc/reveal", methods=["POST"])
@@ -710,4 +776,5 @@ def reveal_npc():
 
 
 if __name__ == "__main__":
+    _startup_init()
     app.run(host="0.0.0.0", port=5000, debug=True)

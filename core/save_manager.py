@@ -478,8 +478,8 @@ class SaveManager:
             with open(os.path.join(docs_dir, "illustration_state.json"),
                        "w", encoding="utf-8") as f:
                 json.dump(ill_state, f, ensure_ascii=False, indent=2)
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"[WARN] illustration state 빌드 실패: {e}")
 
     def _build_static_player_stats(self, game_state, docs_dir):
         """정적 웹용 플레이어 상세 파일 빌드.

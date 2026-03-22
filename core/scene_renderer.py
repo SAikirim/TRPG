@@ -6,22 +6,7 @@ import math
 import hashlib
 import skia
 
-
-def _skia_rgba(r, g, b, a=1.0):
-    return skia.Color4f(r, g, b, a).toColor()
-
-
-def _skia_paint(r=0, g=0, b=0, a=1.0, style=None, stroke_width=None, anti_alias=True):
-    p = skia.Paint()
-    p.setAntiAlias(anti_alias)
-    p.setColor(_skia_rgba(r, g, b, a))
-    if style is not None:
-        p.setStyle(style)
-    else:
-        p.setStyle(skia.Paint.kFill_Style)
-    if stroke_width is not None:
-        p.setStrokeWidth(stroke_width)
-    return p
+from core.skia_utils import skia_rgba, skia_paint
 
 
 def _draw_linear_gradient_rect(canvas, x, y, w, h, pt0, pt1, stops):
@@ -32,9 +17,9 @@ def _draw_linear_gradient_rect(canvas, x, y, w, h, pt0, pt1, stops):
     positions = []
     for pos, col in stops:
         if len(col) == 3:
-            colors.append(_skia_rgba(*col))
+            colors.append(skia_rgba(*col))
         else:
-            colors.append(_skia_rgba(*col))
+            colors.append(skia_rgba(*col))
         positions.append(pos)
     p = skia.Paint()
     p.setAntiAlias(True)
@@ -50,7 +35,7 @@ def _draw_radial_gradient_circle(canvas, cx, cy, radius, stops):
     colors = []
     positions = []
     for pos, col in stops:
-        colors.append(_skia_rgba(*col))
+        colors.append(skia_rgba(*col))
         positions.append(pos)
     p = skia.Paint()
     p.setAntiAlias(True)
@@ -139,7 +124,7 @@ class SceneRenderer:
                 path = skia.Path()
                 path.moveTo(gx, gy)
                 path.cubicTo(gx - 3, gy - 10, gx + 2, gy - 12, gx + 1, gy - 15)
-                canvas.drawPath(path, _skia_paint(0.22, 0.50, 0.15, 0.3,
+                canvas.drawPath(path, skia_paint(0.22, 0.50, 0.15, 0.3,
                     style=skia.Paint.kStroke_Style, stroke_width=1.5))
 
         x_scale = W / 768.0
@@ -159,7 +144,7 @@ class SceneRenderer:
         p.setAntiAlias(True)
         p.setShader(skia.GradientShader.MakeLinear(
             points=[(0, 250), (0, 350)],
-            colors=[_skia_rgba(0.3, 0.4, 0.3, 0), _skia_rgba(0.3, 0.4, 0.3, 0.15), _skia_rgba(0.3, 0.4, 0.3, 0)],
+            colors=[skia_rgba(0.3, 0.4, 0.3, 0), skia_rgba(0.3, 0.4, 0.3, 0.15), skia_rgba(0.3, 0.4, 0.3, 0)],
             positions=[0, 0.5, 1.0]))
         canvas.drawRect(skia.Rect(0, 250, W, 350), p)
 
@@ -169,7 +154,7 @@ class SceneRenderer:
             p.setAntiAlias(True)
             p.setShader(skia.GradientShader.MakeLinear(
                 points=[(rx, 0), (rx + 30, 320)],
-                colors=[_skia_rgba(0.9, 0.9, 0.6, 0.08), _skia_rgba(0.9, 0.9, 0.6, 0)]))
+                colors=[skia_rgba(0.9, 0.9, 0.6, 0.08), skia_rgba(0.9, 0.9, 0.6, 0)]))
             path = skia.Path()
             path.moveTo(rx, 0); path.lineTo(rx + 50, 0)
             path.lineTo(rx + 80, 320); path.lineTo(rx - 10, 320)
@@ -199,7 +184,7 @@ class SceneRenderer:
             y_scale = 0.7
 
         # Trunk
-        colors = [_skia_rgba(*c) for _, c in trunk_colors]
+        colors = [skia_rgba(*c) for _, c in trunk_colors]
         positions = [pos for pos, _ in trunk_colors]
         p = skia.Paint()
         p.setAntiAlias(True)
@@ -212,7 +197,7 @@ class SceneRenderer:
         for layer in range(canopy_layers):
             ly = ground_y - th - (30 if not back else 20) + layer * canopy_offset
             lr = (canopy_base_r - layer * canopy_step) * scale
-            colors_c = [_skia_rgba(*c) for _, c in leaf_colors]
+            colors_c = [skia_rgba(*c) for _, c in leaf_colors]
             positions_c = [pos for pos, _ in leaf_colors]
             p = skia.Paint()
             p.setAntiAlias(True)
@@ -244,7 +229,7 @@ class SceneRenderer:
             offset = 20 if ((y - 320) // 30) % 2 else 0
             for x in range(-20 + offset, W + 20, 55):
                 canvas.drawRect(skia.Rect(x, y, x + 50, y + 26),
-                    _skia_paint(0.22, 0.21, 0.20, 0.5, style=skia.Paint.kStroke_Style, stroke_width=1))
+                    skia_paint(0.22, 0.21, 0.20, 0.5, style=skia.Paint.kStroke_Style, stroke_width=1))
 
         # Stone pillars
         pillar_positions = [int(p * x_scale) for p in [120, 380, 640]]
@@ -252,8 +237,8 @@ class SceneRenderer:
             pillar_positions.append(int(820 * x_scale))
         for px in pillar_positions:
             # Pillar body
-            colors = [_skia_rgba(0.20, 0.19, 0.18), _skia_rgba(0.32, 0.30, 0.28),
-                      _skia_rgba(0.28, 0.27, 0.25), _skia_rgba(0.16, 0.15, 0.14)]
+            colors = [skia_rgba(0.20, 0.19, 0.18), skia_rgba(0.32, 0.30, 0.28),
+                      skia_rgba(0.28, 0.27, 0.25), skia_rgba(0.16, 0.15, 0.14)]
             p = skia.Paint()
             p.setAntiAlias(True)
             p.setShader(skia.GradientShader.MakeLinear(
@@ -261,7 +246,7 @@ class SceneRenderer:
                 positions=[0, 0.4, 0.7, 1.0]))
             canvas.drawRect(skia.Rect(px, 80, px + 45, 320), p)
             # Cap
-            cap_colors = [_skia_rgba(0.24, 0.23, 0.22), _skia_rgba(0.36, 0.34, 0.32), _skia_rgba(0.20, 0.19, 0.18)]
+            cap_colors = [skia_rgba(0.24, 0.23, 0.22), skia_rgba(0.36, 0.34, 0.32), skia_rgba(0.20, 0.19, 0.18)]
             cp = skia.Paint()
             cp.setAntiAlias(True)
             cp.setShader(skia.GradientShader.MakeLinear(
@@ -271,7 +256,7 @@ class SceneRenderer:
             # Stone lines
             for sy in range(100, 310, 35):
                 canvas.drawLine(px, sy, px + 45, sy,
-                    _skia_paint(0.12, 0.11, 0.10, 0.4, style=skia.Paint.kStroke_Style, stroke_width=1))
+                    skia_paint(0.12, 0.11, 0.10, 0.4, style=skia.Paint.kStroke_Style, stroke_width=1))
 
         # Torches
         torch_positions = [int(p * x_scale) for p in [250, 510]]
@@ -286,7 +271,7 @@ class SceneRenderer:
 
     def _draw_torch(self, canvas, tx, W, H):
         # Handle
-        canvas.drawRect(skia.Rect(tx - 3, 160, tx + 5, 205), _skia_paint(0.35, 0.18, 0.06))
+        canvas.drawRect(skia.Rect(tx - 3, 160, tx + 5, 205), skia_paint(0.35, 0.18, 0.06))
         # Flame glow
         _draw_radial_gradient_circle(canvas, tx + 1, 148, 80,
             [(5/80, (1.0, 0.65, 0.1, 0.25)), (0.4, (1.0, 0.40, 0.0, 0.10)), (1, (0.8, 0.2, 0.0, 0))])
@@ -296,21 +281,21 @@ class SceneRenderer:
         path.cubicTo(tx - 10, 145, tx + 1, 125, tx + 1, 118)
         path.cubicTo(tx + 1, 125, tx + 12, 145, tx + 10, 160)
         path.close()
-        canvas.drawPath(path, _skia_paint(1.0, 0.45, 0.0, 0.9))
+        canvas.drawPath(path, skia_paint(1.0, 0.45, 0.0, 0.9))
         # Inner flame
         path2 = skia.Path()
         path2.moveTo(tx - 4, 160)
         path2.cubicTo(tx - 5, 148, tx + 1, 132, tx + 1, 128)
         path2.cubicTo(tx + 1, 132, tx + 7, 148, tx + 6, 160)
         path2.close()
-        canvas.drawPath(path2, _skia_paint(1.0, 0.75, 0.0, 0.9))
+        canvas.drawPath(path2, skia_paint(1.0, 0.75, 0.0, 0.9))
         # Bright core
         path3 = skia.Path()
         path3.moveTo(tx - 1, 158)
         path3.cubicTo(tx - 1, 150, tx + 1, 140, tx + 1, 136)
         path3.cubicTo(tx + 1, 140, tx + 3, 150, tx + 3, 158)
         path3.close()
-        canvas.drawPath(path3, _skia_paint(1.0, 0.95, 0.6, 0.8))
+        canvas.drawPath(path3, skia_paint(1.0, 0.95, 0.6, 0.8))
 
     def _draw_treasure_scene(self, canvas, W, H):
         # Background
@@ -328,7 +313,7 @@ class SceneRenderer:
             offset = 15 if ((y - 340) // 28) % 2 else 0
             for x in range(-15 + offset, W + 15, 50):
                 canvas.drawRect(skia.Rect(x, y, x + 46, y + 24),
-                    _skia_paint(0.38, 0.30, 0.22, 0.4, style=skia.Paint.kStroke_Style, stroke_width=1))
+                    skia_paint(0.38, 0.30, 0.22, 0.4, style=skia.Paint.kStroke_Style, stroke_width=1))
 
         # Treasure chest
         chest_x, chest_y = W / 2 - 70, 290
@@ -344,7 +329,7 @@ class SceneRenderer:
         p.setAntiAlias(True)
         p.setShader(skia.GradientShader.MakeLinear(
             points=[(chest_x, chest_y - 40), (chest_x, chest_y)],
-            colors=[_skia_rgba(0.62, 0.48, 0.16), _skia_rgba(0.52, 0.38, 0.12)]))
+            colors=[skia_rgba(0.62, 0.48, 0.16), skia_rgba(0.52, 0.38, 0.12)]))
         path = skia.Path()
         path.moveTo(chest_x, chest_y)
         path.cubicTo(chest_x, chest_y - 50, chest_x + chest_w, chest_y - 50, chest_x + chest_w, chest_y)
@@ -355,13 +340,13 @@ class SceneRenderer:
         for bx_offset in [0.25, 0.5, 0.75]:
             bx = chest_x + chest_w * bx_offset
             canvas.drawLine(bx, chest_y - 30, bx, chest_y + chest_h,
-                _skia_paint(0.45, 0.35, 0.15, style=skia.Paint.kStroke_Style, stroke_width=3))
+                skia_paint(0.45, 0.35, 0.15, style=skia.Paint.kStroke_Style, stroke_width=3))
 
         # Lock
         lock_cx = chest_x + chest_w / 2
         lock_cy = chest_y + 5
-        canvas.drawCircle(lock_cx, lock_cy, 8, _skia_paint(0.75, 0.65, 0.20))
-        canvas.drawCircle(lock_cx, lock_cy, 4, _skia_paint(0.55, 0.45, 0.10))
+        canvas.drawCircle(lock_cx, lock_cy, 8, skia_paint(0.75, 0.65, 0.20))
+        canvas.drawCircle(lock_cx, lock_cy, 4, skia_paint(0.55, 0.45, 0.10))
 
         # Gold glow
         _draw_radial_gradient_circle(canvas, lock_cx, chest_y, 200,
@@ -378,7 +363,7 @@ class SceneRenderer:
             p.setAntiAlias(True)
             p.setShader(skia.GradientShader.MakeRadial(
                 center=(gx + 5, gy + 5), radius=9,
-                colors=[_skia_rgba(1.0, 0.92, 0.45), _skia_rgba(0.95, 0.80, 0.20), _skia_rgba(0.75, 0.60, 0.10)],
+                colors=[skia_rgba(1.0, 0.92, 0.45), skia_rgba(0.95, 0.80, 0.20), skia_rgba(0.75, 0.60, 0.10)],
                 positions=[0, 0.6, 1.0]))
             canvas.save()
             canvas.translate(gx + 5, gy + 5)
@@ -394,13 +379,13 @@ class SceneRenderer:
             p.setAntiAlias(True)
             p.setShader(skia.GradientShader.MakeRadial(
                 center=(gx, gy), radius=6,
-                colors=[_skia_rgba(min(gr + 0.4, 1), min(gg + 0.4, 1), min(gb + 0.4, 1)),
-                        _skia_rgba(gr * 0.6, gg * 0.6, gb * 0.6)]))
+                colors=[skia_rgba(min(gr + 0.4, 1), min(gg + 0.4, 1), min(gb + 0.4, 1)),
+                        skia_rgba(gr * 0.6, gg * 0.6, gb * 0.6)]))
             path = skia.Path()
             path.moveTo(gx, gy - 6); path.lineTo(gx + 5, gy)
             path.lineTo(gx, gy + 6); path.lineTo(gx - 5, gy); path.close()
             canvas.drawPath(path, p)
-            canvas.drawCircle(gx - 1, gy - 2, 1.5, _skia_paint(1, 1, 1, 0.7))
+            canvas.drawCircle(gx - 1, gy - 2, 1.5, skia_paint(1, 1, 1, 0.7))
 
         # Vignette
         _draw_radial_gradient_circle(canvas, W / 2, H / 2 - 30, 450,
@@ -425,7 +410,7 @@ class SceneRenderer:
         path.lineTo(W * 0.6, H)
         path.cubicTo(W * 0.48, H * 0.7, W * 0.4, H * 0.75, W * 0.38, H)
         path.close()
-        canvas.drawPath(path, _skia_paint(0.35, 0.28, 0.18, 0.6))
+        canvas.drawPath(path, skia_paint(0.35, 0.28, 0.18, 0.6))
 
         # Cottages
         cottages = [
@@ -442,12 +427,12 @@ class SceneRenderer:
             roof = skia.Path()
             roof.moveTo(cx - 10, cy); roof.lineTo(cx + cw / 2, cy - 50); roof.lineTo(cx + cw + 10, cy)
             roof.close()
-            canvas.drawPath(roof, _skia_paint(0.45, 0.20, 0.10))
+            canvas.drawPath(roof, skia_paint(0.45, 0.20, 0.10))
             # Roof highlight
             rh = skia.Path()
             rh.moveTo(cx - 5, cy); rh.lineTo(cx + cw / 2, cy - 45); rh.lineTo(cx + cw / 2, cy)
             rh.close()
-            canvas.drawPath(rh, _skia_paint(0.55, 0.28, 0.12, 0.5))
+            canvas.drawPath(rh, skia_paint(0.55, 0.28, 0.12, 0.5))
 
             # Window (warm glow)
             win_x = cx + cw * 0.3
@@ -456,28 +441,28 @@ class SceneRenderer:
             _draw_radial_gradient_circle(canvas, win_x + win_w / 2, win_y + win_h / 2, 50,
                 [(0, (1.0, 0.85, 0.4, 0.3)), (1, (1.0, 0.7, 0.2, 0))])
             canvas.drawRect(skia.Rect(win_x, win_y, win_x + win_w, win_y + win_h),
-                _skia_paint(0.95, 0.85, 0.45))
+                skia_paint(0.95, 0.85, 0.45))
             canvas.drawRect(skia.Rect(win_x, win_y, win_x + win_w, win_y + win_h),
-                _skia_paint(0.35, 0.22, 0.10, style=skia.Paint.kStroke_Style, stroke_width=2))
+                skia_paint(0.35, 0.22, 0.10, style=skia.Paint.kStroke_Style, stroke_width=2))
             canvas.drawLine(win_x + win_w / 2, win_y, win_x + win_w / 2, win_y + win_h,
-                _skia_paint(0.35, 0.22, 0.10, style=skia.Paint.kStroke_Style, stroke_width=2))
+                skia_paint(0.35, 0.22, 0.10, style=skia.Paint.kStroke_Style, stroke_width=2))
 
             # Door
             door_x = cx + cw * 0.6
             door_y = cy + ch * 0.45
             canvas.drawRect(skia.Rect(door_x, door_y, door_x + 20, door_y + ch * 0.55),
-                _skia_paint(0.30, 0.18, 0.08))
+                skia_paint(0.30, 0.18, 0.08))
 
             # Chimney
             chim_x = cx + cw * 0.7
             canvas.drawRect(skia.Rect(chim_x, cy - 40, chim_x + 14, cy + 5),
-                _skia_paint(0.40, 0.30, 0.25))
+                skia_paint(0.40, 0.30, 0.25))
 
             # Smoke
             for i in range(5):
                 smoke_y = cy - 45 - i * 18
                 canvas.drawCircle(chim_x + 7 + i * 3 * ((-1) ** i), smoke_y, 6 + i * 2,
-                    _skia_paint(0.6, 0.6, 0.6, 0.3 - i * 0.05))
+                    skia_paint(0.6, 0.6, 0.6, 0.3 - i * 0.05))
 
         # Stars
         seed = int(hashlib.md5(b"village").hexdigest()[:8], 16)
@@ -485,7 +470,7 @@ class SceneRenderer:
             sx = ((seed * (i + 1) * 7) % W)
             sy = ((seed * (i + 1) * 13) % int(H * 0.3))
             brightness = 0.5 + (i % 5) * 0.1
-            canvas.drawCircle(sx, sy, 1.2, _skia_paint(1, 1, brightness, 0.6))
+            canvas.drawCircle(sx, sy, 1.2, skia_paint(1, 1, brightness, 0.6))
 
     def _draw_night_scene(self, canvas, W, H):
         # Dark sky
@@ -503,12 +488,12 @@ class SceneRenderer:
         p.setAntiAlias(True)
         p.setShader(skia.GradientShader.MakeRadial(
             center=(moon_x - 5, moon_y - 5), radius=30,
-            colors=[_skia_rgba(0.95, 0.95, 1.0), _skia_rgba(0.80, 0.82, 0.90)],
+            colors=[skia_rgba(0.95, 0.95, 1.0), skia_rgba(0.80, 0.82, 0.90)],
             positions=[5/30, 1.0]))
         canvas.drawCircle(moon_x, moon_y, 30, p)
         # Craters
         for cx, cy, cr in [(moon_x - 8, moon_y - 5, 5), (moon_x + 10, moon_y + 8, 3), (moon_x + 3, moon_y - 12, 4)]:
-            canvas.drawCircle(cx, cy, cr, _skia_paint(0.7, 0.72, 0.80, 0.3))
+            canvas.drawCircle(cx, cy, cr, skia_paint(0.7, 0.72, 0.80, 0.3))
 
         # Stars
         seed = int(hashlib.md5(b"nightsky").hexdigest()[:8], 16)
@@ -517,12 +502,12 @@ class SceneRenderer:
             sy = ((seed * (i + 1) * 13) % int(H * 0.6))
             size = 0.8 + (i % 4) * 0.4
             brightness = 0.5 + (i % 6) * 0.08
-            canvas.drawCircle(sx, sy, size, _skia_paint(1, 1, brightness, 0.7))
+            canvas.drawCircle(sx, sy, size, skia_paint(1, 1, brightness, 0.7))
             if i % 7 == 0:
                 canvas.drawLine(sx - 4, sy, sx + 4, sy,
-                    _skia_paint(1, 1, 1, 0.4, style=skia.Paint.kStroke_Style, stroke_width=0.5))
+                    skia_paint(1, 1, 1, 0.4, style=skia.Paint.kStroke_Style, stroke_width=0.5))
                 canvas.drawLine(sx, sy - 4, sx, sy + 4,
-                    _skia_paint(1, 1, 1, 0.4, style=skia.Paint.kStroke_Style, stroke_width=0.5))
+                    skia_paint(1, 1, 1, 0.4, style=skia.Paint.kStroke_Style, stroke_width=0.5))
 
         # Silhouette hills
         path = skia.Path()
@@ -531,19 +516,19 @@ class SceneRenderer:
         path.cubicTo(W * 0.55, H * 0.54, W * 0.7, H * 0.60, W * 0.85, H * 0.56)
         path.cubicTo(W * 0.95, H * 0.53, W, H * 0.58, W, H * 0.65)
         path.lineTo(W, H); path.lineTo(0, H); path.close()
-        canvas.drawPath(path, _skia_paint(0.03, 0.03, 0.06))
+        canvas.drawPath(path, skia_paint(0.03, 0.03, 0.06))
 
         # Silhouette trees
         tree_positions = [W * 0.1, W * 0.2, W * 0.38, W * 0.55, W * 0.72, W * 0.88]
         for tx in tree_positions:
             ty = H * 0.58 + abs(math.sin(tx * 0.01)) * 30
-            canvas.drawRect(skia.Rect(tx - 3, ty - 40, tx + 3, ty + 5), _skia_paint(0.02, 0.02, 0.05))
+            canvas.drawRect(skia.Rect(tx - 3, ty - 40, tx + 3, ty + 5), skia_paint(0.02, 0.02, 0.05))
             tri1 = skia.Path()
             tri1.moveTo(tx, ty - 70); tri1.lineTo(tx - 20, ty - 30); tri1.lineTo(tx + 20, ty - 30); tri1.close()
-            canvas.drawPath(tri1, _skia_paint(0.02, 0.02, 0.05))
+            canvas.drawPath(tri1, skia_paint(0.02, 0.02, 0.05))
             tri2 = skia.Path()
             tri2.moveTo(tx, ty - 55); tri2.lineTo(tx - 16, ty - 20); tri2.lineTo(tx + 16, ty - 20); tri2.close()
-            canvas.drawPath(tri2, _skia_paint(0.02, 0.02, 0.05))
+            canvas.drawPath(tri2, skia_paint(0.02, 0.02, 0.05))
 
         # Foreground ground
         _draw_linear_gradient_rect(canvas, 0, int(H * 0.7), W, int(H * 0.3),
@@ -569,7 +554,7 @@ class SceneRenderer:
                 canvas.translate(x + 10, y + 8)
                 canvas.scale(10, 7)
                 canvas.drawCircle(0, 0, 1,
-                    _skia_paint(0.38, 0.33, 0.28, 0.4, style=skia.Paint.kStroke_Style, stroke_width=0.08))
+                    skia_paint(0.38, 0.33, 0.28, 0.4, style=skia.Paint.kStroke_Style, stroke_width=0.08))
                 canvas.restore()
 
         # Market stalls
@@ -586,7 +571,7 @@ class SceneRenderer:
 
             # Table
             canvas.drawRect(skia.Rect(sx, table_y, sx + stall_w, table_y + table_h),
-                _skia_paint(0.45, 0.30, 0.15))
+                skia_paint(0.45, 0.30, 0.15))
 
             # Awning
             awning_top = table_y - 70
@@ -602,28 +587,28 @@ class SceneRenderer:
                 path.lineTo(stripe_x + stall_w / 6 + 5, table_y - 5)
                 path.lineTo(stripe_x + 5, table_y - 5)
                 path.close()
-                canvas.drawPath(path, _skia_paint(*color))
+                canvas.drawPath(path, skia_paint(*color))
 
             # Poles
-            canvas.drawRect(skia.Rect(sx + 2, awning_top, sx + 6, table_y + table_h), _skia_paint(0.35, 0.22, 0.10))
+            canvas.drawRect(skia.Rect(sx + 2, awning_top, sx + 6, table_y + table_h), skia_paint(0.35, 0.22, 0.10))
             canvas.drawRect(skia.Rect(sx + stall_w - 6, awning_top, sx + stall_w - 2, table_y + table_h),
-                _skia_paint(0.35, 0.22, 0.10))
+                skia_paint(0.35, 0.22, 0.10))
 
             # Items
             for j in range(4):
                 ix = sx + 12 + j * (stall_w / 5)
                 iy = table_y + 5
-                canvas.drawCircle(ix, iy, 6, _skia_paint(0.6 + j * 0.1, 0.4 + (j % 2) * 0.2, 0.2))
+                canvas.drawCircle(ix, iy, 6, skia_paint(0.6 + j * 0.1, 0.4 + (j % 2) * 0.2, 0.2))
 
         # Crates
         crate_positions = [(W * 0.15, H * 0.75), (W * 0.45, H * 0.78), (W * 0.8, H * 0.72)]
         for crx, cry in crate_positions:
             crate_w, crate_h = 30, 25
-            canvas.drawRect(skia.Rect(crx, cry, crx + crate_w, cry + crate_h), _skia_paint(0.50, 0.35, 0.18))
+            canvas.drawRect(skia.Rect(crx, cry, crx + crate_w, cry + crate_h), skia_paint(0.50, 0.35, 0.18))
             canvas.drawLine(crx, cry + crate_h / 2, crx + crate_w, cry + crate_h / 2,
-                _skia_paint(0.38, 0.25, 0.12, style=skia.Paint.kStroke_Style, stroke_width=1.5))
+                skia_paint(0.38, 0.25, 0.12, style=skia.Paint.kStroke_Style, stroke_width=1.5))
             canvas.drawLine(crx + crate_w / 2, cry, crx + crate_w / 2, cry + crate_h,
-                _skia_paint(0.38, 0.25, 0.12, style=skia.Paint.kStroke_Style, stroke_width=1.5))
+                skia_paint(0.38, 0.25, 0.12, style=skia.Paint.kStroke_Style, stroke_width=1.5))
 
         # Sun glow
         _draw_radial_gradient_circle(canvas, W * 0.8, H * 0.1, 400,
@@ -639,7 +624,7 @@ class SceneRenderer:
         cloud_positions = [(W * 0.15, H * 0.1), (W * 0.5, H * 0.08), (W * 0.8, H * 0.15)]
         for clx, cly in cloud_positions:
             for dx, dy, r in [(-15, 0, 18), (0, -5, 22), (15, 0, 18), (25, 5, 14)]:
-                canvas.drawCircle(clx + dx, cly + dy, r, _skia_paint(1, 1, 1, 0.6))
+                canvas.drawCircle(clx + dx, cly + dy, r, skia_paint(1, 1, 1, 0.6))
 
         # Far hills
         path = skia.Path()
@@ -648,14 +633,14 @@ class SceneRenderer:
         path.cubicTo(W * 0.5, H * 0.35, W * 0.6, H * 0.42, W * 0.75, H * 0.37)
         path.cubicTo(W * 0.9, H * 0.33, W * 0.95, H * 0.40, W, H * 0.42)
         path.lineTo(W, H * 0.55); path.lineTo(0, H * 0.55); path.close()
-        canvas.drawPath(path, _skia_paint(0.45, 0.60, 0.40))
+        canvas.drawPath(path, skia_paint(0.45, 0.60, 0.40))
 
         # Near hills
         p = skia.Paint()
         p.setAntiAlias(True)
         p.setShader(skia.GradientShader.MakeLinear(
             points=[(0, H * 0.45), (0, H)],
-            colors=[_skia_rgba(0.30, 0.50, 0.22), _skia_rgba(0.25, 0.42, 0.18), _skia_rgba(0.18, 0.32, 0.12)],
+            colors=[skia_rgba(0.30, 0.50, 0.22), skia_rgba(0.25, 0.42, 0.18), skia_rgba(0.18, 0.32, 0.12)],
             positions=[0, 0.5, 1.0]))
         path2 = skia.Path()
         path2.moveTo(0, H * 0.5)
@@ -669,7 +654,7 @@ class SceneRenderer:
         rp.setAntiAlias(True)
         rp.setShader(skia.GradientShader.MakeLinear(
             points=[(0, H * 0.5), (0, H)],
-            colors=[_skia_rgba(0.55, 0.45, 0.30), _skia_rgba(0.40, 0.32, 0.20)]))
+            colors=[skia_rgba(0.55, 0.45, 0.30), skia_rgba(0.40, 0.32, 0.20)]))
         road_path = skia.Path()
         road_path.moveTo(W * 0.35, H)
         road_path.cubicTo(W * 0.38, H * 0.75, W * 0.42, H * 0.6, W * 0.48, H * 0.48)
@@ -684,7 +669,7 @@ class SceneRenderer:
             ep = skia.Path()
             ep.moveTo(pts[0][0], pts[0][1])
             ep.cubicTo(pts[1][0], pts[1][1], pts[2][0], pts[2][1], pts[3][0], pts[3][1])
-            canvas.drawPath(ep, _skia_paint(0.35, 0.28, 0.18, 0.5,
+            canvas.drawPath(ep, skia_paint(0.35, 0.28, 0.18, 0.5,
                 style=skia.Paint.kStroke_Style, stroke_width=2))
 
         # Grass tufts
@@ -693,16 +678,16 @@ class SceneRenderer:
                 gp = skia.Path()
                 gp.moveTo(gx, gy)
                 gp.cubicTo(gx - 2, gy - 8, gx + 1, gy - 10, gx, gy - 12)
-                canvas.drawPath(gp, _skia_paint(0.28, 0.55, 0.20, 0.3,
+                canvas.drawPath(gp, skia_paint(0.28, 0.55, 0.20, 0.3,
                     style=skia.Paint.kStroke_Style, stroke_width=1.5))
 
         # Distant trees
         for tx, s in [(W * 0.42, 0.5), (W * 0.55, 0.45), (W * 0.38, 0.55),
                       (W * 0.58, 0.4), (W * 0.15, 0.7), (W * 0.85, 0.65)]:
             ty = H * 0.48 + (1 - s) * 40
-            canvas.drawCircle(tx, ty - 12 * s, 10 * s, _skia_paint(0.15, 0.35, 0.12))
+            canvas.drawCircle(tx, ty - 12 * s, 10 * s, skia_paint(0.15, 0.35, 0.12))
             canvas.drawRect(skia.Rect(tx - 2 * s, ty - 5 * s, tx + 2 * s, ty + 7 * s),
-                _skia_paint(0.25, 0.15, 0.05))
+                skia_paint(0.25, 0.15, 0.05))
 
         # Sun glow
         _draw_radial_gradient_circle(canvas, W * 0.5, H * 0.35, 200,
@@ -727,7 +712,7 @@ class SceneRenderer:
             py = (seed * (i + 1) * 13) % H
             r = 1 + (i % 3)
             alpha = 0.05 + (i % 5) * 0.02
-            canvas.drawCircle(px, py, r, _skia_paint(0.6, 0.65, 0.8, alpha))
+            canvas.drawCircle(px, py, r, skia_paint(0.6, 0.65, 0.8, alpha))
 
         # Center glow
         _draw_radial_gradient_circle(canvas, W / 2, H / 2, 250,
@@ -741,14 +726,14 @@ class SceneRenderer:
         ty = H / 2 + 12
 
         # Shadow
-        canvas.drawString(name, tx + 2, ty + 2, font, _skia_paint(0, 0, 0, 0.5))
+        canvas.drawString(name, tx + 2, ty + 2, font, skia_paint(0, 0, 0, 0.5))
         # Text
-        canvas.drawString(name, tx, ty, font, _skia_paint(0.85, 0.85, 0.90, 0.9))
+        canvas.drawString(name, tx, ty, font, skia_paint(0.85, 0.85, 0.90, 0.9))
 
         # Decorative line
         line_w = min(text_w + 40, W * 0.6)
         canvas.drawLine((W - line_w) / 2, ty + 15, (W + line_w) / 2, ty + 15,
-            _skia_paint(0.6, 0.65, 0.8, 0.4, style=skia.Paint.kStroke_Style, stroke_width=1.5))
+            skia_paint(0.6, 0.65, 0.8, 0.4, style=skia.Paint.kStroke_Style, stroke_width=1.5))
 
         # Vignette
         _draw_radial_gradient_circle(canvas, W / 2, H / 2, 500,
@@ -812,9 +797,9 @@ class SceneRenderer:
         p_body.setAntiAlias(True)
         p_body.setShader(skia.GradientShader.MakeLinear(
             points=[(cx, 0), (cx, H)],
-            colors=[_skia_rgba(r * 0.8, g * 0.8, b * 0.8, 0.85),
-                    _skia_rgba(r * 0.5, g * 0.5, b * 0.5, 0.90),
-                    _skia_rgba(r * 0.3, g * 0.3, b * 0.3, 0.85)],
+            colors=[skia_rgba(r * 0.8, g * 0.8, b * 0.8, 0.85),
+                    skia_rgba(r * 0.5, g * 0.5, b * 0.5, 0.90),
+                    skia_rgba(r * 0.3, g * 0.3, b * 0.3, 0.85)],
             positions=[0, 0.5, 1.0]))
 
         # Head
@@ -880,7 +865,7 @@ class SceneRenderer:
         # Feet
         foot_w = W * 0.08
         foot_h = H * 0.03
-        foot_paint = _skia_paint(r * 0.3, g * 0.3, b * 0.3, 0.85)
+        foot_paint = skia_paint(r * 0.3, g * 0.3, b * 0.3, 0.85)
         for foot_x in [cx - gap - leg_w * 0.3 - foot_w * 0.3, cx + gap + leg_w * 0.3 + foot_w * 0.3]:
             canvas.save()
             canvas.translate(foot_x, leg_bottom)
@@ -893,7 +878,7 @@ class SceneRenderer:
         rim_p.setAntiAlias(True)
         rim_p.setShader(skia.GradientShader.MakeLinear(
             points=[(cx + W * 0.2, 0), (cx + W * 0.35, 0)],
-            colors=[_skia_rgba(r, g, b, 0.2), _skia_rgba(r, g, b, 0)]))
+            colors=[skia_rgba(r, g, b, 0.2), skia_rgba(r, g, b, 0)]))
         canvas.drawRect(skia.Rect(0, 0, W, H), rim_p)
 
         # Name label
@@ -910,8 +895,8 @@ class SceneRenderer:
         label_x = (W - label_w) / 2
         label_y = ty - 20 - pad
         rrect = skia.RRect.MakeRectXY(skia.Rect(label_x, label_y, label_x + label_w, label_y + label_h), 4, 4)
-        canvas.drawRRect(rrect, _skia_paint(0, 0, 0, 0.6))
-        canvas.drawString(name, tx, ty, font, _skia_paint(1, 1, 1, 0.95))
+        canvas.drawRRect(rrect, skia_paint(0, 0, 0, 0.6))
+        canvas.drawString(name, tx, ty, font, skia_paint(1, 1, 1, 0.95))
 
     def _draw_object_icon(self, canvas, W, H, name):
         cx, cy = W / 2, H / 2
@@ -939,8 +924,8 @@ class SceneRenderer:
         tx = (W - text_w) / 2
         ty = H * 0.92
 
-        canvas.drawString(name, tx + 1, ty + 1, font, _skia_paint(0, 0, 0, 0.7))
-        canvas.drawString(name, tx, ty, font, _skia_paint(1, 1, 1, 0.9))
+        canvas.drawString(name, tx + 1, ty + 1, font, skia_paint(0, 0, 0, 0.7))
+        canvas.drawString(name, tx, ty, font, skia_paint(1, 1, 1, 0.9))
 
     def _draw_chest_icon(self, canvas, cx, cy, W, H):
         cw, ch = W * 0.5, H * 0.3
@@ -953,7 +938,7 @@ class SceneRenderer:
         p.setAntiAlias(True)
         p.setShader(skia.GradientShader.MakeLinear(
             points=[(cx, cy - ch * 0.5), (cx, cy)],
-            colors=[_skia_rgba(0.62, 0.48, 0.16), _skia_rgba(0.52, 0.38, 0.12)]))
+            colors=[skia_rgba(0.62, 0.48, 0.16), skia_rgba(0.52, 0.38, 0.12)]))
         path = skia.Path()
         path.moveTo(cx - cw / 2, cy)
         path.cubicTo(cx - cw / 2, cy - ch * 0.7, cx + cw / 2, cy - ch * 0.7, cx + cw / 2, cy)
@@ -961,9 +946,9 @@ class SceneRenderer:
         canvas.drawPath(path, p)
         # Band
         canvas.drawLine(cx, cy - ch * 0.4, cx, cy + ch,
-            _skia_paint(0.45, 0.35, 0.15, style=skia.Paint.kStroke_Style, stroke_width=2))
+            skia_paint(0.45, 0.35, 0.15, style=skia.Paint.kStroke_Style, stroke_width=2))
         # Lock
-        canvas.drawCircle(cx, cy + 3, 6, _skia_paint(0.75, 0.65, 0.20))
+        canvas.drawCircle(cx, cy + 3, 6, skia_paint(0.75, 0.65, 0.20))
         # Glow
         _draw_radial_gradient_circle(canvas, cx, cy, 80,
             [(10/80, (1.0, 0.85, 0.3, 0.25)), (1, (1.0, 0.7, 0.1, 0))])
@@ -973,19 +958,19 @@ class SceneRenderer:
             [(10/80, (1.0, 0.85, 0.3, 0.2)), (1, (0.8, 0.6, 0.1, 0))])
         # Shaft
         canvas.drawLine(cx - W * 0.15, cy, cx + W * 0.15, cy,
-            _skia_paint(0.85, 0.75, 0.25, style=skia.Paint.kStroke_Style, stroke_width=6))
+            skia_paint(0.85, 0.75, 0.25, style=skia.Paint.kStroke_Style, stroke_width=6))
         # Teeth
         for i in range(3):
             t = cx + W * 0.08 + i * 10
             canvas.drawLine(t, cy, t, cy + 12,
-                _skia_paint(0.85, 0.75, 0.25, style=skia.Paint.kStroke_Style, stroke_width=4))
+                skia_paint(0.85, 0.75, 0.25, style=skia.Paint.kStroke_Style, stroke_width=4))
         # Bow
         canvas.drawCircle(cx - W * 0.2, cy, 15,
-            _skia_paint(0.85, 0.75, 0.25, style=skia.Paint.kStroke_Style, stroke_width=5))
+            skia_paint(0.85, 0.75, 0.25, style=skia.Paint.kStroke_Style, stroke_width=5))
         # Highlight
         canvas.drawArc(skia.Rect(cx - W * 0.2 - 10, cy - 13, cx - W * 0.2 + 10, cy + 7),
             180, 180, False,
-            _skia_paint(1, 0.95, 0.5, 0.5, style=skia.Paint.kStroke_Style, stroke_width=2))
+            skia_paint(1, 0.95, 0.5, 0.5, style=skia.Paint.kStroke_Style, stroke_width=2))
 
     def _draw_potion_icon(self, canvas, cx, cy, W, H):
         bottle_w = W * 0.2
@@ -1000,8 +985,8 @@ class SceneRenderer:
         p.setAntiAlias(True)
         p.setShader(skia.GradientShader.MakeLinear(
             points=[(cx - bottle_w, cy), (cx + bottle_w, cy)],
-            colors=[_skia_rgba(0.15, 0.60, 0.25, 0.8), _skia_rgba(0.20, 0.75, 0.30, 0.85),
-                    _skia_rgba(0.15, 0.65, 0.25, 0.85), _skia_rgba(0.10, 0.50, 0.20, 0.8)],
+            colors=[skia_rgba(0.15, 0.60, 0.25, 0.8), skia_rgba(0.20, 0.75, 0.30, 0.85),
+                    skia_rgba(0.15, 0.65, 0.25, 0.85), skia_rgba(0.10, 0.50, 0.20, 0.8)],
             positions=[0, 0.3, 0.7, 1.0]))
         path = skia.Path()
         path.moveTo(cx - bottle_w, bottle_top + bottle_h * 0.3)
@@ -1016,7 +1001,7 @@ class SceneRenderer:
 
         # Cork
         canvas.drawRect(skia.Rect(cx - bottle_w * 0.3, bottle_top - 8,
-                                   cx + bottle_w * 0.3, bottle_top + 2), _skia_paint(0.55, 0.38, 0.18))
+                                   cx + bottle_w * 0.3, bottle_top + 2), skia_paint(0.55, 0.38, 0.18))
 
         # Highlight
         hp = skia.Path()
@@ -1025,7 +1010,7 @@ class SceneRenderer:
                    cx - bottle_w * 0.1, bottle_top + bottle_h * 0.8,
                    cx - bottle_w * 0.1, bottle_top + bottle_h * 0.35)
         hp.close()
-        canvas.drawPath(hp, _skia_paint(1, 1, 1, 0.25))
+        canvas.drawPath(hp, skia_paint(1, 1, 1, 0.25))
 
     def _draw_scroll_icon(self, canvas, cx, cy, W, H):
         scroll_w = W * 0.35
@@ -1038,7 +1023,7 @@ class SceneRenderer:
         p.setAntiAlias(True)
         p.setShader(skia.GradientShader.MakeLinear(
             points=[(sx, sy), (sx + scroll_w, sy + scroll_h)],
-            colors=[_skia_rgba(0.90, 0.82, 0.65), _skia_rgba(0.95, 0.88, 0.72), _skia_rgba(0.85, 0.78, 0.60)],
+            colors=[skia_rgba(0.90, 0.82, 0.65), skia_rgba(0.95, 0.88, 0.72), skia_rgba(0.85, 0.78, 0.60)],
             positions=[0, 0.5, 1.0]))
         canvas.drawRect(skia.Rect(sx + 10, sy + 8, sx + scroll_w - 10, sy + scroll_h - 8), p)
 
@@ -1047,7 +1032,7 @@ class SceneRenderer:
         rp.setAntiAlias(True)
         rp.setShader(skia.GradientShader.MakeLinear(
             points=[(sx, sy), (sx, sy + 16)],
-            colors=[_skia_rgba(0.80, 0.72, 0.55), _skia_rgba(0.92, 0.85, 0.68), _skia_rgba(0.82, 0.74, 0.56)],
+            colors=[skia_rgba(0.80, 0.72, 0.55), skia_rgba(0.92, 0.85, 0.68), skia_rgba(0.82, 0.74, 0.56)],
             positions=[0, 0.5, 1.0]))
         canvas.save()
         canvas.translate(cx, sy + 8)
@@ -1067,10 +1052,10 @@ class SceneRenderer:
             ly = sy + 22 + i * 14
             lw = scroll_w * (0.5 + (i % 3) * 0.1)
             canvas.drawLine(cx - lw / 2, ly, cx + lw / 2, ly,
-                _skia_paint(0.35, 0.28, 0.15, 0.5, style=skia.Paint.kStroke_Style, stroke_width=1.5))
+                skia_paint(0.35, 0.28, 0.15, 0.5, style=skia.Paint.kStroke_Style, stroke_width=1.5))
 
         # Seal
-        canvas.drawCircle(cx, sy + scroll_h + 5, 8, _skia_paint(0.75, 0.15, 0.10))
+        canvas.drawCircle(cx, sy + scroll_h + 5, 8, skia_paint(0.75, 0.15, 0.10))
 
     def _draw_sword_icon(self, canvas, cx, cy, W, H):
         _draw_radial_gradient_circle(canvas, cx, cy, 80,
@@ -1081,8 +1066,8 @@ class SceneRenderer:
         p.setAntiAlias(True)
         p.setShader(skia.GradientShader.MakeLinear(
             points=[(cx - 8, cy), (cx + 8, cy)],
-            colors=[_skia_rgba(0.70, 0.72, 0.78), _skia_rgba(0.90, 0.92, 0.96),
-                    _skia_rgba(0.85, 0.87, 0.92), _skia_rgba(0.65, 0.67, 0.72)],
+            colors=[skia_rgba(0.70, 0.72, 0.78), skia_rgba(0.90, 0.92, 0.96),
+                    skia_rgba(0.85, 0.87, 0.92), skia_rgba(0.65, 0.67, 0.72)],
             positions=[0, 0.3, 0.7, 1.0]))
         path = skia.Path()
         path.moveTo(cx, cy - H * 0.35); path.lineTo(cx - 8, cy + H * 0.05)
@@ -1091,23 +1076,23 @@ class SceneRenderer:
 
         # Guard
         canvas.drawRect(skia.Rect(cx - 25, cy + H * 0.05, cx + 25, cy + H * 0.05 + 8),
-            _skia_paint(0.55, 0.45, 0.15))
+            skia_paint(0.55, 0.45, 0.15))
 
         # Grip
         gp = skia.Paint()
         gp.setAntiAlias(True)
         gp.setShader(skia.GradientShader.MakeLinear(
             points=[(cx - 5, cy + H * 0.05), (cx + 5, cy + H * 0.05)],
-            colors=[_skia_rgba(0.35, 0.20, 0.08), _skia_rgba(0.45, 0.28, 0.12), _skia_rgba(0.30, 0.18, 0.06)],
+            colors=[skia_rgba(0.35, 0.20, 0.08), skia_rgba(0.45, 0.28, 0.12), skia_rgba(0.30, 0.18, 0.06)],
             positions=[0, 0.5, 1.0]))
         canvas.drawRect(skia.Rect(cx - 5, cy + H * 0.06, cx + 5, cy + H * 0.21), gp)
 
         # Pommel
-        canvas.drawCircle(cx, cy + H * 0.22, 7, _skia_paint(0.65, 0.55, 0.20))
+        canvas.drawCircle(cx, cy + H * 0.22, 7, skia_paint(0.65, 0.55, 0.20))
 
         # Blade highlight
         canvas.drawLine(cx - 2, cy - H * 0.3, cx - 5, cy + H * 0.04,
-            _skia_paint(1, 1, 1, 0.3, style=skia.Paint.kStroke_Style, stroke_width=1))
+            skia_paint(1, 1, 1, 0.3, style=skia.Paint.kStroke_Style, stroke_width=1))
 
     def _draw_shield_icon(self, canvas, cx, cy, W, H):
         sw, sh = W * 0.35, H * 0.4
@@ -1117,7 +1102,7 @@ class SceneRenderer:
         p.setAntiAlias(True)
         p.setShader(skia.GradientShader.MakeLinear(
             points=[(cx - sw, cy - sh / 2), (cx + sw, cy + sh / 2)],
-            colors=[_skia_rgba(0.20, 0.30, 0.55), _skia_rgba(0.28, 0.40, 0.65), _skia_rgba(0.15, 0.25, 0.48)],
+            colors=[skia_rgba(0.20, 0.30, 0.55), skia_rgba(0.28, 0.40, 0.65), skia_rgba(0.15, 0.25, 0.48)],
             positions=[0, 0.5, 1.0]))
 
         def _shield_path():
@@ -1134,20 +1119,20 @@ class SceneRenderer:
 
         # Border
         canvas.drawPath(_shield_path(),
-            _skia_paint(0.55, 0.50, 0.20, style=skia.Paint.kStroke_Style, stroke_width=3))
+            skia_paint(0.55, 0.50, 0.20, style=skia.Paint.kStroke_Style, stroke_width=3))
 
         # Cross emblem
         canvas.drawLine(cx, cy - sh * 0.25, cx, cy + sh * 0.15,
-            _skia_paint(0.65, 0.60, 0.25, style=skia.Paint.kStroke_Style, stroke_width=4))
+            skia_paint(0.65, 0.60, 0.25, style=skia.Paint.kStroke_Style, stroke_width=4))
         canvas.drawLine(cx - sw * 0.2, cy - sh * 0.05, cx + sw * 0.2, cy - sh * 0.05,
-            _skia_paint(0.65, 0.60, 0.25, style=skia.Paint.kStroke_Style, stroke_width=4))
+            skia_paint(0.65, 0.60, 0.25, style=skia.Paint.kStroke_Style, stroke_width=4))
 
         # Highlight
         hp = skia.Path()
         hp.moveTo(cx, cy - sh / 2)
         hp.cubicTo(cx - sw * 0.5, cy - sh / 2, cx - sw * 0.5, cy, cx - sw * 0.3, cy + sh * 0.1)
         hp.lineTo(cx, cy + sh * 0.1); hp.lineTo(cx, cy - sh / 2); hp.close()
-        canvas.drawPath(hp, _skia_paint(1, 1, 1, 0.15))
+        canvas.drawPath(hp, skia_paint(1, 1, 1, 0.15))
 
     def _draw_orb_icon(self, canvas, cx, cy, W, H, name):
         name_hash = int(hashlib.md5(name.encode("utf-8")).hexdigest()[:8], 16)
@@ -1167,13 +1152,13 @@ class SceneRenderer:
         p.setAntiAlias(True)
         p.setShader(skia.GradientShader.MakeRadial(
             center=(cx - orb_r * 0.3, cy - orb_r * 0.3), radius=orb_r,
-            colors=[_skia_rgba(min(r + 0.3, 1), min(g + 0.3, 1), min(b + 0.3, 1)),
-                    _skia_rgba(r, g, b), _skia_rgba(r * 0.5, g * 0.5, b * 0.5)],
+            colors=[skia_rgba(min(r + 0.3, 1), min(g + 0.3, 1), min(b + 0.3, 1)),
+                    skia_rgba(r, g, b), skia_rgba(r * 0.5, g * 0.5, b * 0.5)],
             positions=[0, 0.7, 1.0]))
         canvas.drawCircle(cx, cy, orb_r, p)
 
         # Highlights
         canvas.drawCircle(cx - orb_r * 0.25, cy - orb_r * 0.25, orb_r * 0.25,
-            _skia_paint(1, 1, 1, 0.4))
+            skia_paint(1, 1, 1, 0.4))
         canvas.drawCircle(cx + orb_r * 0.3, cy + orb_r * 0.3, orb_r * 0.1,
-            _skia_paint(1, 1, 1, 0.2))
+            skia_paint(1, 1, 1, 0.2))

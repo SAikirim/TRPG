@@ -6,22 +6,7 @@ import os
 import math
 import skia
 
-
-def _skia_rgba(r, g, b, a=1.0):
-    return skia.Color4f(r, g, b, a).toColor()
-
-
-def _skia_paint(r=0, g=0, b=0, a=1.0, style=None, stroke_width=None, anti_alias=True):
-    p = skia.Paint()
-    p.setAntiAlias(anti_alias)
-    p.setColor(_skia_rgba(r, g, b, a))
-    if style is not None:
-        p.setStyle(style)
-    else:
-        p.setStyle(skia.Paint.kFill_Style)
-    if stroke_width is not None:
-        p.setStrokeWidth(stroke_width)
-    return p
+from core.skia_utils import skia_rgba, skia_paint
 
 
 class PortraitGenerator:
@@ -78,7 +63,7 @@ class PortraitGenerator:
             bg_p.setAntiAlias(True)
             bg_p.setShader(skia.GradientShader.MakeRadial(
                 center=(cx, cy - 20), radius=100,
-                colors=[_skia_rgba(0.12, 0.08, 0.20), _skia_rgba(0.04, 0.02, 0.08)],
+                colors=[skia_rgba(0.12, 0.08, 0.20), skia_rgba(0.04, 0.02, 0.08)],
                 positions=[10/100, 1.0]))
             canvas.drawRect(skia.Rect(0, 0, SIZE, SIZE), bg_p)
 
@@ -94,14 +79,14 @@ class PortraitGenerator:
             hair_path.cubicTo(head_cx + 45, head_cy + 15, head_cx + 40, head_cy + 30, head_cx + 35, head_cy + 40)
             hair_path.lineTo(head_cx - 35, head_cy + 40)
             hair_path.cubicTo(head_cx - 40, head_cy + 30, head_cx - 45, head_cy + 15, head_cx - 42, head_cy - 5)
-            canvas.drawPath(hair_path, _skia_paint(hr, hg, hb))
+            canvas.drawPath(hair_path, skia_paint(hr, hg, hb))
 
             # Face (ellipse with radial gradient)
             face_p = skia.Paint()
             face_p.setAntiAlias(True)
             face_p.setShader(skia.GradientShader.MakeRadial(
                 center=(head_cx - 5, head_cy - 10), radius=45,
-                colors=[_skia_rgba(0.98, 0.85, 0.72), _skia_rgba(0.90, 0.72, 0.55)],
+                colors=[skia_rgba(0.98, 0.85, 0.72), skia_rgba(0.90, 0.72, 0.55)],
                 positions=[5/45, 1.0]))
             canvas.save()
             canvas.translate(head_cx, head_cy)
@@ -115,20 +100,20 @@ class PortraitGenerator:
                 canvas.save()
                 canvas.translate(eye_x, head_cy + 2)
                 canvas.scale(8, 5)
-                canvas.drawCircle(0, 0, 1, _skia_paint(0.95, 0.95, 0.97))
+                canvas.drawCircle(0, 0, 1, skia_paint(0.95, 0.95, 0.97))
                 canvas.restore()
                 # Iris
                 iris_p = skia.Paint()
                 iris_p.setAntiAlias(True)
                 iris_p.setShader(skia.GradientShader.MakeRadial(
                     center=(eye_x - 1, head_cy + 1), radius=5,
-                    colors=[_skia_rgba(0.45, 0.30, 0.15), _skia_rgba(0.25, 0.15, 0.05)],
+                    colors=[skia_rgba(0.45, 0.30, 0.15), skia_rgba(0.25, 0.15, 0.05)],
                     positions=[1/5, 1.0]))
                 canvas.drawCircle(eye_x, head_cy + 2, 4, iris_p)
                 # Pupil
-                canvas.drawCircle(eye_x, head_cy + 2, 2, _skia_paint(0.05, 0.05, 0.08))
+                canvas.drawCircle(eye_x, head_cy + 2, 2, skia_paint(0.05, 0.05, 0.08))
                 # Highlight
-                canvas.drawCircle(eye_x + 1.5, head_cy + 0.5, 1.2, _skia_paint(1, 1, 1, 0.8))
+                canvas.drawCircle(eye_x + 1.5, head_cy + 0.5, 1.2, skia_paint(1, 1, 1, 0.8))
 
             # Eyebrows
             ebr = config["hair"][0] * 0.7
@@ -138,7 +123,7 @@ class PortraitGenerator:
                 brow = skia.Path()
                 brow.moveTo(bx - 9 * direction, head_cy - 8)
                 brow.cubicTo(bx - 5 * direction, head_cy - 12, bx + 5 * direction, head_cy - 12, bx + 9 * direction, head_cy - 9)
-                canvas.drawPath(brow, _skia_paint(ebr, ebg, ebb,
+                canvas.drawPath(brow, skia_paint(ebr, ebg, ebb,
                     style=skia.Paint.kStroke_Style, stroke_width=2.5))
 
             # Nose
@@ -146,20 +131,20 @@ class PortraitGenerator:
             nose.moveTo(head_cx, head_cy + 5)
             nose.lineTo(head_cx - 3, head_cy + 16)
             nose.cubicTo(head_cx - 2, head_cy + 18, head_cx + 2, head_cy + 18, head_cx + 3, head_cy + 16)
-            canvas.drawPath(nose, _skia_paint(0.70, 0.50, 0.38, 0.5,
+            canvas.drawPath(nose, skia_paint(0.70, 0.50, 0.38, 0.5,
                 style=skia.Paint.kStroke_Style, stroke_width=1.5))
 
             # Mouth
             mouth = skia.Path()
             mouth.moveTo(head_cx - 10, head_cy + 24)
             mouth.cubicTo(head_cx - 5, head_cy + 27, head_cx + 5, head_cy + 27, head_cx + 10, head_cy + 24)
-            canvas.drawPath(mouth, _skia_paint(0.78, 0.45, 0.40,
+            canvas.drawPath(mouth, skia_paint(0.78, 0.45, 0.40,
                 style=skia.Paint.kStroke_Style, stroke_width=1.8))
             # Upper lip
             ulip = skia.Path()
             ulip.moveTo(head_cx - 8, head_cy + 24)
             ulip.cubicTo(head_cx - 3, head_cy + 22, head_cx + 3, head_cy + 22, head_cx + 8, head_cy + 24)
-            canvas.drawPath(ulip, _skia_paint(0.55, 0.30, 0.25, 0.6,
+            canvas.drawPath(ulip, skia_paint(0.55, 0.30, 0.25, 0.6,
                 style=skia.Paint.kStroke_Style, stroke_width=1))
 
             # Class-specific face detail
@@ -167,14 +152,14 @@ class PortraitGenerator:
                 scar = skia.Path()
                 scar.moveTo(head_cx + 20, head_cy - 5)
                 scar.lineTo(head_cx + 15, head_cy + 15)
-                canvas.drawPath(scar, _skia_paint(0.65, 0.35, 0.30, 0.6,
+                canvas.drawPath(scar, skia_paint(0.65, 0.35, 0.30, 0.6,
                     style=skia.Paint.kStroke_Style, stroke_width=1.5))
             elif config["detail"] == "glow":
                 glow_p = skia.Paint()
                 glow_p.setAntiAlias(True)
                 glow_p.setShader(skia.GradientShader.MakeRadial(
                     center=(head_cx, head_cy - 30), radius=25,
-                    colors=[_skia_rgba(0.4, 0.6, 1.0, 0.3), _skia_rgba(0.2, 0.3, 0.8, 0)],
+                    colors=[skia_rgba(0.4, 0.6, 1.0, 0.3), skia_rgba(0.2, 0.3, 0.8, 0)],
                     positions=[5/25, 1.0]))
                 canvas.drawRect(skia.Rect(0, 0, SIZE, SIZE), glow_p)
 
@@ -184,8 +169,8 @@ class PortraitGenerator:
             body_p.setAntiAlias(True)
             body_p.setShader(skia.GradientShader.MakeLinear(
                 points=[(cx - 60, 130), (cx + 60, 200)],
-                colors=[_skia_rgba(pr * 1.1, pg * 1.1, pb * 1.1),
-                        _skia_rgba(*config["secondary"])]))
+                colors=[skia_rgba(pr * 1.1, pg * 1.1, pb * 1.1),
+                        skia_rgba(*config["secondary"])]))
             body_path = skia.Path()
             body_path.moveTo(cx - 55, 130)
             body_path.cubicTo(cx - 65, 145, cx - 70, 190, cx - 60, 210)
@@ -200,14 +185,14 @@ class PortraitGenerator:
             collar.moveTo(cx - 25, 125)
             collar.cubicTo(cx - 15, 140, cx + 15, 140, cx + 25, 125)
             collar.cubicTo(cx + 15, 135, cx - 15, 135, cx - 25, 125)
-            canvas.drawPath(collar, _skia_paint(sr * 0.8, sg * 0.8, sb * 0.8))
+            canvas.drawPath(collar, skia_paint(sr * 0.8, sg * 0.8, sb * 0.8))
 
             # Emblem
             if config["emblem"] == "swords":
-                sp = _skia_paint(0.85, 0.85, 0.80, 0.8, style=skia.Paint.kStroke_Style, stroke_width=2.5)
+                sp = skia_paint(0.85, 0.85, 0.80, 0.8, style=skia.Paint.kStroke_Style, stroke_width=2.5)
                 canvas.drawLine(cx - 10, 150, cx + 10, 175, sp)
                 canvas.drawLine(cx + 10, 150, cx - 10, 175, sp)
-                gp = _skia_paint(pr, pg, pb, 0.9, style=skia.Paint.kStroke_Style, stroke_width=3)
+                gp = skia_paint(pr, pg, pb, 0.9, style=skia.Paint.kStroke_Style, stroke_width=3)
                 canvas.drawLine(cx - 14, 155, cx - 6, 155, gp)
                 canvas.drawLine(cx + 6, 155, cx + 14, 155, gp)
             elif config["emblem"] == "star":
@@ -225,12 +210,12 @@ class PortraitGenerator:
                     iy = 162 + 4 * math.sin(inner_angle)
                     star.lineTo(ix, iy)
                 star.close()
-                canvas.drawPath(star, _skia_paint(1, 0.85, 0.0, 0.8))
+                canvas.drawPath(star, skia_paint(1, 0.85, 0.0, 0.8))
             elif config["emblem"] == "dagger":
                 canvas.drawLine(cx, 148, cx, 178,
-                    _skia_paint(0.85, 0.85, 0.80, 0.8, style=skia.Paint.kStroke_Style, stroke_width=2))
+                    skia_paint(0.85, 0.85, 0.80, 0.8, style=skia.Paint.kStroke_Style, stroke_width=2))
                 canvas.drawLine(cx - 6, 155, cx + 6, 155,
-                    _skia_paint(0.85, 0.85, 0.80, 0.8, style=skia.Paint.kStroke_Style, stroke_width=3))
+                    skia_paint(0.85, 0.85, 0.80, 0.8, style=skia.Paint.kStroke_Style, stroke_width=3))
 
             # Hood for rogue
             if config["detail"] == "hood":
@@ -240,7 +225,7 @@ class PortraitGenerator:
                 hood.cubicTo(head_cx + 50, head_cy - 5, head_cx + 48, head_cy + 5, head_cx + 43, head_cy + 10)
                 hood.lineTo(head_cx - 43, head_cy + 10)
                 hood.cubicTo(head_cx - 48, head_cy + 5, head_cx - 50, head_cy - 5, head_cx - 45, head_cy - 15)
-                canvas.drawPath(hood, _skia_paint(0.12, 0.55, 0.30, 0.35))
+                canvas.drawPath(hood, skia_paint(0.12, 0.55, 0.30, 0.35))
 
             # Vignette — reset clip first
             canvas.restore()
@@ -249,7 +234,7 @@ class PortraitGenerator:
             vig_p.setAntiAlias(True)
             vig_p.setShader(skia.GradientShader.MakeRadial(
                 center=(cx, cy), radius=100,
-                colors=[_skia_rgba(0, 0, 0, 0), _skia_rgba(0, 0, 0, 0.4)],
+                colors=[skia_rgba(0, 0, 0, 0), skia_rgba(0, 0, 0, 0.4)],
                 positions=[50/100, 1.0]))
             # Draw vignette inside circle only
             vp = skia.Path()
@@ -260,7 +245,7 @@ class PortraitGenerator:
 
             # Border ring (outside clip)
             canvas.drawCircle(cx, cy, 95,
-                _skia_paint(pr * 0.6, pg * 0.6, pb * 0.6,
+                skia_paint(pr * 0.6, pg * 0.6, pb * 0.6,
                     style=skia.Paint.kStroke_Style, stroke_width=3))
 
             filepath = os.path.join(portrait_dir, f"player_{player['id']}.png")

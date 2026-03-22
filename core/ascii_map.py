@@ -532,7 +532,15 @@ def show_emoji_map(state):
         print(f'{y:2d}│{row_str}│')
     print('  └' + '──' * width + '┘')
     print()
-    print('  🔵사이키(마법사)  🟢루체나(도적)  🔴노을(전사)')
+    # 플레이어 범례 — game_state에서 동적 생성
+    player_legend_parts = []
+    for pl in state.get('players', []):
+        icon = P_ICON.get(pl.get('class', ''), '🔵')
+        name = pl.get('name', '???')
+        cls = pl.get('class', '')
+        player_legend_parts.append(f'{icon}{name}({cls})')
+    if player_legend_parts:
+        print('  ' + '  '.join(player_legend_parts))
     print('  💀처치됨   🌲숲   🪨던전   🟡보물실')
     print('  📋퍼즐(미해결)  📜퍼즐(해결)  🔒보물상자  🛌안식처  ⚠️함정  ✅함정(해제)')
     print()
