@@ -311,7 +311,7 @@ class SaveManager:
                 os.path.join(docs_dir, rel))
 
         # 단일 파일 (맵)
-        for fname in ["static/map.png", "static/map_mini.png"]:
+        for fname in ["static/map.png", "static/map_mini.png", "static/world_map.png"]:
             self._copy_if_changed(
                 os.path.join(BASE_DIR, fname),
                 os.path.join(docs_dir, fname))
@@ -345,25 +345,51 @@ class SaveManager:
                     "pixel": "static/illustrations/pixel/treasure.png"},
             }
 
-            # sd_generator의 실시간 scene_state 참조 (동적 웹과 동일한 소스)
+            # 배경/레이어 결정: 3단계 폴백
+            # 1) sd_generator 메모리 (Flask 내 호출)
+            # 2) Flask API HTTP 호출 (CLI에서 Flask가 동작 중일 때)
+            # 3) glob 최신 파일 (Flask 미실행)
             background = None
             live_layers = []
+
+            # 1단계: sd_generator 메모리
             try:
                 from core.sd_generator import get_scene_state
                 scene = get_scene_state()
                 if scene.get("background"):
-                    bg = scene["background"]
-                    # /static/ 접두사 제거 (정적 웹은 상대경로 사용)
-                    background = bg.lstrip("/")
-                live_layers = scene.get("layers", [])
+                    background = scene["background"].lstrip("/")
+                    live_layers = scene.get("layers", [])
             except Exception:
-                # sd_generator를 import할 수 없는 경우 (CLI 실행 등) 폴백
+                pass
+
+            # 2단계: Flask API 호출 (1단계에서 background를 못 가져왔을 때)
+            if not background:
+                try:
+                    import urllib.request
+                    req = urllib.request.Request("http://localhost:5000/api/illustration", method="GET")
+                    resp = urllib.request.urlopen(req, timeout=2)
+                    import json as _json
+                    api_data = _json.loads(resp.read().decode("utf-8"))
+                    if api_data.get("background"):
+                        background = api_data["background"].lstrip("/")
+                    if api_data.get("layers") and not live_layers:
+                        live_layers = api_data["layers"]
+                except Exception:
+                    pass
+
+            # 3단계: glob 최신 파일
+            if not background:
                 sd_bgs = sorted(
                     glob.glob(os.path.join(
                         BASE_DIR, "static", "illustrations", "sd", "background_*")),
                     key=os.path.getmtime, reverse=True)
                 if sd_bgs:
                     background = "static/illustrations/sd/" + os.path.basename(sd_bgs[0])
+
+            # live_layers의 이미지 경로도 상대경로로 정규화
+            for layer in live_layers:
+                if "image" in layer:
+                    layer["image"] = layer["image"].lstrip("/")
 
             ill_state = {
                 "background": background,
