@@ -103,7 +103,7 @@ generate_world_map() 함수가 세계 지도를 자동 생성한다.
 생성 흐름:
 1. worldbuilding.json에서 terrain + locations + world_info 로드
 2. Cairo로 지형별 그라디언트 색상맵 생성 (가우시안 블러 적용)
-3. SD img2img로 판타지 텍스처 변환 시도 (캐시: world_map_bg.webp)
+3. SD img2img로 판타지 텍스처 변환 시도 (캐시: maps/world/{세계관}/background_sd.webp)
 4. SD 실패 시 Cairo 양피지 + 헥스 그리드 폴백
 5. Cairo 오버레이: 강(베지어 곡선) + 도로(메인/샛길) + 지역 마커 + 라벨 + 현재 위치
 6. 장식: 세계 이름 + 테두리 + 나침반
