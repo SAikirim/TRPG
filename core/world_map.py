@@ -725,15 +725,15 @@ def generate_world_map():
     safe_world_name = world_name.replace(" ", "_")
     world_map_dir = os.path.join(BASE_DIR, "static", "maps", "world", safe_world_name)
     os.makedirs(world_map_dir, exist_ok=True)
-    cairo_bg_cache_path = os.path.join(world_map_dir, "background_cairo.webp")
+    skia_bg_cache_path = os.path.join(world_map_dir, "background_skia.webp")
     sd_cache_path = os.path.join(world_map_dir, "background_sd.webp")
 
-    # 배경 우선순위: SD 캐시 > Cairo 캐시 > 새로 생성
+    # 배경 우선순위: SD 캐시 > Skia 캐시 > 새로 생성
     cached_bg = None
     if os.path.exists(sd_cache_path):
         cached_bg = Image.open(sd_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
-    elif os.path.exists(cairo_bg_cache_path):
-        cached_bg = Image.open(cairo_bg_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
+    elif os.path.exists(skia_bg_cache_path):
+        cached_bg = Image.open(skia_bg_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
 
     # ─── 1단계: Skia 판타지 스타일 배경 ───
     final_surface = skia.Surface(W, H)
@@ -932,7 +932,7 @@ def generate_world_map():
         _cache_tmp = os.path.join(world_map_dir, "world_map_temp_cache.tmp.png")
         final_surface.makeImageSnapshot().save(_cache_tmp, skia.kPNG)
         _cache_img = Image.open(_cache_tmp).convert("RGBA")
-        _cache_img.save(cairo_bg_cache_path, "WEBP", quality=90)
+        _cache_img.save(skia_bg_cache_path, "WEBP", quality=90)
         try:
             os.remove(_cache_tmp)
         except Exception:
@@ -959,7 +959,7 @@ def generate_world_map():
                 if os.path.exists(sd_cache_path):
                     sd_bg = Image.open(sd_cache_path).convert("RGBA").resize((W, H), Image.LANCZOS)
                 else:
-                    _sd_input = Image.open(cairo_bg_cache_path).convert("RGB")
+                    _sd_input = Image.open(skia_bg_cache_path).convert("RGB")
                     buffered = io.BytesIO()
                     _sd_input.save(buffered, format="PNG")
                     img_b64 = base64.b64encode(buffered.getvalue()).decode()
