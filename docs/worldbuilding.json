@@ -82,7 +82,8 @@
         "한트": "늙은 경비병. 마을 입구 근무."
       },
       "connections": {
-        "잃어버린 보물의 숲 던전": {"direction": "동쪽", "distance_km": 16, "route": "숲 안쪽"}
+        "잃어버린 보물의 숲 던전": {"direction": "동쪽", "distance_km": 16, "route": "숲 안쪽"},
+        "교역로 (카렌델 방면)": {"direction": "북쪽", "distance_km": 16}
       }
     },
     "trade_road_karendel": {

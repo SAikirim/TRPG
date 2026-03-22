@@ -204,7 +204,7 @@ python ascii_map.py    # 터미널 맵 확인
 | `guides/gm_rules.txt` | GM 나레이션 원칙, 웹 반영, 주사위 판정, 맵 표시, 좌표 시스템, 저장 규칙, 턴 추적기 |
 | `guides/illustration.txt` | SD 연동, 레이어 시스템, 파라미터, 사전 생성 이미지, 외형 일관성, 품질 관리 |
 | `guides/sd_environment.txt` | SD WebUI 경로, 실행 명령, 모델/VAE/확장 목록, 호환성 수정 |
-| `guides/entities.txt` | NPC 엔티티 규칙, JSON 구조, 자동 생성, Agent 연속성, 세계관/웹 반영 Agent 상세 |
+| `guides/entities.txt` | NPC 엔티티 규칙, JSON 구조, 자동 생성, Agent 연속성, 시스템 반영 Agent 상세 |
 | `guides/api.txt` | 전체 API 엔드포인트 목록, gm-update 파라미터 |
 | `guides/scenario.txt` | 시나리오/룰셋 추가 방법, 구성 요소, 게임 시작 플로우 |
 | `guides/process.txt` | 프로세스 관리, 실행/종료, 중복 방지, 상태 확인 |

@@ -37,6 +37,8 @@ REQUIRED_STEPS = {
     "agent:worldbuilding": "세계관 에이전트 자동 검증",
     "agent:rules": "룰 에이전트 자동 검증",
     "agent:scenario": "시나리오 에이전트 자동 검증",
+    "agent:npc": "NPC 에이전트 자동 검증",
+    "agent:worldmap": "세계 지도 에이전트 자동 검증",
 }
 
 # 조건부 필수 (판정이 있었으면 dice 필요 등)
