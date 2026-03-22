@@ -113,19 +113,31 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 유저 (터미널 채팅으로 액션 선언)
   ↓
 메인 Claude = GM (나레이션/진행/유저 상호작용)
-  ├── Agent [룰 심판]   → rulesets/{id}.json 판정, 주사위, 이니셔티브
-  ├── Agent [시나리오]  → scenarios/{id}.json 챕터/이벤트/엔딩 분기
-  ├── Agent [세계관]    → worldbuilding.json 지명/화폐/세력/NPC 관리
-  ├── Agent [NPC:{name}] → entities/{id}/npcs/npc_{id}.json (NPC 1명당 1개)
-  ├── Agent [플레이어]  → entities/{id}/players/player_{id}.json
-  ├── Agent [오브젝트]  → entities/{id}/objects/obj_{id}.json
-  ├── Agent [세계 지도] → worldbuildings/{id}.json 지리 검증 + 지도 갱신
-  └── Agent [시스템 반영] → game_state 업데이트 + gm-update + 일러스트 + NPC 등록 + 로그 + git
+  ├── Agent [룰 심판]
+  │     필수 읽기: guides/gm_rules.txt, data/rules.json
+  │     역할: 판정, 주사위, 이니셔티브, 전투 규칙 검증
+  ├── Agent [시나리오]
+  │     필수 읽기: guides/scenario.txt, data/scenario.json, data/quests.json
+  │     역할: 챕터/이벤트/엔딩 분기, 퀘스트 상태 확인
+  ├── Agent [세계관]
+  │     필수 읽기: data/worldbuilding.json
+  │     역할: 지명/화폐/세력/NPC 관리, 나레이션 정합성 검증
+  ├── Agent [NPC:{name}]
+  │     필수 읽기: guides/entities.txt, entities/{id}/npcs/npc_{id}.json
+  │     역할: 해당 NPC의 대사/행동 생성 (성격/기억/관계 기반)
+  ├── Agent [세계 지도]
+  │     필수 읽기: guides/illustration.txt (세계 지도 섹션), data/worldbuilding.json
+  │     역할: 좌표/지리 검증, 경로 합리성, 지도 갱신
+  └── Agent [시스템 반영]
+        필수 읽기: guides/gm_rules.txt (시스템 반영 에이전트 역할 섹션)
+        역할: game_state 업데이트, gm-update API, 일러스트 교체, NPC 등록, 로그, git
   ↓
 결과 종합 → 나레이션 + 맵 출력 + game_state.json 업데이트 + 저장(git push)
 ```
 
 > 상세: guides/entities.txt 참조
+
+> **에이전트 필수 읽기 규칙**: 모든 하위 에이전트는 호출 시 "필수 읽기" 파일을 반드시 먼저 읽고 동작해야 한다. 가이드를 읽지 않고 동작하는 것은 금지. 이 규칙은 CLAUDE.md에 있으므로 하위 에이전트도 자동으로 적용된다.
 
 ---
 
