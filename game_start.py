@@ -34,6 +34,17 @@ def save_json(path, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+# ─── 유틸리티 ───
+
+def _get_agent_name(agent_id):
+    """에이전트 ID로 에이전트 이름 조회. agents/{agent_id}.json에서 name 필드."""
+    try:
+        agent = load_json(f"agents/{agent_id}.json")
+        return agent.get("name", agent_id)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return agent_id
+
+
 # ─── 세이브 파일 표시 ───
 
 def _show_existing_saves():
@@ -146,7 +157,7 @@ def create_entities(scenario_id, players, npcs):
             "name": p["name"],
             "class": p["class"],
             "level": p.get("level", 1),
-            "background": {"origin": "", "motivation": "", "personality": ""},
+            "background": p.get("background", {"origin": "", "motivation": "", "personality": ""}),
             "stats": p.get("stats", {}),
             "hp": p.get("hp", p.get("max_hp", 10)),
             "max_hp": p.get("max_hp", 10),
@@ -155,8 +166,8 @@ def create_entities(scenario_id, players, npcs):
             "position": p.get("position", [0, 0]),
             "status_effects": [],
             "inventory": p.get("inventory", []),
-            "equipment": {},
-            "available_actions": [],
+            "equipment": p.get("equipment", {}),
+            "available_actions": p.get("available_actions", []),
             "combat_state": {"is_in_combat": False, "defense_bonus": 0, "next_turn_penalty": 0},
             "history": {
                 "actions_taken": [], "damage_dealt_total": 0, "damage_received_total": 0,
@@ -167,6 +178,9 @@ def create_entities(scenario_id, players, npcs):
             "race": p.get("race", "인간"),
             "appearance": p.get("appearance", {}),
         }
+        # 선택적 확장 필드 (에이전트 시스템)
+        if p.get("agent_id"):
+            entity["agent_id"] = p["agent_id"]
         save_json(f"entities/{scenario_id}/players/player_{p['id']}.json", entity)
 
     # NPC 엔티티 — game_mechanics.create_npc_entity 호환 구조
@@ -213,8 +227,18 @@ def create_entities(scenario_id, players, npcs):
 
 # ─── 새 게임 ───
 
-def new_game(scenario_id, skip_mode_select=False):
-    """새 게임 시작. 시나리오 로드 → 룰셋 선택 → 시작 모드 → 캐릭터 메이킹 → 상태 초기화."""
+def new_game(scenario_id, skip_mode_select=False, party=None):
+    """새 게임 시작. 시나리오 로드 → 룰셋 선택 → 시작 모드 → 캐릭터 메이킹 → 상태 초기화.
+
+    Args:
+        scenario_id: 시나리오 ID (예: "lost_treasure")
+        skip_mode_select: True면 시작 모드 선택 건너뜀 (CLI 전용)
+        party: 외부에서 주입하는 파티 데이터 (리스트). 주어지면 대화형 캐릭터 메이킹 스킵.
+            각 항목: {"id":1, "name":"가온", "class":"전사", "stats":{"STR":18,...},
+                      "controlled_by":"ai", "agent_id":"agent_a", "background":{...},
+                      "appearance":{...}, "race":"인간"}
+            HP/MP는 stats + character_classes.json 공식으로 자동 계산됨.
+    """
     index = load_json("scenarios/index.json")
     scenario_entry = next((s for s in index["scenarios"] if s["id"] == scenario_id), None)
     if not scenario_entry:
@@ -300,7 +324,19 @@ def new_game(scenario_id, skip_mode_select=False):
     classes = load_json("templates/character_classes.json")
 
     # ─── 캐릭터 메이킹 ───
-    players = _character_making(scenario, classes, state)
+    if party:
+        # 외부 주입 파티 (에이전트 대화 결과, API 호출 등)
+        # HP/MP 자동 계산 + _build_player로 정규화
+        players = _build_party_from_data(party, scenario, classes)
+        print(f"\n=== 파티 등록 (외부 주입) ===")
+        for p in players:
+            ctrl = "USER" if p.get("controlled_by") == "user" else "AI"
+            agent = f" ({p['agent_id']})" if p.get("agent_id") else ""
+            stats_str = " ".join(f"{k}:{v}" for k, v in p["stats"].items())
+            print(f"  {p['name']} ({p['class']}) [{ctrl}{agent}] HP:{p['hp']}/{p['max_hp']} MP:{p['mp']}/{p['max_mp']} {stats_str}")
+    else:
+        # 대화형 CLI 캐릭터 메이킹 (기존)
+        players = _character_making(scenario, classes, state)
 
     # game_state 구성
     state["players"] = players
@@ -350,7 +386,8 @@ def new_game(scenario_id, skip_mode_select=False):
             {
                 "name": p["name"], "class": p["class"],
                 "hp": f"{p['hp']}/{p['max_hp']}", "mp": f"{p['mp']}/{p['max_mp']}",
-                "key_items": p.get("inventory", [])[:5]
+                "key_items": p.get("inventory", [])[:5],
+                **( {"agent": _get_agent_name(p["agent_id"])} if p.get("agent_id") else {} )
             }
             for p in players
         ],
@@ -871,8 +908,10 @@ def _input_stats(stat_pool, min_stat, max_stat):
 
 
 def _build_player(template, name, cls_name, hp, mp, stats=None):
-    """플레이어 딕셔너리 생성."""
-    return {
+    """플레이어 딕셔너리 생성.
+    template: 시나리오 default_party의 플레이어 또는 외부 주입 데이터.
+    agent_id, background 등 추가 필드가 있으면 그대로 포함."""
+    player = {
         "id": template["id"],
         "name": name,
         "class": cls_name,
@@ -885,11 +924,59 @@ def _build_player(template, name, cls_name, hp, mp, stats=None):
         "stats": stats or template["stats"],
         "position": [0, 0],
         "status_effects": [],
-        "inventory": template.get("starting_inventory", []),
+        "inventory": template.get("starting_inventory", template.get("inventory", [])),
+        "available_actions": template.get("available_actions", []),
         "controlled_by": template.get("controlled_by", "ai"),
         "race": template.get("race", "인간"),
         "appearance": template.get("appearance", {}),
     }
+    # 선택적 확장 필드 (에이전트 시스템, 배경 등)
+    if template.get("agent_id"):
+        player["agent_id"] = template["agent_id"]
+    if template.get("background"):
+        player["background"] = template["background"]
+    return player
+
+
+def _build_party_from_data(party_data, scenario, classes):
+    """외부 주입 파티 데이터를 정규화하여 플레이어 리스트 생성.
+    CLI 대화형 캐릭터 메이킹과 동일한 결과물을 만든다.
+
+    party_data: [{"id":1, "name":"가온", "class":"전사", "stats":{...}, ...}, ...]
+    scenario: scenario.json 데이터 (default_party에서 템플릿 참조)
+    classes: character_classes.json 데이터 (HP/MP 계산용)
+
+    HP/MP가 이미 있으면 그대로 사용, 없으면 calculate_hp_mp로 자동 계산.
+    인벤토리가 없으면 해당 클래스의 starting_equipment 사용.
+    """
+    cls_data = classes.get("classes", {})
+
+    players = []
+    for p in party_data:
+        cls_name = p["class"]
+        cls_info = cls_data.get(cls_name, {})
+
+        # 스탯: 외부 데이터 필수, 없으면 클래스 권장값
+        stats = p.get("stats", cls_info.get("recommended_stats", {"STR": 10, "DEX": 10, "INT": 10, "CON": 10}))
+
+        # HP/MP: 이미 있으면 사용, 없으면 클래스 공식으로 자동 계산
+        if "hp" in p and "mp" in p:
+            hp, mp = p["hp"], p["mp"]
+        else:
+            hp, mp = calculate_hp_mp({"class": cls_name, "stats": stats}, classes)
+
+        # 인벤토리: 외부 데이터 → 클래스 starting_equipment → 빈 리스트
+        if "inventory" not in p and "starting_inventory" not in p:
+            p["starting_inventory"] = cls_info.get("starting_equipment", [])
+
+        # available_actions: 외부 데이터 → 클래스 기본값
+        if "available_actions" not in p:
+            p["available_actions"] = cls_info.get("available_actions", [])
+
+        player = _build_player(p, p["name"], cls_name, hp, mp, stats)
+        players.append(player)
+
+    return players
 
 
 def _carry_over_npc_states(new_scenario_id, from_scenario, prev_save, new_state):
