@@ -503,12 +503,25 @@ def check_orphan_npcs(state):
     if orphan_entities:
         turn = state.get("turn_count", 0)
         if turn == 0 and FIX_MODE:
-            # 새 게임 상태(턴 0)에서 고아 엔티티 = 이전 플레이 잔존물 → 자동 정리
+            # 새 게임 상태(턴 0)에서 고아 엔티티 → monster만 정리, 세계관 NPC 보존
+            removed = 0
+            preserved = []
             for oid in orphan_entities:
                 orphan_path = os.path.join(npc_dir, f"npc_{oid}.json")
                 if os.path.exists(orphan_path):
-                    os.remove(orphan_path)
-            log("warn", f"이전 플레이 잔존 NPC 엔티티 {len(orphan_entities)}개 자동 정리 (턴 0)", auto_fixed=True)
+                    try:
+                        npc_data = load_json_safe(orphan_path)
+                        if npc_data and npc_data.get("type") == "monster":
+                            os.remove(orphan_path)
+                            removed += 1
+                        else:
+                            preserved.append(npc_data.get("name", str(oid)) if npc_data else str(oid))
+                    except Exception:
+                        preserved.append(str(oid))
+            if removed:
+                log("warn", f"이전 플레이 잔존 monster 엔티티 {removed}개 자동 정리 (턴 0)", auto_fixed=True)
+            if preserved:
+                log("ok", f"세계관 NPC 보존: {', '.join(preserved)}")
         else:
             log("warn", f"엔티티 파일은 있지만 game_state에 없는 NPC: {orphan_entities}")
     else:

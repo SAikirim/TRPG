@@ -75,16 +75,29 @@ def calculate_hp_mp(player, classes_data):
 
 def create_entities(scenario_id, players, npcs):
     """시나리오용 엔티티 디렉토리와 파일을 생성.
-    새 게임이므로 이전 플레이의 NPC 엔티티를 정리한다."""
+    새 게임이므로 일회성 NPC(monster)를 정리하고, 세계관 NPC(friendly/neutral)는 보존한다."""
     ent_dir = os.path.join(BASE_DIR, "entities", scenario_id)
     for sub in ["players", "npcs", "objects"]:
         sub_dir = os.path.join(ent_dir, sub)
         os.makedirs(sub_dir, exist_ok=True)
-        # 새 게임: 이전 플레이 잔존 NPC/오브젝트 엔티티 정리
-        if sub in ("npcs", "objects"):
+        # 새 게임: 일회성 엔티티만 정리 (오브젝트는 전부, NPC는 monster만)
+        if sub == "objects":
             for old_file in os.listdir(sub_dir):
                 if old_file.endswith(".json"):
                     os.remove(os.path.join(sub_dir, old_file))
+        elif sub == "npcs":
+            for old_file in os.listdir(sub_dir):
+                if not old_file.endswith(".json"):
+                    continue
+                fpath = os.path.join(sub_dir, old_file)
+                try:
+                    with open(fpath, "r", encoding="utf-8") as f:
+                        npc_data = json.load(f)
+                    # monster 타입만 삭제, friendly/neutral 등 세계관 NPC는 보존
+                    if npc_data.get("type") == "monster":
+                        os.remove(fpath)
+                except (json.JSONDecodeError, KeyError):
+                    pass  # 파싱 실패 시 보존
 
     # 플레이어 엔티티
     for p in players:
