@@ -138,13 +138,45 @@
         "갈림길 쉼터": {"direction": "남쪽", "distance_km": 56}
       }
     },
+    "forest_entrance": {
+      "name": "숲의 입구",
+      "world_pos": [60, 80],
+      "type": "forest",
+      "description": "하룬 마을 동쪽 숲으로 들어서는 길. 나무가 빽빽하고 빛이 잘 들지 않는다. 약초와 함정이 곳곳에 있다.",
+      "connections": {
+        "하룬 마을": {"direction": "서쪽", "distance_km": 8},
+        "잃어버린 보물의 숲 던전": {"direction": "동쪽", "distance_km": 8}
+      }
+    },
     "lost_treasure_dungeon": {
       "name": "잃어버린 보물의 숲 던전",
       "type": "dungeon",
       "world_pos": [70, 80],
-      "description": "하룬 마을 동쪽 숲 깊은 곳의 고대 던전. 이미 클리어됨.",
+      "description": "하룬 마을 동쪽 숲 깊은 곳의 고대 던전.",
+      "sub_areas": ["ancient_dungeon", "treasure_room"],
       "connections": {
+        "숲의 입구": {"direction": "서쪽", "distance_km": 8},
         "하룬 마을": {"direction": "서쪽", "distance_km": 16}
+      }
+    },
+    "ancient_dungeon": {
+      "name": "고대 던전",
+      "type": "dungeon",
+      "world_pos": [70, 80],
+      "description": "숲 깊은 곳의 돌로 된 던전. 오크와 슬라임이 서식하며, 고대 비문과 숨겨진 열쇠가 있다.",
+      "parent": "lost_treasure_dungeon",
+      "connections": {
+        "보물실": {"direction": "안쪽", "distance_km": 0.5}
+      }
+    },
+    "treasure_room": {
+      "name": "보물실",
+      "type": "dungeon",
+      "world_pos": [70, 80],
+      "description": "던전 최심부의 황금 방. 독 가스 함정이 걸린 보물 상자와 수호자 골렘이 기다린다.",
+      "parent": "lost_treasure_dungeon",
+      "connections": {
+        "고대 던전": {"direction": "바깥쪽", "distance_km": 0.5}
       }
     },
     "crossroads_rest": {

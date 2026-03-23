@@ -74,10 +74,17 @@ def calculate_hp_mp(player, classes_data):
 # ─── 엔티티 생성 ───
 
 def create_entities(scenario_id, players, npcs):
-    """시나리오용 엔티티 디렉토리와 파일을 생성."""
+    """시나리오용 엔티티 디렉토리와 파일을 생성.
+    새 게임이므로 이전 플레이의 NPC 엔티티를 정리한다."""
     ent_dir = os.path.join(BASE_DIR, "entities", scenario_id)
     for sub in ["players", "npcs", "objects"]:
-        os.makedirs(os.path.join(ent_dir, sub), exist_ok=True)
+        sub_dir = os.path.join(ent_dir, sub)
+        os.makedirs(sub_dir, exist_ok=True)
+        # 새 게임: 이전 플레이 잔존 NPC/오브젝트 엔티티 정리
+        if sub in ("npcs", "objects"):
+            for old_file in os.listdir(sub_dir):
+                if old_file.endswith(".json"):
+                    os.remove(os.path.join(sub_dir, old_file))
 
     # 플레이어 엔티티
     for p in players:

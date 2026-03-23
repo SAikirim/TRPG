@@ -235,16 +235,28 @@ def check_scenario_files(state):
         else:
             log("error", f"data/{fname} 파일 없음")
 
-    # scenario.json 타이틀이 현재 game_state의 시나리오와 일치하는지 검증
+    # scenario.json이 현재 game_state의 시나리오와 일치하는지 검증 (scenario_id 기준)
     scenario_data = load_json_safe("data/scenario.json")
     if scenario_data and state:
         gs_scenario_id = state.get("game_info", {}).get("scenario_id", "")
-        sc_title = scenario_data.get("scenario_info", {}).get("title", "")
-        gs_title = state.get("game_info", {}).get("title", "")
-        if sc_title != gs_title:
-            log("error", f"scenario.json 타이틀 불일치: scenario.json='{sc_title}' vs game_state='{gs_title}'")
+        # scenario.json에서 scenario_id 추출 (scenario_info.id 또는 타이틀 기반 매칭)
+        sc_info = scenario_data.get("scenario_info", {})
+        sc_id = sc_info.get("id", "")
+        sc_title = sc_info.get("title", "")
+
+        # scenario_id가 직접 있으면 그걸로, 없으면 index.json에서 타이틀로 매칭
+        if not sc_id and gs_scenario_id:
+            idx = load_json_safe("scenarios/index.json")
+            if idx:
+                for s in idx.get("scenarios", []):
+                    if s["id"] == gs_scenario_id:
+                        sc_id = s["id"]
+                        break
+
+        # scenario_id로 비교 (title은 에필로그 등에서 변경될 수 있으므로 비교하지 않음)
+        if gs_scenario_id and sc_id and gs_scenario_id != sc_id:
+            log("error", f"scenario.json 불일치: scenario_id='{sc_id}' vs game_state='{gs_scenario_id}'")
             if FIX_MODE:
-                # Try to find and copy correct scenario file
                 idx = load_json_safe("scenarios/index.json")
                 if idx:
                     for s in idx.get("scenarios", []):
@@ -253,10 +265,10 @@ def check_scenario_files(state):
                             if os.path.exists(src):
                                 import shutil
                                 shutil.copy2(src, os.path.join(BASE_DIR, "data", "scenario.json"))
-                                log("warn", f"scenario.json을 '{gs_title}'로 교체", auto_fixed=True)
+                                log("warn", f"scenario.json을 '{gs_scenario_id}'로 교체", auto_fixed=True)
                             break
         else:
-            log("ok", f"scenario.json 타이틀 일치: '{sc_title}'")
+            log("ok", f"scenario.json 일치: {gs_scenario_id} ('{sc_title}')")
 
     # scenarios/index.json + 개별 시나리오 파일 존재 검증
     idx = load_json_safe("scenarios/index.json")
@@ -489,7 +501,16 @@ def check_orphan_npcs(state):
     # 엔티티 있지만 game_state에 없는 NPC
     orphan_entities = entity_npc_ids - state_npc_ids
     if orphan_entities:
-        log("warn", f"엔티티 파일은 있지만 game_state에 없는 NPC: {orphan_entities}")
+        turn = state.get("turn_count", 0)
+        if turn == 0 and FIX_MODE:
+            # 새 게임 상태(턴 0)에서 고아 엔티티 = 이전 플레이 잔존물 → 자동 정리
+            for oid in orphan_entities:
+                orphan_path = os.path.join(npc_dir, f"npc_{oid}.json")
+                if os.path.exists(orphan_path):
+                    os.remove(orphan_path)
+            log("warn", f"이전 플레이 잔존 NPC 엔티티 {len(orphan_entities)}개 자동 정리 (턴 0)", auto_fixed=True)
+        else:
+            log("warn", f"엔티티 파일은 있지만 game_state에 없는 NPC: {orphan_entities}")
     else:
         log("ok", "고아 NPC 엔티티 없음")
 
