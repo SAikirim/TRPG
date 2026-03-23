@@ -259,48 +259,8 @@ def new_game(scenario_id, skip_mode_select=False):
     # 클래스 데이터 로드
     classes = load_json("templates/character_classes.json")
 
-    # 파티 구성
-    party = scenario.get("default_party", {}).get("players", [])
-    print(f"\n=== 캐릭터 메이킹: {scenario['scenario_info']['title']} ===")
-    print(f"기본 파티 ({len(party)}명):\n")
-
-    players = []
-    for p in party:
-        cls_name = p["class"]
-        name = p.get("name", "")
-
-        # 이름이 비어있으면 유저에게 입력 요청
-        if not name:
-            auto_names = classes.get("auto_generate", {}).get("name_pool", {})
-            pool = auto_names.get(cls_name, ["모험가"])
-            default_name = pool[0] if pool else "모험가"
-            name = input(f"  [{cls_name}] 이름 입력 (빈칸={default_name}): ").strip()
-            if not name:
-                name = default_name
-                print(f"    -> 자동 이름: {name}")
-
-        hp, mp = calculate_hp_mp(p, classes)
-        player = {
-            "id": p["id"],
-            "name": name,
-            "class": cls_name,
-            "level": p.get("level", 1),
-            "xp": p.get("xp", 0),
-            "hp": hp,
-            "max_hp": hp,
-            "mp": mp,
-            "max_mp": mp,
-            "stats": p["stats"],
-            "position": [0, 0],
-            "status_effects": [],
-            "inventory": p.get("starting_inventory", []),
-            "controlled_by": p.get("controlled_by", "agent"),
-            "race": p.get("race", "인간"),
-            "appearance": p.get("appearance", {}),
-        }
-        players.append(player)
-        ctrl = "USER" if player["controlled_by"] == "user" else "AI"
-        print(f"  [OK] {name} ({cls_name}) HP:{hp} MP:{mp} [{ctrl}]")
+    # ─── 캐릭터 메이킹 ───
+    players = _character_making(scenario, classes, state)
 
     # game_state 구성
     state["players"] = players
@@ -617,6 +577,227 @@ def _activate_scenario_files(scenario_entry, scenario_file, ruleset_override=Non
     if os.path.exists(ruleset_src):
         shutil.copy2(ruleset_src, rules_dst)
         print(f"  [OK] data/rules.json <- {ruleset_file}")
+
+
+def _character_making(scenario, classes, state):
+    """캐릭터 메이킹 플로우.
+    1. 기본 파티를 표시
+    2. [기본 파티 수락 / 커스텀] 선택
+    3. 커스텀: 각 캐릭터의 이름, 클래스, 스탯 조정 가능
+    반환: players 리스트
+    """
+    party = scenario.get("default_party", {}).get("players", [])
+    difficulty = state.get("game_info", {}).get("difficulty", "normal")
+    stat_pool = classes.get("stat_pool", {}).get("by_difficulty", {}).get(difficulty, 50)
+    min_stat = classes.get("stat_pool", {}).get("min_stat", 6)
+    max_stat = classes.get("stat_pool", {}).get("max_stat", 18)
+    available_classes = list(classes.get("classes", {}).keys())
+    auto_names = classes.get("auto_generate", {}).get("name_pool", {})
+
+    print(f"\n{'='*50}")
+    print(f"  캐릭터 메이킹: {scenario['scenario_info']['title']}")
+    print(f"{'='*50}")
+    print(f"  난이도: {difficulty} | 스탯 총합: {stat_pool} | 범위: {min_stat}~{max_stat}")
+    print(f"  사용 가능 클래스: {', '.join(available_classes)}")
+
+    # 기본 파티 표시
+    print(f"\n--- 기본 파티 ({len(party)}명) ---")
+    for i, p in enumerate(party):
+        cls_name = p["class"]
+        hp, mp = calculate_hp_mp(p, classes)
+        ctrl = "USER" if p.get("controlled_by") == "user" else "AI"
+        stats_str = " ".join(f"{k}:{v}" for k, v in p["stats"].items())
+        pool_name = auto_names.get(cls_name, ["?"])
+        default_name = pool_name[0] if pool_name else "?"
+        name_display = p.get("name") or default_name
+        print(f"  [{i+1}] {name_display} ({cls_name}) [{ctrl}]")
+        print(f"      {stats_str} | HP:{hp} MP:{mp}")
+        print(f"      장비: {', '.join(p.get('starting_inventory', []))}")
+    print(f"{'─'*40}")
+
+    # 수락 / 커스텀 선택
+    print(f"\n  [1] 기본 파티로 시작")
+    print(f"  [2] 커스텀 (이름/클래스/스탯 변경)")
+    try:
+        choice = input(f"\n선택 (빈칸=기본 파티): ").strip()
+    except EOFError:
+        choice = ""
+
+    if choice == "2":
+        players = _custom_character_making(party, classes, stat_pool, min_stat, max_stat,
+                                           available_classes, auto_names)
+    else:
+        # 기본 파티 수락 — 이름만 확인/변경
+        print(f"\n--- 기본 파티 이름 확인 ---")
+        players = []
+        for p in party:
+            cls_name = p["class"]
+            name = p.get("name", "")
+            pool = auto_names.get(cls_name, ["모험가"])
+            default_name = pool[0] if pool else "모험가"
+            if not name:
+                try:
+                    name = input(f"  [{cls_name}] 이름 (빈칸={default_name}): ").strip()
+                except EOFError:
+                    name = ""
+                if not name:
+                    name = default_name
+                    print(f"    -> {name}")
+
+            hp, mp = calculate_hp_mp(p, classes)
+            player = _build_player(p, name, cls_name, hp, mp)
+            players.append(player)
+
+    # 최종 확인
+    print(f"\n--- 최종 파티 ---")
+    for p in players:
+        ctrl = "USER" if p["controlled_by"] == "user" else "AI"
+        stats_str = " ".join(f"{k}:{v}" for k, v in p["stats"].items())
+        print(f"  {p['name']} ({p['class']}) [{ctrl}] HP:{p['hp']}/{p['max_hp']} MP:{p['mp']}/{p['max_mp']}")
+        print(f"    {stats_str}")
+    print()
+
+    return players
+
+
+def _custom_character_making(party, classes, stat_pool, min_stat, max_stat,
+                              available_classes, auto_names):
+    """커스텀 캐릭터 메이킹. 각 캐릭터의 이름, 클래스, 스탯을 변경 가능."""
+    class_data = classes.get("classes", {})
+    players = []
+
+    for i, p in enumerate(party):
+        print(f"\n--- 캐릭터 {i+1}/{len(party)} ---")
+        ctrl = "USER" if p.get("controlled_by") == "user" else "AI"
+        print(f"  조종: [{ctrl}]")
+
+        # 클래스 선택
+        current_cls = p["class"]
+        print(f"  현재 클래스: {current_cls}")
+        for j, cls_name in enumerate(available_classes, 1):
+            cd = class_data[cls_name]
+            marker = " (현재)" if cls_name == current_cls else ""
+            print(f"    [{j}] {cls_name} — {cd['role']}{marker}")
+        try:
+            cls_choice = input(f"  클래스 선택 (빈칸={current_cls}): ").strip()
+        except EOFError:
+            cls_choice = ""
+        if cls_choice and cls_choice.isdigit():
+            idx = int(cls_choice) - 1
+            if 0 <= idx < len(available_classes):
+                current_cls = available_classes[idx]
+        print(f"    -> {current_cls}")
+
+        # 이름 입력
+        pool = auto_names.get(current_cls, ["모험가"])
+        default_name = pool[0] if pool else "모험가"
+        try:
+            name = input(f"  이름 (빈칸={default_name}): ").strip()
+        except EOFError:
+            name = ""
+        if not name:
+            name = default_name
+        print(f"    -> {name}")
+
+        # 스탯 배분
+        recommended = class_data.get(current_cls, {}).get("recommended_stats", p["stats"])
+        print(f"  스탯 배분 (총합 {stat_pool}, 범위 {min_stat}~{max_stat})")
+        print(f"  추천: {' '.join(f'{k}:{v}' for k, v in recommended.items())}")
+        print(f"  [1] 추천 스탯 사용")
+        print(f"  [2] 직접 입력")
+        try:
+            stat_choice = input(f"  선택 (빈칸=추천): ").strip()
+        except EOFError:
+            stat_choice = ""
+
+        if stat_choice == "2":
+            stats = _input_stats(stat_pool, min_stat, max_stat)
+        else:
+            stats = dict(recommended)
+        print(f"    -> {' '.join(f'{k}:{v}' for k, v in stats.items())} (합계:{sum(stats.values())})")
+
+        # HP/MP 계산
+        temp_p = dict(p)
+        temp_p["class"] = current_cls
+        temp_p["stats"] = stats
+        hp, mp = calculate_hp_mp(temp_p, classes)
+        player = _build_player(p, name, current_cls, hp, mp, stats=stats)
+        players.append(player)
+        print(f"  [OK] {name} ({current_cls}) HP:{hp} MP:{mp}")
+
+    return players
+
+
+def _input_stats(stat_pool, min_stat, max_stat):
+    """유저가 직접 스탯을 입력. 합계가 stat_pool이 될 때까지 반복."""
+    stat_names = ["STR", "DEX", "INT", "CON"]
+    while True:
+        stats = {}
+        remaining = stat_pool
+        for j, stat in enumerate(stat_names):
+            is_last = (j == len(stat_names) - 1)
+            if is_last:
+                # 마지막 스탯은 남은 포인트 자동 배분
+                val = remaining
+                if val < min_stat or val > max_stat:
+                    print(f"    [!] 남은 포인트({remaining})가 범위({min_stat}~{max_stat}) 밖입니다. 다시 입력하세요.")
+                    break
+                stats[stat] = val
+                remaining = 0
+                print(f"    {stat}: {val} (자동 배분)")
+            else:
+                try:
+                    raw = input(f"    {stat} ({min_stat}~{max_stat}, 남은:{remaining}): ").strip()
+                except EOFError:
+                    raw = ""
+                if not raw:
+                    val = min_stat
+                else:
+                    try:
+                        val = int(raw)
+                    except ValueError:
+                        val = min_stat
+                val = max(min_stat, min(max_stat, val))
+                # 남은 포인트로 나머지 스탯이 최소값 이상이 되는지 확인
+                slots_left = len(stat_names) - j - 1
+                if remaining - val < min_stat * slots_left:
+                    val = remaining - min_stat * slots_left
+                    print(f"    [!] 나머지 스탯 최소값 보장을 위해 {stat}={val}로 조정")
+                stats[stat] = val
+                remaining -= val
+                print(f"    {stat}: {val}")
+        else:
+            # for문이 break 없이 완료
+            total = sum(stats.values())
+            if total == stat_pool:
+                return stats
+            print(f"    [!] 합계 {total} ≠ {stat_pool}. 다시 입력하세요.")
+            continue
+        # break로 빠져나온 경우 — 다시 시도
+        print(f"    다시 입력합니다...")
+        continue
+
+
+def _build_player(template, name, cls_name, hp, mp, stats=None):
+    """플레이어 딕셔너리 생성."""
+    return {
+        "id": template["id"],
+        "name": name,
+        "class": cls_name,
+        "level": template.get("level", 1),
+        "xp": template.get("xp", 0),
+        "hp": hp,
+        "max_hp": hp,
+        "mp": mp,
+        "max_mp": mp,
+        "stats": stats or template["stats"],
+        "position": [0, 0],
+        "status_effects": [],
+        "inventory": template.get("starting_inventory", []),
+        "controlled_by": template.get("controlled_by", "agent"),
+        "race": template.get("race", "인간"),
+        "appearance": template.get("appearance", {}),
+    }
 
 
 def _carry_over_npc_states(new_scenario_id, from_scenario, prev_save, new_state):
