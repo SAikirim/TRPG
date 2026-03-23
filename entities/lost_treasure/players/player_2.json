@@ -23,15 +23,34 @@
     "INT": 18,
     "CON": 16
   },
-  "position": [0, 0],
+  "position": [
+    12,
+    10
+  ],
   "status_effects": [],
-  "inventory": ["철퇴", "성스러운 부적"],
+  "inventory": [
+    "철퇴",
+    "성스러운 부적"
+  ],
   "equipment": {
-    "weapon": {"name": "철퇴", "rarity": "common", "properties": {}},
+    "weapon": {
+      "name": "철퇴",
+      "rarity": "common",
+      "properties": {}
+    },
     "armor": null,
-    "accessory": {"name": "성스러운 부적", "rarity": "common", "properties": {}}
+    "accessory": {
+      "name": "성스러운 부적",
+      "rarity": "common",
+      "properties": {}
+    }
   },
-  "available_actions": ["공격", "치유", "축복", "정화"],
+  "available_actions": [
+    "공격",
+    "치유",
+    "축복",
+    "정화"
+  ],
   "combat_state": {
     "is_in_combat": false,
     "defense_bonus": 0,

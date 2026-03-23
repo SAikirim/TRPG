@@ -23,15 +23,33 @@
     "INT": 6,
     "CON": 16
   },
-  "position": [0, 0],
+  "position": [
+    12,
+    11
+  ],
   "status_effects": [],
-  "inventory": ["철검", "가죽 방패"],
+  "inventory": [
+    "철검",
+    "가죽 방패"
+  ],
   "equipment": {
-    "weapon": {"name": "철검", "rarity": "common", "properties": {}},
-    "armor": {"name": "쇠사슬 갑옷", "rarity": "common", "properties": {}},
+    "weapon": {
+      "name": "철검",
+      "rarity": "common",
+      "properties": {}
+    },
+    "armor": {
+      "name": "쇠사슬 갑옷",
+      "rarity": "common",
+      "properties": {}
+    },
     "accessory": null
   },
-  "available_actions": ["공격", "방어", "도발"],
+  "available_actions": [
+    "공격",
+    "방어",
+    "도발"
+  ],
   "combat_state": {
     "is_in_combat": false,
     "defense_bonus": 0,
