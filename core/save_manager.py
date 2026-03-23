@@ -61,9 +61,21 @@ class SaveManager:
             print(f"  강제 저장이 필요하면 game_state.scenario_id를 먼저 수정하세요.")
             return None
 
-        # 기존 세이브 덮어쓰기 방지
+        # 현재 활성 슬롯 확인 — 활성 슬롯이면 자동 덮어쓰기 허용
         save_file = os.path.join(save_path, "save.json")
-        if os.path.exists(save_file) and not overwrite:
+        is_active_slot = False
+        if os.path.exists(CURRENT_SESSION_PATH):
+            try:
+                with open(CURRENT_SESSION_PATH, "r", encoding="utf-8") as f:
+                    session = json.load(f)
+                active_scenario = session.get("active_scenario", "")
+                active_slot = session.get("active_save_slot", -1)
+                is_active_slot = (active_scenario == scenario_id and active_slot == slot)
+            except Exception:
+                pass
+
+        # 기존 세이브 덮어쓰기 방지 (활성 슬롯은 제외)
+        if os.path.exists(save_file) and not overwrite and not is_active_slot:
             existing = self.get_slot_info(scenario_id, slot)
             if existing:
                 print(f"[BLOCK] 슬롯 {slot}에 기존 세이브가 있습니다:")

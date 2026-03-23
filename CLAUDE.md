@@ -32,7 +32,7 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - ✅ 초상화 배경 자동 제거 (transparent-background)
 - ✅ 이미지 생성 폴백: SD WebUI 우선 → Skia 폴백 (빈 화면 없음)
 - ✅ 저장 시 docs/ 자동 동기화 (GitHub Pages) — build_static.py가 HTML 복사 + 데이터(JSON, 이미지) 동기화
-- ✅ 기존 세이브 슬롯 덮어쓰기 자동 거부 (overwrite=True 없으면 차단 + 빈 슬롯 안내)
+- ✅ 비활성 슬롯 덮어쓰기 자동 거부 (활성 슬롯은 허용, 비활성은 차단 + 빈 슬롯 안내)
 - ✅ 세이브 덮어쓰기 전 자동 백업 (`.backups/`, 최대 5개)
 - ✅ 세이브 저장/로드 시 scenario_id 정합성 자동 검증
 - ✅ session_validator가 모든 세이브 파일 정합성 검증 (scenario_id, NPC 오염, 위치)
@@ -246,7 +246,7 @@ show_system_log: true:
 > **세이브 = 유저의 플레이 기록. 2중 3중으로 보호한다.**
 
 ### 4중 안전망
-1. **덮어쓰기 방지** (코드): 기존 세이브가 있는 슬롯에 저장 시 자동 거부 + 빈 슬롯 안내 (overwrite=True 필요)
+1. **덮어쓰기 방지** (코드): 비활성 슬롯에 기존 세이브가 있으면 자동 거부 + 빈 슬롯 안내. 활성 슬롯(active_save_slot)은 자동 허용
 2. **자동 백업** (코드): save_manager가 덮어쓰기 전 `.backups/`에 자동 백업 (최대 5개)
 3. **정합성 검증** (코드): 저장/로드 시 scenario_id 일치 자동 체크, 불일치하면 저장 거부
 4. **세션 검증** (수동): `session_validator.py`가 모든 세이브 파일의 scenario_id, NPC, 위치 검증
