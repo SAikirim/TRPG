@@ -394,31 +394,138 @@ def check_worldbuilding(state):
         save_json("data/worldbuilding.json", wb)
 
 
+def _find_processes_on_port(port):
+    """특정 포트를 점유하는 프로세스 PID 목록 반환."""
+    import subprocess
+    pids = []
+    try:
+        # Linux: lsof
+        result = subprocess.run(
+            ["lsof", "-ti", f":{port}"], capture_output=True, text=True, timeout=5
+        )
+        if result.returncode == 0:
+            for line in result.stdout.strip().split("\n"):
+                if line.strip():
+                    pids.append(int(line.strip()))
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        try:
+            # Linux fallback: /proc 기반
+            import glob
+            for fd_dir in glob.glob("/proc/[0-9]*/fd/*"):
+                try:
+                    link = os.readlink(fd_dir)
+                    if f"socket:" in link:
+                        pid = int(fd_dir.split("/")[2])
+                        if pid not in pids:
+                            pids.append(pid)
+                except (OSError, ValueError):
+                    pass
+        except Exception:
+            pass
+    try:
+        # Windows fallback: netstat
+        result = subprocess.run(
+            ["netstat", "-ano"], capture_output=True, text=True, timeout=5
+        )
+        if result.returncode == 0:
+            for line in result.stdout.split("\n"):
+                if f":{port} " in line and "LISTEN" in line:
+                    parts = line.strip().split()
+                    if parts:
+                        try:
+                            pid = int(parts[-1])
+                            if pid not in pids:
+                                pids.append(pid)
+                        except ValueError:
+                            pass
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        pass
+    return pids
+
+
+def _find_python_processes(keyword):
+    """특정 키워드를 포함하는 Python 프로세스 목록 반환. [(pid, cmdline), ...]"""
+    import subprocess
+    procs = []
+    try:
+        result = subprocess.run(
+            ["ps", "aux"], capture_output=True, text=True, timeout=5
+        )
+        if result.returncode == 0:
+            for line in result.stdout.split("\n"):
+                if keyword in line and "grep" not in line:
+                    parts = line.split()
+                    if len(parts) >= 2:
+                        try:
+                            pid = int(parts[1])
+                            cmdline = " ".join(parts[10:])
+                            procs.append((pid, cmdline))
+                        except (ValueError, IndexError):
+                            pass
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        pass
+    return procs
+
+
+def _is_service_alive(url, timeout=3):
+    """URL에 GET 요청을 보내 응답 코드를 반환. 실패 시 None."""
+    try:
+        req = urllib.request.Request(url, method="GET")
+        resp = urllib.request.urlopen(req, timeout=timeout)
+        return resp.status
+    except Exception:
+        return None
+
+
 def check_services():
-    """Flask 서버 및 SD WebUI 접속 확인 (선택적)."""
+    """Flask 서버 및 SD WebUI 접속 확인 + 중복 프로세스 감지."""
+    import subprocess
     print("\n[7] 서비스 접속 확인")
 
-    # Flask
-    try:
-        req = urllib.request.Request("http://localhost:5000/api/game-state", method="GET")
-        resp = urllib.request.urlopen(req, timeout=3)
-        if resp.status == 200:
-            log("ok", "Flask 서버 (localhost:5000) 정상")
-        else:
-            log("warn", f"Flask 서버 응답 코드: {resp.status}")
-    except Exception:
-        log("warn", "Flask 서버 (localhost:5000) 접속 불가 — 미실행 상태")
+    # --- Flask ---
+    flask_status = _is_service_alive("http://localhost:5000/api/game-state")
+    flask_procs = _find_python_processes("app.py")
 
-    # SD WebUI
-    try:
-        req = urllib.request.Request("http://localhost:7860/sdapi/v1/options", method="GET")
-        resp = urllib.request.urlopen(req, timeout=3)
-        if resp.status == 200:
-            log("ok", "SD WebUI (localhost:7860) 정상")
-        else:
-            log("warn", f"SD WebUI 응답 코드: {resp.status}")
-    except Exception:
-        log("warn", "SD WebUI (localhost:7860) 접속 불가 — 미실행 또는 Skia 폴백 사용")
+    if flask_status == 200:
+        log("ok", f"Flask 서버 (localhost:5000) 정상 (프로세스 {len(flask_procs)}개)")
+        # debug 모드는 부모+자식 2개가 정상. 3개 이상이면 중복
+        if len(flask_procs) > 2:
+            log("warn", f"Flask 프로세스 {len(flask_procs)}개 감지 — 중복 가능성")
+            for pid, cmd in flask_procs:
+                log("warn", f"  PID {pid}: {cmd}")
+            if FIX_MODE:
+                # 가장 최근(PID가 큰) 부모+자식만 남기고 나머지 종료
+                sorted_procs = sorted(flask_procs, key=lambda x: x[0], reverse=True)
+                keep_pids = {sorted_procs[0][0], sorted_procs[1][0]} if len(sorted_procs) >= 2 else {sorted_procs[0][0]}
+                for pid, cmd in flask_procs:
+                    if pid not in keep_pids:
+                        try:
+                            os.kill(pid, 9)
+                            log("warn", f"  PID {pid} 종료됨", auto_fixed=True)
+                        except OSError:
+                            log("warn", f"  PID {pid} 종료 실패")
+    elif flask_status is not None:
+        log("warn", f"Flask 서버 응답 코드: {flask_status}")
+    else:
+        log("warn", "Flask 서버 (localhost:5000) 접속 불가 — 미실행 상태")
+        if flask_procs:
+            log("warn", f"  그러나 app.py 프로세스 {len(flask_procs)}개 존재 — 좀비 가능성")
+            for pid, cmd in flask_procs:
+                log("warn", f"  PID {pid}: {cmd}")
+        # 자동 시작은 하지 않음 — 환경(venv 등)이 다를 수 있으므로 안내만
+        log("warn", "  → Flask 서버를 수동으로 시작하세요: python app.py")
+
+    # --- SD WebUI ---
+    session = load_json_safe("data/current_session.json") or {}
+    sd_enabled = session.get("sd_illustration", False)
+
+    sd_status = _is_service_alive("http://localhost:7860/sdapi/v1/options", timeout=5)
+    if sd_status == 200:
+        log("ok", "SD WebUI (localhost:7860) 정상")
+    elif sd_enabled:
+        log("warn", "SD WebUI (localhost:7860) 접속 불가 — sd_illustration=true인데 미실행. Skia 폴백 사용")
+    else:
+        log("ok", "SD WebUI 미실행 (sd_illustration=false, Skia 폴백 사용)")
 
 
 def check_illustrations(state):
