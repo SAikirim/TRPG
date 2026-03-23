@@ -2,50 +2,49 @@
   "active_scenario": "lost_treasure",
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
-  "worldbuilding": "karendel_world",
   "turn": 0,
   "chapter": 1,
-  "chapter_name": "숲의 입구",
-  "status": "active",
+  "chapter_name": "숲길",
   "party_summary": [
     {
-      "name": "사이키",
-      "class": "마법사",
-      "hp": "15/15",
-      "mp": "30/30",
-      "key_items": [
-        "마법 지팡이",
-        "마나 포션"
-      ]
-    },
-    {
-      "name": "카이",
-      "class": "도적",
-      "hp": "22/22",
-      "mp": "10/10",
-      "key_items": [
-        "단검 x2",
-        "도둑 도구",
-        "밧줄"
-      ]
-    },
-    {
-      "name": "아론",
+      "name": "가온",
       "class": "전사",
-      "hp": "32/32",
+      "hp": "33/33",
       "mp": "5/5",
       "key_items": [
         "철검",
         "가죽 방패"
       ]
+    },
+    {
+      "name": "세라핀",
+      "class": "성직자",
+      "hp": "26/26",
+      "mp": "24/24",
+      "key_items": [
+        "철퇴",
+        "성스러운 부적"
+      ]
+    },
+    {
+      "name": "여울",
+      "class": "도적",
+      "hp": "20/20",
+      "mp": "12/12",
+      "key_items": [
+        "단검 x2",
+        "도둑 도구",
+        "밧줄"
+      ]
     }
   ],
   "progress_notes": [
-    "새 게임 시작: 잃어버린 보물의 숲 던전"
+    "[시스템] 새 게임 시작: 잃어버린 보물의 숲 던전"
   ],
-  "next_objective": "고대 숲으로 들어서는 길. 나무가 빽빽하고 빛이 잘 들지 않는다. 약초와 함정이 곳곳에 있다.",
+  "next_objective": "",
   "display_mode": "mobile",
   "show_dice_result": false,
+  "show_system_log": false,
   "sd_illustration": true,
   "last_updated": "2026-03-23",
   "difficulty": "normal"

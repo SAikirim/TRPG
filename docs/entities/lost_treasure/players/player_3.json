@@ -1,18 +1,18 @@
 {
   "id": 3,
-  "name": "아론",
-  "class": "전사",
+  "name": "여울",
+  "class": "도적",
   "level": 1,
   "xp": 0,
-  "hp": 32,
-  "max_hp": 32,
-  "mp": 5,
-  "max_mp": 5,
+  "hp": 20,
+  "max_hp": 20,
+  "mp": 12,
+  "max_mp": 12,
   "stats": {
-    "STR": 16,
-    "DEX": 12,
-    "INT": 8,
-    "CON": 14
+    "STR": 8,
+    "DEX": 18,
+    "INT": 14,
+    "CON": 10
   },
   "position": [
     0,
@@ -20,22 +20,49 @@
   ],
   "status_effects": [],
   "inventory": [
-    "철검",
-    "가죽 방패"
+    "단검 x2",
+    "도둑 도구",
+    "밧줄"
   ],
   "controlled_by": "ai",
+  "agent_id": "agent_c",
   "race": "인간",
   "appearance": {
-    "age": "20대 후반",
-    "build": "근육질의 건장한 체형",
-    "skin": "구릿빛 피부",
-    "hair": "짧게 깎은 갈색 머리",
-    "face": "강인한 턱선, 투박하지만 믿음직한 인상",
-    "outfit": "쇠사슬 갑옷, 등에 철검, 왼팔에 가죽 방패",
-    "notable": "팔뚝에 오래된 전투 흉터"
+    "age": "20대 초반",
+    "build": "가볍고 민첩한 체형",
+    "skin": "약간 그을린 피부",
+    "hair": "짧게 자른 흑발, 날카로운 눈매",
+    "face": "비실비실 웃는 입꼬리, 약삭빠른 인상",
+    "outfit": "다크그린 레더아머, 허리에 단검 두 자루",
+    "notable": "그림자 속에 녹아드는 듯한 움직임"
   },
-  "equipment": {},
-  "available_actions": [],
+  "equipment": {
+    "weapon": {
+      "name": "단검 x2",
+      "rarity": "common",
+      "properties": {}
+    },
+    "armor": {
+      "name": "가죽 갑옷",
+      "rarity": "common",
+      "properties": {}
+    },
+    "accessory": null
+  },
+  "available_actions": [
+    "공격",
+    "습격",
+    "도주",
+    "함정 탐지"
+  ],
+  "growth": {
+    "level": 1,
+    "xp": 0,
+    "xp_to_next": 100,
+    "stat_points_available": 0,
+    "learned_skills": [],
+    "xp_log": []
+  },
   "history": {
     "actions_taken": [],
     "damage_dealt_total": 0,

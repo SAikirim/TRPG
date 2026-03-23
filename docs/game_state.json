@@ -14,114 +14,98 @@
   "players": [
     {
       "id": 1,
-      "name": "사이키",
-      "class": "마법사",
+      "name": "가온",
+      "class": "전사",
       "level": 1,
       "xp": 0,
-      "hp": 15,
-      "max_hp": 15,
-      "mp": 30,
-      "max_mp": 30,
+      "hp": 33,
+      "max_hp": 33,
+      "mp": 5,
+      "max_mp": 5,
       "stats": {
-        "STR": 8,
-        "DEX": 14,
-        "INT": 18,
-        "CON": 10
+        "STR": 18,
+        "DEX": 10,
+        "INT": 6,
+        "CON": 16
       },
-      "position": [
-        0,
-        0
-      ],
+      "position": [0, 0],
       "status_effects": [],
-      "inventory": [
-        "마법 지팡이",
-        "마나 포션"
-      ],
-      "controlled_by": "user",
+      "inventory": ["철검", "가죽 방패"],
+      "controlled_by": "ai",
+      "agent_id": "agent_a",
       "race": "인간",
       "appearance": {
-        "age": "20대 초반",
-        "build": "마른 체형",
-        "skin": "창백한 흰 피부",
-        "hair": "긴 은회색 머리, 느슨하게 묶음",
-        "face": "지적인 눈빛, 날카로운 이목구비",
-        "outfit": "남색 로브, 허리띠에 매달린 마법 부적",
-        "notable": "손에 항상 마법 지팡이를 들고 있음"
+        "age": "20대 중반",
+        "build": "단단하고 다부진 체형",
+        "skin": "햇볕에 그을린 피부",
+        "hair": "짧게 자른 흑발",
+        "face": "날카로운 눈빛, 과묵한 인상",
+        "outfit": "낡은 쇠사슬 갑옷, 등에 철검, 왼팔에 가죽 방패",
+        "notable": "갑옷 위로 드러난 오래된 흉터"
       }
     },
     {
       "id": 2,
-      "name": "카이",
-      "class": "도적",
+      "name": "세라핀",
+      "class": "성직자",
       "level": 1,
       "xp": 0,
-      "hp": 22,
-      "max_hp": 22,
-      "mp": 10,
-      "max_mp": 10,
+      "hp": 26,
+      "max_hp": 26,
+      "mp": 24,
+      "max_mp": 24,
       "stats": {
-        "STR": 8,
-        "DEX": 18,
-        "INT": 10,
-        "CON": 14
+        "STR": 6,
+        "DEX": 10,
+        "INT": 18,
+        "CON": 16
       },
-      "position": [
-        0,
-        0
-      ],
+      "position": [0, 0],
       "status_effects": [],
-      "inventory": [
-        "단검 x2",
-        "도둑 도구",
-        "밧줄"
-      ],
+      "inventory": ["철퇴", "성스러운 부적"],
       "controlled_by": "ai",
+      "agent_id": "agent_b",
       "race": "인간",
       "appearance": {
-        "age": "20대 중반",
-        "build": "날씬하고 민첩한 체형",
-        "skin": "약간 그을린 살구색",
-        "hair": "짧은 검은 머리, 한쪽으로 넘김",
-        "face": "날카로운 눈매, 약삭빠른 인상",
-        "outfit": "검은 가죽 갑옷, 허리에 단검 두 자루",
-        "notable": "그림자 속에 녹아드는 듯한 움직임"
+        "age": "20대 초반",
+        "build": "단정하고 슬림한 체형",
+        "skin": "밝은 피부",
+        "hair": "은빛 머리카락을 단정하게 묶음",
+        "face": "날카롭고 차가운 눈빛, 지적인 인상",
+        "outfit": "청백색 사제복, 가벼운 사슬 갑옷",
+        "notable": "은빛 성흔 목걸이, 손에 낡은 성전"
       }
     },
     {
       "id": 3,
-      "name": "아론",
-      "class": "전사",
+      "name": "여울",
+      "class": "도적",
       "level": 1,
       "xp": 0,
-      "hp": 32,
-      "max_hp": 32,
-      "mp": 5,
-      "max_mp": 5,
+      "hp": 20,
+      "max_hp": 20,
+      "mp": 12,
+      "max_mp": 12,
       "stats": {
-        "STR": 16,
-        "DEX": 12,
-        "INT": 8,
-        "CON": 14
+        "STR": 8,
+        "DEX": 18,
+        "INT": 14,
+        "CON": 10
       },
-      "position": [
-        0,
-        0
-      ],
+      "position": [0, 0],
       "status_effects": [],
-      "inventory": [
-        "철검",
-        "가죽 방패"
-      ],
+      "inventory": ["단검 x2", "도둑 도구", "밧줄"],
       "controlled_by": "ai",
+      "agent_id": "agent_c",
       "race": "인간",
       "appearance": {
-        "age": "20대 후반",
-        "build": "근육질의 건장한 체형",
-        "skin": "구릿빛 피부",
-        "hair": "짧게 깎은 갈색 머리",
-        "face": "강인한 턱선, 투박하지만 믿음직한 인상",
-        "outfit": "쇠사슬 갑옷, 등에 철검, 왼팔에 가죽 방패",
-        "notable": "팔뚝에 오래된 전투 흉터"
+        "age": "20대 초반",
+        "build": "가볍고 민첩한 체형",
+        "skin": "약간 그을린 피부",
+        "hair": "짧게 자른 흑발, 날카로운 눈매",
+        "face": "비실비실 웃는 입꼬리, 약삭빠른 인상",
+        "outfit": "다크그린 레더아머, 허리에 단검 두 자루",
+        "notable": "그림자 속에 녹아드는 듯한 움직임"
       }
     }
   ],

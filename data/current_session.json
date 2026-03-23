@@ -2,11 +2,9 @@
   "active_scenario": "lost_treasure",
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
-  "worldbuilding": "karendel_world",
   "turn": 0,
   "chapter": 1,
-  "chapter_name": "숲의 입구",
-  "status": "active",
+  "chapter_name": "숲길",
   "party_summary": [
     {
       "name": "가온",
@@ -16,8 +14,7 @@
       "key_items": [
         "철검",
         "가죽 방패"
-      ],
-      "agent": "준혁"
+      ]
     },
     {
       "name": "세라핀",
@@ -27,8 +24,7 @@
       "key_items": [
         "철퇴",
         "성스러운 부적"
-      ],
-      "agent": "서연"
+      ]
     },
     {
       "name": "여울",
@@ -39,14 +35,13 @@
         "단검 x2",
         "도둑 도구",
         "밧줄"
-      ],
-      "agent": "민지"
+      ]
     }
   ],
   "progress_notes": [
-    "새 게임 시작: 잃어버린 보물의 숲 던전"
+    "[시스템] 새 게임 시작: 잃어버린 보물의 숲 던전"
   ],
-  "next_objective": "고대 숲으로 들어서는 길. 나무가 빽빽하고 빛이 잘 들지 않는다. 약초와 함정이 곳곳에 있다.",
+  "next_objective": "",
   "display_mode": "mobile",
   "show_dice_result": false,
   "show_system_log": false,

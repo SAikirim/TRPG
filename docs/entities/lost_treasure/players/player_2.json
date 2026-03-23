@@ -1,18 +1,18 @@
 {
   "id": 2,
-  "name": "카이",
-  "class": "도적",
+  "name": "세라핀",
+  "class": "성직자",
   "level": 1,
   "xp": 0,
-  "hp": 22,
-  "max_hp": 22,
-  "mp": 10,
-  "max_mp": 10,
+  "hp": 26,
+  "max_hp": 26,
+  "mp": 24,
+  "max_mp": 24,
   "stats": {
-    "STR": 8,
-    "DEX": 18,
-    "INT": 10,
-    "CON": 14
+    "STR": 6,
+    "DEX": 10,
+    "INT": 18,
+    "CON": 16
   },
   "position": [
     0,
@@ -20,23 +20,48 @@
   ],
   "status_effects": [],
   "inventory": [
-    "단검 x2",
-    "도둑 도구",
-    "밧줄"
+    "철퇴",
+    "성스러운 부적"
   ],
   "controlled_by": "ai",
+  "agent_id": "agent_b",
   "race": "인간",
   "appearance": {
-    "age": "20대 중반",
-    "build": "날씬하고 민첩한 체형",
-    "skin": "약간 그을린 살구색",
-    "hair": "짧은 검은 머리, 한쪽으로 넘김",
-    "face": "날카로운 눈매, 약삭빠른 인상",
-    "outfit": "검은 가죽 갑옷, 허리에 단검 두 자루",
-    "notable": "그림자 속에 녹아드는 듯한 움직임"
+    "age": "20대 초반",
+    "build": "단정하고 슬림한 체형",
+    "skin": "밝은 피부",
+    "hair": "은빛 머리카락을 단정하게 묶음",
+    "face": "날카롭고 차가운 눈빛, 지적인 인상",
+    "outfit": "청백색 사제복, 가벼운 사슬 갑옷",
+    "notable": "은빛 성흔 목걸이, 손에 낡은 성전"
   },
-  "equipment": {},
-  "available_actions": [],
+  "equipment": {
+    "weapon": {
+      "name": "철퇴",
+      "rarity": "common",
+      "properties": {}
+    },
+    "armor": null,
+    "accessory": {
+      "name": "성스러운 부적",
+      "rarity": "common",
+      "properties": {}
+    }
+  },
+  "available_actions": [
+    "공격",
+    "치유",
+    "축복",
+    "정화"
+  ],
+  "growth": {
+    "level": 1,
+    "xp": 0,
+    "xp_to_next": 100,
+    "stat_points_available": 0,
+    "learned_skills": [],
+    "xp_log": []
+  },
   "history": {
     "actions_taken": [],
     "damage_dealt_total": 0,

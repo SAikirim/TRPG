@@ -1,18 +1,18 @@
 {
   "id": 1,
-  "name": "사이키",
-  "class": "마법사",
+  "name": "가온",
+  "class": "전사",
   "level": 1,
   "xp": 0,
-  "hp": 15,
-  "max_hp": 15,
-  "mp": 30,
-  "max_mp": 30,
+  "hp": 33,
+  "max_hp": 33,
+  "mp": 5,
+  "max_mp": 5,
   "stats": {
-    "STR": 8,
-    "DEX": 14,
-    "INT": 18,
-    "CON": 10
+    "STR": 18,
+    "DEX": 10,
+    "INT": 6,
+    "CON": 16
   },
   "position": [
     0,
@@ -20,22 +20,47 @@
   ],
   "status_effects": [],
   "inventory": [
-    "마법 지팡이",
-    "마나 포션"
+    "철검",
+    "가죽 방패"
   ],
-  "controlled_by": "user",
+  "controlled_by": "ai",
+  "agent_id": "agent_a",
   "race": "인간",
   "appearance": {
-    "age": "20대 초반",
-    "build": "마른 체형",
-    "skin": "창백한 흰 피부",
-    "hair": "긴 은회색 머리, 느슨하게 묶음",
-    "face": "지적인 눈빛, 날카로운 이목구비",
-    "outfit": "남색 로브, 허리띠에 매달린 마법 부적",
-    "notable": "손에 항상 마법 지팡이를 들고 있음"
+    "age": "20대 중반",
+    "build": "단단하고 다부진 체형",
+    "skin": "햇볕에 그을린 피부",
+    "hair": "짧게 자른 흑발",
+    "face": "날카로운 눈빛, 과묵한 인상",
+    "outfit": "낡은 쇠사슬 갑옷, 등에 철검, 왼팔에 가죽 방패",
+    "notable": "갑옷 위로 드러난 오래된 흉터"
   },
-  "equipment": {},
-  "available_actions": [],
+  "equipment": {
+    "weapon": {
+      "name": "철검",
+      "rarity": "common",
+      "properties": {}
+    },
+    "armor": {
+      "name": "쇠사슬 갑옷",
+      "rarity": "common",
+      "properties": {}
+    },
+    "accessory": null
+  },
+  "available_actions": [
+    "공격",
+    "방어",
+    "도발"
+  ],
+  "growth": {
+    "level": 1,
+    "xp": 0,
+    "xp_to_next": 100,
+    "stat_points_available": 0,
+    "learned_skills": [],
+    "xp_log": []
+  },
   "history": {
     "actions_taken": [],
     "damage_dealt_total": 0,
