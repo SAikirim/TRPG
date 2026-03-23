@@ -153,8 +153,8 @@ def create_entities(scenario_id, players, npcs):
 
 # ─── 새 게임 ───
 
-def new_game(scenario_id):
-    """새 게임 시작. 시나리오 로드 → 캐릭터 메이킹 → 상태 초기화 → 엔티티 생성."""
+def new_game(scenario_id, skip_mode_select=False):
+    """새 게임 시작. 시나리오 로드 → 룰셋 선택 → 시작 모드 → 캐릭터 메이킹 → 상태 초기화."""
     index = load_json("scenarios/index.json")
     scenario_entry = next((s for s in index["scenarios"] if s["id"] == scenario_id), None)
     if not scenario_entry:
@@ -227,48 +227,14 @@ def new_game(scenario_id):
         shutil.copy2(ruleset_src, os.path.join(BASE_DIR, "data", "rules.json"))
     state["game_info"]["ruleset"] = chosen_ruleset["id"]
 
-    # ─── 시작 모드 결정 ───
-    print(f"\n=== 시작 모드 ===")
-    save_dir = os.path.join(BASE_DIR, "saves", scenario_id)
-    has_saves = False
-    save_slots = []
-    if os.path.exists(save_dir):
-        for slot_name in sorted(os.listdir(save_dir)):
-            slot_path = os.path.join(save_dir, slot_name, "save.json")
-            if os.path.exists(slot_path):
-                try:
-                    save_data = load_json(slot_path)
-                except Exception:
-                    save_data = None
-                if save_data:
-                    has_saves = True
-                    info = save_data.get("save_info", {})
-                    save_slots.append({
-                        "slot": slot_name,
-                        "description": info.get("description", ""),
-                        "turn": info.get("turn_count", 0),
-                        "saved_at": info.get("saved_at", ""),
-                    })
-
-    if has_saves:
-        print(f"  [1] 새 게임 — 레벨 {scenario['scenario_info'].get('recommended_level', 1)} 캐릭터로 처음부터")
-        for i, sv in enumerate(save_slots, 2):
-            print(f"  [{i}] 세이브 로드 — {sv['slot']}: {sv['description']} (턴 {sv['turn']}, {sv['saved_at']})")
-        try:
-            mode_choice = input(f"\n선택 (빈칸=새 게임): ").strip()
-            if mode_choice and int(mode_choice) >= 2:
-                slot_idx = int(mode_choice) - 2
-                if 0 <= slot_idx < len(save_slots):
-                    print(f"  -> 세이브 로드: {save_slots[slot_idx]['slot']}")
-                    # 세이브 로드는 별도 플로우
-                    from core.save_manager import load_save
-                    load_save(scenario_id, int(save_slots[slot_idx]['slot'].replace('slot_', '')))
-                    return True
-        except (ValueError, IndexError, EOFError):
-            pass
-        print(f"  -> 새 게임으로 시작합니다.")
+    # ─── 시작 모드 결정 (main 대화형에서 이미 처리된 경우 스킵) ───
+    if not skip_mode_select:
+        result = _start_mode_select(scenario_id, scenario)
+        if result == "load":
+            return True  # 세이브 로드 완료, 새 게임 불필요
     else:
-        print(f"  저장된 게임 없음 — 새 게임으로 시작합니다.")
+        print(f"\n=== 시작 모드 ===")
+        print(f"  -> 새 게임으로 시작합니다.")
 
     # 클래스 데이터 로드
     classes = load_json("templates/character_classes.json")
@@ -686,6 +652,50 @@ def _print_state_summary(state):
     print(f"-----------------\n")
 
 
+def _start_mode_select(scenario_id, scenario):
+    """시작 모드 선택: 새 게임 / 세이브 로드. 'new' 또는 'load' 반환."""
+    print(f"\n=== 시작 모드 ===")
+    save_dir = os.path.join(BASE_DIR, "saves", scenario_id)
+    save_slots = []
+    if os.path.exists(save_dir):
+        for slot_name in sorted(os.listdir(save_dir)):
+            slot_path = os.path.join(save_dir, slot_name, "save.json")
+            if os.path.exists(slot_path):
+                try:
+                    save_data = load_json(slot_path)
+                except Exception:
+                    save_data = None
+                if save_data:
+                    info = save_data.get("save_info", {})
+                    save_slots.append({
+                        "slot": slot_name,
+                        "description": info.get("description", ""),
+                        "turn": info.get("turn_count", 0),
+                        "saved_at": info.get("saved_at", ""),
+                    })
+
+    if save_slots:
+        rec_level = scenario.get("scenario_info", {}).get("recommended_level", 1)
+        print(f"  [1] 새 게임 — 레벨 {rec_level} 캐릭터로 처음부터")
+        for i, sv in enumerate(save_slots, 2):
+            print(f"  [{i}] 세이브 로드 — {sv['slot']}: {sv['description']} (턴 {sv['turn']}, {sv['saved_at']})")
+        try:
+            mode_choice = input(f"\n선택 (빈칸=새 게임): ").strip()
+            if mode_choice and int(mode_choice) >= 2:
+                slot_idx = int(mode_choice) - 2
+                if 0 <= slot_idx < len(save_slots):
+                    print(f"  -> 세이브 로드: {save_slots[slot_idx]['slot']}")
+                    from core.save_manager import load_save
+                    load_save(scenario_id, int(save_slots[slot_idx]['slot'].replace('slot_', '')))
+                    return "load"
+        except (ValueError, IndexError, EOFError):
+            pass
+        print(f"  -> 새 게임으로 시작합니다.")
+    else:
+        print(f"  저장된 게임 없음 — 새 게임으로 시작합니다.")
+    return "new"
+
+
 # ─── 메인 ───
 
 def main():
@@ -703,7 +713,7 @@ def main():
             print("잘못된 선택입니다.")
             return
 
-        # 시작 모드 결정
+        # 시작 모드 결정 — 룰셋 선택은 new_game 내부에서 처리
         has_prereq = bool(scenario.get("prerequisite"))
         prereq_required = scenario.get("prerequisite_required", False)
 
@@ -712,22 +722,21 @@ def main():
             print(f"\n이 시나리오는 '{scenario['prerequisite']}' 클리어 필수입니다.")
             continue_game(scenario["id"], scenario["prerequisite"])
         elif has_prereq and not prereq_required:
-            # 선택 가능
-            print(f"\n선행 시나리오: {scenario['prerequisite']}")
-            mode = input("시작 모드 [1: 새 게임 / 2: 이어하기 / 3: 세이브 로드]: ").strip()
+            # 이어하기 옵션 추가 표시
+            print(f"\n선행 시나리오: {scenario['prerequisite']} (이어하기 가능)")
+            print(f"  [1] 새 게임")
+            print(f"  [2] 이어하기 (선행 시나리오 세이브에서)")
+            try:
+                mode = input("선택 (빈칸=새 게임): ").strip()
+            except EOFError:
+                mode = ""
             if mode == "2":
                 continue_game(scenario["id"], scenario["prerequisite"])
-            elif mode == "3":
-                load_game()
             else:
                 new_game(scenario["id"])
         else:
-            # 선행 없음 — 새 게임만
-            mode = input("시작 모드 [1: 새 게임 / 3: 세이브 로드]: ").strip()
-            if mode == "3":
-                load_game()
-            else:
-                new_game(scenario["id"])
+            # 선행 없음 — new_game 내부에서 시작 모드(새 게임/세이브 로드) 처리
+            new_game(scenario["id"])
 
     elif sys.argv[1] == "new":
         if len(sys.argv) < 3:
