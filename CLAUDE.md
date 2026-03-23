@@ -35,6 +35,9 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - ✅ 세이브 저장/로드 시 scenario_id 정합성 자동 검증
 - ✅ session_validator가 모든 세이브 파일 정합성 검증 (scenario_id, NPC 오염, 위치)
 - ✅ NPC 엔티티 자동 생성 (check_npcs)
+- ✅ 연계 시나리오 시 세계관 NPC 상태 자동 이월 (사망/기억/관계)
+- ✅ 새 게임 시 monster 엔티티만 정리, 세계관 NPC(friendly/neutral) 보존
+- ✅ session_validator가 NPC 시간 정합성 검증 (이전 시나리오 사망 NPC ↔ 현재 상태)
 - ✅ 맵 장소별 자동 전환 (current_location → worldbuilding.json)
 
 ### 매 턴 필수 (GM이 반드시 지켜야 함)
@@ -186,6 +189,17 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - ❗ **타 시나리오 NPC가 섞이면 안 된다** — 시나리오별 NPC는 해당 시나리오 세이브에만
 - ❗ **시나리오 분리 시 세이브도 분리한다** — 각 시나리오별 독립 세이브 유지
 - ❗ **새 게임 시작이 기존 세이브를 삭제하지 않는다** — 기존 세이브는 항상 보존
+- ❗ **연계 시나리오에서 NPC 시간 연속성을 지킨다** — 이전에서 죽은 NPC는 다음에서도 dead
+
+### NPC 시간 연속성 (연계 시나리오)
+같은 세계관의 NPC는 시나리오를 넘어서 상태가 이어진다.
+- **이어하기(continue)** 시 `_carry_over_npc_states()`가 자동 처리:
+  - 이전 시나리오에서 **dead** → 새 시나리오에서도 **dead**
+  - **memory** (대화 기록, 핵심 사건) → 새 시나리오로 이월
+  - **relationships** (호감도, 관계 변화) → 새 시나리오로 이월
+- **새 게임(new)** 시: NPC 초기 상태로 시작 (시간 리셋)
+- **monster** 타입은 시나리오별 독립 (이월 안 함)
+- **session_validator [11]**이 시간 모순 자동 감지 (이전 dead ↔ 현재 alive)
 
 ### 세이브 구조
 ```

@@ -528,9 +528,77 @@ def check_orphan_npcs(state):
         log("ok", "고아 NPC 엔티티 없음")
 
 
+def check_npc_temporal_consistency(state):
+    """연계 시나리오 간 NPC 시간 정합성 검증.
+    이전 시나리오에서 죽은 NPC가 현재 시나리오에서 살아있으면 경고."""
+    print("\n[11] NPC 시간 정합성 검증")
+    if state is None:
+        return
+
+    scenario_id = state.get("game_info", {}).get("scenario_id", "")
+    if not scenario_id:
+        return
+
+    # 현재 시나리오의 선행 시나리오 확인
+    idx = load_json_safe("scenarios/index.json")
+    if not idx:
+        log("ok", "scenarios/index.json 없음 — 시간 검증 스킵")
+        return
+
+    entry = next((s for s in idx.get("scenarios", []) if s["id"] == scenario_id), None)
+    if not entry or not entry.get("prerequisite"):
+        log("ok", "선행 시나리오 없음 — 시간 검증 불필요")
+        return
+
+    prev_scenario = entry["prerequisite"]
+
+    # 이전 시나리오의 최신 세이브에서 NPC 상태 확인
+    prev_save_path = None
+    saves_dir = os.path.join(BASE_DIR, "saves")
+    for slot_name in ["slot_complete", "slot_1"]:
+        candidate = os.path.join(saves_dir, prev_scenario, slot_name, "save.json")
+        if os.path.exists(candidate):
+            prev_save_path = candidate
+            break
+
+    if not prev_save_path:
+        log("ok", f"이전 시나리오 '{prev_scenario}' 세이브 없음 — 시간 검증 스킵")
+        return
+
+    prev_save = load_json_safe(prev_save_path)
+    if not prev_save:
+        return
+
+    prev_npcs = prev_save.get("game_state", {}).get("npcs", [])
+    # 이전에서 dead인 세계관 NPC 목록
+    prev_dead = {n["name"] for n in prev_npcs
+                 if n.get("status") in ("dead", "removed") and n.get("type") != "monster"}
+
+    if not prev_dead:
+        log("ok", f"이전 시나리오 '{prev_scenario}'에서 사망한 세계관 NPC 없음")
+        return
+
+    # 현재 시나리오에서 alive인 NPC와 대조
+    current_npcs = state.get("npcs", [])
+    violations = []
+    for npc in current_npcs:
+        if npc.get("name") in prev_dead and npc.get("status") in ("alive", "active", "idle"):
+            violations.append(npc["name"])
+
+    if violations:
+        log("error", f"시간 모순: 이전 시나리오({prev_scenario})에서 사망했지만 현재 alive인 NPC: {', '.join(violations)}")
+        if FIX_MODE:
+            for npc in current_npcs:
+                if npc.get("name") in violations:
+                    npc["status"] = "dead"
+            log("warn", f"사망 NPC {len(violations)}명 status를 dead로 수정", auto_fixed=True)
+    else:
+        log("ok", f"NPC 시간 정합성 통과 (이전 사망: {', '.join(prev_dead)})")
+
+
 def check_rules_consistency(state):
     """룰 기반 데이터 일관성 검증."""
-    print("\n[11] 룰 일관성 검증")
+    print("\n[12] 룰 일관성 검증")
     if state is None:
         return
 
@@ -590,7 +658,7 @@ def check_rules_consistency(state):
 
 def check_save_integrity(state):
     """세이브 파일 정합성 검증 (2중 안전망)."""
-    print("\n[12] 세이브 파일 정합성 검증")
+    print("\n[13] 세이브 파일 정합성 검증")
     saves_dir = os.path.join(BASE_DIR, "saves")
     if not os.path.exists(saves_dir):
         log("ok", "세이브 디렉토리 없음 (새 게임)")
@@ -679,7 +747,7 @@ def check_save_integrity(state):
 
 def check_quest_consistency(state):
     """퀘스트 상태 일관성 검증."""
-    print("\n[13] 퀘스트 상태 검증")
+    print("\n[14] 퀘스트 상태 검증")
     quests = load_json_safe("data/quests.json")
     if quests is None:
         log("ok", "quests.json 없음 (퀘스트 미사용)")
@@ -784,6 +852,7 @@ def main():
     check_worldbuilding(state)
     check_entity_directory_structure(state)
     check_orphan_npcs(state)
+    check_npc_temporal_consistency(state)
     check_services()
     check_illustrations(state)
     check_rules_consistency(state)

@@ -485,6 +485,9 @@ def continue_game(scenario_id, from_scenario):
             })
             save_json(ent_path, ent)
 
+    # ─── 세계관 NPC 상태 이월 (시간 연속성) ───
+    _carry_over_npc_states(scenario_id, from_scenario, prev_save, state)
+
     # current_session 파티 요약 갱신
     session = load_json("data/current_session.json")
     session["party_summary"] = [
@@ -614,6 +617,103 @@ def _activate_scenario_files(scenario_entry, scenario_file, ruleset_override=Non
     if os.path.exists(ruleset_src):
         shutil.copy2(ruleset_src, rules_dst)
         print(f"  [OK] data/rules.json <- {ruleset_file}")
+
+
+def _carry_over_npc_states(new_scenario_id, from_scenario, prev_save, new_state):
+    """이전 시나리오의 세계관 NPC 상태를 새 시나리오로 이월 (시간 연속성).
+    - 이전에서 dead인 세계관 NPC → 새 시나리오에서도 dead
+    - memory, relationships 등 축적 데이터 이월
+    - monster는 이월 안 함 (시나리오별 독립)
+    """
+    prev_gs = prev_save.get("game_state", {})
+    prev_npcs = {n["name"]: n for n in prev_gs.get("npcs", []) if n.get("type") != "monster"}
+
+    # 이전 시나리오의 NPC 엔티티 파일에서 상세 데이터 수집
+    prev_ent_dir = os.path.join(BASE_DIR, "entities", from_scenario, "npcs")
+    prev_entities = {}  # name → entity data
+    if os.path.isdir(prev_ent_dir):
+        for fname in os.listdir(prev_ent_dir):
+            if not fname.endswith(".json"):
+                continue
+            fpath = os.path.join(prev_ent_dir, fname)
+            try:
+                with open(fpath, "r", encoding="utf-8") as f:
+                    ent = json.load(f)
+                if ent.get("type") != "monster":
+                    prev_entities[ent.get("name", "")] = ent
+            except (json.JSONDecodeError, KeyError):
+                pass
+
+    if not prev_npcs and not prev_entities:
+        return
+
+    # 새 시나리오의 NPC에 이전 상태 적용
+    new_ent_dir = os.path.join(BASE_DIR, "entities", new_scenario_id, "npcs")
+    carried = []
+    dead_npcs = []
+
+    for npc_name, prev_npc in prev_npcs.items():
+        prev_status = prev_npc.get("status", "alive")
+        prev_entity = prev_entities.get(npc_name, {})
+
+        # 새 시나리오의 game_state.npcs에서 같은 이름의 NPC 찾기
+        new_npc = next((n for n in new_state.get("npcs", []) if n["name"] == npc_name), None)
+
+        if prev_status in ("dead", "removed"):
+            if new_npc:
+                # 이전에서 죽은 NPC가 새 시나리오에 등록됨 → dead로 변경
+                new_npc["status"] = "dead"
+                dead_npcs.append(npc_name)
+            # 새 시나리오에 없으면 무시 (등장 예정 아님)
+            continue
+
+        # 살아있는 세계관 NPC → 엔티티에 memory/relationships 이월
+        if prev_entity:
+            new_ent_path = os.path.join(new_ent_dir, f"npc_{prev_entity['id']}.json")
+            # 새 시나리오에도 같은 ID의 엔티티가 있으면 이월
+            if os.path.exists(new_ent_path):
+                try:
+                    with open(new_ent_path, "r", encoding="utf-8") as f:
+                        new_entity = json.load(f)
+                    # 축적 데이터 이월 (memory, relationships, personality는 보존)
+                    if prev_entity.get("memory"):
+                        new_entity["memory"] = prev_entity["memory"]
+                    if prev_entity.get("relationships"):
+                        new_entity["relationships"] = prev_entity["relationships"]
+                    new_entity["status"] = prev_status
+                    save_json(new_ent_path, new_entity)
+                    carried.append(npc_name)
+                except (json.JSONDecodeError, KeyError):
+                    pass
+            else:
+                # 같은 ID가 없지만 같은 이름의 엔티티가 있을 수 있음 → 이름으로 탐색
+                for fname in os.listdir(new_ent_dir) if os.path.isdir(new_ent_dir) else []:
+                    if not fname.endswith(".json"):
+                        continue
+                    try:
+                        fpath = os.path.join(new_ent_dir, fname)
+                        with open(fpath, "r", encoding="utf-8") as f:
+                            ne = json.load(f)
+                        if ne.get("name") == npc_name:
+                            if prev_entity.get("memory"):
+                                ne["memory"] = prev_entity["memory"]
+                            if prev_entity.get("relationships"):
+                                ne["relationships"] = prev_entity["relationships"]
+                            ne["status"] = prev_status
+                            save_json(fpath, ne)
+                            carried.append(npc_name)
+                            break
+                    except (json.JSONDecodeError, KeyError):
+                        pass
+
+    # game_state 저장 (dead NPC 반영)
+    if dead_npcs:
+        save_json("data/game_state.json", new_state)
+
+    if carried:
+        print(f"  [OK] NPC 상태 이월: {', '.join(carried)}")
+    if dead_npcs:
+        print(f"  [WARN] 이전 시나리오에서 사망한 NPC: {', '.join(dead_npcs)} → dead 상태로 등록")
 
 
 def _activate_worldbuilding(scenario_entry):
