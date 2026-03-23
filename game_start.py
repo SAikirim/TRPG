@@ -227,6 +227,49 @@ def new_game(scenario_id):
         shutil.copy2(ruleset_src, os.path.join(BASE_DIR, "data", "rules.json"))
     state["game_info"]["ruleset"] = chosen_ruleset["id"]
 
+    # ─── 시작 모드 결정 ───
+    print(f"\n=== 시작 모드 ===")
+    save_dir = os.path.join(BASE_DIR, "saves", scenario_id)
+    has_saves = False
+    save_slots = []
+    if os.path.exists(save_dir):
+        for slot_name in sorted(os.listdir(save_dir)):
+            slot_path = os.path.join(save_dir, slot_name, "save.json")
+            if os.path.exists(slot_path):
+                try:
+                    save_data = load_json(slot_path)
+                except Exception:
+                    save_data = None
+                if save_data:
+                    has_saves = True
+                    info = save_data.get("save_info", {})
+                    save_slots.append({
+                        "slot": slot_name,
+                        "description": info.get("description", ""),
+                        "turn": info.get("turn_count", 0),
+                        "saved_at": info.get("saved_at", ""),
+                    })
+
+    if has_saves:
+        print(f"  [1] 새 게임 — 레벨 {scenario['scenario_info'].get('recommended_level', 1)} 캐릭터로 처음부터")
+        for i, sv in enumerate(save_slots, 2):
+            print(f"  [{i}] 세이브 로드 — {sv['slot']}: {sv['description']} (턴 {sv['turn']}, {sv['saved_at']})")
+        try:
+            mode_choice = input(f"\n선택 (빈칸=새 게임): ").strip()
+            if mode_choice and int(mode_choice) >= 2:
+                slot_idx = int(mode_choice) - 2
+                if 0 <= slot_idx < len(save_slots):
+                    print(f"  -> 세이브 로드: {save_slots[slot_idx]['slot']}")
+                    # 세이브 로드는 별도 플로우
+                    from core.save_manager import load_save
+                    load_save(scenario_id, int(save_slots[slot_idx]['slot'].replace('slot_', '')))
+                    return True
+        except (ValueError, IndexError, EOFError):
+            pass
+        print(f"  -> 새 게임으로 시작합니다.")
+    else:
+        print(f"  저장된 게임 없음 — 새 게임으로 시작합니다.")
+
     # 클래스 데이터 로드
     classes = load_json("templates/character_classes.json")
 
