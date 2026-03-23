@@ -1469,7 +1469,7 @@ def check_hazard_tile(entity_id, new_position, state):
 
 def turn_start_check(state=None):
     """매 턴 시작 시 환경 효과 + 상태이상 틱을 통합 처리.
-    Agent [룰 심판]이 GM 턴 1단계에서 호출한다.
+    Agent [룰 심판]이 GM 턴 1b단계에서 호출한다.
 
     주의: 이 함수는 내부에서 tick_status_effects()를 호출하므로,
     turn_start_check를 호출한 턴에서는 tick_status를 별도로 호출하면 안 된다.

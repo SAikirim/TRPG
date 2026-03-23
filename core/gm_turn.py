@@ -71,7 +71,7 @@ def start_turn():
         "completed": False,
     }
     _save_tracker(tracker)
-    print("━━━ Phase 1 시작 ━━━")
+    print("━━━ GM 턴 시작 (1a 방향설정 → 1b 에이전트 → 2 나레이션 → 3 시스템반영) ━━━")
 
 
 def log_step(tag, message):
@@ -159,12 +159,12 @@ def end_turn():
     _save_tracker(tracker)
 
     if warnings:
-        print("━━━ Phase 1 종료 — 경고 ━━━")
+        print("━━━ GM 턴 종료 — 경고 ━━━")
         for w in warnings:
             print(w)
         print("━━━━━━━━━━━━━━━━━━━━━")
     else:
-        print("━━━ Phase 1 완료 ✓ ━━━")
+        print("━━━ GM 턴 완료 ✓ ━━━")
 
     # 수행 요약
     print(f"  수행된 작업: {len(tracker['steps'])}건")
