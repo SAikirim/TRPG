@@ -615,34 +615,61 @@ def _character_making(scenario, classes, state):
         print(f"      장비: {', '.join(p.get('starting_inventory', []))}")
     print(f"{'─'*40}")
 
-    # 수락 / 커스텀 선택
-    print(f"\n  [1] 기본 파티로 시작")
+    # 수락 / 커스텀 선택 (명시적 선택 필수 — 빈칸 자동 수락 금지)
+    print(f"\n  [1] 기본 파티로 시작 (이름만 변경 가능)")
     print(f"  [2] 커스텀 (이름/클래스/스탯 변경)")
-    try:
-        choice = input(f"\n선택 (빈칸=기본 파티): ").strip()
-    except EOFError:
-        choice = ""
+    choice = ""
+    for _ in range(20):  # 최대 20회 재시도
+        try:
+            choice = input(f"\n선택 (1 또는 2): ").strip()
+        except EOFError:
+            print("  [WARN] 입력 종료 — 캐릭터 메이킹을 건너뜁니다.")
+            choice = "1"  # EOF 시 기본 파티로 폴백 (이름 확인은 아래에서)
+            break
+        if choice in ("1", "2"):
+            break
+        print("  ※ 1 또는 2를 입력해주세요.")
 
     if choice == "2":
         players = _custom_character_making(party, classes, stat_pool, min_stat, max_stat,
                                            available_classes, auto_names)
     else:
-        # 기본 파티 수락 — 이름만 확인/변경
-        print(f"\n--- 기본 파티 이름 확인 ---")
+        # 기본 파티 수락 — 각 캐릭터 이름을 반드시 확인
+        print(f"\n--- 기본 파티 이름 설정 ---")
         players = []
+        eof_reached = False
         for p in party:
             cls_name = p["class"]
-            name = p.get("name", "")
+            ctrl = "USER" if p.get("controlled_by") == "user" else "AI"
             pool = auto_names.get(cls_name, ["모험가"])
             default_name = pool[0] if pool else "모험가"
-            if not name:
-                try:
-                    name = input(f"  [{cls_name}] 이름 (빈칸={default_name}): ").strip()
-                except EOFError:
-                    name = ""
-                if not name:
+            if eof_reached:
+                name = default_name
+                print(f"  [{cls_name}/{ctrl}] -> {name} (자동)")
+            else:
+                name = default_name
+                for _ in range(10):
+                    try:
+                        raw = input(f"  [{cls_name}/{ctrl}] 이름 (빈칸={default_name}): ").strip()
+                    except EOFError:
+                        eof_reached = True
+                        break
+                    candidate = raw if raw else default_name
+                    try:
+                        confirm = input(f"    '{candidate}'(으)로 확정? (Y/n): ").strip().lower()
+                    except EOFError:
+                        eof_reached = True
+                        name = candidate
+                        break
+                    if confirm in ("", "y", "yes"):
+                        name = candidate
+                        print(f"    -> {name}")
+                        break
+                    print(f"    다시 입력해주세요.")
+                else:
                     name = default_name
-                    print(f"    -> {name}")
+                if eof_reached:
+                    print(f"  [{cls_name}/{ctrl}] -> {name} (EOF)")
 
             hp, mp = calculate_hp_mp(p, classes)
             player = _build_player(p, name, cls_name, hp, mp)
@@ -688,16 +715,26 @@ def _custom_character_making(party, classes, stat_pool, min_stat, max_stat,
                 current_cls = available_classes[idx]
         print(f"    -> {current_cls}")
 
-        # 이름 입력
+        # 이름 입력 (확인 필수)
         pool = auto_names.get(current_cls, ["모험가"])
         default_name = pool[0] if pool else "모험가"
-        try:
-            name = input(f"  이름 (빈칸={default_name}): ").strip()
-        except EOFError:
-            name = ""
-        if not name:
-            name = default_name
-        print(f"    -> {name}")
+        name = default_name
+        for _ in range(10):
+            try:
+                raw = input(f"  이름 (빈칸={default_name}): ").strip()
+            except EOFError:
+                break
+            candidate = raw if raw else default_name
+            try:
+                confirm = input(f"    '{candidate}'(으)로 확정? (Y/n): ").strip().lower()
+            except EOFError:
+                name = candidate
+                break
+            if confirm in ("", "y", "yes"):
+                name = candidate
+                print(f"    -> {name}")
+                break
+            print(f"    다시 입력해주세요.")
 
         # 스탯 배분
         recommended = class_data.get(current_cls, {}).get("recommended_stats", p["stats"])
