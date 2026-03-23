@@ -39,12 +39,12 @@
     }
   ],
   "progress_notes": [
-    "[시스템] 새 게임 시작: 잃어버린 보물의 숲 던전"
+    "[GM] 오프닝 — 숲 속 던전 입구에 도착한 세 모험가"
   ],
   "next_objective": "",
   "display_mode": "mobile",
-  "show_dice_result": false,
-  "show_system_log": false,
+  "show_dice_result": true,
+  "show_system_log": true,
   "sd_illustration": true,
   "last_updated": "2026-03-23"
 }
