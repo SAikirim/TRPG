@@ -75,7 +75,7 @@
         "도둑 도구",
         "밧줄"
       ],
-      "controlled_by": "agent",
+      "controlled_by": "ai",
       "race": "인간",
       "appearance": {
         "age": "20대 중반",
@@ -112,7 +112,7 @@
         "철검",
         "가죽 방패"
       ],
-      "controlled_by": "agent",
+      "controlled_by": "ai",
       "race": "인간",
       "appearance": {
         "age": "20대 후반",

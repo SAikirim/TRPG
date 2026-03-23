@@ -794,7 +794,7 @@ def _create_player_entity(scenario_id, player):
             "kills": [], "items_used": [], "turns_played": 0
         },
         "conditions": {"alive": True, "conscious": True, "death_save_turns": 0},
-        "controlled_by": player.get("controlled_by", "agent"),
+        "controlled_by": player.get("controlled_by", "ai"),
     }
     save_json(os.path.join(ent_dir, f"player_{player['id']}.json"), entity)
 

@@ -94,7 +94,7 @@ default_party 구조
 }
 
 - name이 빈 문자열이면 캐릭터 메이킹 단계에서 유저에게 이름 입력을 요청한다.
-- controlled_by: "user"인 캐릭터는 유저가 직접 조종한다. "agent"는 GM이 조종한다.
+- controlled_by: "user"인 캐릭터는 유저가 직접 조종한다. "ai"는 Player Agent가 조종한다.
 - hp/mp 실제 값은 hp_formula / mp_formula로 계산한다 (character_classes.json 참조).
 - starting_inventory: 시나리오 시작 시 보유할 아이템 목록.
 - level/xp: 해당 시나리오의 권장 레벨에 맞춰 설정한다.

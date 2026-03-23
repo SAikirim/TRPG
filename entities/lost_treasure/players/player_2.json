@@ -1,7 +1,7 @@
 {
   "id": 2,
-  "name": "카이",
-  "class": "도적",
+  "name": "카이른",
+  "class": "전사",
   "level": 1,
   "background": {
     "origin": "",
@@ -9,24 +9,23 @@
     "personality": ""
   },
   "stats": {
-    "STR": 8,
-    "DEX": 18,
-    "INT": 10,
+    "STR": 16,
+    "DEX": 12,
+    "INT": 8,
     "CON": 14
   },
-  "hp": 22,
-  "max_hp": 22,
-  "mp": 10,
-  "max_mp": 10,
+  "hp": 32,
+  "max_hp": 32,
+  "mp": 5,
+  "max_mp": 5,
   "position": [
     0,
     0
   ],
   "status_effects": [],
   "inventory": [
-    "단검 x2",
-    "도둑 도구",
-    "밧줄"
+    "철검",
+    "가죽 방패"
   ],
   "equipment": {},
   "available_actions": [],
@@ -48,15 +47,15 @@
     "conscious": true,
     "death_save_turns": 0
   },
-  "controlled_by": "agent",
+  "controlled_by": "ai",
   "race": "인간",
   "appearance": {
-    "age": "20대 중반",
-    "build": "날씬하고 민첩한 체형",
-    "skin": "약간 그을린 살구색",
-    "hair": "짧은 검은 머리, 한쪽으로 넘김",
-    "face": "날카로운 눈매, 약삭빠른 인상",
-    "outfit": "검은 가죽 갑옷, 허리에 단검 두 자루",
-    "notable": "그림자 속에 녹아드는 듯한 움직임"
+    "age": "20대 후반",
+    "build": "근육질의 건장한 체형",
+    "skin": "햇볕에 그을린 구릿빛 피부",
+    "hair": "짧게 깎은 검은 머리, 이마에 흉터",
+    "face": "과묵한 인상, 깊은 눈빛",
+    "outfit": "낡은 쇠사슬 갑옷, 등에 철검, 왼팔에 가죽 방패",
+    "notable": "팔뚝에 오래된 전투 흉터 여럿"
   }
 }

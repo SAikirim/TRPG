@@ -40,7 +40,7 @@
         "hp_base": 15,
         "mp_base": 5,
         "starting_inventory": ["단검 x2", "도둑 도구", "밧줄"],
-        "controlled_by": "agent"
+        "controlled_by": "ai"
       },
       {
         "id": 3,
@@ -54,7 +54,7 @@
         "hp_base": 25,
         "mp_base": 5,
         "starting_inventory": ["철검", "가죽 방패"],
-        "controlled_by": "agent"
+        "controlled_by": "ai"
       }
     ]
   },

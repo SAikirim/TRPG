@@ -84,7 +84,7 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
   - show_dice_result가 false면 판정 수치 노출 금지
   - 유저 캐릭터(controlled_by: "user")의 대사/감정/판단을 GM이 만들지 않는다
   ↓
-[3단계 — 시스템 반영 (Agent [시스템]에게 넘긴다)]
+[3단계 — 시스템 반영 (Agent [시스템 반영]에게 넘긴다)]
   Agent [시스템 반영]이 다음을 자동 처리:
   - game_state.json + entities/ 업데이트
   - gm-update API 호출 (나레이션 + 웹 UI 반영)

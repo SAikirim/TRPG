@@ -123,7 +123,7 @@ def create_entities(scenario_id, players, npcs):
                 "kills": [], "items_used": [], "turns_played": 0
             },
             "conditions": {"alive": True, "conscious": True, "death_save_turns": 0},
-            "controlled_by": p.get("controlled_by", "agent"),
+            "controlled_by": p.get("controlled_by", "ai"),
             "race": p.get("race", "인간"),
             "appearance": p.get("appearance", {}),
         }
@@ -422,7 +422,7 @@ def continue_game(scenario_id, from_scenario):
                     "stats": prev_p["stats"],
                     "inventory": prev_p.get("inventory", []),
                     "status_effects": prev_p.get("status_effects", []),
-                    "controlled_by": prev_p.get("controlled_by", "agent"),
+                    "controlled_by": prev_p.get("controlled_by", "ai"),
                 })
                 break
     save_json("data/game_state.json", state)
@@ -441,7 +441,7 @@ def continue_game(scenario_id, from_scenario):
                 "mp": p["mp"],
                 "max_mp": p["max_mp"],
                 "inventory": p.get("inventory", []),
-                "controlled_by": p.get("controlled_by", "agent"),
+                "controlled_by": p.get("controlled_by", "ai"),
             })
             save_json(ent_path, ent)
 
@@ -682,8 +682,13 @@ def _character_making(scenario, classes, state):
             player = _build_player(p, name, cls_name, hp, mp)
             players.append(player)
 
+    # 파티 인원 검증
+    if len(players) < min_party or len(players) > max_party:
+        print(f"\n[경고] 파티 인원이 범위를 벗어났습니다: {len(players)}명 (허용: {min_party}~{max_party}명)")
+        print(f"  시나리오가 {rec_party}명에 맞춰 설계되어 밸런스가 맞지 않을 수 있습니다.")
+
     # 최종 확인
-    print(f"\n--- 최종 파티 ---")
+    print(f"\n--- 최종 파티 ({len(players)}명) ---")
     for p in players:
         ctrl = "USER" if p["controlled_by"] == "user" else "AI"
         stats_str = " ".join(f"{k}:{v}" for k, v in p["stats"].items())
@@ -838,7 +843,7 @@ def _build_player(template, name, cls_name, hp, mp, stats=None):
         "position": [0, 0],
         "status_effects": [],
         "inventory": template.get("starting_inventory", []),
-        "controlled_by": template.get("controlled_by", "agent"),
+        "controlled_by": template.get("controlled_by", "ai"),
         "race": template.get("race", "인간"),
         "appearance": template.get("appearance", {}),
     }

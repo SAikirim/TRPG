@@ -74,7 +74,7 @@
         "철검",
         "가죽 방패"
       ],
-      "controlled_by": "agent",
+      "controlled_by": "ai",
       "race": "인간",
       "appearance": {
         "age": "20대 후반",
@@ -111,7 +111,7 @@
         "철퇴",
         "성스러운 부적"
       ],
-      "controlled_by": "agent",
+      "controlled_by": "ai",
       "race": "인간",
       "appearance": {
         "age": "20대 초반",
