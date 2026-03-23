@@ -78,7 +78,11 @@ class SaveManager:
         if os.path.exists(save_file) and not overwrite and not is_active_slot:
             existing = self.get_slot_info(scenario_id, slot)
             if existing:
+                party_str = ", ".join(
+                    f"{p['name']}({p['class']})" for p in existing.get("party_summary", [])
+                ) or "(파티 정보 없음)"
                 print(f"[BLOCK] 슬롯 {slot}에 기존 세이브가 있습니다:")
+                print(f"  파티: {party_str}")
                 print(f"  턴 {existing.get('turn_count', '?')}, "
                       f"ch{existing.get('chapter', '?')}, "
                       f"{existing.get('description', '')}")
@@ -91,6 +95,16 @@ class SaveManager:
                     print(f"  → 빈 슬롯이 없습니다. overwrite=True로 덮어쓰세요.")
                 return None
 
+        # 파티 요약 생성 (세이브 식별용)
+        party_summary = []
+        for p in game_state.get("players", []):
+            party_summary.append({
+                "name": p.get("name", ""),
+                "class": p.get("class", ""),
+                "level": p.get("level", 1),
+                "controlled_by": p.get("controlled_by", "ai"),
+            })
+
         save_data = {
             "save_info": {
                 "scenario_id": scenario_id,
@@ -99,6 +113,7 @@ class SaveManager:
                 "saved_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "turn_count": game_state.get("turn_count", 0),
                 "chapter": self._detect_chapter(game_state),
+                "party_summary": party_summary,
             },
             "game_state": game_state,
         }
