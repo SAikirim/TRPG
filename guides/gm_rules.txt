@@ -69,10 +69,33 @@ show_system_log: true:
     ━━ GM 턴 1 ━━
     (나레이션)
 
-내부 로그 (gm_turn):
-  - show_system_log 설정과 무관하게, 모든 단계의 전체 내용을 gm_turn.py가 기록한다
+gm_turn.py 연동 (필수):
+  GM은 매 턴 반드시 gm_turn.py를 사용하여 진행 상황을 기록해야 한다.
+  gm_turn.py가 show_system_log 설정을 자동으로 읽어 터미널 출력을 제어한다.
+  GM이 직접 출력 형식을 판단할 필요 없음 — gm_turn.py에 위임한다.
+
+  매 턴 호출 순서:
+    1. python core/gm_turn.py start
+    2. python core/gm_turn.py phase 1a "방향 설정 요약"
+    3. python core/gm_turn.py phase 1b
+    4. (에이전트 호출마다) python core/gm_turn.py agent "{이름}" "결과 요약"
+    5. python core/gm_turn.py phase 2 "나레이션 작성 요약"
+    6. python core/gm_turn.py phase 3 "시스템 반영 요약"
+    7. (시스템 반영 에이전트가 log 태그도 기록: gm-update, state, entity 등)
+    8. python core/gm_turn.py end
+
+  agent 커맨드의 detail 인자:
+    - 에이전트가 반환한 핵심 결과를 한 줄로 요약
+    - 예: agent "Player:여울" "도적 유틸로 함정 탐색, 바닥 살핌"
+    - 예: agent "룰 심판" "DEX 체크 DC 12, 여울 보너스 +3, 결과: 성공"
+    - 예: agent "NPC:할란" "\"조심해라\" 경고, 횃불 높이 듦"
+    - 이 요약이 show_system_log: true일 때 유저에게 보이는 세부 내용이다
+
+내부 로그 (.turn_tracker.json):
+  - show_system_log 설정과 무관하게, 모든 단계/에이전트/태그의 전체 내용을 기록한다
   - GM 판단, 에이전트 호출/결과, 판정 상세, 시스템 반영 내역 전부 포함
   - 세션 복원, 디버그, 히스토리 추적에 사용
+  - end_turn() 호출 시 전체 요약이 항상 출력된다 (show_system_log 무관)
 
 전환 방법:
   - 유저가 ":시스템로그 on" 또는 ":시스템로그 off"로 전환
@@ -82,6 +105,7 @@ show_system_log: true:
 주의:
   - show_system_log가 off여도 에이전트 호출 자체는 반드시 실행한다 (표시만 숨김)
   - show_dice_result와 독립적인 설정이다 (주사위 수치 ≠ 시스템 로그)
+  - gm_turn.py를 호출하지 않으면 다른 세션에서 턴 히스토리를 복원할 수 없다
 
 GM 웹 반영 필수 규칙
 ===

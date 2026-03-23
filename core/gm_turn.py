@@ -3,10 +3,12 @@ GM 턴 추적기 — 실제 동작만 기록하고, 턴 종료 시 누락 경고
 가짜 상태 출력 절대 금지: 기록된 것만 표시.
 
 사용법:
-  python gm_turn.py start              턴 처리 시작 (tracker 초기화)
-  python gm_turn.py log <tag> <msg>    실제 수행한 작업 기록
-  python gm_turn.py end                턴 종료 검증 (누락 경고)
-  python gm_turn.py status             현재 턴 진행 상황
+  python gm_turn.py start                     턴 처리 시작 (tracker 초기화)
+  python gm_turn.py log <tag> <msg>           실제 수행한 작업 기록
+  python gm_turn.py phase <phase_id> [msg]    단계 시작 기록
+  python gm_turn.py agent <name> <detail>     에이전트 호출 기록
+  python gm_turn.py end                       턴 종료 검증 (누락 경고)
+  python gm_turn.py status                    현재 턴 진행 상황
 
 태그 목록:
   dice      — 주사위 판정 (game_mechanics.py 연동 시 자동)
@@ -20,9 +22,21 @@ GM 턴 추적기 — 실제 동작만 기록하고, 턴 종료 시 누락 경고
   rules — 룰 검증 완료 (판정/비용/사거리/상태이상 확인)
   scenario — 시나리오 검증 완료 (챕터 목표/퀘스트/이벤트 확인)
 
+단계(phase) 태그:
+  1a — GM 방향 설정
+  1b — 에이전트 호출
+  2  — 나레이션 작성
+  3  — 시스템 반영
+
 순서 규칙:
   gm-update → narration (나레이션 기록 후 출력, write-before-display)
   gm-update가 없으면 narration 기록 시 경고 출력
+
+출력 규칙 (show_system_log):
+  ① 단계 헤더 → 항상 표시
+  ② 에이전트 이름 → 항상 표시
+  ③ 세부 내용 → show_system_log: true일 때만 표시
+  ④ 내부 로그 → 무조건 기록 (.turn_tracker.json)
 """
 
 import json
@@ -32,6 +46,25 @@ from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TRACKER_PATH = os.path.join(BASE_DIR, ".turn_tracker.json")
+SESSION_PATH = os.path.join(BASE_DIR, "data", "current_session.json")
+
+# 단계 헤더 이름
+PHASE_NAMES = {
+    "1a": "GM 방향 설정",
+    "1b": "에이전트 호출",
+    "2": "나레이션 작성",
+    "3": "시스템 반영",
+}
+
+
+def _get_show_system_log():
+    """current_session.json에서 show_system_log 설정을 읽는다."""
+    try:
+        with open(SESSION_PATH, "r", encoding="utf-8") as f:
+            session = json.load(f)
+        return session.get("show_system_log", False)
+    except Exception:
+        return False
 
 # 턴에서 수행해야 할 필수 단계
 REQUIRED_STEPS = {
@@ -68,10 +101,12 @@ def start_turn():
     tracker = {
         "started_at": datetime.now().isoformat(),
         "steps": [],
+        "phases": [],
+        "agents": [],
         "completed": False,
     }
     _save_tracker(tracker)
-    print("━━━ GM 턴 시작 (1a 방향설정 → 1b 에이전트 → 2 나레이션 → 3 시스템반영) ━━━")
+    print("━━━ GM 턴 시작 ━━━")
 
 
 def log_step(tag, message):
@@ -125,6 +160,74 @@ def log_step(tag, message):
     print(f"  {icon} [{tag}] {message}")
 
 
+def log_phase(phase_id, detail=""):
+    """단계 시작을 기록한다. 헤더는 항상 표시, 세부 내용은 show_system_log에 따름."""
+    tracker = _load_tracker()
+    if not tracker:
+        tracker = {
+            "started_at": datetime.now().isoformat(),
+            "steps": [],
+            "phases": [],
+            "agents": [],
+            "completed": False,
+        }
+
+    phase_name = PHASE_NAMES.get(phase_id, phase_id)
+    entry = {
+        "phase": phase_id,
+        "name": phase_name,
+        "detail": detail,
+        "time": datetime.now().isoformat(),
+    }
+
+    if "phases" not in tracker:
+        tracker["phases"] = []
+    tracker["phases"].append(entry)
+    _save_tracker(tracker)
+
+    # 단계 헤더는 항상 표시
+    print(f"\n  [{phase_id}] {phase_name}")
+
+    # 세부 내용은 show_system_log가 true일 때만
+    if detail and _get_show_system_log():
+        for line in detail.split("\n"):
+            if line.strip():
+                print(f"    → {line.strip()}")
+
+
+def log_agent(agent_name, detail=""):
+    """에이전트 호출을 기록한다. 이름은 항상 표시, 세부 내용은 show_system_log에 따름."""
+    tracker = _load_tracker()
+    if not tracker:
+        tracker = {
+            "started_at": datetime.now().isoformat(),
+            "steps": [],
+            "phases": [],
+            "agents": [],
+            "completed": False,
+        }
+
+    entry = {
+        "agent": agent_name,
+        "detail": detail,
+        "time": datetime.now().isoformat(),
+    }
+
+    if "agents" not in tracker:
+        tracker["agents"] = []
+    tracker["agents"].append(entry)
+    _save_tracker(tracker)
+
+    # 에이전트 이름은 항상 표시
+    print(f"    → Agent [{agent_name}]")
+
+    # 세부 내용은 show_system_log가 true일 때만
+    if detail and _get_show_system_log():
+        for line in detail.split("\n"):
+            if line.strip():
+                print(f"      - {line.strip()}")
+
+
 def end_turn():
     """턴 종료 — 누락 검증"""
     tracker = _load_tracker()
@@ -167,8 +270,20 @@ def end_turn():
         print("━━━ GM 턴 완료 ✓ ━━━")
 
     # 수행 요약
-    print(f"  수행된 작업: {len(tracker['steps'])}건")
-    for s in tracker["steps"]:
+    phases = tracker.get("phases", [])
+    agents = tracker.get("agents", [])
+    steps = tracker.get("steps", [])
+    total = len(phases) + len(agents) + len(steps)
+    print(f"  수행된 작업: {total}건 (단계 {len(phases)}, 에이전트 {len(agents)}, 태그 {len(steps)})")
+
+    # 단계별 요약 (내부 로그이므로 항상 전부 출력)
+    for p in phases:
+        detail_str = f" — {p['detail']}" if p.get("detail") else ""
+        print(f"    [{p['phase']}] {p['name']}{detail_str}")
+    for a in agents:
+        detail_str = f" — {a['detail']}" if a.get("detail") else ""
+        print(f"    → Agent [{a['agent']}]{detail_str}")
+    for s in steps:
         icons = {"dice": "🎲", "gm-update": "🖼️", "state": "💾",
                  "entity": "📁", "save": "📌", "npc": "💬", "narration": "📖",
                  "worldbuilding": "🌍", "rules": "⚖️", "scenario": "📜"}
@@ -210,12 +325,14 @@ def should_push(push_interval=3):
 
 def main():
     if len(sys.argv) < 2:
-        print("사용법: python gm_turn.py <start|log|end|status>")
-        print("  start              턴 처리 시작")
-        print("  log <tag> <msg>    작업 기록")
-        print("  end                턴 종료 검증")
-        print("  status             진행 상황")
-        print("  should_push [N]    N턴마다 push 필요 여부 (기본 3)")
+        print("사용법: python gm_turn.py <start|log|phase|agent|end|status>")
+        print("  start                     턴 처리 시작")
+        print("  log <tag> <msg>           작업 기록")
+        print("  phase <1a|1b|2|3> [msg]   단계 시작 기록")
+        print("  agent <name> [detail]     에이전트 호출 기록")
+        print("  end                       턴 종료 검증")
+        print("  status                    진행 상황")
+        print("  should_push [N]           N턴마다 push 필요 여부 (기본 3)")
         return
 
     cmd = sys.argv[1]
@@ -224,6 +341,12 @@ def main():
         start_turn()
     elif cmd == "log" and len(sys.argv) >= 4:
         log_step(sys.argv[2], " ".join(sys.argv[3:]))
+    elif cmd == "phase" and len(sys.argv) >= 3:
+        detail = " ".join(sys.argv[3:]) if len(sys.argv) >= 4 else ""
+        log_phase(sys.argv[2], detail)
+    elif cmd == "agent" and len(sys.argv) >= 3:
+        detail = " ".join(sys.argv[3:]) if len(sys.argv) >= 4 else ""
+        log_agent(sys.argv[2], detail)
     elif cmd == "end":
         end_turn()
     elif cmd == "status":

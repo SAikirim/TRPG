@@ -104,40 +104,87 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 
 ### GM 턴 템플릿 (매 턴 이 순서를 따른다)
 
+> **gm_turn.py 필수 사용**: 매 턴 start → phase/agent/log → end 호출로 추적한다.
+> gm_turn.py가 show_system_log 설정에 따라 터미널 출력을 자동 제어한다.
+
 ```
-[1a단계] GM 방향 설정 (시스템)
+python core/gm_turn.py start                          # 턴 시작
+
+[1a단계] GM 방향 설정
+  python core/gm_turn.py phase 1a "이벤트, 분위기, 전개방향 요약"
   → 대화 컨텍스트 기반으로 이 턴의 전개 방향 판단
   → 필요한 에이전트 선정 + 각 에이전트에게 전달할 맥락/질문 준비
 
-[1b단계] 에이전트 호출 (시스템)
-  → Agent [Player:{이름}] 행동 선택 — AI 플레이어의 의사결정 (controlled_by: "ai"만)
-  → Agent [NPC:{이름}] 대사/행동 생성 — NPC의 능동적 판단 포함 (해당 NPC마다 병렬)
-  → Agent [룰] 판정 필요? — 어떤 판정인지 맥락 전달 (필요 시 game_mechanics.py 실행)
-  → Agent [세계관/시나리오/세계지도] — GM 방향이 정합한지 검증 요청
+[1b단계] 에이전트 호출
+  python core/gm_turn.py phase 1b
+  → 각 에이전트 호출 시:
+    python core/gm_turn.py agent "Player:{이름}" "행동 선택 요약"
+    python core/gm_turn.py agent "NPC:{이름}" "대사/행동 요약"
+    python core/gm_turn.py agent "룰 심판" "판정 결과 요약"
+    python core/gm_turn.py agent "세계관" "정합성 확인 결과"
+    python core/gm_turn.py agent "시나리오" "이벤트/퀘스트 확인"
+    python core/gm_turn.py agent "세계 지도" "위치/경로 확인"
   → 결과 수집 대기
 
-[2단계] 나레이션 작성 (시스템)
+[2단계] 나레이션 작성
+  python core/gm_turn.py phase 2 "나레이션 작성 요약"
   → show_dice_result 확인 (false면 수치 노출 금지)
   → 에이전트 결과를 종합하여 나레이션 작성
   → 유저 캐릭터 대사/감정 작성 금지
 
-[3단계] Agent [시스템 반영]에게 전달 (시스템/백그라운드)
+[3단계] Agent [시스템 반영]에게 전달 (백그라운드)
+  python core/gm_turn.py phase 3 "시스템 반영 요약"
   전달 내용:
   - 나레이션 텍스트
   - 위치 변경 여부 + 새 위치
   - 시간대 (낮/밤/새벽)
   - NPC/플레이어 상태 변경
   - 배경 일러스트 교체 필요 여부
+  (시스템 반영 에이전트가 gm-update, state, entity 등 log 태그도 기록)
 
 [나레이션 출력] — 굵게 구분하여 터미널에 출력
 
-★ 터미널 출력 규칙 (show_system_log 설정):
+python core/gm_turn.py end                            # 턴 종료 + 누락 검증
+```
+
+### 터미널 출력 규칙 (show_system_log)
+
+```
+★ gm_turn.py가 show_system_log 설정을 읽어 자동 제어:
   ① 단계 헤더 ([1a], [1b], [2], [3])      → 항상 표시
   ② 에이전트 이름 (어떤 에이전트가 동작 중)  → 항상 표시
   ③ 세부 내용 (에이전트의 구체적 판단/결과)   → show_system_log로 on/off
-  ④ 내부 로그 (gm_turn)                    → 무조건 기록 (표시와 무관)
-  show_system_log: false (기본) → 헤더 + 에이전트 이름만, 세부 내용 숨김
-  show_system_log: true → 헤더 + 에이전트 이름 + 세부 내용 모두 출력
+  ④ 내부 로그 (.turn_tracker.json)          → 무조건 기록 (표시와 무관)
+
+show_system_log: false (기본):
+  [1a] GM 방향 설정
+  [1b] 에이전트 호출
+    → Agent [Player:가온]
+    → Agent [Player:여울]
+    → Agent [룰 심판]
+  [2] 나레이션 작성
+  [3] 시스템 반영
+  ━━ GM 턴 1 ━━
+  (나레이션)
+
+show_system_log: true:
+  [1a] GM 방향 설정
+    → 함정 탐지 이벤트, 던전 분위기 확립
+  [1b] 에이전트 호출
+    → Agent [Player:가온]
+      - 전위에서 경계, 방패 들고 앞장
+    → Agent [Player:여울]
+      - 도적 유틸로 함정 탐색
+    → Agent [룰 심판]
+      - DEX 체크 DC 12, 여울 보너스 +3
+  [2] 나레이션 작성
+    → 여울의 함정 탐지 성공 반영
+  [3] 시스템 반영
+    → game_state 업데이트, 배경 교체
+  ━━ GM 턴 1 ━━
+  (나레이션)
+
+전환: ":시스템로그 on/off" 또는 settings API
 ```
 
 ---
