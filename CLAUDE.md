@@ -41,7 +41,8 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - ✅ 맵 장소별 자동 전환 (current_location → worldbuilding.json)
 
 ### 매 턴 필수 (GM이 반드시 지켜야 함)
-- ❗ NPC 대사는 NPC Agent가 생성한다 — GM이 직접 쓰지 않는다
+- ❗ AI 플레이어의 행동/대사는 Player Agent가 생성한다 — GM이 직접 쓰지 않는다
+- ❗ NPC 대사/행동은 NPC Agent가 생성한다 — GM이 직접 쓰지 않는다 (NPC는 능동적으로 행동한다)
 - ❗ 판정은 룰 Agent가 처리한다 — GM이 직접 주사위를 굴리지 않는다
 - ❗ show_dice_result가 false면 나레이션에 판정 수치를 절대 노출하지 않는다 (내부 기록은 항상 필수)
 - ❗ 판정 상세(주사위값, DC, 수정치, 결과)는 gm-update의 dice_rolls 필드로 항상 기록한다
@@ -70,7 +71,8 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
   ↓
 [1b단계 — 에이전트에게 방향을 전달하고 결과를 받는다]
   GM의 방향 + 구체적 맥락을 포함하여 병렬 호출:
-  - Agent [NPC:{name}] → "함정 발견 상황에서 할란의 반응/대사 생성해줘"
+  - Agent [Player:{name}] → "함정 발견 상황에서 노을은 어떻게 행동할지 선택해줘" (AI 플레이어)
+  - Agent [NPC:{name}] → "함정 발견 상황에서 할란의 반응/대사/행동 생성해줘"
   - Agent [룰 심판]   → "함정 감지 판정 필요 — DEX 체크 DC 확인해줘"
   - Agent [세계관]    → "이 숲의 설정과 함정 배치가 정합한지 확인해줘"
   - Agent [시나리오]  → "함정 이벤트 트리거 조건 충족했는지 확인해줘"
@@ -108,7 +110,8 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
   → 필요한 에이전트 선정 + 각 에이전트에게 전달할 맥락/질문 준비
 
 [1b단계] 에이전트 호출 (방향 + 맥락 포함)
-  → Agent [NPC:{이름}] 대사 생성 — 상황 맥락 전달 (해당 NPC마다 병렬)
+  → Agent [Player:{이름}] 행동 선택 — AI 플레이어의 의사결정 (controlled_by: "ai"만)
+  → Agent [NPC:{이름}] 대사/행동 생성 — NPC의 능동적 판단 포함 (해당 NPC마다 병렬)
   → Agent [룰] 판정 필요? — 어떤 판정인지 맥락 전달 (필요 시 game_mechanics.py 실행)
   → Agent [세계관/시나리오/세계지도] — GM 방향이 정합한지 검증 요청
   → 결과 수집 대기
@@ -149,10 +152,16 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
   │     필수 읽기: data/worldbuilding.json
   │     역할: 지명/화폐/세력/NPC 관리, 나레이션 정합성 검증
   │     페르소나: "나는 세계관 창조 전문가다. 이 세계는 실제로 있어도 문제될 게 없을 만큼 정합하고 살아있어야 한다."
+  ├── Agent [Player:{name}]
+  │     필수 읽기: guides/entities.txt, entities/{id}/players/player_{id}.json
+  │     역할: AI 조종 플레이어의 의사결정, 대사, 행동 선택 (성격/배경/관계 기반)
+  │     페르소나: "나는 이 플레이어 캐릭터다. 나의 성격과 동기로 생각하고, 상황을 판단해 스스로 행동을 선택한다."
+  │     ※ controlled_by: "user"인 캐릭터는 호출하지 않는다 — 유저가 직접 조종
   ├── Agent [NPC:{name}]
   │     필수 읽기: guides/entities.txt, entities/{id}/npcs/npc_{id}.json
-  │     역할: 해당 NPC의 대사/행동 생성 (성격/기억/관계 기반)
-  │     페르소나: "나는 이 캐릭터다. 이 캐릭터의 성격으로 생각하고, 이 캐릭터의 입으로 말한다. 설정에 없는 행동은 하지 않는다."
+  │     역할: 해당 NPC의 대사/행동/주도적 판단 생성 (성격/기억/관계/목적 기반)
+  │     페르소나: "나는 이 세계에 사는 인물이다. 나만의 목적과 일상이 있고, 플레이어와 무관하게도 행동한다. 설정에 기반하되, 살아있는 사람처럼 판단한다."
+  │     ※ NPC는 수동적 반응자가 아니다 — 자기 목적에 따라 능동적으로 행동/제안/거부할 수 있다
   ├── Agent [세계 지도]
   │     필수 읽기: guides/illustration.txt (세계 지도 섹션), data/worldbuilding.json
   │     역할: 좌표/지리 검증, 경로 합리성, 지도 갱신

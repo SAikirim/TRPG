@@ -406,7 +406,8 @@ GM이 시스템 반영 에이전트에게 전달해야 하는 정보:
 | 좌표, 해안선, 도로 연결, 지형 배치 | Agent [세계 지도] (worldmap_agent) |
 | 판정, 스킬, HP/MP, 전투 규칙 | Agent [룰 심판] (rules_agent) |
 | 챕터 전환, 퀘스트, 스토리 분기 | Agent [시나리오] (scenario_agent) |
-| NPC 상태, 대사, 행동 일관성 | Agent [NPC] (npc_agent) |
+| AI 플레이어 행동/대사/의사결정 | Agent [Player:{name}] (player_agent) |
+| NPC 상태, 대사, 행동, 능동적 판단 | Agent [NPC:{name}] (npc_agent) |
 
 GM이 직접 JSON을 읽고 판단하는 것은 금지한다. 에이전트가 검증한 결과를 바탕으로 판단해야 한다.
 - 나쁜 예: GM이 worldbuilding.json을 직접 읽고 "세렌 항구는 여기에 있으니까..." 판단
