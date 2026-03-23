@@ -34,6 +34,46 @@ def save_json(path, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+# ─── 세이브 파일 표시 ───
+
+def _show_existing_saves():
+    """기존 세이브 파일 목록을 표시한다."""
+    saves_dir = os.path.join(BASE_DIR, "saves")
+    if not os.path.exists(saves_dir):
+        return
+    saves = []
+    for sid in sorted(os.listdir(saves_dir)):
+        sid_dir = os.path.join(saves_dir, sid)
+        if not os.path.isdir(sid_dir):
+            continue
+        for slot_name in sorted(os.listdir(sid_dir)):
+            if not slot_name.startswith("slot_"):
+                continue
+            sf = os.path.join(sid_dir, slot_name, "save.json")
+            if os.path.exists(sf):
+                try:
+                    with open(sf, "r", encoding="utf-8") as f:
+                        info = json.load(f).get("save_info", {})
+                    saves.append((sid, slot_name, info))
+                except Exception:
+                    pass
+    if not saves:
+        print("\n  (저장된 세이브 없음)")
+        return
+    print(f"\n{'='*50}")
+    print(f"  기존 세이브 파일")
+    print(f"{'='*50}")
+    for sid, slot_name, info in saves:
+        slot_num = slot_name.replace("slot_", "#")
+        desc = info.get("description", "") or "(설명 없음)"
+        turn = info.get("turn_count", "?")
+        chapter = f"Ch.{info.get('chapter', '?')}" if info.get("chapter") else ""
+        saved_at = info.get("saved_at", "")
+        print(f"  {sid}  슬롯{slot_num}  {desc}  턴 {turn}  {chapter}  {saved_at}")
+    print(f"  → 세이브 로드: L 입력")
+    print()
+
+
 # ─── 시나리오 목록 ───
 
 def list_scenarios():
@@ -504,7 +544,10 @@ def load_game():
     print("\n=== 세이브 목록 ===")
     for i, s in enumerate(all_saves):
         info = s["info"]
-        print(f"  [{i+1}] {s['scenario_id']}/{s['slot']}: 턴{info.get('turn_count', '?')} - {info.get('description', '')} ({info.get('saved_at', '')})")
+        slot_num = s['slot'].replace('slot_', '#')
+        desc = info.get('description', '') or "(설명 없음)"
+        chapter = f"Ch.{info.get('chapter', '?')}" if info.get('chapter') else ""
+        print(f"  [{i+1}] {s['scenario_id']}  슬롯{slot_num}  {desc}  턴 {info.get('turn_count', '?')}  {chapter}  {info.get('saved_at', '')}")
 
     choice = input("\n로드할 세이브 번호 (0=취소): ").strip()
     try:
@@ -1026,14 +1069,20 @@ def _start_mode_select(scenario_id, scenario):
                         "slot": slot_name,
                         "description": info.get("description", ""),
                         "turn": info.get("turn_count", 0),
+                        "chapter": info.get("chapter", ""),
                         "saved_at": info.get("saved_at", ""),
                     })
 
     if save_slots:
         rec_level = scenario.get("scenario_info", {}).get("recommended_level", 1)
         print(f"  [1] 새 게임 — 레벨 {rec_level} 캐릭터로 처음부터")
+        print()
+        print(f"  --- 세이브 파일 ---")
         for i, sv in enumerate(save_slots, 2):
-            print(f"  [{i}] 세이브 로드 — {sv['slot']}: {sv['description']} (턴 {sv['turn']}, {sv['saved_at']})")
+            slot_num = sv['slot'].replace('slot_', '#')
+            desc = sv['description'] or "(설명 없음)"
+            chapter = f"Ch.{sv.get('chapter', '?')}" if sv.get('chapter') else ""
+            print(f"  [{i}] 슬롯{slot_num}  {desc}  턴 {sv['turn']}  {chapter}  {sv['saved_at']}")
         try:
             mode_choice = input(f"\n선택 (빈칸=새 게임): ").strip()
             if mode_choice and int(mode_choice) >= 2:
@@ -1071,8 +1120,13 @@ def _start_mode_select(scenario_id, scenario):
 def main():
     if len(sys.argv) < 2:
         # 대화형 모드
+        # 기존 세이브 파일 표시
+        _show_existing_saves()
         scenarios = list_scenarios()
-        choice = input("\n시나리오 번호 선택 (0=취소): ").strip()
+        choice = input("\n시나리오 번호 선택 (0=취소, L=세이브 로드): ").strip()
+        if choice.lower() == "l":
+            load_game()
+            return
         try:
             idx = int(choice) - 1
             if idx < 0:
