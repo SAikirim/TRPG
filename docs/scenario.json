@@ -1,39 +1,40 @@
 {
   "scenario_info": {
-    "title": "카렌델로 가는 길",
-    "description": "전설의 보물을 손에 넣은 세 모험가가 감정을 위해 교역도시 카렌델로 향한다.",
+    "title": "잃어버린 보물의 숲 던전",
+    "description": "고대 숲 깊은 곳에 잠든 전설의 보물. 세 명의 모험가가 위험을 무릅쓰고 던전에 발을 들인다.",
     "difficulty": "normal",
-    "recommended_level": 3,
-    "prerequisite": "lost_treasure",
-    "prerequisite_required": false,
-    "backstory": "숲 깊은 곳의 던전에서 전설의 보물을 발견한 모험가들. 보물의 정체를 밝히기 위해 교역도시 카렌델로 향한다. 도중에 부상당한 상인 일행을 만나 동행하게 된다."
+    "recommended_level": 1,
+    "backstory": "하룬 마을 근처의 고대 숲. 오래전부터 숲 깊은 곳에 전설의 보물이 잠들어 있다는 소문이 있었다. 마을에서 자란 세 명의 젊은 모험가가 보물을 찾기 위해 숲으로 향한다."
   },
   "opening": {
-    "continue": "전작에서 이어하기 — 캐릭터, 인벤토리, 레벨을 그대로 유지합니다.",
-    "new_game": "새 게임 시작 — 레벨 3 캐릭터로 시작합니다. 던전을 클리어하고 보물을 손에 넣은 상태입니다.",
-    "narrative": "세 명의 모험가가 숲의 던전에서 전설의 보물을 손에 넣었다. 정체를 알 수 없는 고대 장식함. 감정을 위해 교역도시 카렌델로 향하던 중, 교역로에서 늑대에게 습격당한 상인 일행을 발견한다."
+    "new_game": "새 게임 시작 — 레벨 1 캐릭터로 시작합니다.",
+    "narrative": "하룬 마을 외곽의 숲. 고대 던전의 입구가 덤불 사이로 어렴풋이 보인다. 세 명의 모험가가 횃불을 들고 입구 앞에 섰다."
   },
   "default_party": {
-    "description": "새 게임 시작 시 사용할 기본 파티 (레벨 3)",
+    "description": "새 게임 시작 시 사용할 기본 파티 (레벨 1)",
     "players": [
       {
         "id": 1,
         "name": "",
         "class": "마법사",
-        "level": 3,
-        "xp": 300,
+        "race": "인간",
+        "appearance": {"age": "20대 초반", "build": "마른 체형", "skin": "창백한 흰 피부", "hair": "긴 은회색 머리, 느슨하게 묶음", "face": "지적인 눈빛, 날카로운 이목구비", "outfit": "남색 로브, 허리띠에 매달린 마법 부적", "notable": "손에 항상 마법 지팡이를 들고 있음"},
+        "level": 1,
+        "xp": 0,
         "stats": {"STR": 8, "DEX": 14, "INT": 18, "CON": 10},
         "hp_base": 10,
         "mp_base": 12,
-        "starting_inventory": ["마법 지팡이", "마나 포션", "전설의 보물", "고대 열쇠"],
+        "starting_inventory": ["마법 지팡이", "마나 포션"],
         "controlled_by": "user"
       },
       {
         "id": 2,
         "name": "",
         "class": "도적",
-        "level": 3,
-        "xp": 300,
+        "race": "인간",
+        "appearance": {"age": "20대 중반", "build": "날씬하고 민첩한 체형", "skin": "약간 그을린 살구색", "hair": "짧은 검은 머리, 한쪽으로 넘김", "face": "날카로운 눈매, 약삭빠른 인상", "outfit": "검은 가죽 갑옷, 허리에 단검 두 자루", "notable": "그림자 속에 녹아드는 듯한 움직임"},
+        "level": 1,
+        "xp": 0,
         "stats": {"STR": 8, "DEX": 18, "INT": 10, "CON": 14},
         "hp_base": 15,
         "mp_base": 5,
@@ -44,27 +45,48 @@
         "id": 3,
         "name": "",
         "class": "전사",
-        "level": 3,
-        "xp": 300,
+        "race": "인간",
+        "appearance": {"age": "20대 후반", "build": "근육질의 건장한 체형", "skin": "구릿빛 피부", "hair": "짧게 깎은 갈색 머리", "face": "강인한 턱선, 투박하지만 믿음직한 인상", "outfit": "쇠사슬 갑옷, 등에 철검, 왼팔에 가죽 방패", "notable": "팔뚝에 오래된 전투 흉터"},
+        "level": 1,
+        "xp": 0,
         "stats": {"STR": 16, "DEX": 12, "INT": 8, "CON": 14},
         "hp_base": 25,
         "mp_base": 5,
-        "starting_inventory": ["철검", "가죽 방패", "황금 100개"],
+        "starting_inventory": ["철검", "가죽 방패"],
         "controlled_by": "agent"
       }
     ]
   },
-  "default_npcs": [
-    {"id": 300, "name": "할란", "type": "friendly", "stats": {"STR": 10, "DEX": 8, "INT": 14, "CON": 10}, "hp": 8, "max_hp": 12, "mp": 3, "max_mp": 3, "position": [9, 5], "status": "alive", "location": "trade_road_karendel"},
-    {"id": 301, "name": "미라", "type": "friendly", "stats": {"STR": 8, "DEX": 14, "INT": 12, "CON": 10}, "hp": 10, "max_hp": 10, "mp": 5, "max_mp": 5, "position": [10, 5], "status": "alive", "location": "trade_road_karendel"}
-  ],
+  "default_npcs": [],
   "chapters": [
-    {"id": 1, "name": "교역로", "description": "하룬 마을에서 카렌델로 이어지는 교역로. 상인 할란과 미라와 동행 중.", "map_area": "trade_road_karendel"},
-    {"id": 2, "name": "카렌델 입성", "description": "북쪽의 교역 도시 카렌델. 다양한 종족과 상인이 모이는 곳.", "map_area": "karendel"},
-    {"id": 3, "name": "보물의 비밀", "description": "전설의 보물의 정체가 밝혀지고, 새로운 모험이 시작된다.", "map_area": "karendel"}
+    {
+      "id": 1,
+      "name": "숲의 입구",
+      "description": "고대 숲으로 들어서는 길. 나무가 빽빽하고 빛이 잘 들지 않는다. 약초와 함정이 곳곳에 있다.",
+      "map_area": "forest_entrance"
+    },
+    {
+      "id": 2,
+      "name": "고대 던전",
+      "description": "숲 깊은 곳의 돌로 된 던전. 오크와 슬라임이 서식하며, 고대 비문과 숨겨진 열쇠가 있다.",
+      "map_area": "ancient_dungeon"
+    },
+    {
+      "id": 3,
+      "name": "보물실",
+      "description": "던전 최심부의 황금 방. 독 가스 함정이 걸린 보물 상자와 수호자 골렘이 기다린다.",
+      "map_area": "treasure_room"
+    },
+    {
+      "id": 4,
+      "name": "에필로그",
+      "description": "보물을 손에 넣고 던전을 탈출한 후. 마을로 귀환하여 다음 여정을 준비한다.",
+      "map_area": "harun_village"
+    }
   ],
   "endings": [
-    {"id": "treasure_revealed", "condition": "treasure_appraised", "title": "보물의 진실", "narrative": "전설의 보물의 정체가 밝혀졌다."},
-    {"id": "new_adventure", "condition": "accept_new_quest", "title": "새로운 모험의 시작", "narrative": "카렌델에서의 경험이 세 모험가를 더 큰 세계로 이끈다."}
+    {"id": "perfect", "condition": "all_alive_with_treasure", "title": "완벽한 승리", "narrative": "세 명의 모험가 모두 살아서 전설의 보물을 가지고 마을로 돌아왔다."},
+    {"id": "pyrrhic", "condition": "treasure_with_casualties", "title": "값비싼 대가", "narrative": "보물은 손에 넣었지만, 대가가 컸다."},
+    {"id": "escape", "condition": "alive_no_treasure", "title": "목숨만 건짐", "narrative": "보물을 포기하고 던전에서 탈출했다. 살아있는 것만으로도 충분하다."}
   ]
 }

@@ -1,37 +1,28 @@
 {
-  "active_scenario": "karendel_journey",
+  "active_scenario": "lost_treasure",
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
-  "turn": 25,
+  "worldbuilding": "karendel_world",
+  "turn": 0,
   "chapter": 1,
-  "chapter_name": "갈림길 쉼터",
+  "chapter_name": "숲의 입구",
+  "status": "active",
   "party_summary": [
     {
       "name": "사이키",
       "class": "마법사",
-      "hp": "21/21",
-      "mp": "40/41",
+      "hp": "15/15",
+      "mp": "30/30",
       "key_items": [
         "마법 지팡이",
-        "마나 포션",
-        "마나 결정",
-        "슬라임 젤리",
-        "약초",
-        "고대 열쇠",
-        "전설의 보물",
-        "에르네스의 소개장",
-        "약초 봉투 (볼프에게 전달)",
-        "노잣돈 (은화 10닢)",
-        "금화 1닢 (공용, 카렌델 환전 후 3등분)",
-        "밧줄",
-        "부싯돌"
+        "마나 포션"
       ]
     },
     {
       "name": "루체나",
       "class": "도적",
-      "hp": "30/30",
-      "mp": "12/14",
+      "hp": "22/22",
+      "mp": "10/10",
       "key_items": [
         "단검 x2",
         "도둑 도구",
@@ -41,28 +32,18 @@
     {
       "name": "노을",
       "class": "전사",
-      "hp": "45/45",
-      "mp": "7/7",
+      "hp": "32/32",
+      "mp": "5/5",
       "key_items": [
-        "가죽 방패",
-        "오크의 도끼",
-        "상처 치료 약병"
+        "철검",
+        "가죽 방패"
       ]
     }
   ],
   "progress_notes": [
-    "[GM] 사이키가 루체나, 노을에게 말을 건다. 갈림길 쉼터 모닥불 대화.",
-    "[GM] 갈림길 쉼터 야영. 사이키가 주변을 살폈다. 위험한 기척 없음.",
-    "[GM] 세션 복원: 턴 25, 갈림길 쉼터 야영 (밤)",
-    "[GM] scene persistence test",
-    "[GM] scene sync test",
-    "[GM] map object icon added, refresh map",
-    "[GM] map refresh: 2-tile wagon, objects, NPC positions",
-    "[GM] map render fix",
-    "[GM] legend added",
-    "[GM] map refresh"
+    "새 게임 시작: 잃어버린 보물의 숲 던전"
   ],
-  "next_objective": "",
+  "next_objective": "고대 숲으로 들어서는 길. 나무가 빽빽하고 빛이 잘 들지 않는다. 약초와 함정이 곳곳에 있다.",
   "display_mode": "mobile",
   "show_dice_result": false,
   "sd_illustration": true,

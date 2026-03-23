@@ -2,28 +2,25 @@
   "id": 2,
   "name": "루체나",
   "class": "도적",
+  "level": 1,
   "background": {
-    "origin": "사이키의 여동생. 오빠가 마법을 배우는 동안 뒷골목에서 생존술을 익힘. 소매치기, 자물쇠 따기가 그녀의 학교였다.",
-    "motivation": "오빠와 함께 보물을 찾아 가난에서 벗어나기. '오빠가 길을 밝히면, 내가 그림자에서 길을 열게.'",
-    "personality": "입은 거칠고 손은 빠르지만, 오빠 앞에서만은 아직도 투정부리는 열다섯 살 — 세상에서 가장 믿음직한 여동생.",
-    "relationships": {
-      "사이키": "오빠. 세상에서 가장 소중한 사람",
-      "노을": "동갑내기 친구. 서로 티격태격하지만 통하는 사이"
-    }
+    "origin": "",
+    "motivation": "",
+    "personality": ""
   },
   "stats": {
-    "hp": 30,
-    "max_hp": 30,
-    "mp": 12,
-    "max_mp": 14,
     "STR": 8,
-    "DEX": 20,
+    "DEX": 18,
     "INT": 10,
-    "CON": 15
+    "CON": 14
   },
+  "hp": 22,
+  "max_hp": 22,
+  "mp": 10,
+  "max_mp": 10,
   "position": [
-    4,
-    7
+    0,
+    0
   ],
   "status_effects": [],
   "inventory": [
@@ -31,93 +28,35 @@
     "도둑 도구",
     "밧줄"
   ],
-  "equipment": {
-    "weapon": {
-      "name": "단검 x2",
-      "rarity": "common",
-      "properties": {}
-    },
-    "armor": null,
-    "accessory": null
-  },
-  "available_actions": [
-    "공격",
-    "습격",
-    "도주",
-    "독 바르기"
-  ],
+  "equipment": {},
+  "available_actions": [],
   "combat_state": {
     "is_in_combat": false,
     "defense_bonus": 0,
     "next_turn_penalty": 0
   },
   "history": {
-    "actions_taken": [
-      {
-        "turn": 3,
-        "action": "습격",
-        "target": "어두운 오크",
-        "roll": "자동명중(은신)",
-        "damage": 14,
-        "result": "처치"
-      },
-      {
-        "turn": 7,
-        "action": "함정 해제",
-        "target": "보물 상자 독 가스 함정",
-        "roll": "성공",
-        "damage": 0,
-        "result": "함정 해제 완료"
-      }
-    ],
-    "damage_dealt_total": 14,
+    "actions_taken": [],
+    "damage_dealt_total": 0,
     "damage_received_total": 0,
-    "kills": [
-      "어두운 오크"
-    ],
+    "kills": [],
     "items_used": [],
-    "turns_played": 2
+    "turns_played": 0
   },
   "conditions": {
     "alive": true,
     "conscious": true,
     "death_save_turns": 0
   },
-  "growth": {
-    "level": 3,
-    "xp": 315,
-    "xp_to_next": 600,
-    "stat_points_available": 0,
-    "learned_skills": [
-      "독 바르기"
-    ],
-    "xp_log": [
-      {
-        "source": "오크 처치 (high)",
-        "amount": 60
-      },
-      {
-        "source": "챕터1 완료",
-        "amount": 100
-      },
-      {
-        "source": "함정 해제 (퍼즐)",
-        "amount": 25
-      },
-      {
-        "source": "보물 상자 획득 (퀘스트)",
-        "amount": 50
-      },
-      {
-        "source": "탐색/RP (숲, 던전, 비문)",
-        "amount": 50
-      },
-      {
-        "source": "늑대 처치 (medium)",
-        "amount": 30
-      }
-    ]
-  },
-  "party_role": "중열 (기습/유틸)",
-  "controlled_by": "agent"
+  "controlled_by": "agent",
+  "race": "인간",
+  "appearance": {
+    "age": "20대 중반",
+    "build": "날씬하고 민첩한 체형",
+    "skin": "약간 그을린 살구색",
+    "hair": "짧은 검은 머리, 한쪽으로 넘김",
+    "face": "날카로운 눈매, 약삭빠른 인상",
+    "outfit": "검은 가죽 갑옷, 허리에 단검 두 자루",
+    "notable": "그림자 속에 녹아드는 듯한 움직임"
+  }
 }

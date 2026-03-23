@@ -1,23 +1,6 @@
 {
-  "background": "static/illustrations/sd/background_crossroads_rest_night.webp",
-  "layers": [
-    {
-      "type": "portrait",
-      "image": "static/portraits/sd/portrait_미라.webp",
-      "position": "left",
-      "name": "미라",
-      "distance": 2,
-      "size_class": "d2"
-    },
-    {
-      "type": "portrait",
-      "image": "static/portraits/sd/portrait_할란.webp",
-      "position": "center",
-      "name": "할란",
-      "distance": 2,
-      "size_class": "d2"
-    }
-  ],
+  "background": "static/illustrations/sd/background_211356.webp",
+  "layers": [],
   "generating": {
     "status": "idle",
     "type": null,

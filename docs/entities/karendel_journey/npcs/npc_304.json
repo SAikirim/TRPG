@@ -1,0 +1,31 @@
+{
+  "id": 304,
+  "name": "검객",
+  "type": "neutral",
+  "status": "alive",
+  "location": "crossroads_rest",
+  "personality": {
+    "temperament": "neutral",
+    "intelligence": "medium",
+    "behavior_pattern": "",
+    "speech_style": "",
+    "motivation": ""
+  },
+  "relationships": {},
+  "memory": {
+    "dialogue_history": [],
+    "key_events": []
+  },
+  "stats": {
+    "STR": 14,
+    "DEX": 14,
+    "INT": 10,
+    "CON": 12
+  },
+  "hp": 18,
+  "max_hp": 18,
+  "position": [
+    11,
+    13
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "id": 303,
+  "name": "행상인",
+  "type": "neutral",
+  "status": "alive",
+  "location": "crossroads_rest",
+  "personality": {
+    "temperament": "neutral",
+    "intelligence": "medium",
+    "behavior_pattern": "",
+    "speech_style": "",
+    "motivation": ""
+  },
+  "relationships": {},
+  "memory": {
+    "dialogue_history": [],
+    "key_events": []
+  },
+  "stats": {
+    "STR": 12,
+    "DEX": 8,
+    "INT": 8,
+    "CON": 10
+  },
+  "hp": 8,
+  "max_hp": 8,
+  "position": [
+    14,
+    13
+  ]
+}

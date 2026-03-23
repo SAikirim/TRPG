@@ -1,0 +1,31 @@
+{
+  "id": 305,
+  "name": "후드 인물",
+  "type": "neutral",
+  "status": "alive",
+  "location": "crossroads_rest",
+  "personality": {
+    "temperament": "neutral",
+    "intelligence": "medium",
+    "behavior_pattern": "",
+    "speech_style": "",
+    "motivation": ""
+  },
+  "relationships": {},
+  "memory": {
+    "dialogue_history": [],
+    "key_events": []
+  },
+  "stats": {
+    "STR": 10,
+    "DEX": 12,
+    "INT": 14,
+    "CON": 10
+  },
+  "hp": 12,
+  "max_hp": 12,
+  "position": [
+    10,
+    13
+  ]
+}
