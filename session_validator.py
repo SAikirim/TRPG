@@ -554,9 +554,98 @@ def check_rules_consistency(state):
     log("ok", "룰 일관성 검증 완료")
 
 
+def check_save_integrity(state):
+    """세이브 파일 정합성 검증 (2중 안전망)."""
+    print("\n[12] 세이브 파일 정합성 검증")
+    saves_dir = os.path.join(BASE_DIR, "saves")
+    if not os.path.exists(saves_dir):
+        log("ok", "세이브 디렉토리 없음 (새 게임)")
+        return
+
+    save_count = 0
+    for sid in sorted(os.listdir(saves_dir)):
+        sid_path = os.path.join(saves_dir, sid)
+        if not os.path.isdir(sid_path):
+            continue
+        for slot_dir in sorted(os.listdir(sid_path)):
+            if not slot_dir.startswith("slot_"):
+                continue
+            save_file = os.path.join(sid_path, slot_dir, "save.json")
+            if not os.path.exists(save_file):
+                continue
+            save_count += 1
+
+            save_data = load_json_safe(save_file)
+            if save_data is None:
+                log("error", f"{sid}/{slot_dir}: 세이브 파일 파싱 실패")
+                continue
+
+            info = save_data.get("save_info", {})
+            gs = save_data.get("game_state", {})
+            gi = gs.get("game_info", {})
+
+            # 1. scenario_id 일치 (폴더 vs save_info vs game_state)
+            info_sid = info.get("scenario_id", "")
+            gs_sid = gi.get("scenario_id", "")
+            if info_sid and info_sid != sid:
+                log("error", f"{sid}/{slot_dir}: save_info.scenario_id='{info_sid}' ≠ 폴더='{sid}'")
+                if FIX_MODE:
+                    info["scenario_id"] = sid
+                    save_json(save_file, save_data)
+                    log("warn", f"{sid}/{slot_dir}: save_info.scenario_id를 '{sid}'로 수정", auto_fixed=True)
+            elif info_sid:
+                log("ok", f"{sid}/{slot_dir}: scenario_id 일치 ({info_sid})")
+
+            if gs_sid and gs_sid != sid:
+                log("error", f"{sid}/{slot_dir}: game_state.scenario_id='{gs_sid}' ≠ 폴더='{sid}'")
+                if FIX_MODE:
+                    gi["scenario_id"] = sid
+                    save_json(save_file, save_data)
+                    log("warn", f"{sid}/{slot_dir}: game_state.scenario_id를 '{sid}'로 수정", auto_fixed=True)
+
+            # 2. current_location 존재
+            loc = gs.get("current_location")
+            if not loc:
+                log("warn", f"{sid}/{slot_dir}: current_location 비어있음")
+
+            # 3. 필수 키 존재
+            for key in ["players", "npcs", "events"]:
+                if key not in gs:
+                    log("error", f"{sid}/{slot_dir}: game_state.{key} 누락")
+
+            # 4. 시나리오 파일과 NPC 대조 (타 시나리오 NPC 오염 감지)
+            scenario_path = os.path.join(BASE_DIR, "scenarios", f"{sid}.json")
+            if os.path.exists(scenario_path):
+                sc = load_json_safe(scenario_path)
+                if sc:
+                    valid_npc_names = {n.get("name") for n in sc.get("default_npcs", [])}
+                    # 몬스터/임시 NPC는 제외, friendly/quest NPC만 체크
+                    for npc in gs.get("npcs", []):
+                        if npc.get("type") in ("monster",):
+                            continue
+                        if npc.get("status") in ("dead", "removed", "fled"):
+                            continue
+                        npc_name = npc.get("name", "")
+                        if npc_name and valid_npc_names and npc_name not in valid_npc_names:
+                            log("warn", f"{sid}/{slot_dir}: NPC '{npc_name}'이 시나리오 default_npcs에 없음 (타 시나리오 오염?)")
+
+            # 5. 플레이어 HP/MP 범위
+            for p in gs.get("players", []):
+                pname = p.get("name", "?")
+                if p.get("hp", 0) > p.get("max_hp", 999):
+                    log("warn", f"{sid}/{slot_dir}: {pname} HP({p['hp']}) > max_hp({p['max_hp']})")
+                if p.get("mp", 0) > p.get("max_mp", 999):
+                    log("warn", f"{sid}/{slot_dir}: {pname} MP({p['mp']}) > max_mp({p['max_mp']})")
+
+    if save_count == 0:
+        log("ok", "세이브 파일 없음 (새 게임)")
+    else:
+        log("ok", f"세이브 파일 {save_count}개 검증 완료")
+
+
 def check_quest_consistency(state):
     """퀘스트 상태 일관성 검증."""
-    print("\n[12] 퀘스트 상태 검증")
+    print("\n[13] 퀘스트 상태 검증")
     quests = load_json_safe("data/quests.json")
     if quests is None:
         log("ok", "quests.json 없음 (퀘스트 미사용)")
@@ -664,6 +753,7 @@ def main():
     check_services()
     check_illustrations(state)
     check_rules_consistency(state)
+    check_save_integrity(state)
     check_quest_consistency(state)
 
     # 자동 수정된 game_state 저장

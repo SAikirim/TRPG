@@ -10,6 +10,9 @@ SAVES_DIR = os.path.join(BASE_DIR, "saves")
 GAME_STATE_PATH = os.path.join(BASE_DIR, "data", "game_state.json")
 CURRENT_SESSION_PATH = os.path.join(BASE_DIR, "data", "current_session.json")
 
+# 백업 보관 최대 수
+MAX_BACKUPS = 5
+
 
 class SaveManager:
     def __init__(self):
@@ -21,12 +24,21 @@ class SaveManager:
         return os.path.join(SAVES_DIR, scenario_id)
 
     def save_game(self, scenario_id, slot=1, description=""):
-        """현재 게임 상태를 시나리오별 슬롯에 저장"""
+        """현재 게임 상태를 시나리오별 슬롯에 저장.
+        저장 전 기존 파일 자동 백업 + 정합성 검증."""
         save_path = self._save_dir(scenario_id, slot)
         os.makedirs(save_path, exist_ok=True)
 
         with open(GAME_STATE_PATH, "r", encoding="utf-8") as f:
             game_state = json.load(f)
+
+        # 정합성 검증: game_state의 scenario_id와 저장 대상이 일치해야 함
+        gs_scenario = game_state.get("game_info", {}).get("scenario_id", "")
+        if gs_scenario and gs_scenario != scenario_id:
+            print(f"[WARN] save_game: game_state.scenario_id='{gs_scenario}' ≠ save target='{scenario_id}'")
+            print(f"  다른 시나리오의 데이터를 잘못된 슬롯에 저장하는 것을 방지합니다.")
+            print(f"  강제 저장이 필요하면 game_state.scenario_id를 먼저 수정하세요.")
+            return None
 
         save_data = {
             "save_info": {
@@ -40,7 +52,10 @@ class SaveManager:
             "game_state": game_state,
         }
 
+        # 기존 세이브 백업 (덮어쓰기 전)
         save_file = os.path.join(save_path, "save.json")
+        self._backup_save(save_file)
+
         with open(save_file, "w", encoding="utf-8") as f:
             json.dump(save_data, f, ensure_ascii=False, indent=2)
 
@@ -56,13 +71,24 @@ class SaveManager:
         return save_data["save_info"]
 
     def load_game(self, scenario_id, slot=1):
-        """저장된 게임 상태를 불러와서 현재 게임에 적용"""
+        """저장된 게임 상태를 불러와서 현재 게임에 적용.
+        로드 전 현재 game_state.json 자동 백업."""
         save_file = os.path.join(self._save_dir(scenario_id, slot), "save.json")
         if not os.path.exists(save_file):
             return None
 
         with open(save_file, "r", encoding="utf-8") as f:
             save_data = json.load(f)
+
+        # 세이브 정합성 검증
+        save_scenario = save_data.get("save_info", {}).get("scenario_id", "")
+        gs_scenario = save_data.get("game_state", {}).get("game_info", {}).get("scenario_id", "")
+        if save_scenario and gs_scenario and save_scenario != gs_scenario:
+            print(f"[WARN] load_game: save_info.scenario_id='{save_scenario}' ≠ game_state.scenario_id='{gs_scenario}'")
+            print(f"  세이브 파일 내부 불일치 — 데이터 오염 가능성")
+
+        # 현재 game_state.json 백업 (로드로 덮어쓰기 전)
+        self._backup_save(GAME_STATE_PATH)
 
         with open(GAME_STATE_PATH, "w", encoding="utf-8") as f:
             json.dump(save_data["game_state"], f, ensure_ascii=False, indent=2)
@@ -107,6 +133,111 @@ class SaveManager:
             with open(progress_file, "r", encoding="utf-8") as f:
                 return json.load(f)
         return None
+
+    def _backup_save(self, file_path):
+        """파일 덮어쓰기 전 자동 백업. 최대 MAX_BACKUPS개 유지."""
+        if not os.path.isfile(file_path):
+            return
+        backup_dir = os.path.join(os.path.dirname(file_path), ".backups")
+        os.makedirs(backup_dir, exist_ok=True)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        base_name = os.path.basename(file_path)
+        backup_name = f"{base_name}.{timestamp}.bak"
+        backup_path = os.path.join(backup_dir, backup_name)
+        shutil.copy2(file_path, backup_path)
+
+        # 오래된 백업 정리 (MAX_BACKUPS개 초과 시 삭제)
+        backups = sorted(
+            [f for f in os.listdir(backup_dir) if f.startswith(base_name) and f.endswith(".bak")],
+            reverse=True,
+        )
+        for old in backups[MAX_BACKUPS:]:
+            os.remove(os.path.join(backup_dir, old))
+
+    def validate_save(self, scenario_id, slot=1):
+        """세이브 파일 정합성 검증. 문제 목록 반환 (빈 리스트 = 정상)."""
+        errors = []
+        save_file = os.path.join(self._save_dir(scenario_id, slot), "save.json")
+        if not os.path.exists(save_file):
+            return [f"세이브 파일 없음: {save_file}"]
+
+        with open(save_file, "r", encoding="utf-8") as f:
+            save_data = json.load(f)
+
+        info = save_data.get("save_info", {})
+        gs = save_data.get("game_state", {})
+        gi = gs.get("game_info", {})
+
+        # 1. scenario_id 일치
+        if info.get("scenario_id") != scenario_id:
+            errors.append(f"save_info.scenario_id='{info.get('scenario_id')}' ≠ 폴더='{scenario_id}'")
+        if gi.get("scenario_id") and gi["scenario_id"] != scenario_id:
+            errors.append(f"game_state.scenario_id='{gi['scenario_id']}' ≠ 폴더='{scenario_id}'")
+
+        # 2. save_info와 game_state 내부 일치
+        if info.get("scenario_id") != gi.get("scenario_id"):
+            errors.append(f"save_info.scenario_id='{info.get('scenario_id')}' ≠ game_state.scenario_id='{gi.get('scenario_id')}'")
+
+        # 3. 필수 필드 존재
+        for key in ["players", "npcs", "events"]:
+            if key not in gs:
+                errors.append(f"game_state.{key} 누락")
+
+        # 4. current_location 유효성
+        loc = gs.get("current_location")
+        if not loc:
+            errors.append("current_location 비어있음")
+        else:
+            wb_path = os.path.join(BASE_DIR, "data", "worldbuilding.json")
+            if os.path.exists(wb_path):
+                with open(wb_path, "r", encoding="utf-8") as f:
+                    wb = json.load(f)
+                if loc not in wb.get("locations", {}):
+                    errors.append(f"current_location='{loc}'이 worldbuilding에 없음")
+
+        # 5. NPC가 해당 시나리오에 소속되는지 (시나리오 파일과 대조)
+        scenario_path = os.path.join(BASE_DIR, "scenarios", f"{scenario_id}.json")
+        if os.path.exists(scenario_path):
+            with open(scenario_path, "r", encoding="utf-8") as f:
+                scenario = json.load(f)
+            valid_npc_ids = {n["id"] for n in scenario.get("default_npcs", [])}
+            # 시나리오 default_npcs에 없는 NPC는 게임 중 추가된 것 → 경고만
+            for npc in gs.get("npcs", []):
+                npc_id = npc.get("id")
+                if npc_id and npc_id not in valid_npc_ids and npc.get("status") not in ("dead", "removed", "fled"):
+                    errors.append(f"NPC '{npc.get('name', npc_id)}'(id={npc_id})이 시나리오 default_npcs에 없음 (게임 중 추가?)")
+
+        # 6. 플레이어 HP/MP 범위
+        for p in gs.get("players", []):
+            name = p.get("name", "?")
+            if p.get("hp", 0) > p.get("max_hp", 0):
+                errors.append(f"{name} HP({p['hp']}) > max_hp({p['max_hp']})")
+            if p.get("mp", 0) > p.get("max_mp", 0):
+                errors.append(f"{name} MP({p['mp']}) > max_mp({p['max_mp']})")
+
+        return errors
+
+    def validate_all_saves(self):
+        """모든 세이브 파일 정합성 검증. {scenario_id/slot: errors} 반환."""
+        results = {}
+        if not os.path.exists(SAVES_DIR):
+            return results
+        for sid in os.listdir(SAVES_DIR):
+            sid_path = os.path.join(SAVES_DIR, sid)
+            if not os.path.isdir(sid_path):
+                continue
+            for slot_dir in os.listdir(sid_path):
+                if not slot_dir.startswith("slot_"):
+                    continue
+                try:
+                    slot_num = int(slot_dir.replace("slot_", ""))
+                except ValueError:
+                    continue
+                errors = self.validate_save(sid, slot_num)
+                if errors:
+                    results[f"{sid}/{slot_dir}"] = errors
+        return results
 
     def _update_progress(self, scenario_id, save_info):
         """시나리오별 진행 상황 요약 갱신"""
