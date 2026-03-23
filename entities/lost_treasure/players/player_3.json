@@ -1,34 +1,37 @@
 {
   "id": 3,
-  "name": "세라핀",
-  "class": "성직자",
-  "level": 1,
+  "name": "여울",
+  "class": "도적",
+  "controlled_by": "ai",
+  "agent_id": "agent_c",
   "background": {
-    "origin": "",
-    "motivation": "",
-    "personality": ""
+    "origin": "시장 골목에서 잔뼈가 굵었다. 손버릇보다 입버릇이 더 나쁘다는 소리를 들으며 컸다.",
+    "motivation": "보물이 있다면 가야지. 위험? 그게 재밌잖아.",
+    "personality": "위험한 상황일수록 오히려 실실 웃는 타입. 겁이 없는 건지, 겁을 숨기는 게 습관이 된 건지 본인도 모른다.",
+    "relationships": {
+      "가온": "파티 탱커. 든든하긴 한데 너무 딱딱해. 좀 풀어줘야 해.",
+      "세라핀": "파티 힐러. 잔소리 많지만 결국 다 챙겨주는 타입."
+    }
   },
   "stats": {
-    "STR": 10,
-    "DEX": 8,
+    "hp": 20,
+    "max_hp": 20,
+    "mp": 12,
+    "max_mp": 12,
+    "STR": 8,
+    "DEX": 18,
     "INT": 14,
-    "CON": 18
+    "CON": 10
   },
-  "hp": 27,
-  "max_hp": 27,
-  "mp": 21,
-  "max_mp": 21,
-  "position": [
-    0,
-    0
-  ],
+  "position": [0, 0],
   "status_effects": [],
-  "inventory": [
-    "철퇴",
-    "성스러운 부적"
-  ],
-  "equipment": {},
-  "available_actions": [],
+  "inventory": ["단검 x2", "도둑 도구", "밧줄"],
+  "equipment": {
+    "weapon": {"name": "단검 x2", "rarity": "common", "properties": {}},
+    "armor": {"name": "가죽 갑옷", "rarity": "common", "properties": {}},
+    "accessory": null
+  },
+  "available_actions": ["공격", "습격", "도주", "함정 탐지"],
   "combat_state": {
     "is_in_combat": false,
     "defense_bonus": 0,
@@ -47,15 +50,22 @@
     "conscious": true,
     "death_save_turns": 0
   },
-  "controlled_by": "ai",
-  "race": "인간",
+  "growth": {
+    "level": 1,
+    "xp": 0,
+    "xp_to_next": 100,
+    "stat_points_available": 0,
+    "learned_skills": [],
+    "xp_log": []
+  },
+  "party_role": "중열 기습/유틸",
   "appearance": {
-    "age": "20대 중반",
-    "build": "단정한 중간 체형",
-    "skin": "밝은 피부",
-    "hair": "어깨까지 내려오는 밤색 머리, 뒤로 묶음",
-    "face": "온화한 눈빛, 부드러운 이목구비",
-    "outfit": "흰색 성직자 로브, 허리에 철퇴, 목에 성스러운 부적",
-    "notable": "항상 미소를 짓고 있음"
+    "age": "20대 초반",
+    "build": "가볍고 민첩한 체형",
+    "skin": "약간 그을린 피부",
+    "hair": "짧게 자른 흑발, 날카로운 눈매",
+    "face": "비실비실 웃는 입꼬리, 약삭빠른 인상",
+    "outfit": "다크그린 레더아머, 허리에 단검 두 자루",
+    "notable": "그림자 속에 녹아드는 듯한 움직임"
   }
 }

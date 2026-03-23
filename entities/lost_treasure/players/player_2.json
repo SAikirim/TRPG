@@ -1,34 +1,37 @@
 {
   "id": 2,
-  "name": "카이른",
-  "class": "전사",
-  "level": 1,
+  "name": "세라핀",
+  "class": "성직자",
+  "controlled_by": "ai",
+  "agent_id": "agent_b",
   "background": {
-    "origin": "",
-    "motivation": "",
-    "personality": ""
+    "origin": "어린 시절 역병으로 마을이 쓸렸고, 혼자 살아남은 이후 치유술을 독학으로 익혀 성직자 길드에 들어왔다.",
+    "motivation": "기적을 기다리기 전에 내가 먼저 손을 쓴다. 신앙심보다 실용성으로 신을 섬긴다.",
+    "personality": "말수는 적은데 판단은 빠르다. 차가워 보이지만 파티원의 상태를 가장 주의 깊게 살핀다.",
+    "relationships": {
+      "가온": "파티 탱커. 앞에서 버텨주면 내가 뒤에서 커버한다.",
+      "여울": "파티 도적. 무모하게 나서면 힐이 늦을 수 있으니 조심시켜야 한다."
+    }
   },
   "stats": {
-    "STR": 16,
-    "DEX": 12,
-    "INT": 8,
-    "CON": 14
+    "hp": 26,
+    "max_hp": 26,
+    "mp": 24,
+    "max_mp": 24,
+    "STR": 6,
+    "DEX": 10,
+    "INT": 18,
+    "CON": 16
   },
-  "hp": 32,
-  "max_hp": 32,
-  "mp": 5,
-  "max_mp": 5,
-  "position": [
-    0,
-    0
-  ],
+  "position": [0, 0],
   "status_effects": [],
-  "inventory": [
-    "철검",
-    "가죽 방패"
-  ],
-  "equipment": {},
-  "available_actions": [],
+  "inventory": ["철퇴", "성스러운 부적"],
+  "equipment": {
+    "weapon": {"name": "철퇴", "rarity": "common", "properties": {}},
+    "armor": null,
+    "accessory": {"name": "성스러운 부적", "rarity": "common", "properties": {}}
+  },
+  "available_actions": ["공격", "치유", "축복", "정화"],
   "combat_state": {
     "is_in_combat": false,
     "defense_bonus": 0,
@@ -47,15 +50,22 @@
     "conscious": true,
     "death_save_turns": 0
   },
-  "controlled_by": "ai",
-  "race": "인간",
+  "growth": {
+    "level": 1,
+    "xp": 0,
+    "xp_to_next": 100,
+    "stat_points_available": 0,
+    "learned_skills": [],
+    "xp_log": []
+  },
+  "party_role": "후열 힐러/서포터",
   "appearance": {
-    "age": "20대 후반",
-    "build": "근육질의 건장한 체형",
-    "skin": "햇볕에 그을린 구릿빛 피부",
-    "hair": "짧게 깎은 검은 머리, 이마에 흉터",
-    "face": "과묵한 인상, 깊은 눈빛",
-    "outfit": "낡은 쇠사슬 갑옷, 등에 철검, 왼팔에 가죽 방패",
-    "notable": "팔뚝에 오래된 전투 흉터 여럿"
+    "age": "20대 초반",
+    "build": "단정하고 슬림한 체형",
+    "skin": "밝은 피부",
+    "hair": "은빛 머리카락을 단정하게 묶음",
+    "face": "날카롭고 차가운 눈빛, 지적인 인상",
+    "outfit": "청백색 사제복, 가벼운 사슬 갑옷",
+    "notable": "은빛 성흔 목걸이, 손에 낡은 성전"
   }
 }
