@@ -23,9 +23,30 @@ class SaveManager:
             return os.path.join(SAVES_DIR, scenario_id, f"slot_{slot}")
         return os.path.join(SAVES_DIR, scenario_id)
 
-    def save_game(self, scenario_id, slot=1, description=""):
+    def find_empty_slot(self, scenario_id, max_slots=10):
+        """비어있는 가장 낮은 번호의 슬롯을 찾는다. 없으면 None."""
+        for i in range(1, max_slots + 1):
+            save_file = os.path.join(self._save_dir(scenario_id, i), "save.json")
+            if not os.path.exists(save_file):
+                return i
+        return None
+
+    def get_slot_info(self, scenario_id, slot):
+        """슬롯에 저장된 세이브 정보를 반환. 없으면 None."""
+        save_file = os.path.join(self._save_dir(scenario_id, slot), "save.json")
+        if not os.path.exists(save_file):
+            return None
+        try:
+            with open(save_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data.get("save_info", {})
+        except Exception:
+            return None
+
+    def save_game(self, scenario_id, slot=1, description="", overwrite=False):
         """현재 게임 상태를 시나리오별 슬롯에 저장.
-        저장 전 기존 파일 자동 백업 + 정합성 검증."""
+        저장 전 기존 파일 자동 백업 + 정합성 검증.
+        overwrite=False일 때, 기존 세이브가 있으면 저장을 거부하고 빈 슬롯을 안내한다."""
         save_path = self._save_dir(scenario_id, slot)
         os.makedirs(save_path, exist_ok=True)
 
@@ -39,6 +60,24 @@ class SaveManager:
             print(f"  다른 시나리오의 데이터를 잘못된 슬롯에 저장하는 것을 방지합니다.")
             print(f"  강제 저장이 필요하면 game_state.scenario_id를 먼저 수정하세요.")
             return None
+
+        # 기존 세이브 덮어쓰기 방지
+        save_file = os.path.join(save_path, "save.json")
+        if os.path.exists(save_file) and not overwrite:
+            existing = self.get_slot_info(scenario_id, slot)
+            if existing:
+                print(f"[BLOCK] 슬롯 {slot}에 기존 세이브가 있습니다:")
+                print(f"  턴 {existing.get('turn_count', '?')}, "
+                      f"ch{existing.get('chapter', '?')}, "
+                      f"{existing.get('description', '')}")
+                print(f"  saved_at: {existing.get('saved_at', '?')}")
+                empty = self.find_empty_slot(scenario_id)
+                if empty:
+                    print(f"  → 빈 슬롯 추천: slot {empty}")
+                    print(f"  덮어쓰려면 overwrite=True를 명시하세요.")
+                else:
+                    print(f"  → 빈 슬롯이 없습니다. overwrite=True로 덮어쓰세요.")
+                return None
 
         save_data = {
             "save_info": {
