@@ -234,7 +234,23 @@ build_static.py는 HTML 복사 + 데이터 동기화를 수행한다.
 3. `data/current_session.json` → `data/worldbuilding.json` → `data/game_state.json` 읽기
 4. `guides/gm_rules.txt` 읽기 — 주사위 표시, NPC 등록, 에이전트 규칙 확인
 5. Flask 서버 확인 → 웹 UI 장면 복원 (자동: `restore_scene`)
-6. 유저에게 현재 상황 요약 → 게임 이어가기
+6. 게임 상태에 따라 분기:
+   - **새 게임 (turn_count=0, status=active)** → GM 턴 0 (오프닝) 진행 (아래 참조)
+   - **이어하기 (turn_count>0)** → 유저에게 현재 상황 요약 → 행동 대기
+
+### 새 게임 오프닝 (GM 턴 0)
+game_start.py가 데이터를 초기화한 것뿐이다. 캐릭터가 아직 등장하지 않았다.
+GM이 반드시 오프닝 나레이션을 진행해야 게임이 시작된다.
+
+1. scenario.json의 opening.narrative 확인
+2. GM 턴 템플릿대로 진행:
+   - [1a] 오프닝 방향 설정 (첫 장면, 분위기, 등장인물)
+   - [1b] 에이전트 호출 (세계관 정합성, NPC 있으면 대사)
+   - [2] 오프닝 나레이션 작성 (캐릭터 등장 + 장면 묘사)
+   - [3] 시스템 반영 (gm-update: 배경 일러스트 + 캐릭터 레이어)
+3. 나레이션 출력 → 유저 행동 대기
+
+> 오프닝 없이 "뭘 할래?"를 묻는 것은 금지. 캐릭터가 세계에 등장해야 행동할 수 있다.
 
 > 상세 로드 절차: 아래 "세션 로드 상세" 참조
 

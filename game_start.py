@@ -385,6 +385,11 @@ def new_game(scenario_id, skip_mode_select=False):
     print(f"Flask 서버: start_server.bat 또는 SD venv Python app.py -> http://localhost:5000")
     _print_state_summary(state)
 
+    print(f"⚠️  다음 단계: GM 턴 0 (오프닝 나레이션) 진행 필요")
+    print(f"   game_start.py는 데이터만 초기화합니다.")
+    print(f"   GM이 오프닝 나레이션을 진행해야 캐릭터가 세계에 등장합니다.")
+    print(f"   (CLAUDE.md '새 게임 오프닝' 참조)\n")
+
     # 정적 웹 동기화
     _sync_docs()
     return True
