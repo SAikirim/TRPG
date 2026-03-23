@@ -201,7 +201,9 @@ def new_game(scenario_id):
     if len(rulesets) == 1:
         # 룰셋이 하나뿐이면 자동 선택
         chosen_ruleset = rulesets[0]
-        print(f"\n=== 룰셋: {chosen_ruleset['title']} (자동) ===")
+        print(f"\n=== 룰셋 선택 ===")
+        print(f"  [1] {chosen_ruleset['title']} — {chosen_ruleset['description']}")
+        print(f"  -> 룰셋이 1개뿐이므로 자동 선택: {chosen_ruleset['title']}")
     else:
         print(f"\n=== 룰셋 선택 ===")
         for i, r in enumerate(rulesets, 1):
