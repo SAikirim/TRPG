@@ -163,13 +163,24 @@ def new_game(scenario_id):
         return False
 
     # 시나리오 파일 로드
-    scenario_file = scenario_entry.get("scenario_file", f"scenarios/{scenario_id}.json")
-    # scenario_file이 scenarios/ 접두사 없이 있을 수 있음
-    if not os.path.exists(os.path.join(BASE_DIR, scenario_file)):
-        alt = f"scenarios/{scenario_file}"
-        if os.path.exists(os.path.join(BASE_DIR, alt)):
-            scenario_file = alt
-    scenario = load_json(scenario_file)
+    scenario_file = scenario_entry.get("scenario_file", f"{scenario_id}.json")
+    # 여러 경로 시도: scenarios/{file}, {file}, scenarios/{id}.json
+    candidates = [
+        os.path.join("scenarios", scenario_file),
+        scenario_file,
+        os.path.join("scenarios", f"{scenario_id}.json"),
+    ]
+    resolved = None
+    for c in candidates:
+        if os.path.exists(os.path.join(BASE_DIR, c)):
+            resolved = c
+            break
+    if resolved is None:
+        print(f"[ERROR] 시나리오 파일을 찾을 수 없습니다: {scenario_id}")
+        print(f"  시도한 경로: {candidates}")
+        print(f"  scenarios/index.json의 scenario_file 값을 확인하세요.")
+        return False
+    scenario = load_json(resolved)
 
     # initial_state 로드
     initial_file = scenario_entry.get("initial_state", "data/game_state_initial.json")

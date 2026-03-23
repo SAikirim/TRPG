@@ -258,10 +258,36 @@ def check_scenario_files(state):
         else:
             log("ok", f"scenario.json 타이틀 일치: '{sc_title}'")
 
-    # scenarios/index.json
+    # scenarios/index.json + 개별 시나리오 파일 존재 검증
     idx = load_json_safe("scenarios/index.json")
     if idx:
-        log("ok", f"scenarios/index.json 존재 ({len(idx.get('scenarios',[]))}개 시나리오)")
+        scenarios = idx.get("scenarios", [])
+        log("ok", f"scenarios/index.json 존재 ({len(scenarios)}개 시나리오)")
+
+        # 등록된 모든 시나리오의 파일 존재 확인
+        for s in scenarios:
+            sid = s["id"]
+            sf = s.get("scenario_file", f"{sid}.json")
+            # scenarios/ 접두사 붙여서 경로 탐색
+            sf_path = os.path.join(BASE_DIR, "scenarios", sf) if not sf.startswith("scenarios/") else os.path.join(BASE_DIR, sf)
+            if not os.path.exists(sf_path):
+                # scenarios/ 없이도 시도
+                alt_path = os.path.join(BASE_DIR, sf)
+                if os.path.exists(alt_path):
+                    sf_path = alt_path
+            if os.path.exists(sf_path):
+                log("ok", f"시나리오 파일 존재: {sid} -> {sf}")
+            else:
+                log("error", f"시나리오 파일 누락: {sid} -> {sf} (index.json에 등록되어 있지만 파일 없음)")
+
+            # initial_state 파일 확인
+            isf = s.get("initial_state", "")
+            if isf:
+                isf_path = os.path.join(BASE_DIR, isf)
+                if os.path.exists(isf_path):
+                    log("ok", f"초기 상태 파일 존재: {sid} -> {isf}")
+                else:
+                    log("error", f"초기 상태 파일 누락: {sid} -> {isf}")
     else:
         log("error", "scenarios/index.json 없음 또는 파싱 실패")
 
