@@ -231,6 +231,9 @@ def player_action():
     event = {
         "turn": state["turn_count"],
         "message": f"{player['name']}({player['class']})이(가) '{action}' 행동을 선택했다!",
+        "narrative": "",
+        "user_input": action,
+        "dialogues": [],
         "timestamp": datetime.now().strftime("%H:%M:%S"),
     }
     state["events"].append(event)
@@ -685,6 +688,9 @@ def reset_game():
             {
                 "turn": 0,
                 "message": "게임이 초기화되었다! 모험가들이 숲의 입구에 다시 모였다.",
+                "narrative": "",
+                "user_input": "",
+                "dialogues": [],
                 "timestamp": datetime.now().strftime("%H:%M:%S"),
             }
         ]

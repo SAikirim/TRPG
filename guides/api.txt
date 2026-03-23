@@ -55,7 +55,11 @@ gm-update 대화 기록 필드
 
 gm-update 판정 기록 필드
 ===
-  dice_rolls (array, optional): 해당 턴 판정 상세. show_dice_result와 무관하게 항상 기록.
+  판정 기록 ≠ 판정 표시. show_dice_result는 나레이션 표시만 제어한다.
+  판정 상세는 아래 두 경로 중 하나로 항상 기록해야 한다:
+
+  [경로 1] dice_rolls 필드 (에이전트 경유 판정 시 — 수동 기록)
+  dice_rolls (array): 해당 턴 판정 상세.
     - type (string, 필수): skill_check / attack / save / contest
     - roller (string, 필수): 판정 주체 이름
     - stat (string, 필수): 사용 능력치 (STR/DEX/INT/CON 등)
@@ -66,7 +70,15 @@ gm-update 판정 기록 필드
     - result (string, 필수): success / failure / critical / fumble
     - note (string, 선택): 추가 설명 ("소매치기 시도", "함정 감지" 등)
 
-  mechanics 필드로 판정을 요청한 경우:
-    - mechanics_results가 이벤트에 자동 기록됨
-    - dice_rolls는 별도로 넣지 않아도 됨 (mechanics_results에 상세 포함)
-    - GM이 에이전트를 통해 직접 판정한 경우에만 dice_rolls 수동 기록 필수
+  [경로 2] mechanics 필드 (game_mechanics.py 실행 시 — 자동 기록)
+  mechanics (array): 판정/회복/전투 요청. 결과는 이벤트에 mechanics_results로 자동 기록됨.
+    예시:
+    "mechanics": [
+      {"type": "skill_check", "player": 1, "stat": "DEX", "dc": 13},
+      {"type": "attack", "attacker": 1, "target": 101, "action": "단검 공격"},
+      {"type": "heal", "caster": 1, "target": 2},
+      {"type": "turn_start"}
+    ]
+  이 경우 dice_rolls는 넣지 않아도 됨 (mechanics_results에 상세 포함).
+
+  ⚠️ 판정이 있었는데 dice_rolls도 mechanics도 없으면 기록 누락이다.
