@@ -35,10 +35,10 @@
     },
     "weapons": {
       "맨손": {"dice": "1d2", "type": "melee", "stat": "STR", "description": "주먹과 발. 무기 없이 싸울 때 사용."},
-      "마법 지팡이": {"dice": "1d8", "type": "magic", "stat": "INT", "description": "마법사의 기본 무기. 마법 공격 매개체", "range": 8},
+      "마법 지팡이": {"dice": "1d4", "type": "melee", "stat": "STR", "description": "근접 타격용"},
       "단검": {"dice": "1d6", "type": "melee", "stat": "DEX", "description": "가볍고 빠른 단검"},
       "단검 x2": {"dice": "2d6", "type": "melee", "stat": "DEX", "description": "쌍단검 이도류"},
-      "오크의 도끼": {"dice": "1d8+2", "type": "melee", "stat": "STR", "description": "어두운 오크에게서 획득한 전투 도끼. 묵직하고 강력하다"},
+      "오크의 도끼": {"dice": "1d8", "type": "melee", "stat": "STR", "description": "무겁고 강력한 전투 도끼"},
       "장검": {"dice": "1d8", "type": "melee", "stat": "STR", "description": "표준 한손검"},
       "대검": {"dice": "1d10", "type": "melee", "stat": "STR", "description": "양손 대검"},
       "활": {"dice": "1d6", "type": "ranged", "stat": "DEX", "description": "표준 단궁"}
@@ -101,81 +101,6 @@
     "flee": {
       "formula": "1d20 + DEX_modifier >= flee_dc",
       "description": "도주 판정. 실패 시 도주 불가 + 적에게 기회 공격 허용."
-    },
-    "cover": {
-      "description": "오브젝트 뒤에 숨어 엄폐. 원거리 공격에 대한 방어 보너스 제공.",
-      "types": {
-        "none": {"defense_bonus": 0, "description": "엄폐 없음"},
-        "half": {"defense_bonus": 2, "description": "반 엄폐. AC +2 (원거리만)"},
-        "full": {"defense_bonus": 5, "description": "완전 엄폐. AC +5 또는 원거리 차단"}
-      },
-      "rules": [
-        "엄폐는 공격자 방향에 엄폐물이 있을 때만 적용",
-        "근거리(인접 타일) 공격에는 엄폐 미적용",
-        "full cover로 원거리 차단 시 공격 자동 빗나감",
-        "가연성 엄폐물은 화염 공격으로 파괴 가능",
-        "폭발성 오브젝트는 파괴 시 주변 피해",
-        "파괴된 오브젝트는 엄폐 효과 소멸"
-      ]
-    }
-  },
-  "tile_scale": {
-    "local_map": {
-      "tile_meters": 2,
-      "note": "로컬 맵 1타일 = 약 2m. 이동, 사거리, 범위 효과 계산에 사용."
-    }
-  },
-  "distance": {
-    "description": "좌표 기반 거리 계산. 맨하탄 거리(|x1-x2| + |y1-y2|) 사용.",
-    "unit": "칸 (1칸 = 약 2m)",
-    "melee_range": 1,
-    "short_range": 3,
-    "medium_range": 6,
-    "long_range": 10,
-    "rules": {
-      "melee_attack": {
-        "max_range": 1,
-        "description": "근접 공격은 인접 1칸 이내만 가능"
-      },
-      "ranged_attack": {
-        "max_range": 10,
-        "penalty_beyond": 6,
-        "penalty_value": -2,
-        "description": "원거리 공격 최대 10칸. 6칸 초과 시 명중 -2"
-      },
-      "magic_attack": {
-        "max_range": 8,
-        "description": "마법 공격 최대 8칸"
-      },
-      "aoe_radius": {
-        "fireball": 2,
-        "heal": 1,
-        "description": "범위 공격은 지정 좌표 기준 반경 내 모든 대상 적중"
-      },
-      "movement": {
-        "per_turn": 3,
-        "dash": 6,
-        "description": "턴당 기본 이동 3칸. 대시(행동 소모) 시 6칸",
-        "terrain_cost": {
-          "road": 1,
-          "grass": 1,
-          "village": 1,
-          "house": 1,
-          "dungeon": 1,
-          "treasure": 1,
-          "water": 2,
-          "mountain": 3
-        }
-      },
-      "detection": {
-        "visual_range": 8,
-        "stealth_modifier": "-1 per 2 distance",
-        "description": "시각 인식 범위 8칸. 은신 판정 시 거리 2칸당 DC -1"
-      },
-      "flee": {
-        "min_distance": 3,
-        "description": "도주 성공 시 적에게서 3칸 이상 떨어져야 완전 이탈"
-      }
     }
   },
   "stat_modifiers": {
@@ -295,23 +220,6 @@
       "마나 포션": {"heal_mp": 8, "description": "MP 8 회복"}
     }
   },
-  "travel": {
-    "description": "월드맵 이동 속도. 이동 시간 = distance_km / speed_kmh. 하루 이동 가능 시간은 8시간.",
-    "speed_table": {
-      "walk": {"speed_kmh": 4, "description": "도보 이동"},
-      "cart": {"speed_kmh": 6, "description": "짐마차 (짐말/소가 끄는 수레)"},
-      "horse": {"speed_kmh": 8, "description": "기마 이동"},
-      "run": {"speed_kmh": 8, "description": "달리기 (1시간 제한, 이후 피로)"}
-    },
-    "modifiers": {
-      "injured": 0.7,
-      "heavy_load": 0.8,
-      "night": 0.5,
-      "rain": 0.7,
-      "mountain_road": 0.6
-    },
-    "daily_travel_hours": 8
-  },
   "level_up": {
     "enabled": true,
     "description": "경험치(XP) 획득 → 레벨업 → 능력치/HP/MP 성장 + 신규 스킬 해금",
@@ -371,45 +279,7 @@
           "9": {"name": "불굴의 의지", "type": "passive", "description": "HP가 25% 이하일 때 방어력 +4, 공격력 +2 자동 적용."}
         }
       }
-    },
-    "multiclass": {
-      "enabled": true,
-      "description": "레벨업 시 기존 클래스를 올리거나 새 클래스를 추가할 수 있다. 새 클래스 추가 시 해당 클래스의 주 스탯 요구치를 충족해야 한다.",
-      "min_level_to_multiclass": 3,
-      "max_classes": 3,
-      "requirements": {
-        "전사": {"STR": 12},
-        "마법사": {"INT": 12},
-        "도적": {"DEX": 12},
-        "성직자": {"INT": 12},
-        "궁수": {"DEX": 12}
-      },
-      "on_add_class": {
-        "description": "새 클래스 추가 시 해당 클래스의 레벨 1 스킬을 획득한다. HP/MP 증가는 새 클래스 기준.",
-        "starting_skills": true,
-        "hp_mp_gain": "new_class"
-      },
-      "level_up_rule": {
-        "description": "레벨업 시 어느 클래스를 올릴지 선택한다. 선택한 클래스의 hp/mp_per_level로 성장하고, 해당 클래스의 스킬을 해금한다.",
-        "stat_points": "기존과 동일 (per_level.stat_points)"
-      }
     }
-  },
-  "npc_stats": {
-    "description": "모든 NPC(몬스터 포함)는 플레이어와 동일한 4능력치 시스템을 사용한다.",
-    "guidelines": {
-      "weak_monster": {"STR": "8-12", "DEX": "8-12", "INT": "4-8", "CON": "8-10", "HP": "8-15"},
-      "strong_monster": {"STR": "14-18", "DEX": "8-14", "INT": "6-12", "CON": "12-16", "HP": "20-40"},
-      "boss_monster": {"STR": "18-20", "DEX": "10-14", "INT": "10-16", "CON": "16-20", "HP": "35-60"},
-      "civilian": {"STR": "6-10", "DEX": "8-12", "INT": "10-14", "CON": "8-10", "HP": "6-12"},
-      "guard": {"STR": "12-14", "DEX": "10-12", "INT": "8-10", "CON": "12-14", "HP": "15-25"},
-      "merchant": {"STR": "8-10", "DEX": "10-12", "INT": "12-16", "CON": "8-12", "HP": "8-15"},
-      "animal_horse": {"STR": "14-18", "DEX": "12-14", "INT": "2-4", "CON": "12-16", "HP": "15-25"},
-      "animal_wolf": {"STR": "12-14", "DEX": "14-16", "INT": "4-6", "CON": "10-12", "HP": "10-18"}
-    },
-    "hp_formula": "base + floor(CON * 0.5)",
-    "mp_formula": "base + floor(INT * 0.3)",
-    "defense_formula": "10 + DEX_modifier + armor_bonus"
   },
   "death_rules": {
     "player_death": "HP가 0이 되면 기절. 다음 턴에 힐을 받지 못하면 사망.",
