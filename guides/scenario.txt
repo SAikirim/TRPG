@@ -129,7 +129,11 @@ default_party 구조
 게임 시작 플로우 (신규 게임)
 ===
 1. scenarios/index.json 에서 시나리오 선택
-2. 연결된 룰셋 (rulesets/) 확인
+2. 룰셋 선택:
+   - rulesets/index.json 에서 룰셋 목록 표시
+   - 시나리오의 ruleset 필드가 권장 룰셋 (기본값)
+   - 유저가 선택하지 않으면 권장 룰셋 자동 적용
+   - 룰셋이 하나뿐이면 자동 선택
 3. 시작 모드 결정:
    - prerequisite가 없으면 → 새 게임
    - prerequisite가 있고 prerequisite_required가 false이면 → "새 게임" / "이어하기" 선택
@@ -139,4 +143,5 @@ default_party 구조
    - 이어하기: 이전 세이브에서 캐릭터 로드. 추가 설정 없음.
 5. initial_state 파일로 game_state.json 초기화
 6. entities/{scenario_id}/ 엔티티 파일 생성
-7. opening.narrative 표시 + 챕터 1 맵 표시
+7. 활성 파일 복사: scenarios/ → data/scenario.json, rulesets/ → data/rules.json
+8. opening.narrative 표시 + 챕터 1 맵 표시

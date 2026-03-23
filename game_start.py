@@ -192,6 +192,39 @@ def new_game(scenario_id):
         return False
     state = load_json(initial_file)
 
+    # ─── 룰셋 선택 ───
+    ruleset_index = load_json("rulesets/index.json")
+    rulesets = ruleset_index.get("rulesets", [])
+    # 시나리오 권장 룰셋 (index.json의 ruleset 필드)
+    recommended_ruleset = scenario_entry.get("ruleset", ruleset_index.get("default_ruleset", ""))
+
+    if len(rulesets) == 1:
+        # 룰셋이 하나뿐이면 자동 선택
+        chosen_ruleset = rulesets[0]
+        print(f"\n=== 룰셋: {chosen_ruleset['title']} (자동) ===")
+    else:
+        print(f"\n=== 룰셋 선택 ===")
+        for i, r in enumerate(rulesets, 1):
+            rec = " (권장)" if r["id"] == recommended_ruleset else ""
+            print(f"  [{i}] {r['title']} — {r['description']}{rec}")
+        try:
+            choice = input(f"\n룰셋 번호 선택 (빈칸={recommended_ruleset}): ").strip()
+            if not choice:
+                chosen_ruleset = next((r for r in rulesets if r["id"] == recommended_ruleset), rulesets[0])
+            else:
+                chosen_ruleset = rulesets[int(choice) - 1]
+        except (ValueError, IndexError, EOFError):
+            chosen_ruleset = next((r for r in rulesets if r["id"] == recommended_ruleset), rulesets[0])
+        print(f"  -> {chosen_ruleset['title']}")
+
+    # 룰셋 파일 복사 → data/rules.json
+    ruleset_file = chosen_ruleset.get("rules_file", f"{chosen_ruleset['id']}.json")
+    ruleset_src = os.path.join(BASE_DIR, "rulesets", ruleset_file)
+    if os.path.exists(ruleset_src):
+        import shutil
+        shutil.copy2(ruleset_src, os.path.join(BASE_DIR, "data", "rules.json"))
+    state["game_info"]["ruleset"] = chosen_ruleset["id"]
+
     # 클래스 데이터 로드
     classes = load_json("templates/character_classes.json")
 
@@ -301,7 +334,7 @@ def new_game(scenario_id):
     print(f"  [OK] current_session.json 저장 완료")
 
     # 활성 시나리오/룰셋 파일 복사 (scenario.json, rules.json)
-    _activate_scenario_files(scenario_entry, scenario_file)
+    _activate_scenario_files(scenario_entry, resolved, ruleset_override=chosen_ruleset["id"])
 
     # 세계관 활성화 (worldbuildings/ → data/worldbuilding.json)
     _activate_worldbuilding(scenario_entry)
@@ -528,7 +561,7 @@ def _sync_docs():
 
 # ─── 유틸리티 ───
 
-def _activate_scenario_files(scenario_entry, scenario_file):
+def _activate_scenario_files(scenario_entry, scenario_file, ruleset_override=None):
     """활성 시나리오/룰셋 파일을 data/에 복사 (scenario.json, rules.json)."""
     # scenario.json
     src = os.path.join(BASE_DIR, scenario_file)
@@ -537,8 +570,8 @@ def _activate_scenario_files(scenario_entry, scenario_file):
         shutil.copy2(src, dst)
         print(f"  [OK] data/scenario.json <- {scenario_file}")
 
-    # rules.json (룰셋)
-    ruleset_id = scenario_entry.get("ruleset", "fantasy_basic")
+    # rules.json (룰셋) — 유저가 선택한 룰셋 우선, 없으면 시나리오 기본값
+    ruleset_id = ruleset_override or scenario_entry.get("ruleset", "fantasy_basic")
     ruleset_file = f"rulesets/{ruleset_id}.json"
     ruleset_src = os.path.join(BASE_DIR, ruleset_file)
     rules_dst = os.path.join(BASE_DIR, "data", "rules.json")
