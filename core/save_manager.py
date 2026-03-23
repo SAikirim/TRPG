@@ -307,12 +307,14 @@ class SaveManager:
         # 기존 current_session.json에서 유저 설정 보존
         existing_display_mode = "mobile"
         existing_show_dice = False
+        existing_show_system_log = False
         existing_sd_illustration = False
         if os.path.exists(CURRENT_SESSION_PATH):
             with open(CURRENT_SESSION_PATH, "r", encoding="utf-8") as f:
                 existing = json.load(f)
                 existing_display_mode = existing.get("display_mode", "mobile")
                 existing_show_dice = existing.get("show_dice_result", False)
+                existing_show_system_log = existing.get("show_system_log", False)
                 existing_sd_illustration = existing.get("sd_illustration", False)
 
         session = {
@@ -327,6 +329,7 @@ class SaveManager:
             "next_objective": "",
             "display_mode": existing_display_mode,
             "show_dice_result": existing_show_dice,
+            "show_system_log": existing_show_system_log,
             "sd_illustration": existing_sd_illustration,
             "last_updated": datetime.now().strftime("%Y-%m-%d"),
         }

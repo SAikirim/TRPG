@@ -576,6 +576,7 @@ def get_settings():
     return jsonify({
         "sd_illustration": session.get("sd_illustration", False),
         "show_dice_result": session.get("show_dice_result", False),
+        "show_system_log": session.get("show_system_log", False),
         "display_mode": session.get("display_mode", "mobile"),
         "difficulty": state.get("game_info", {}).get("difficulty", "normal"),
     })
@@ -592,6 +593,8 @@ def update_settings():
         session["sd_illustration"] = bool(data["sd_illustration"])
     if "show_dice_result" in data:
         session["show_dice_result"] = bool(data["show_dice_result"])
+    if "show_system_log" in data:
+        session["show_system_log"] = bool(data["show_system_log"])
     if "display_mode" in data and data["display_mode"] in ("mobile", "terminal"):
         session["display_mode"] = data["display_mode"]
 

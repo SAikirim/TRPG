@@ -39,6 +39,7 @@
   "next_objective": "고대 숲으로 들어서는 길. 나무가 빽빽하고 빛이 잘 들지 않는다. 약초와 함정이 곳곳에 있다.",
   "display_mode": "mobile",
   "show_dice_result": false,
+  "show_system_log": false,
   "sd_illustration": true,
   "last_updated": "2026-03-23"
 }
