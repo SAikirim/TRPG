@@ -4,6 +4,7 @@
     "description": "고대 숲 깊은 곳에 잠든 전설의 보물. 세 명의 모험가가 위험을 무릅쓰고 던전에 발을 들인다.",
     "difficulty": "normal",
     "recommended_level": 1,
+    "party_size": {"min": 3, "max": 3, "recommended": 3},
     "backstory": "하룬 마을 근처의 고대 숲. 오래전부터 숲 깊은 곳에 전설의 보물이 잠들어 있다는 소문이 있었다. 마을에서 자란 세 명의 젊은 모험가가 보물을 찾기 위해 숲으로 향한다."
   },
   "opening": {

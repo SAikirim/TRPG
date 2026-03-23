@@ -594,10 +594,17 @@ def _character_making(scenario, classes, state):
     available_classes = list(classes.get("classes", {}).keys())
     auto_names = classes.get("auto_generate", {}).get("name_pool", {})
 
+    # 시나리오 파티 인원 제한
+    party_size = scenario.get("scenario_info", {}).get("party_size", {})
+    min_party = party_size.get("min", len(party))
+    max_party = party_size.get("max", len(party))
+    rec_party = party_size.get("recommended", len(party))
+
     print(f"\n{'='*50}")
     print(f"  캐릭터 메이킹: {scenario['scenario_info']['title']}")
     print(f"{'='*50}")
     print(f"  난이도: {difficulty} | 스탯 총합: {stat_pool} | 범위: {min_stat}~{max_stat}")
+    print(f"  파티 인원: {min_party}~{max_party}명 (권장: {rec_party}명)")
     print(f"  사용 가능 클래스: {', '.join(available_classes)}")
 
     # 기본 파티 표시

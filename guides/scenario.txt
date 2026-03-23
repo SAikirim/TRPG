@@ -26,6 +26,7 @@
     "description": "시나리오 한줄 설명",
     "difficulty": "normal",
     "recommended_level": 1,
+    "party_size": {"min": 3, "max": 3, "recommended": 3},
     "prerequisite": "이전_시나리오_id 또는 null",
     "prerequisite_required": false,
     "backstory": "시나리오 배경 설명 (새 게임 시작 시 표시)"

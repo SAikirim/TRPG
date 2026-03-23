@@ -4,6 +4,7 @@
     "description": "전설의 보물을 손에 넣은 세 모험가가 감정을 위해 교역도시 카렌델로 향한다.",
     "difficulty": "normal",
     "recommended_level": 3,
+    "party_size": {"min": 3, "max": 3, "recommended": 3},
     "prerequisite": "lost_treasure",
     "prerequisite_required": false,
     "backstory": "숲 깊은 곳의 던전에서 전설의 보물을 발견한 모험가들. 보물의 정체를 밝히기 위해 교역도시 카렌델로 향한다. 도중에 부상당한 상인 일행을 만나 동행하게 된다."
