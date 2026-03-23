@@ -689,12 +689,20 @@ def _start_mode_select(scenario_id, scenario):
             if mode_choice and int(mode_choice) >= 2:
                 slot_idx = int(mode_choice) - 2
                 if 0 <= slot_idx < len(save_slots):
-                    print(f"  -> 세이브 로드: {save_slots[slot_idx]['slot']}")
+                    sv = save_slots[slot_idx]
+                    slot_num = int(sv['slot'].replace('slot_', ''))
+                    save_file = os.path.join("saves", scenario_id, sv['slot'], "save.json")
+                    print(f"\n=== 세이브 로드 ===")
+                    print(f"  시나리오: {scenario_id}")
+                    print(f"  슬롯: {slot_num} ({sv['slot']})")
+                    print(f"  파일: {save_file}")
+                    print(f"  설명: {sv['description']}")
+                    print(f"  저장일: {sv['saved_at']}")
                     from core.save_manager import SaveManager
                     sm = SaveManager()
-                    save_info = sm.load_game(scenario_id, int(save_slots[slot_idx]['slot'].replace('slot_', '')))
+                    save_info = sm.load_game(scenario_id, slot_num)
                     if save_info:
-                        print(f"  [OK] 세이브 로드 완료: {save_info.get('description', '')}")
+                        print(f"  -> 로드 완료!")
                         state = load_json("data/game_state.json")
                         _print_state_summary(state)
                     else:
