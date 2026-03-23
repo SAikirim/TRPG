@@ -104,9 +104,57 @@ Player 에이전트:
 - AI 조종 플레이어(controlled_by: "ai")는 1명당 Agent [Player:{이름}] 1개
 - 예: [Player:노을], [Player:사이키] (controlled_by: "user"인 캐릭터는 유저가 직접 조종)
 - 역할: 상황을 보고 행동을 선택한다 (이동, 전투, 대화, 탐색 등)
-- 읽기: entities/{scenario_id}/players/player_{id}.json
-- 성격/배경/관계/인벤토리를 기반으로 의사결정
+- 읽기: agents/agent_{id}.json (에이전트 정체성) + entities/{scenario_id}/players/player_{id}.json (캐릭터 데이터)
+- 에이전트 성격/플레이스타일 + 캐릭터 배경/관계/인벤토리를 종합하여 의사결정
 - NPC Agent와 다른 점: 플레이어는 목표 달성을 위해 전략적으로 행동을 "선택"한다
+
+플레이어 에이전트 시스템 (agents/)
+===
+플레이어 에이전트(= AI 플레이어)와 캐릭터(= 게임 내 인물)는 분리된 개념이다.
+에이전트는 지속되고, 캐릭터는 교체될 수 있다.
+
+구조:
+  agents/                          ← 플레이어 에이전트 (시나리오 독립, 지속)
+    agent_a.json                   ← 에이전트 A의 정체성
+    agent_b.json
+    agent_c.json
+  entities/{scenario}/players/     ← 캐릭터 (시나리오 종속, 교체 가능)
+    player_1.json
+    player_2.json
+
+연결:
+  agent.json의 current_character → "player_1" (현재 조종 중인 캐릭터)
+  player.json의 controlled_by → "ai" (기존 호환성 유지: "user" | "ai")
+  player.json의 agent_id → "agent_a" (어떤 에이전트가 조종하는지, 선택적)
+  ※ controlled_by는 기존 코드 호환을 위해 "ai" 유지
+  ※ agent_id로 구체적 에이전트를 식별 (양방향 링크)
+
+에이전트 JSON 구조:
+{
+  "id": "agent_a",
+  "name": "플레이어 A",
+  "gender": "male",                    // 에이전트의 성별 (캐릭터 성별과 다를 수 있음)
+  "personality": "...",                 // 에이전트의 성격 (의사결정 스타일)
+  "play_style": "...",                  // 플레이 성향 (공격적/방어적/서포트 등)
+  "decision_tendency": "...",           // 판단 기준 (직감형/분석형/모험형 등)
+  "current_character": "player_1",      // 현재 조종 중인 캐릭터 ID
+  "character_history": [                // 이전에 조종했던 캐릭터 기록
+    {"character_id": "player_1", "name": "가온", "status": "dead", "scenario": "lost_treasure"}
+  ]
+}
+
+캐릭터 교체 시나리오:
+1. 캐릭터 사망 → character_history에 기록 → 새 캐릭터 생성 → current_character 갱신
+2. NPC 이관 → NPC를 players/로 이동 → controlled_by를 에이전트 ID로 변경 → current_character 갱신
+3. 시나리오 전환 → 새 시나리오의 캐릭터에 current_character 연결
+
+Agent [Player:{이름}] 호출 시:
+1. agents/agent_{id}.json 읽기 → 에이전트 정체성 복원
+2. entities/{scenario}/players/player_{id}.json 읽기 → 캐릭터 상태 복원
+3. 에이전트 성격 + 캐릭터 성격을 종합하여 의사결정
+   - 에이전트 = "이 사람은 어떤 플레이어인가" (전략형? 즉흥형?)
+   - 캐릭터 = "이 캐릭터는 어떤 인물인가" (성격, 배경, 동기)
+   - 둘을 합쳐서 "이 플레이어가 이 캐릭터로 이 상황에서 뭘 하겠는가" 결정
 
 NPC 에이전트:
 - NPC는 1명당 Agent [NPC:{이름}] 1개 (예: [NPC:할란], [NPC:미라])

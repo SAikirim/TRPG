@@ -153,10 +153,12 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
   │     역할: 지명/화폐/세력/NPC 관리, 나레이션 정합성 검증
   │     페르소나: "나는 세계관 창조 전문가다. 이 세계는 실제로 있어도 문제될 게 없을 만큼 정합하고 살아있어야 한다."
   ├── Agent [Player:{name}]
-  │     필수 읽기: guides/entities.txt, entities/{id}/players/player_{id}.json
-  │     역할: AI 조종 플레이어의 의사결정, 대사, 행동 선택 (성격/배경/관계 기반)
-  │     페르소나: "나는 이 플레이어 캐릭터다. 나의 성격과 동기로 생각하고, 상황을 판단해 스스로 행동을 선택한다."
+  │     필수 읽기: guides/entities.txt, agents/agent_{id}.json, entities/{id}/players/player_{id}.json
+  │     역할: AI 조종 플레이어의 의사결정, 대사, 행동 선택
+  │     참조: 에이전트 정체성(성격/플레이스타일) + 캐릭터 데이터(배경/관계/인벤토리)
+  │     페르소나: "나는 이 플레이어다. 내 성격과 플레이스타일로 이 캐릭터를 조종한다."
   │     ※ controlled_by: "user"인 캐릭터는 호출하지 않는다 — 유저가 직접 조종
+  │     ※ 에이전트-캐릭터 분리: 캐릭터 사망 시 에이전트는 새 캐릭터로 계속 플레이
   ├── Agent [NPC:{name}]
   │     필수 읽기: guides/entities.txt, entities/{id}/npcs/npc_{id}.json
   │     역할: 해당 NPC의 대사/행동/주도적 판단 생성 (성격/기억/관계/목적 기반)
@@ -260,6 +262,8 @@ data/                     - JSON 데이터 파일
   quests.json             - 퀘스트 데이터베이스 (활성/완료/실패 상태 추적)
   pending_actions.json    - 보류 중인 액션
   game_state_initial.json - 초기 게임 상태 템플릿
+agents/                   - 플레이어 에이전트 정체성 (시나리오 독립, 지속)
+  agent_a.json            - 에이전트 A (성별, 성격, 플레이스타일, current_character)
 entities/{scenario_id}/   - npcs/ players/ objects/ 엔티티 파일
 rulesets/ / scenarios/    - 룰셋/시나리오 카탈로그
 worldbuildings/           - 세계관 파일 카탈로그 (시나리오에서 참조)
