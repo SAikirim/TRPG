@@ -9,7 +9,7 @@
       "rules_file": "fantasy_basic.json",
       "features": ["전투", "마법", "상태이상", "휴식", "도주"],
       "stat_system": ["STR", "DEX", "INT", "CON"],
-      "compatible_scenarios": ["lost_treasure"]
+      "compatible_scenarios": ["lost_treasure", "karendel_journey"]
     }
   ],
   "default_ruleset": "fantasy_basic"
