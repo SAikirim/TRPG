@@ -690,8 +690,15 @@ def _start_mode_select(scenario_id, scenario):
                 slot_idx = int(mode_choice) - 2
                 if 0 <= slot_idx < len(save_slots):
                     print(f"  -> 세이브 로드: {save_slots[slot_idx]['slot']}")
-                    from core.save_manager import load_save
-                    load_save(scenario_id, int(save_slots[slot_idx]['slot'].replace('slot_', '')))
+                    from core.save_manager import SaveManager
+                    sm = SaveManager()
+                    save_info = sm.load_game(scenario_id, int(save_slots[slot_idx]['slot'].replace('slot_', '')))
+                    if save_info:
+                        print(f"  [OK] 세이브 로드 완료: {save_info.get('description', '')}")
+                        state = load_json("data/game_state.json")
+                        _print_state_summary(state)
+                    else:
+                        print(f"  [ERROR] 세이브 로드 실패")
                     return "load"
         except (ValueError, IndexError, EOFError):
             pass
