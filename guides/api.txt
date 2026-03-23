@@ -37,6 +37,7 @@ gm-update 파라미터
   "illustration": {"type": "background", "prompt": "..."},
   "user_input": "유저의 원문 입력 (이벤트에 기록됨)",
   "dialogues": [{"speaker": "캐릭터이름", "line": "대사 텍스트"}],
+  "dice_rolls": [{"type": "skill_check", "roller": "사이키", "stat": "DEX", "roll": 14, "modifier": 3, "total": 17, "dc": 13, "result": "success"}],
   "clear_scene": true,
   "remove_layer": "오크"
 }
@@ -51,3 +52,21 @@ gm-update 대화 기록 필드
     - tone (string, 선택): 감정/어조 (장난, 진지, 화남, 걱정, 냉정 등)
     - action (string, 선택): 동반 행동 (손가락을 튕기며 등)
     - type (string, 선택): 대화/독백/외침/속삭임 (기본: 대화)
+
+gm-update 판정 기록 필드
+===
+  dice_rolls (array, optional): 해당 턴 판정 상세. show_dice_result와 무관하게 항상 기록.
+    - type (string, 필수): skill_check / attack / save / contest
+    - roller (string, 필수): 판정 주체 이름
+    - stat (string, 필수): 사용 능력치 (STR/DEX/INT/CON 등)
+    - roll (number, 필수): 주사위 결과값 (d20 결과)
+    - modifier (number, 필수): 능력치 수정치
+    - total (number, 필수): roll + modifier
+    - dc (number, 필수): 목표 난이도
+    - result (string, 필수): success / failure / critical / fumble
+    - note (string, 선택): 추가 설명 ("소매치기 시도", "함정 감지" 등)
+
+  mechanics 필드로 판정을 요청한 경우:
+    - mechanics_results가 이벤트에 자동 기록됨
+    - dice_rolls는 별도로 넣지 않아도 됨 (mechanics_results에 상세 포함)
+    - GM이 에이전트를 통해 직접 판정한 경우에만 dice_rolls 수동 기록 필수

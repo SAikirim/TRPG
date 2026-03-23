@@ -344,6 +344,9 @@ def gm_update():
             "dialogues": data.get("dialogues", []),
             "timestamp": datetime.now().strftime("%H:%M:%S"),
         }
+        # 판정 상세 기록 — show_dice_result와 무관하게 항상 기록
+        if data.get("dice_rolls"):
+            event["dice_rolls"] = data["dice_rolls"]
         state["events"].append(event)
 
     # Process mechanics requests (자동 판정/회복/전투)
@@ -384,6 +387,19 @@ def gm_update():
         elif mtype == "allocate_stats":
             mechanics_results.append(gm.allocate_stats(
                 mreq["player"], mreq["stats"], state))
+
+    # mechanics 결과를 이벤트에 자동 기록 (판정 상세 영구 보존)
+    if mechanics_results and event:
+        event["mechanics_results"] = mechanics_results
+    elif mechanics_results and not event:
+        # 나레이션 없이 mechanics만 호출된 경우에도 기록
+        mech_event = {
+            "turn": state["turn_count"],
+            "message": "[시스템] 판정 처리",
+            "mechanics_results": mechanics_results,
+            "timestamp": datetime.now().strftime("%H:%M:%S"),
+        }
+        state["events"].append(mech_event)
 
     # Update game status if provided
     if "game_status" in data:
