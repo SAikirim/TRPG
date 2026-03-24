@@ -3,6 +3,8 @@ map_generator.py에서 분리된 세계 지도 관련 코드."""
 
 import json
 import os
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 import math
 import skia
 from PIL import Image

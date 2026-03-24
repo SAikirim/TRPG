@@ -16,6 +16,7 @@ import json
 import os
 import re
 import sys
+sys.stdout.reconfigure(encoding='utf-8')
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WB_PATH = os.path.join(BASE_DIR, "data", "worldbuilding.json")

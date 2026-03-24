@@ -33,6 +33,7 @@ gm-update 파라미터
   "npc_updates": [{"id": 101, "hp": 0, "status": "dead"}],
   "new_npcs": [...],
   "game_status": "in_progress",
+  "location": "crossroads_rest (위치 변경 시 current_location + 맵 자동 갱신)",
   "scene_update": {"chapter": 3, "narrative_title": "보물실 진입"},
   "illustration": {"type": "background", "prompt": "..."},
   "user_input": "유저의 원문 입력 (이벤트에 기록됨)",

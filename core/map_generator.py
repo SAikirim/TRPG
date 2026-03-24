@@ -1,5 +1,7 @@
 import json
 import os
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 from PIL import Image, ImageDraw, ImageFont
 
 # 호환성 re-export (기존 import 안 깨뜨리기)

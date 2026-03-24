@@ -42,6 +42,7 @@ GM 턴 추적기 — 실제 동작만 기록하고, 턴 종료 시 누락 경고
 import json
 import os
 import sys
+sys.stdout.reconfigure(encoding='utf-8')
 from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -256,6 +257,22 @@ def end_turn():
         warnings.append("  ⚠️  순서 위반: 나레이션이 출력되었으나 gm-update가 호출되지 않음 → events 미기록")
     elif narration_time and gm_update_time and narration_time < gm_update_time:
         warnings.append("  ⚠️  순서 위반: 나레이션이 gm-update보다 먼저 출력됨 → write-before-display 위반")
+
+    # 위치 변경 누락 체크: 나레이션에 이동 키워드가 있는데 location 갱신이 없으면 경고
+    has_location_update = any(
+        s["tag"] == "gm-update" and "location" in s.get("detail", "").lower()
+        for s in tracker["steps"]
+    )
+    if not has_location_update:
+        # 에이전트 결과나 나레이션에서 이동 키워드 탐지
+        move_keywords = ["도착", "이동", "들어서", "진입", "떠나", "출발", "쉼터에", "마을에", "성문"]
+        all_details = " ".join(
+            a.get("detail", "") for a in tracker.get("agents", [])
+        ) + " " + " ".join(
+            p.get("message", "") for p in tracker.get("phases", [])
+        )
+        if any(kw in all_details for kw in move_keywords):
+            warnings.append("  ⚠️  위치 변경 누락 가능: 나레이션에 이동 키워드 감지됨 → gm-update에 location 필드 추가 필요")
 
     tracker["completed"] = True
     tracker["ended_at"] = datetime.now().isoformat()

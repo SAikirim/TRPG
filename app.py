@@ -1,5 +1,7 @@
 import json
 import os
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 from datetime import datetime
 
 from flask import Flask, jsonify, render_template, request
@@ -132,15 +134,120 @@ def update_map_image():
     gen.save_map()
 
 
+def _find_best_background(state):
+    """현재 위치/시간대에 맞는 최적 배경 일러스트를 찾는다.
+    매칭 실패 시 None 반환 (기존 배경 유지)."""
+    import glob as _glob
+
+    ill_dir = os.path.join(BASE_DIR, "static", "illustrations", "sd")
+    if not os.path.isdir(ill_dir):
+        return None
+
+    # 사용 가능한 배경 파일 목록
+    bg_files = []
+    for ext in ("*.webp", "*.png"):
+        bg_files.extend(_glob.glob(os.path.join(ill_dir, f"background_{ext}")))
+    if not bg_files:
+        return None
+
+    # 파일명만 추출 (경로 제외)
+    bg_names = {os.path.basename(f): f"/static/illustrations/sd/{os.path.basename(f)}" for f in bg_files}
+
+    location = state.get("current_location", "")
+    # location 키워드 추출: "trade_road_karendel" → ["trade", "road", "karendel"]
+    loc_keywords = [k.lower() for k in location.replace("-", "_").split("_") if len(k) > 2]
+
+    # 시간대 감지: 최근 나레이션에서 밤/낮 키워드
+    night_keywords = ["밤", "야영", "night", "새벽", "dawn", "모닥불", "달빛", "어둠"]
+    is_night = False
+    events = state.get("events", [])
+    for ev in reversed(events[-5:]):  # 최근 5개 이벤트만
+        narr = (ev.get("narrative", "") + ev.get("message", "")).lower()
+        if any(kw in narr for kw in night_keywords):
+            is_night = True
+            break
+
+    # 1순위: worldbuilding.json의 default_bg
+    try:
+        wb_path = os.path.join(BASE_DIR, "data", "worldbuilding.json")
+        with open(wb_path, "r", encoding="utf-8") as f:
+            wb = json.load(f)
+        loc_data = wb.get("locations", {}).get(location, {})
+        default_bg = loc_data.get("default_bg", {})
+        if default_bg:
+            time_key = "night" if is_night else "day"
+            bg_url = default_bg.get(time_key)
+            if bg_url:
+                bg_file = os.path.join(BASE_DIR, bg_url.lstrip("/"))
+                if os.path.isfile(bg_file):
+                    return bg_url
+            # 시간대 매칭 실패 시 반대 시간대도 시도
+            alt_key = "day" if is_night else "night"
+            bg_url_alt = default_bg.get(alt_key)
+            if bg_url_alt:
+                bg_file_alt = os.path.join(BASE_DIR, bg_url_alt.lstrip("/"))
+                if os.path.isfile(bg_file_alt):
+                    return bg_url_alt
+    except Exception:
+        pass
+
+    # 2순위: 파일명 키워드 매칭 (기존 로직)
+    best_score = 0
+    best_bg = None
+    for fname, url in bg_names.items():
+        fname_lower = fname.lower()
+        score = 0
+        for kw in loc_keywords:
+            if kw in fname_lower:
+                score += 1
+        # 시간대 보너스
+        if is_night and "night" in fname_lower:
+            score += 2
+        elif not is_night and "night" not in fname_lower and score > 0:
+            score += 1
+
+        if score > best_score:
+            best_score = score
+            best_bg = url
+
+    # 최소 1개 키워드 매칭 필요
+    return best_bg if best_score >= 1 else None
+
+
 def restore_scene():
     """Restore web UI scene from current game state. Called on startup and game load."""
     state = load_game_state()
     saved_scene = state.get("current_scene")
 
     if saved_scene and saved_scene.get("background"):
-        # 저장된 장면 정보에서 직접 복원
+        background = saved_scene["background"]
+
+        # 배경 파일 존재 여부 + 위치 적합성 검증
+        bg_path = os.path.join(BASE_DIR, background.lstrip("/")) if background else None
+        needs_fix = False
+        if bg_path and not os.path.isfile(bg_path):
+            needs_fix = True  # 파일 자체가 없음
+
+        # 위치 키워드가 배경 파일명에 없으면 불일치 가능
+        if not needs_fix:
+            location = state.get("current_location", "")
+            loc_keywords = [k.lower() for k in location.replace("-", "_").split("_") if len(k) > 2]
+            bg_basename = os.path.basename(background).lower()
+            # ch1_forest.png 같은 챕터 기본 배경이면 항상 재검증
+            if bg_basename.startswith("ch") and "_" in bg_basename:
+                needs_fix = True
+            # location 키워드가 하나도 안 맞고, 턴이 있으면 (초기 상태가 아니면) 재검증
+            elif loc_keywords and not any(kw in bg_basename for kw in loc_keywords):
+                if state.get("turn_count", 0) > 0:
+                    needs_fix = True
+
+        if needs_fix:
+            better_bg = _find_best_background(state)
+            if better_bg:
+                background = better_bg
+
         set_scene_state(
-            background=saved_scene["background"],
+            background=background,
             layers=saved_scene.get("layers", [])
         )
         _add_npc_layers(state)
@@ -412,6 +519,28 @@ def gm_update():
     # Update game status if provided
     if "game_status" in data:
         state["game_info"]["status"] = data["game_status"]
+
+    # Update location if provided — 맵 + 배경 자동 교체
+    if "location" in data:
+        new_loc = data["location"]
+        old_loc = state.get("current_location", "")
+        if new_loc != old_loc:
+            state["current_location"] = new_loc
+            # worldbuilding에서 새 location의 맵 데이터 로드
+            try:
+                wb_path = os.path.join(BASE_DIR, "data", "worldbuilding.json")
+                with open(wb_path, "r", encoding="utf-8") as f:
+                    wb = json.load(f)
+                loc_data = wb.get("locations", {}).get(new_loc, {})
+                if loc_data.get("map"):
+                    state["map"] = {
+                        "width": loc_data["map"]["width"],
+                        "height": loc_data["map"]["height"],
+                        "tile_size": state.get("map", {}).get("tile_size", 40),
+                        "locations": loc_data["map"]["areas"],
+                    }
+            except Exception:
+                pass
 
     # Handle illustration request (재활용 체크 우선 — 즉시 적용)
     illustration_req = data.get("illustration")

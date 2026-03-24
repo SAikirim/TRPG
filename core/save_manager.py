@@ -1,5 +1,7 @@
 import json
 import os
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 import shutil
 import glob
 import filecmp

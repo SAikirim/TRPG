@@ -2,8 +2,8 @@
   "save_info": {
     "scenario_id": "karendel_journey",
     "slot": 1,
-    "description": "시스템 수정 후 저장 (턴 21)",
-    "saved_at": "2026-03-25 02:05:11",
+    "description": "자동 저장 (턴 21)",
+    "saved_at": "2026-03-25 01:33:45",
     "turn_count": 21,
     "chapter": 2,
     "party_summary": [

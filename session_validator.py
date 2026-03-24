@@ -13,6 +13,7 @@ TRPG 세션 검증 자동화
 import json
 import os
 import sys
+sys.stdout.reconfigure(encoding='utf-8')
 import urllib.request
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

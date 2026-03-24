@@ -18,6 +18,7 @@
 import json
 import os
 import sys
+sys.stdout.reconfigure(encoding='utf-8')
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GAME_STATE_PATH = os.path.join(BASE_DIR, "data", "game_state.json")

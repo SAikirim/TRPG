@@ -52,6 +52,10 @@
   "locations": {
     "harun_village": {
       "name": "하룬 마을",
+      "default_bg": {
+        "day": "/static/illustrations/sd/ch1_forest.png",
+        "night": "/static/illustrations/sd/background_village_night.webp"
+      },
       "world_pos": [40, 80],
       "type": "village",
       "description": "숲 근처의 작은 농촌 마을. 주민 약 200명.",
@@ -92,6 +96,10 @@
     },
     "trade_road_karendel": {
       "name": "교역로 (카렌델 방면)",
+      "default_bg": {
+        "day": "/static/illustrations/sd/background_trade_road_afternoon.webp",
+        "night": null
+      },
       "world_pos": [40, 50],
       "type": "road",
       "description": "하룬 마을에서 카렌델로 이어지는 교역로",
@@ -112,6 +120,10 @@
     },
     "karendel": {
       "name": "카렌델",
+      "default_bg": {
+        "day": null,
+        "night": null
+      },
       "world_pos": [55, 20],
       "type": "trade_city",
       "description": "북쪽의 교역 도시. 다양한 종족과 상인이 모이는 곳.",
@@ -140,6 +152,10 @@
     },
     "lost_treasure_dungeon": {
       "name": "잃어버린 보물의 숲 던전",
+      "default_bg": {
+        "day": "/static/illustrations/sd/ch2_dungeon.png",
+        "night": "/static/illustrations/sd/ch2_dungeon.png"
+      },
       "type": "dungeon",
       "world_pos": [60, 80],
       "description": "하룬 마을 동쪽 숲 깊은 곳의 고대 던전.",
@@ -150,6 +166,10 @@
     },
     "crossroads_rest": {
       "name": "갈림길 쉼터",
+      "default_bg": {
+        "day": null,
+        "night": "/static/illustrations/sd/background_crossroads_rest_night.webp"
+      },
       "world_pos": [55, 45],
       "type": "rest_area",
       "description": "교역로가 북쪽(카렌델)과 남쪽(세렌 항구)으로 갈라지는 지점. 평원 한가운데 자리 잡아 사방이 탁 트여 있다. 여행자들이 야영하는 쉼터가 있다.",

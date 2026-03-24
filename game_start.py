@@ -13,6 +13,7 @@ TRPG 게임 시작 자동화
 import json
 import os
 import sys
+sys.stdout.reconfigure(encoding='utf-8')
 import shutil
 from datetime import datetime
 
@@ -615,7 +616,7 @@ def load_game():
         print(f"  [WARN] 맵 갱신 실패: {e}")
 
     # 장면 복원
-    _try_restore_scene()
+    _try_restore_scene(scenario_id=selected["scenario_id"], slot=selected["slot"])
 
     _print_state_summary(save_data["game_state"])
 
@@ -1106,18 +1107,43 @@ def _activate_worldbuilding(scenario_entry):
         print(f"  [WARN] 세계관 파일 없음: {wb_file}")
 
 
-def _try_restore_scene():
-    """Flask 서버가 실행 중이면 restore_scene API 호출."""
+def _try_restore_scene(scenario_id=None, slot=None):
+    """Flask 서버가 실행 중이면 /api/load를 호출하여 장면+맵 복원."""
     try:
         import urllib.request
+        # 서버 동작 확인
         req = urllib.request.Request("http://localhost:5000/api/game-state", method="GET")
         urllib.request.urlopen(req, timeout=2)
         print(f"  [OK] Flask 서버 감지됨 (localhost:5000)")
-        # restore_scene은 Flask 서버 내부에서 동작하므로 직접 호출 불가
-        # 대신 load API를 통해 간접 트리거하거나, 유저에게 안내
-        print(f"  [INFO] 웹 UI 장면 복원: Flask 서버 재시작 또는 브라우저 새로고침 필요")
-    except Exception:
-        print(f"  [INFO] Flask 서버 미실행. start_server.bat 또는 SD venv Python app.py 실행 시 자동 복원됩니다.")
+
+        # /api/load 호출하여 서버 측 restore_scene + update_map_image 트리거
+        if scenario_id and slot is not None:
+            import json as _json
+            slot_num = slot
+            if isinstance(slot, str):
+                slot_num = slot.replace("slot_", "")
+                try:
+                    slot_num = int(slot_num)
+                except ValueError:
+                    slot_num = slot
+            payload = _json.dumps({"scenario_id": scenario_id, "slot": slot_num}).encode("utf-8")
+            req2 = urllib.request.Request(
+                "http://localhost:5000/api/load",
+                data=payload,
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+            resp = urllib.request.urlopen(req2, timeout=10)
+            result = _json.loads(resp.read().decode("utf-8"))
+            if result.get("success"):
+                print(f"  [OK] 웹 UI 장면 + 맵 복원 완료")
+            else:
+                print(f"  [WARN] 웹 UI 복원 응답: {result}")
+        else:
+            print(f"  [INFO] 웹 UI 장면 복원: 브라우저 새로고침 필요")
+    except Exception as e:
+        print(f"  [INFO] Flask 서버 미실행 또는 복원 실패: {e}")
+        print(f"         start_server.bat 실행 시 자동 복원됩니다.")
 
 
 def _print_state_summary(state):

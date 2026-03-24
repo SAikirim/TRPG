@@ -4,6 +4,7 @@ import json
 import os
 import shutil
 import sys
+sys.stdout.reconfigure(encoding='utf-8')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from core.save_manager import SaveManager
