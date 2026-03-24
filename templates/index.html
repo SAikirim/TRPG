@@ -738,6 +738,10 @@
                 <div id="setting-dice" class="settings-toggle"></div>
             </div>
             <div class="settings-row">
+                <span class="settings-label">시스템 로그</span>
+                <div id="setting-syslog" class="settings-toggle"></div>
+            </div>
+            <div class="settings-row">
                 <span class="settings-label">표시 모드</span>
                 <select id="setting-display" class="settings-select">
                     <option value="mobile">Mobile</option>
@@ -1439,6 +1443,7 @@
                 const data = await res.json();
                 document.getElementById('setting-sd').className = 'settings-toggle' + (data.sd_illustration ? ' active' : '');
                 document.getElementById('setting-dice').className = 'settings-toggle' + (data.show_dice_result ? ' active' : '');
+                document.getElementById('setting-syslog').className = 'settings-toggle' + (data.show_system_log ? ' active' : '');
                 document.getElementById('setting-display').value = data.display_mode || 'mobile';
 
                 // Difficulty: from settings API in dynamic, from gameState in static
@@ -1459,7 +1464,8 @@
         async function toggleSetting(key) {
             if (isStatic) return;
             try {
-                const el = document.getElementById(key === 'sd_illustration' ? 'setting-sd' : 'setting-dice');
+                const elMap = {'sd_illustration': 'setting-sd', 'show_dice_result': 'setting-dice', 'show_system_log': 'setting-syslog'};
+                const el = document.getElementById(elMap[key]);
                 const current = el.classList.contains('active');
                 const body = {};
                 body[key] = !current;
@@ -1485,6 +1491,7 @@
         } else {
             document.getElementById('setting-sd').onclick = function() { toggleSetting('sd_illustration'); };
             document.getElementById('setting-dice').onclick = function() { toggleSetting('show_dice_result'); };
+            document.getElementById('setting-syslog').onclick = function() { toggleSetting('show_system_log'); };
             document.getElementById('setting-display').onchange = function() { changeSetting('display_mode', this.value); };
             document.getElementById('setting-difficulty').onchange = function() { changeSetting('difficulty', this.value); };
         }

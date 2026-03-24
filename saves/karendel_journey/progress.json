@@ -1,7 +1,7 @@
 {
   "scenario_id": "karendel_journey",
   "first_played": "2026-03-21 03:50:21",
-  "total_saves": 1,
+  "total_saves": 2,
   "history": [
     {
       "slot": 1,
@@ -9,9 +9,16 @@
       "turn": 21,
       "description": "턴20 갈림길 쉼터 정차 논의 — 할란/미라/짐말 동행 중",
       "saved_at": "2026-03-22 00:00:00"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 21,
+      "description": "자동 저장 (턴 21)",
+      "saved_at": "2026-03-24 21:16:53"
     }
   ],
-  "last_played": "2026-03-22 00:00:00",
-  "last_chapter": 1,
+  "last_played": "2026-03-24 21:16:53",
+  "last_chapter": 2,
   "last_turn": 21
 }

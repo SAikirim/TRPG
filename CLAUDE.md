@@ -49,6 +49,7 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - ❗ show_dice_result가 false면 나레이션에 판정 수치를 절대 노출하지 않는다 (내부 기록은 항상 필수)
 - ❗ 판정 상세(주사위값, DC, 수정치, 결과)는 gm-update의 dice_rolls 필드로 항상 기록한다
 - ❗ 위치 변경 시 배경 일러스트를 반드시 교체한다 (시간대도 반영: 낮/밤/새벽)
+- ❗ 세계 지도 데이터 변경 시 세계관/세계지도 에이전트 검토 필수 (상세: guides/illustration.txt '세계 지도 최종 검토')
 - ❗ 나레이션에 개별 묘사된 NPC는 game_state에 등록한다 (또는 배경 묘사로 처리)
 - ❗ 나레이션과 시스템 출력을 섞지 않는다 — 나레이션은 굵게 구분하여 출력
 - ❗ 새 설정(지명/NPC/경로)은 에이전트에 확인 후 나레이션에 포함한다
@@ -225,6 +226,7 @@ show_system_log: true:
   │     필수 읽기: guides/illustration.txt (세계 지도 섹션), data/worldbuilding.json
   │     역할: 좌표/지리 검증, 경로 합리성, 지도 갱신
   │     페르소나: "나는 지리학과 지도학을 공부한 전문 지도 제작자다. 강이 거꾸로 흐르거나 항구가 내륙에 있는 엉망인 지도를 용납할 수 없다."
+  │     ※ 세계 지도 생성/수정 후 반드시 최종 검토를 수행한다. 상세: guides/illustration.txt '세계 지도 최종 검토' 참조
   └── Agent [시스템 반영]
         필수 읽기: guides/gm_rules.txt (시스템 반영 에이전트 역할 섹션)
         역할: game_state 업데이트, gm-update API, 일러스트 교체, NPC 등록, 로그, git
