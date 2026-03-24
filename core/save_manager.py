@@ -14,6 +14,76 @@ CURRENT_SESSION_PATH = os.path.join(BASE_DIR, "data", "current_session.json")
 MAX_BACKUPS = 5
 
 
+EVENTS_ARCHIVE_PATH = os.path.join(BASE_DIR, "data", "events_archive.json")
+
+
+def archive_old_events(game_state_path=None, max_recent=10):
+    """game_state의 events가 max_recent를 초과하면 오래된 이벤트를 아카이브 파일로 이동.
+
+    - 최근 max_recent개만 game_state에 유지
+    - 나머지는 data/events_archive.json에 추가 (append)
+    - 아카이브 파일은 시나리오별로 구분
+    """
+    if game_state_path is None:
+        game_state_path = GAME_STATE_PATH
+
+    # 1. Load game_state.json
+    if not os.path.isfile(game_state_path):
+        return 0
+
+    with open(game_state_path, "r", encoding="utf-8") as f:
+        game_state = json.load(f)
+
+    events = game_state.get("events", [])
+
+    # 2. If events count <= max_recent, do nothing
+    if len(events) <= max_recent:
+        return 0
+
+    # 3. Split events into archive (older) and keep (recent max_recent)
+    to_archive = events[:-max_recent]
+    to_keep = events[-max_recent:]
+
+    # 4. Append archived events to data/events_archive.json
+    scenario_id = game_state.get("game_info", {}).get("scenario_id", "unknown")
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    archive_path = os.path.join(os.path.dirname(game_state_path), "events_archive.json")
+
+    if os.path.isfile(archive_path):
+        with open(archive_path, "r", encoding="utf-8") as f:
+            archive_data = json.load(f)
+    else:
+        archive_data = {
+            "scenario_id": scenario_id,
+            "archived_events": [],
+        }
+
+    # 시나리오 ID가 다르면 경고하되 계속 진행 (동일 파일에 누적)
+    if archive_data.get("scenario_id") != scenario_id:
+        print(f"[WARN] archive: 기존 아카이브 scenario_id='{archive_data.get('scenario_id')}' ≠ 현재='{scenario_id}'")
+        archive_data["scenario_id"] = scenario_id
+
+    # archived_at 타임스탬프 추가
+    for evt in to_archive:
+        evt["archived_at"] = today
+
+    archive_data["archived_events"].extend(to_archive)
+
+    with open(archive_path, "w", encoding="utf-8") as f:
+        json.dump(archive_data, f, ensure_ascii=False, indent=2)
+
+    # 5. Update game_state.json with only recent events
+    game_state["events"] = to_keep
+    with open(game_state_path, "w", encoding="utf-8") as f:
+        json.dump(game_state, f, ensure_ascii=False, indent=2)
+
+    # 6. Return count of archived events
+    archived_count = len(to_archive)
+    print(f"[INFO] archive: {archived_count}개 이벤트 아카이브 완료 (유지: {len(to_keep)}개)")
+    return archived_count
+
+
 class SaveManager:
     def __init__(self):
         os.makedirs(SAVES_DIR, exist_ok=True)

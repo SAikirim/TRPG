@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import Flask, jsonify, render_template, request
 
 from core.map_generator import MapGenerator
-from core.save_manager import SaveManager
+from core.save_manager import SaveManager, archive_old_events
 from core.sd_generator import request_illustration, get_scene_state, set_scene_state, is_sd_enabled, clear_scene, remove_layer
 import core.game_mechanics as gm
 from core.worldbuilding_agent import check_and_warn as wb_check
@@ -107,6 +107,11 @@ save_manager = SaveManager()
 def save_game_state(state):
     with open(GAME_STATE_PATH, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
+    # 이벤트 아카이빙: max_recent 초과 시 오래된 이벤트를 아카이브 파일로 이동
+    archive_old_events(GAME_STATE_PATH)
+    # 아카이빙 후 최신 state를 다시 읽어서 이후 save_game에 반영
+    with open(GAME_STATE_PATH, "r", encoding="utf-8") as f:
+        state = json.load(f)
     # 자동 저장: 시나리오 ID 기반으로 슬롯 1에 항상 저장
     scenario_id = state.get("game_info", {}).get("scenario_id", "default")
     turn = state.get("turn_count", 0)
