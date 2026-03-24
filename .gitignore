@@ -2,7 +2,7 @@ __pycache__/
 *.pyc
 .env
 static/map.png
-saves/
+# saves/ — git 추적하여 세션 간 공유
 .last_result.json
 .turn_tracker.json
 .backups/
