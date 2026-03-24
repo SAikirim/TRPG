@@ -5,4 +5,4 @@ static/map.png
 # saves/ — git 추적하여 세션 간 공유
 .last_result.json
 .turn_tracker.json
-.backups/
+data/.backups/
