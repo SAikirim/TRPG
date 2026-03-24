@@ -54,7 +54,7 @@ def _draw_parchment_bg(canvas, W, H, _rng):
     _rng.seed(42)
 
     # ── 1) 기본 세피아톤 베이스 ──
-    canvas.drawRect(skia.Rect(0, 0, W, H), skia_paint(0.89, 0.83, 0.69))
+    canvas.drawRect(skia.Rect(0, 0, W, H), skia_paint(0.84, 0.78, 0.61))
 
     # ── 2) 여러 겹의 radial gradient로 자연스러운 색상 변화 ──
     for _ in range(12):
@@ -340,18 +340,19 @@ def _draw_terrain_pattern(canvas, coords, terrain_type, to_pixel_fn, tw, th, _rn
 
     if terrain_type == "forest":
         if not icons_only:
-            _fill_terrain_hull(0.15, 0.40, 0.12, 0.80)
+            # 파스텔 연두 (색연필 느낌) rgba(60,140,60,70)
+            _fill_terrain_hull(0.24, 0.55, 0.24, 0.40)
             for px_c, py_c in pixels:
                 p = skia.Paint()
                 p.setAntiAlias(True)
                 p.setShader(skia.GradientShader.MakeRadial(
-                    center=(px_c, py_c), radius=tw * 0.9,
-                    colors=[skia_rgba(0.12, 0.35, 0.08, 0.35),
-                            skia_rgba(0.18, 0.38, 0.10, 0.20),
-                            skia_rgba(0.22, 0.40, 0.15, 0.05)],
+                    center=(px_c, py_c), radius=tw * 1.6,
+                    colors=[skia_rgba(0.24, 0.55, 0.24, 0.33),
+                            skia_rgba(0.28, 0.58, 0.26, 0.18),
+                            skia_rgba(0.30, 0.60, 0.28, 0)],
                     positions=[0, 0.6, 1.0],
                 ))
-                canvas.drawCircle(px_c, py_c, tw * 0.9, p)
+                canvas.drawCircle(px_c, py_c, tw * 1.6, p)
 
         if fill_only:
             return
@@ -394,18 +395,19 @@ def _draw_terrain_pattern(canvas, coords, terrain_type, to_pixel_fn, tw, th, _rn
 
     elif terrain_type == "mountain":
         if not icons_only:
-            _fill_terrain_hull(0.45, 0.36, 0.26, 0.75)
+            # 파스텔 브라운/탄 (색연필 느낌) rgba(160,130,100,70)
+            _fill_terrain_hull(0.63, 0.51, 0.39, 0.38)
             for px_c, py_c in pixels:
                 p = skia.Paint()
                 p.setAntiAlias(True)
                 p.setShader(skia.GradientShader.MakeRadial(
-                    center=(px_c, py_c), radius=tw * 0.8,
-                    colors=[skia_rgba(0.52, 0.45, 0.38, 0.30),
-                            skia_rgba(0.48, 0.40, 0.30, 0.18),
-                            skia_rgba(0.42, 0.35, 0.25, 0.05)],
+                    center=(px_c, py_c), radius=tw * 1.6,
+                    colors=[skia_rgba(0.63, 0.51, 0.39, 0.32),
+                            skia_rgba(0.60, 0.48, 0.36, 0.18),
+                            skia_rgba(0.58, 0.46, 0.34, 0)],
                     positions=[0, 0.6, 1.0],
                 ))
-                canvas.drawCircle(px_c, py_c, tw * 0.8, p)
+                canvas.drawCircle(px_c, py_c, tw * 1.6, p)
 
         if fill_only:
             return
@@ -468,7 +470,8 @@ def _draw_terrain_pattern(canvas, coords, terrain_type, to_pixel_fn, tw, th, _rn
     elif terrain_type == "sea":
         if icons_only:
             return
-        _fill_organic_blob(0.22, 0.48, 0.62, 0.80)
+        # 파스텔 블루 (색연필 느낌) rgba(100,150,220,80)
+        _fill_organic_blob(0.39, 0.59, 0.86, 0.42)
 
         if len(pixels) > 1:
             for px_c, py_c in pixels:
@@ -477,10 +480,10 @@ def _draw_terrain_pattern(canvas, coords, terrain_type, to_pixel_fn, tw, th, _rn
                 edge_dist = min(dx_edge, dy_edge)
                 max_dist = min(area_w, area_h) * 0.5
                 depth_ratio = min(1.0, edge_dist / max(1, max_dist))
-                r = 0.22 - depth_ratio * 0.12
-                g = 0.48 - depth_ratio * 0.18
-                b = 0.62 - depth_ratio * 0.05
-                canvas.drawCircle(px_c, py_c, tw * 0.55, skia_paint(r, g, b, 0.45))
+                r = 0.39 - depth_ratio * 0.08
+                g = 0.59 - depth_ratio * 0.10
+                b = 0.86 - depth_ratio * 0.05
+                canvas.drawCircle(px_c, py_c, tw * 0.55, skia_paint(r, g, b, 0.25))
 
         # 파도 라인
         wave_count = max(20, int(area_h / 3))
@@ -500,7 +503,7 @@ def _draw_terrain_pattern(canvas, coords, terrain_type, to_pixel_fn, tw, th, _rn
                       + math.sin((wx + phase2) * 0.25) * amp2
                       + math.sin((wx + phase3) * 0.06) * amp3)
                 wave_path.lineTo(wx, wy + dy)
-            p = skia_paint(0.35, 0.55, 0.78, alpha,
+            p = skia_paint(0.50, 0.65, 0.85, alpha * 0.6,
                             style=skia.Paint.kStroke_Style,
                             stroke_width=1.0 + _rng.random() * 1.2)
             canvas.drawPath(wave_path, p)
@@ -514,28 +517,29 @@ def _draw_terrain_pattern(canvas, coords, terrain_type, to_pixel_fn, tw, th, _rn
             for wx in range(int(min_px), int(max_px), 10):
                 dy = math.sin((wx + phase) * 0.10) * 4
                 wave_path.lineTo(wx, wy + dy)
-            p = skia_paint(0.50, 0.65, 0.85, 0.10 + _rng.random() * 0.08,
+            p = skia_paint(0.60, 0.72, 0.90, 0.08 + _rng.random() * 0.06,
                             style=skia.Paint.kStroke_Style, stroke_width=0.6)
             canvas.drawPath(wave_path, p)
 
     elif terrain_type == "plains":
         if not icons_only:
-            _fill_terrain_hull(0.55, 0.62, 0.30, 0.65)
+            # 파스텔 옐로/크림 (색연필 느낌) rgba(200,190,140,50)
+            _fill_terrain_hull(0.78, 0.75, 0.55, 0.30)
             for i, (px_c, py_c) in enumerate(pixels):
                 ratio = i / max(1, len(pixels) - 1)
-                r = 0.50 + ratio * 0.18
-                g = 0.58 + ratio * 0.08
-                b = 0.22 + ratio * 0.08
+                r = 0.76 + ratio * 0.06
+                g = 0.73 + ratio * 0.04
+                b = 0.52 + ratio * 0.06
                 p = skia.Paint()
                 p.setAntiAlias(True)
                 p.setShader(skia.GradientShader.MakeRadial(
-                    center=(px_c, py_c), radius=tw * 0.8,
-                    colors=[skia_rgba(r, g, b, 0.28),
+                    center=(px_c, py_c), radius=tw * 1.6,
+                    colors=[skia_rgba(r, g, b, 0.27),
                             skia_rgba(r, g, b, 0.15),
                             skia_rgba(r, g, b, 0)],
                     positions=[0, 0.6, 1.0],
                 ))
-                canvas.drawCircle(px_c, py_c, tw * 0.8, p)
+                canvas.drawCircle(px_c, py_c, tw * 1.6, p)
 
         if fill_only:
             return
@@ -562,18 +566,19 @@ def _draw_terrain_pattern(canvas, coords, terrain_type, to_pixel_fn, tw, th, _rn
 
     elif terrain_type == "swamp":
         if not icons_only:
-            _fill_terrain_hull(0.48, 0.43, 0.28, 0.70)
+            # 파스텔 올리브/머드 (색연필 느낌)
+            _fill_terrain_hull(0.55, 0.52, 0.38, 0.32)
             for px_c, py_c in pixels:
                 p = skia.Paint()
                 p.setAntiAlias(True)
                 p.setShader(skia.GradientShader.MakeRadial(
-                    center=(px_c, py_c), radius=tw * 0.8,
-                    colors=[skia_rgba(0.34, 0.36, 0.18, 0.25),
-                            skia_rgba(0.38, 0.40, 0.22, 0.12),
-                            skia_rgba(0.38, 0.40, 0.22, 0)],
+                    center=(px_c, py_c), radius=tw * 1.6,
+                    colors=[skia_rgba(0.50, 0.50, 0.35, 0.27),
+                            skia_rgba(0.52, 0.52, 0.38, 0.15),
+                            skia_rgba(0.52, 0.52, 0.38, 0)],
                     positions=[0, 0.6, 1.0],
                 ))
-                canvas.drawCircle(px_c, py_c, tw * 0.8, p)
+                canvas.drawCircle(px_c, py_c, tw * 1.6, p)
 
         if fill_only:
             return
@@ -604,13 +609,14 @@ def _draw_terrain_pattern(canvas, coords, terrain_type, to_pixel_fn, tw, th, _rn
     elif terrain_type == "coastline":
         if icons_only:
             return
-        _fill_terrain_hull(0.68, 0.60, 0.40, 0.60)
+        # 파스텔 샌드/코스트 (색연필 느낌)
+        _fill_terrain_hull(0.75, 0.68, 0.50, 0.30)
         for px_c, py_c in pixels:
             p = skia.Paint()
             p.setAntiAlias(True)
             p.setShader(skia.GradientShader.MakeRadial(
                 center=(px_c, py_c), radius=tw * 0.5,
-                colors=[skia_rgba(0.76, 0.68, 0.48, 0.15), skia_rgba(0.65, 0.55, 0.35, 0.05)],
+                colors=[skia_rgba(0.76, 0.68, 0.48, 0.22), skia_rgba(0.65, 0.55, 0.35, 0.08)],
             ))
             canvas.drawCircle(px_c, py_c, tw * 0.5, p)
         sand_count = max(30, int(area_w * area_h / 250))
@@ -647,8 +653,9 @@ def _draw_coastline_hatching(canvas, path, to_pixel_fn, tw, _math):
 
 
 def generate_world_map():
-    """worldbuilding.json 기반 판타지 스타일 세계 지도 생성.
-    Skia로 고퀄리티 판타지 백지도를 생성. SD img2img는 선택적."""
+    """worldbuilding.json 기반 세계 지도 오버레이 재생성.
+    기존 배경(SD/Skia/custom)을 읽어서 위에 마커/라벨/도로를 그린다.
+    SD 백지도 생성은 generate_world_map_pipeline()에서만 수행."""
     import random as _rng
 
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -797,22 +804,18 @@ def generate_world_map():
 
                 if sea_is_right:
                     # 해안선 끝 → 우측 하단 → 우측 상단 → 해안선 시작
-                    sea_path.lineTo(W + 10, last_py)
                     sea_path.lineTo(W + 10, H + 10)
                     sea_path.lineTo(W + 10, -10)
-                    sea_path.lineTo(first_px, -10)
                 else:
                     # 해안선 끝 → 좌측 하단 → 좌측 상단 → 해안선 시작
-                    sea_path.lineTo(-10, last_py)
                     sea_path.lineTo(-10, H + 10)
                     sea_path.lineTo(-10, -10)
-                    sea_path.lineTo(first_px, -10)
                 sea_path.close()
 
-                # 바다 영역을 진한 남색으로 채우기
-                canvas.drawPath(sea_path, skia_paint(0.10, 0.30, 0.57, 0.85))
+                # 바다 영역을 파스텔 블루로 채우기 (색연필 느낌)
+                canvas.drawPath(sea_path, skia_paint(0.39, 0.59, 0.86, 0.42))
 
-                # 해안 근처 밝은 청록 그라디언트 오버레이 (clip)
+                # 해안 근처 밝은 청록 파스텔 그라디언트 오버레이 (clip)
                 canvas.save()
                 canvas.clipPath(sea_path)
                 for i in range(len(coast_pixels)):
@@ -821,8 +824,8 @@ def generate_world_map():
                     p.setAntiAlias(True)
                     p.setShader(skia.GradientShader.MakeRadial(
                         center=(cpx_c, cpy_c), radius=tw * 3.0,
-                        colors=[skia_rgba(0.28, 0.58, 0.72, 0.55),
-                                skia_rgba(0.18, 0.42, 0.62, 0.25),
+                        colors=[skia_rgba(0.45, 0.65, 0.80, 0.30),
+                                skia_rgba(0.40, 0.60, 0.78, 0.15),
                                 skia_rgba(0, 0, 0, 0)],
                         positions=[0, 0.4, 1.0],
                     ))
@@ -861,7 +864,7 @@ def generate_world_map():
                               + math.sin((wx + phase2) * 0.25) * amp2
                               + math.sin((wx + phase3) * 0.06) * amp3)
                         wave_path.lineTo(wx, wy + dy)
-                    p = skia_paint(0.35, 0.55, 0.78, alpha,
+                    p = skia_paint(0.50, 0.65, 0.85, alpha * 0.6,
                                     style=skia.Paint.kStroke_Style,
                                     stroke_width=1.0 + _rng.random() * 1.2)
                     canvas.drawPath(wave_path, p)
@@ -874,7 +877,7 @@ def generate_world_map():
                     for wx in range(int(sea_min_x), int(sea_max_x), 10):
                         dy = math.sin((wx + phase) * 0.10) * 4
                         wave_path.lineTo(wx, wy + dy)
-                    p = skia_paint(0.50, 0.65, 0.85, 0.10 + _rng.random() * 0.08,
+                    p = skia_paint(0.60, 0.72, 0.90, 0.08 + _rng.random() * 0.06,
                                     style=skia.Paint.kStroke_Style, stroke_width=0.6)
                     canvas.drawPath(wave_path, p)
 
@@ -941,8 +944,8 @@ def generate_world_map():
                         cpx = (prev_x + px) / 2 + (py - prev_y) * 0.1
                         cpy = (prev_y + py) / 2 - (px - prev_x) * 0.1
                         coast_path.quadTo(cpx, cpy, px, py)
-                    p = skia_paint(0.40, 0.32, 0.20, 0.7,
-                                    style=skia.Paint.kStroke_Style, stroke_width=tw * 0.25)
+                    p = skia_paint(0.35, 0.28, 0.18, 0.75,
+                                    style=skia.Paint.kStroke_Style, stroke_width=tw * 0.28)
                     p.setStrokeCap(skia.Paint.kRound_Cap)
                     canvas.drawPath(coast_path, p)
                     # 빗금
@@ -953,8 +956,9 @@ def generate_world_map():
             if feat.get("type") == "river" and "path" in feat:
                 path_pts = [to_pixel(c[0], c[1]) for c in feat["path"]]
                 if len(path_pts) >= 2:
-                    base_width = max(2, tw * 0.08)
-                    max_width = max(5, tw * 0.22)
+                    # 파스텔 블루 강 (색연필 느낌) rgba(70,120,200,120) — 약간 두껍게
+                    base_width = max(3, tw * 0.12)
+                    max_width = max(6, tw * 0.28)
                     for i in range(1, len(path_pts)):
                         progress = i / max(1, len(path_pts) - 1)
                         line_w = base_width + (max_width - base_width) * progress
@@ -962,24 +966,24 @@ def generate_world_map():
                         dx = curr[0]-prev[0]; dy = curr[1]-prev[1]
                         cpx = (prev[0]+curr[0])/2 - dy*0.2 + _rng.uniform(-6,6)
                         cpy = (prev[1]+curr[1])/2 + dx*0.2 + _rng.uniform(-3,3)
-                        # 어두운 외곽
+                        # 어두운 외곽 (파스텔)
                         rp = skia.Path()
                         rp.moveTo(*prev); rp.quadTo(cpx, cpy, *curr)
-                        p = skia_paint(0.12, 0.25, 0.50, 0.6,
+                        p = skia_paint(0.20, 0.38, 0.65, 0.35,
                                         style=skia.Paint.kStroke_Style, stroke_width=line_w + 1.5)
                         p.setStrokeCap(skia.Paint.kRound_Cap)
                         canvas.drawPath(rp, p)
-                        # 메인 강
+                        # 메인 강 (파스텔 블루)
                         rp2 = skia.Path()
                         rp2.moveTo(*prev); rp2.quadTo(cpx, cpy, *curr)
-                        p2 = skia_paint(0.20, 0.40, 0.65, 0.8,
+                        p2 = skia_paint(0.27, 0.47, 0.78, 0.47,
                                          style=skia.Paint.kStroke_Style, stroke_width=line_w)
                         p2.setStrokeCap(skia.Paint.kRound_Cap)
                         canvas.drawPath(rp2, p2)
-                        # 하이라이트
+                        # 하이라이트 (파스텔)
                         rp3 = skia.Path()
                         rp3.moveTo(prev[0]+1, prev[1]-1); rp3.quadTo(cpx+1, cpy-1, curr[0]+1, curr[1]-1)
-                        p3 = skia_paint(0.35, 0.55, 0.80, 0.3,
+                        p3 = skia_paint(0.50, 0.65, 0.88, 0.22,
                                          style=skia.Paint.kStroke_Style, stroke_width=max(1, line_w * 0.4))
                         p3.setStrokeCap(skia.Paint.kRound_Cap)
                         canvas.drawPath(rp3, p3)
@@ -997,57 +1001,9 @@ def generate_world_map():
         except Exception:
             pass
 
-    # ─── SD 새 생성 (캐시 없고 SD ON일 때) ───
-    # _has_sd_bg=True → 이미 895행에서 SD 캐시를 그렸으므로 패스
-    # _has_sd_bg=False, _sd_enabled=True → SD 새 생성 시도
-    # _has_sd_bg=False, _sd_enabled=False → 패스
-    if not _has_sd_bg and _sd_enabled:
-        try:
-            from core.sd_generator import is_sd_enabled
-            if is_sd_enabled():
-                import requests
-                import base64
-                import io
-                from core.sd_generator import SD_API_URL
-
-                _sd_input = Image.open(skia_bg_cache_path).convert("RGB")
-                buffered = io.BytesIO()
-                _sd_input.save(buffered, format="PNG")
-                img_b64 = base64.b64encode(buffered.getvalue()).decode()
-
-                prompt = (
-                    "fantasy map, <lora:AZovyaRPGArtistToolsLORAV2art:0.6>, "
-                    "medieval cartography style, parchment texture, hand painted, "
-                    "watercolor terrain, top down birds eye view, aged paper"
-                )
-                negative_prompt = (
-                    "animals, birds, people, characters, faces, 3d render, "
-                    "realistic photo, modern, text, labels, blurry, low quality, close up"
-                )
-
-                payload = {
-                    "init_images": [img_b64],
-                    "prompt": prompt,
-                    "negative_prompt": negative_prompt,
-                    "steps": 25,
-                    "sampler_name": "DPM++ 2M Karras",
-                    "width": 768,
-                    "height": 768,
-                    "cfg_scale": 8,
-                    "denoising_strength": 0.45,
-                }
-
-                resp = requests.post(f"{SD_API_URL}/sdapi/v1/img2img", json=payload, timeout=300)
-                resp.raise_for_status()
-
-                result = resp.json()
-                if result.get("images"):
-                    img_data = base64.b64decode(result["images"][0])
-                    sd_bg = Image.open(io.BytesIO(img_data)).convert("RGBA").resize((W, H), Image.LANCZOS)
-                    sd_bg.save(sd_cache_path, "WEBP", quality=90)
-                    canvas.drawImage(pil_to_skia_image(sd_bg), 0, 0)
-        except Exception:
-            pass
+    # SD 백지도는 generate_world_map_pipeline()에서만 생성. 이 함수는 오버레이만 재생성.
+    # SD 배경이 이미 있으면 위(740행 부근)에서 읽어서 cached_bg로 사용하고,
+    # 없으면 Skia 배경을 폴백으로 사용한다.
 
     # ─── 3단계: 공통 오버레이 (도로/마커/라벨) ───
 
@@ -1626,7 +1582,8 @@ def generate_sd_background(guide_path, output_path):
             "width": 1024,
             "height": 1024,
             "cfg_scale": 8,
-            "denoising_strength": 0.55,
+            # 기본값 0.75 (추천), 차선 0.45 (입력에 더 충실)
+            "denoising_strength": 0.75,
         }
 
         resp = requests.post(
