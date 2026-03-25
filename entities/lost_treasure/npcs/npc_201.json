@@ -1,0 +1,27 @@
+{
+  "id": 201,
+  "name": "늑대A",
+  "type": "monster",
+  "status": "dead",
+  "location": "교역로",
+  "stats": {
+    "STR": 12,
+    "DEX": 14,
+    "INT": 4,
+    "CON": 10
+  },
+  "hp": 0,
+  "max_hp": 15,
+  "mp": 0,
+  "max_mp": 0,
+  "personality": {
+    "temperament": "aggressive",
+    "intelligence": "low",
+    "behavior_pattern": "무리의 우두머리. 동료가 도주해도 혼자 버텼다.",
+    "speech_style": "으르렁",
+    "motivation": "먹이 확보"
+  },
+  "memory": {
+    "cause_of_death": "사이키 마법탄(크리티컬 12뎀) + 노을 도끼(4뎀)로 사망"
+  }
+}

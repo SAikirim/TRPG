@@ -1,0 +1,34 @@
+{
+  "background": "static/illustrations/sd/background_village_night.webp",
+  "layers": [
+    {
+      "type": "portrait",
+      "image": "static/portraits/sd/portrait_미라.webp",
+      "position": "left",
+      "name": "미라",
+      "distance": 1,
+      "size_class": "d1"
+    },
+    {
+      "type": "portrait",
+      "image": "static/portraits/sd/portrait_할란.webp",
+      "position": "center",
+      "name": "할란",
+      "distance": 1,
+      "size_class": "d1"
+    }
+  ],
+  "generating": {
+    "status": "idle",
+    "type": null,
+    "prompt": null,
+    "error": null,
+    "started_at": null
+  },
+  "enabled": false,
+  "default_bg": {
+    "sd": "static/illustrations/sd/ch1_forest.png",
+    "pixel": "static/illustrations/pixel/forest.png"
+  },
+  "current_chapter": 1
+}

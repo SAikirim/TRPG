@@ -1,105 +1,189 @@
-# 판타지 TRPG - 잃어버린 보물의 숲 던전
+# TRPG 시스템 (Claude GM)
 
-## 프로젝트 개요
-웹 기반 멀티플레이어 TRPG 게임 시스템. Flask + PIL + JSON으로 구축.
+Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 시스템.
+웹 UI는 **표시 전용** (Flask + PIL). 실제 게임 진행은 터미널에서만.
+시나리오와 룰셋을 교체하여 판타지, 현대, 공포(CoC) 등 다양한 세계관에서 플레이 가능.
+
+---
+
+## ⚠️ 핵심 규칙 요약 (모든 세션 필독)
+
+> **이 섹션은 모든 세션에서 가장 먼저 읽고 준수해야 한다.**
+
+### 절대 금지
+- ❌ 유저 캐릭터(controlled_by: "user")의 대사/감정/판단을 GM이 만들지 않는다
+- ❌ 터미널에만 나레이션 쓰고 웹 반영(gm-update) 안 하는 것
+- ❌ "나중에 하겠습니다", "TODO" — 발견 즉시 처리 또는 폴백
+- ❌ 나레이션과 시스템 로그가 섞이는 것 (Phase 분리 필수)
+- ❌ 배경 위 인물 레이어에 불투명 배경 사용
+- ❌ 동일 인물의 외형이 장면마다 바뀌는 것
+
+### 필수 자동화 (코드로 동작)
+- ✅ Flask 시작/로드 시 `restore_scene()` → 배경 자동 복원
+- ✅ SD 실패 시 Cairo 폴백 (빈 화면 없음)
+- ✅ 이미지 재활용 (이름 매칭 → 기존 고퀄 우선)
+- ✅ 초상화 배경 자동 제거 (transparent-background)
+- ✅ 저장 시 docs/ 자동 동기화 (GitHub Pages) — build_static.py가 HTML 복사 + 데이터(JSON, 이미지) 동기화
+- ✅ NPC 엔티티 자동 생성 (check_npcs)
+- ✅ 맵 장소별 자동 전환 (current_location → worldbuilding.json)
+
+---
+
+## GM 턴 처리 순서 (엄격 준수)
+
+> 유저에게 보이는 나레이션은 반드시 모든 시스템 작업이 끝난 후 마지막에 출력한다.
+
+```
+유저 액션 선언
+  ↓
+[Phase 1 — 시스템 처리] (나레이션 출력 금지)
+  1. NPC Agent 병렬 호출 (대사/행동 생성)
+  2. 룰 판정 (주사위, DC 체크)
+  3. game_state.json + entities/ 업데이트
+  4. gm-update API 호출 (웹 UI 반영 + 일러스트)
+  5. docs/ 동기화 + git commit + push
+  ↓
+[Phase 2 — 나레이션 출력] (시스템 작업 완료 후)
+  6. 터미널에 나레이션 텍스트 출력
+  7. 맵 표시 + 유저 다음 행동 대기
+```
+
+> 상세: guides/gm_rules.txt 참조
+
+---
+
+## Agent 분담 구조
+
+```
+유저 (터미널 채팅으로 액션 선언)
+  ↓
+메인 Claude = GM (나레이션/진행/유저 상호작용)
+  ├── Agent [룰 심판]   → rulesets/{id}.json 판정, 주사위, 이니셔티브
+  ├── Agent [시나리오]  → scenarios/{id}.json 챕터/이벤트/엔딩 분기
+  ├── Agent [세계관]    → worldbuilding.json 지명/화폐/세력/NPC 관리
+  ├── Agent [NPC:{name}] → entities/{id}/npcs/npc_{id}.json (NPC 1명당 1개)
+  ├── Agent [플레이어]  → entities/{id}/players/player_{id}.json
+  ├── Agent [오브젝트]  → entities/{id}/objects/obj_{id}.json
+  └── Agent [웹 반영]   → gm-update API 호출 + 일러스트 생성
+  ↓
+결과 종합 → 나레이션 + 맵 출력 + game_state.json 업데이트 + 저장(git push)
+```
+
+> 상세: guides/entities.txt 참조
+
+---
 
 ## 기술 스택
 - **백엔드**: Flask 2.3.0 (Python)
-- **맵 생성**: Pillow (PIL) - 800x600px 타일 기반 맵 이미지
-- **데이터**: game_state.json (파일 기반 상태 관리)
-- **프론트엔드**: 순수 HTML/CSS/JS (2초 간격 폴링)
+- **이미지**: SD WebUI API (포트 7860) + Cairo/Pillow 폴백
+- **데이터**: JSON 파일 기반 (game_state.json + entities/)
+- **프론트엔드**: 순수 HTML/CSS/JS (2초 폴링, 표시 전용)
 
-## 파일 구조
+---
+
+## 파일 구조 (주요)
 ```
-app.py              - Flask 웹 서버 (포트 5000, 7개 API 엔드포인트)
-map_generator.py    - PIL 맵 이미지 생성기 (20x15 타일, 40px/타일)
-game_state.json     - 게임 상태 (플레이어, NPC, 맵, 턴, 이벤트)
-scenario.json       - 시나리오 (3챕터 구성, 이벤트/트리거/엔딩 분기)
-rules.json          - 룰셋 (전투/주사위/액션/상태이상/사망 규칙)
-save_manager.py     - 세이브/로드 매니저 (시나리오별 슬롯 저장)
-saves/              - 저장 데이터 디렉토리 (.gitignore 처리됨)
-templates/index.html - 게임 UI (맵 표시, 플레이어 정보, 액션 버튼, 이벤트 로그)
-static/map.png      - 생성된 맵 이미지 (.gitignore 처리됨)
+app.py                    - Flask 웹 서버, API 엔드포인트, gm-update 처리
+game_start.py             - 게임 시작 자동화 CLI (새 게임/이어하기/세이브 로드)
+build_static.py           - docs/ 데이터 동기화 CLI (save_manager._sync_docs 호출)
+session_validator.py      - 세션 검증 자동화 (상태 일관성 검사 + 자동 수정)
+core/                     - Python 엔진 모듈 (패키지)
+  __init__.py
+  sd_generator.py         - SD WebUI API 래퍼, 레이어 시스템
+  map_generator.py        - Cairo/PIL 이미지 생성, SD OFF 시 폴백
+  ascii_map.py            - CLI 터미널용 이모지 ASCII 맵 출력
+  gm_turn.py              - GM 턴 추적기 (실행 작업 기록 + 누락 경고)
+  save_manager.py         - 세이브/로드 매니저
+  game_mechanics.py       - 주사위, 판정, 전투, 회복, 아이템, 상태이상 처리
+data/                     - JSON 데이터 파일
+  game_state.json         - 현재 게임 상태
+  current_session.json    - 현재 활성 세션 요약 (세션 복원용)
+  worldbuilding.json      - 세계관 설정 (시나리오 독립)
+  rules.json              - 현재 활성 룰셋
+  scenario.json           - 현재 활성 시나리오
+  items.json              - 아이템 데이터베이스 (효과, 설명, 수치, 희귀도)
+  skills.json             - 스킬 데이터베이스 (효과, 비용, 사거리, 요구 레벨)
+  status_effects.json     - 상태이상 데이터베이스 (버프/디버프, 지속시간, 치료법)
+  creature_templates.json - 생물체 템플릿 (몬스터, 동물, 소환수)
+  shops.json              - 상점 데이터베이스 (위치, 품목, 가격, 매입률)
+  quests.json             - 퀘스트 데이터베이스 (활성/완료/실패 상태 추적)
+  pending_actions.json    - 보류 중인 액션
+  game_state_initial.json - 초기 게임 상태 템플릿
+entities/{scenario_id}/   - npcs/ players/ objects/ 엔티티 파일
+rulesets/ / scenarios/    - 룰셋/시나리오 카탈로그
+static/                   - 맵, 초상화, 일러스트 이미지
+  map.png                 - 전체 맵 (클릭 확대용, ~1000x1000px)
+  map_mini.png            - 미니맵 (플레이어 중심 크롭, 사이드바용)
+templates/                - 웹 UI (동적/정적 자동 감지) + 캐릭터 클래스 템플릿
+docs/index.html           - templates/index.html 복사본 (build_static.py가 자동 복사)
+saves/                    - 세이브 데이터
+guides/                   - 상세 규칙 참조 파일
 ```
 
-## API 엔드포인트
-| 경로 | 메서드 | 기능 |
-|------|--------|------|
-| `/` | GET | 웹 UI |
-| `/api/game-state` | GET | 전체 게임 상태 |
-| `/api/player-action` | POST | 플레이어 액션 (턴 증가) |
-| `/api/player-stats/<id>` | GET | 특정 플레이어 정보 |
-| `/api/events` | GET | 최근 20개 이벤트 |
-| `/api/gm-update` | POST | GM이 게임 상태 업데이트 |
-| `/api/reset-game` | POST | 게임 초기화 |
-| `/api/load` | POST | 저장된 게임 불러오기 (scenario_id, slot) |
-| `/api/saves` | GET | 저장 목록 조회 (?scenario_id=) |
-| `/api/progress/<id>` | GET | 시나리오별 진행 상황 조회 |
+---
 
-자동 저장: 턴이 변경될 때마다 (player-action, gm-update, reset) 시나리오별 슬롯 1에 자동 저장됨.
+## 웹 관리 규칙
 
-## 게임 설정
-- **플레이어 3명**: 전사 아론(HP:30), 마법사 리나(HP:15, MP:20), 도적 카이(HP:20, DEX:18)
-- **몬스터 2마리**: 어두운 오크(위치 [5,10]), 마법사 슬라임(위치 [10,10])
-- **맵 영역**: 숲의 입구(grass) → 고대 던전(dungeon) → 보물실(treasure)
-- **목표**: 보물실에 도달하여 보물 획득
+templates/index.html과 docs/index.html은 동일 파일이다.
+런타임에 isStatic 변수로 환경을 자동 감지하여 API/경로를 전환한다.
+build_static.py는 HTML 복사 + 데이터 동기화를 수행한다.
+웹 기능 수정 시 templates/index.html만 편집하면 docs/에 자동 반영된다.
+
+- **templates/index.html**: 단일 소스 (동적/정적 자동 감지)
+- **docs/index.html**: templates/index.html의 복사본 (build_static.py 또는 _sync_docs가 자동 복사)
+- **build_static.py**: HTML 복사 + 데이터(JSON, 이미지, 엔티티) docs/에 동기화
+
+---
+
+## 세션 시작 체크리스트
+1. CLAUDE.md 읽기 (이 파일)
+2. `python session_validator.py` 실행 — 상태 검증 + 자동 수정
+3. `data/current_session.json` → `data/worldbuilding.json` → `data/game_state.json` 읽기
+4. Flask 서버 확인 → 웹 UI 장면 복원 (자동: `restore_scene`)
+5. 유저에게 현재 상황 요약 → 게임 이어가기
+
+> 상세 로드 절차: 아래 "세션 로드 상세" 참조
+
+### 세션 로드 상세
+1. `CLAUDE.md` → 2. `python session_validator.py` (상태 검증 + 엔티티 누락 자동 생성)
+3. `data/current_session.json` → 4. `data/worldbuilding.json` → 5. `data/game_state.json`
+6. `entities/{scenario_id}/` (players, npcs, objects)
+7. `data/scenario.json` + `data/rules.json`
+8. Flask 서버 확인 → gm-update로 현재 장면 복원 (배경+NPC 레이어)
+9. 유저에게 현재 상황 요약 제시
+
+> 세션 로드 시 웹 UI가 빈 화면이거나 이전 장면을 보여주는 것은 금지.
+
+### 새 게임 시작
+```bash
+python game_start.py                    # 대화형: 시나리오 선택
+python game_start.py new lost_treasure  # 특정 시나리오 새 게임
+python game_start.py continue karendel_journey --from lost_treasure  # 이어하기
+python game_start.py load               # 세이브 로드
+```
+
+---
 
 ## 실행 방법
 ```bash
 pip install -r requirements.txt
-python app.py
-# http://localhost:5000 접속
+C:\git\WebUI\stable-diffusion-webui\venv\Scripts\Python.exe app.py    # 웹 UI (SD venv 사용)
+python ascii_map.py    # 터미널 맵 확인
+# 또는 편의 스크립트: start_server.bat (Windows) / start_server.sh (Git Bash)
 ```
 
-## 현재 상태 (2026-03-19)
-- 초기 구현 완료 - 모든 기본 기능 동작 확인
-- 게임 턴: 0 (아직 플레이 시작 전)
-- 서버 정상 작동 확인됨
+> **참고**: Flask 서버는 SD WebUI의 venv Python으로 실행해야 torch GPU, transparent-background, PIL 등
+> 라이브러리를 통일할 수 있다. 시스템 Python에 별도 설치할 필요 없음.
 
-## CLI 세션 TRPG 모드 (TODO)
-웹 UI 없이 Claude Code CLI 세션에서 직접 TRPG를 진행하는 방식.
+---
 
-### 개요
-- Claude가 GM 역할을 하며 채팅으로 TRPG 진행
-- 유저가 액션 선언 → Claude가 판정/나레이션 → game_state.json 업데이트
-- Flask 서버 불필요
+## 상세 참조 파일
 
-### 맵 표시 방식
-- **ASCII 맵**: 이모지/텍스트 기반 (모바일 호환)
-- PIL 이미지: 데스크탑 CLI에서는 Read 도구로 이미지 확인 가능, 모바일은 불가
-- 캐릭터 일러스트 생성은 불가 (도형 기반 맵만 가능)
-
-### ASCII 맵 범례
-```
-🔴 전사 아론    🟢 마법사 리나    🔵 도적 카이
-🔺 몬스터       🌲 숲(grass)     ⬜ 던전(dungeon)    🟡 보물실(treasure)
-```
-
-### 진행 방식
-1. 유저가 채팅으로 액션 선언 (예: "아론이 오크를 공격")
-2. Claude(GM)가 rules.json 기반으로 주사위 판정 (Bash에서 $RANDOM 사용)
-3. game_state.json 업데이트 (HP, 위치, 턴 등)
-4. ASCII 맵 + 나레이션 텍스트로 결과 표시
-5. 턴 종료 시 자동 저장
-
-### 필요 파일
-- `game_state.json` - 상태 추적
-- `rules.json` - 전투/판정 규칙
-- `scenario.json` - 시나리오 진행
-
-### 구현 TODO
-- [ ] CLI TRPG 진행용 Python 스크립트 (ascii_map.py) - ASCII 맵 생성기
-- [ ] GM 판정 로직 헬퍼 (dice_roller.py) - 주사위/판정 유틸
-- [ ] 세션 간 이어하기 지원 (game_state.json 기반)
-
-## 게임 플로우
-웹 UI에서 액션 버튼 클릭 → Flask API로 전송 → game_state.json 업데이트 → 맵 이미지 재생성 → UI 자동 갱신(2초)
-
-GM(Claude)이 `/api/gm-update`로 나레이션, NPC 반응, HP/MP 변경 등을 처리.
-
-## GM 업데이트 예시
-```bash
-curl -X POST http://localhost:5000/api/gm-update \
-  -H "Content-Type: application/json" \
-  -d '{"description": "전사가 오크를 공격!", "npc_updates": [{"id": 100, "hp": 20}], "narrative": "오크가 으르렁거린다!"}'
-```
+| 파일 | 내용 |
+|------|------|
+| `guides/gm_rules.txt` | GM 나레이션 원칙, 웹 반영, 주사위 판정, 맵 표시, 좌표 시스템, 저장 규칙, 턴 추적기 |
+| `guides/illustration.txt` | SD 연동, 레이어 시스템, 파라미터, 사전 생성 이미지, 외형 일관성, 품질 관리 |
+| `guides/sd_environment.txt` | SD WebUI 경로, 실행 명령, 모델/VAE/확장 목록, 호환성 수정 |
+| `guides/entities.txt` | NPC 엔티티 규칙, JSON 구조, 자동 생성, Agent 연속성, 세계관/웹 반영 Agent 상세 |
+| `guides/api.txt` | 전체 API 엔드포인트 목록, gm-update 파라미터 |
+| `guides/scenario.txt` | 시나리오/룰셋 추가 방법, 구성 요소, 게임 시작 플로우 |

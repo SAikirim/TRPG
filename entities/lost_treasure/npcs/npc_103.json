@@ -1,0 +1,29 @@
+{
+  "id": 103,
+  "name": "한트",
+  "type": "friendly",
+  "status": "alive",
+  "location": "하룬 마을 입구",
+  "personality": {
+    "temperament": "grumpy",
+    "intelligence": "medium",
+    "behavior_pattern": "늙은 경비병. 투덜거리지만 성실. 마을 입구를 지킨다.",
+    "speech_style": "퉁명스럽고 짧은 말투.",
+    "motivation": "마을 경비. 은퇴하고 싶지만 후임이 없다."
+  },
+  "stats": {
+    "STR": 12,
+    "DEX": 8,
+    "INT": 8,
+    "CON": 12
+  },
+  "hp": 20,
+  "max_hp": 20,
+  "mp": 2,
+  "max_mp": 2,
+  "relationships": {},
+  "memory": {
+    "dialogue_history": [],
+    "key_events": []
+  }
+}

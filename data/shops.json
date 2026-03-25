@@ -1,0 +1,62 @@
+{
+  "description": "상점 데이터베이스. 각 상점의 위치, 판매 품목, 매입 가격을 정의.",
+  "shops": {
+    "하룬_잡화점": {
+      "name": "하룬 마을 잡화점",
+      "location": "harun_village",
+      "type": "general",
+      "owner": "없음 (무명 상인)",
+      "inventory": {
+        "치유 약초": {"price": 5, "stock": 10},
+        "마나 포션": {"price": 15, "stock": 3},
+        "밧줄": {"price": 3, "stock": 5},
+        "부싯돌": {"price": 1, "stock": 10},
+        "횃불": {"price": 1, "stock": 20}
+      },
+      "buy_rate": 0.5
+    },
+    "카렌델_대장간": {
+      "name": "카렌델 대장간",
+      "location": "karendel",
+      "type": "weapon_armor",
+      "owner": "미정",
+      "inventory": {
+        "철검": {"price": 20, "stock": 5},
+        "장검": {"price": 50, "stock": 2},
+        "가죽 방패": {"price": 15, "stock": 5},
+        "체인메일": {"price": 80, "stock": 1},
+        "단검 x2": {"price": 25, "stock": 3}
+      },
+      "buy_rate": 0.4
+    },
+    "카렌델_약초상": {
+      "name": "카렌델 약초상",
+      "location": "karendel",
+      "type": "consumable",
+      "owner": "미정",
+      "inventory": {
+        "치유 약초": {"price": 5, "stock": 20},
+        "마나 포션": {"price": 15, "stock": 10},
+        "해독제": {"price": 10, "stock": 5},
+        "상처 치료 약병": {"price": 20, "stock": 5},
+        "마나 결정": {"price": 25, "stock": 3}
+      },
+      "buy_rate": 0.5
+    },
+    "멜로스_골동품점": {
+      "name": "멜로스 골동품점",
+      "location": "karendel",
+      "type": "appraisal_antique",
+      "owner": "멜로스",
+      "services": {
+        "감정": {"price": 10, "desc": "아이템 감정. 희귀 아이템은 추가 비용."},
+        "매입": {"desc": "고대 유물, 마법 아이템 고가 매입"}
+      },
+      "inventory": {
+        "마법 반지 (INT+1)": {"price": 200, "stock": 1},
+        "보호의 부적": {"price": 150, "stock": 1}
+      },
+      "buy_rate": 0.6
+    }
+  }
+}

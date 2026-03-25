@@ -3,4 +3,5 @@ __pycache__/
 .env
 static/map.png
 saves/
-pending_actions.json
+.last_result.json
+.turn_tracker.json

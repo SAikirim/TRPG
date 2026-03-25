@@ -1,0 +1,40 @@
+API 엔드포인트
+===
+
+전체 API 목록
+===
+| 경로                        | 메서드 | 기능                                  |
+| /                           | GET    | 웹 UI (표시 전용)                     |
+| /api/game-state             | GET    | 전체 게임 상태                        |
+| /api/player-stats/{id}      | GET    | 특정 플레이어 상세 정보               |
+| /api/events                 | GET    | 최근 이벤트 20개                      |
+| /api/illustration           | GET    | 현재 일러스트 장면 상태 + SD 활성 여부|
+| /api/saves                  | GET    | 저장 목록 (scenario_id 쿼리 파라미터) |
+| /api/progress/{id}          | GET    | 시나리오 진행 상황                    |
+| /api/items                  | GET    | 아이템 데이터베이스 (items.json)      |
+| /api/skills                 | GET    | 스킬 데이터베이스 (skills.json)       |
+| /api/status-effects         | GET    | 상태이상 데이터베이스 (status_effects.json) |
+| /api/monsters               | GET    | 몬스터 템플릿 (monster_templates.json) |
+| /api/shops                  | GET    | 상점 데이터베이스 (shops.json)        |
+| /api/quests                 | GET    | 퀘스트 데이터베이스 (quests.json)     |
+| /api/gm-update              | POST   | GM 상태 업데이트 (핵심 API)           |
+| /api/player-action          | POST   | 플레이어 액션 처리                    |
+| /api/illustration/toggle    | POST   | SD ON/OFF 토글                        |
+| /api/illustration/clear     | POST   | 전체 장면 초기화                      |
+| /api/reset-game             | POST   | 게임 초기화                           |
+| /api/load                   | POST   | 저장된 게임 불러오기                  |
+
+gm-update 파라미터
+===
+{
+  "description": "GM 설명",
+  "narrative": "나레이션 (금색 표시)",
+  "player_updates": [{"id": 1, "hp": 10, "mp": 5, "position": [3,9], "inventory": [...]}],
+  "npc_updates": [{"id": 101, "hp": 0, "status": "dead"}],
+  "new_npcs": [...],
+  "game_status": "in_progress",
+  "scene_update": {"chapter": 3, "narrative_title": "보물실 진입"},
+  "illustration": {"type": "background", "prompt": "..."},
+  "clear_scene": true,
+  "remove_layer": "오크"
+}
