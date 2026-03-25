@@ -1,8 +1,8 @@
 {
   "id": 303,
-  "name": "행상인",
+  "name": "후드 인물",
   "type": "neutral",
-  "status": "alive",
+  "status": "fled",
   "location": "crossroads_rest",
   "personality": {
     "temperament": "neutral",
@@ -14,8 +14,11 @@
   "relationships": {},
   "memory": {
     "dialogue_history": [],
-    "key_events": []
+    "key_events": [
+      "새벽에 쉼터를 몰래 떠남 (turn 23)"
+    ]
   },
+  "note": "새벽에 쉼터를 떠남",
   "stats": {
     "STR": 12,
     "DEX": 8,
