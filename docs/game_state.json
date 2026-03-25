@@ -183,6 +183,48 @@
       ],
       "status": "alive",
       "location": "trade_road_karendel"
+    },
+    {
+      "id": 303,
+      "name": "후드 인물",
+      "type": "neutral",
+      "known": false,
+      "hp": 15,
+      "max_hp": 15,
+      "mp": 0,
+      "max_mp": 0,
+      "position": [16, 11],
+      "status": "alive",
+      "location": "trade_road_karendel",
+      "description": "짐이 하나도 없는 수상한 후드 인물. 모닥불 너머에 가만히 앉아 있다."
+    },
+    {
+      "id": 304,
+      "name": "행상인",
+      "type": "neutral",
+      "known": false,
+      "hp": 10,
+      "max_hp": 10,
+      "mp": 0,
+      "max_mp": 0,
+      "position": [10, 11],
+      "status": "alive",
+      "location": "trade_road_karendel",
+      "description": "보따리를 짊어진 행상인. 자물쇠가 허술하다."
+    },
+    {
+      "id": 305,
+      "name": "검객",
+      "type": "neutral",
+      "known": false,
+      "hp": 25,
+      "max_hp": 25,
+      "mp": 0,
+      "max_mp": 0,
+      "position": [16, 13],
+      "status": "alive",
+      "location": "trade_road_karendel",
+      "description": "술잔을 기울이며 검을 놓지 않는 검객. 루체나의 정찰을 눈치챘다."
     }
   ],
   "map": {
