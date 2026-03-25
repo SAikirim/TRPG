@@ -3,7 +3,7 @@
     "scenario_id": "karendel_journey",
     "slot": 1,
     "description": "자동 저장 (턴 22)",
-    "saved_at": "2026-03-25 09:31:39",
+    "saved_at": "2026-03-25 09:30:00",
     "turn_count": 22,
     "chapter": 2,
     "party_summary": [
@@ -460,42 +460,35 @@
           {
             "speaker": "사이키",
             "line": "내일 일찍 일어나려면 일찍 자야지.",
-            "tone": "담담",
-            "type": "대화"
+            "tone": "담담"
           },
           {
             "speaker": "할란",
             "line": "...보초는 세워야지. 모르는 놈들이 섞여 있는데.",
-            "tone": "경계",
-            "type": "대화"
+            "tone": "경계"
           },
           {
             "speaker": "루체나",
             "line": "오, 뭐야 그거? 함정?",
-            "tone": "호기심",
-            "type": "대화"
+            "tone": "호기심"
           },
           {
             "speaker": "사이키",
             "line": "마나 와이어. 누가 넘으면 내가 느껴.",
-            "tone": "담담",
-            "type": "대화"
+            "tone": "담담"
           },
           {
             "speaker": "루체나",
             "line": "좋아, 그래도 보초는 서야지. 아까 그 후드 쓴 사람 진짜 수상했단 말이야. 나 아직 잠 안 오니까 1교대 설게.",
-            "tone": "자신감",
-            "type": "대화"
+            "tone": "자신감"
           },
           {
             "speaker": "노을",
             "line": "...2교대.",
-            "tone": "담담",
-            "action": "사이키를 보며 고개를 끄덕임",
-            "type": "대화"
+            "tone": "담담"
           }
         ],
-        "timestamp": "09:31:39"
+        "timestamp": "09:30:00"
       }
     ],
     "current_scene": {
@@ -503,7 +496,7 @@
       "layers": [
         {
           "type": "portrait",
-          "image": "/static/portraits/sd/portrait_미라.webp",
+          "image": "static/portraits/sd/portrait_미라.webp",
           "position": "left",
           "name": "미라",
           "distance": 1,
@@ -511,7 +504,7 @@
         },
         {
           "type": "portrait",
-          "image": "/static/portraits/sd/portrait_할란.webp",
+          "image": "static/portraits/sd/portrait_할란.webp",
           "position": "center",
           "name": "할란",
           "distance": 1,
