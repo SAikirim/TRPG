@@ -64,7 +64,7 @@
   ],
   "next_objective": "",
   "display_mode": "mobile",
-  "show_dice_result": true,
+  "show_dice_result": false,
   "show_system_log": true,
   "sd_illustration": true,
   "last_updated": "2026-03-24"
