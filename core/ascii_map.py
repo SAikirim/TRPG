@@ -545,7 +545,24 @@ def show_emoji_map(state):
         player_legend_parts.append(f'{icon}{name}({cls})')
     if player_legend_parts:
         print('  ' + '  '.join(player_legend_parts))
-    print('  😊동행  👤중립  👹적대  💀처치됨')
+    # NPC 범례 — 이름+위치로 개별 식별
+    npc_legend_parts = []
+    for npc in state.get('npcs', []):
+        pos = npc.get('position')
+        if not (pos and len(pos) == 2):
+            continue
+        name = npc.get('name', '???')
+        ntype = npc.get('type', 'neutral')
+        status = npc.get('status', 'alive')
+        if status == 'dead':
+            icon = NPC_DEAD
+        else:
+            icon = NPC_ICON.get(ntype, '👾')
+        npc_legend_parts.append(f'{icon}{name}({pos[0]},{pos[1]})')
+    if npc_legend_parts:
+        # 한 줄에 3개씩 출력
+        for i in range(0, len(npc_legend_parts), 3):
+            print('  ' + '  '.join(npc_legend_parts[i:i+3]))
     print('  🌲숲  🪨던전  🟡보물실  📋퍼즐  🔒상자  🛌안식처  ⚠️함정  ✅해제')
     print()
 
