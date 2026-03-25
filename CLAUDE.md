@@ -51,8 +51,6 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 - ❗ 나레이션과 시스템 출력을 섞지 않는다 — 나레이션은 굵게 구분하여 출력
 - ❗ 새 설정(지명/NPC/경로)은 에이전트에 확인 후 나레이션에 포함한다
 - ❗ 이벤트 로그에 잘못된 정보가 발견되면 즉시 수정한다
-- ❗ 유저가 "블록맵"을 요청하면 `python core/ascii_map.py` 실행 (터미널 이모지 블록맵, 웹 맵과 별개)
-
 ---
 
 ## GM 턴 처리 순서 (엄격 준수)
@@ -67,7 +65,7 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
  → [1b] 에이전트 병렬 호출 (방향 + 맥락 + 질문 전달 → 검증 + 결과 수신)
  → [2]  나레이션 작성 (에이전트 결과 종합)
  → [3]  시스템 반영 (Agent [시스템 반영]: state/gm-update/일러스트/로그/git)
- → 나레이션 출력 + 블록맵 표시 + 행동 대기
+ → 나레이션 출력 + 맵 표시 + 행동 대기
 ```
 
 > 상세 (각 단계 설명 + 예시): guides/gm_rules.txt 참조
@@ -162,7 +160,7 @@ core/                     - Python 엔진 모듈 (패키지)
   __init__.py
   sd_generator.py         - SD WebUI API 래퍼, 레이어 시스템
   map_generator.py        - Skia/PIL 이미지 생성, SD OFF 시 폴백
-  ascii_map.py            - CLI 터미널용 블록맵 출력 (유저가 "블록맵"이라 하면 `python core/ascii_map.py` 실행)
+  ascii_map.py            - 터미널 블록맵 (유저 요청 시에만 `python core/ascii_map.py` 실행, 웹 맵과 별개)
   gm_turn.py              - GM 턴 추적기 (실행 작업 기록 + 누락 경고)
   save_manager.py         - 세이브/로드 매니저
   game_mechanics.py       - 주사위, 판정, 전투, 회복, 아이템, 상태이상 처리
