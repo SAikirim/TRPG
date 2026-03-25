@@ -424,7 +424,7 @@ def show_emoji_map(state):
     EMPTY    = '··'
     TERRAIN  = {'grass': '🌲', 'dungeon': '🪨', 'treasure': '🟡'}
     P_ICON   = {'마법사': '🔵', '도적': '🟢', '전사': '🔴'}
-    NPC_LIVE = '👾'
+    NPC_ICON = {'friendly': '😊', 'neutral': '👤', 'monster': '👹', 'hostile': '👹'}
     NPC_DEAD = '💀'
 
     map_info  = state.get('map', {})
@@ -515,7 +515,11 @@ def show_emoji_map(state):
         if pos and len(pos) == 2:
             x, y = int(pos[0]), int(pos[1])
             if 0 <= x < width and 0 <= y < height:
-                grid[y][x] = NPC_DEAD if npc.get('status') == 'dead' else NPC_LIVE
+                if npc.get('status') == 'dead':
+                    grid[y][x] = NPC_DEAD
+                else:
+                    ntype = npc.get('type', 'neutral')
+                    grid[y][x] = NPC_ICON.get(ntype, '👾')
 
     for pl in state.get('players', []):
         pos = pl.get('position')
@@ -541,8 +545,8 @@ def show_emoji_map(state):
         player_legend_parts.append(f'{icon}{name}({cls})')
     if player_legend_parts:
         print('  ' + '  '.join(player_legend_parts))
-    print('  💀처치됨   🌲숲   🪨던전   🟡보물실')
-    print('  📋퍼즐(미해결)  📜퍼즐(해결)  🔒보물상자  🛌안식처  ⚠️함정  ✅함정(해제)')
+    print('  😊동행  👤중립  👹적대  💀처치됨')
+    print('  🌲숲  🪨던전  🟡보물실  📋퍼즐  🔒상자  🛌안식처  ⚠️함정  ✅해제')
     print()
 
 
