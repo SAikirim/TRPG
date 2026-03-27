@@ -103,6 +103,8 @@ class TurnOrchestrator:
         # Pending events buffer — 턴 완료 전 대화/행동 임시 저장
         self.pending_events: list[dict[str, Any]] = []
         self.pending_dialogues: list[dict[str, Any]] = []
+        # Session initialized flag — ensure_session은 첫 턴에만 full 실행
+        self._session_initialized = False
 
     # ─── Pending Events (턴 중간 대화/행동 기록) ───
 
@@ -958,21 +960,19 @@ class TurnOrchestrator:
 
     # ─── Auto Save (git commit + push) ───
 
+    @staticmethod
+    def _get_sd_python() -> str:
+        sd = os.path.join("C:\\", "git", "WebUI", "stable-diffusion-webui", "venv", "Scripts", "Python.exe")
+        return sd if os.path.isfile(sd) else sys.executable
+
     def _auto_save(self, turn: int, description: str = "") -> None:
-        """매 턴 git commit, 3턴마다 push."""
+        """매 턴 git commit + push (전부 백그라운드, 턴 시간에 영향 없음)."""
         try:
-            subprocess.run(
-                ["git", "add", "-A"],
-                cwd=BASE_DIR, capture_output=True, timeout=10,
-            )
-            subprocess.run(
-                ["git", "commit", "-m", f"turn {turn}: {description}"],
-                cwd=BASE_DIR, capture_output=True, timeout=10,
-            )
-            # 매 턴 push (백그라운드)
+            # commit + push를 하나의 백그라운드 프로세스로
+            cmd = f'cd "{BASE_DIR}" && git add -A && git commit -m "turn {turn}: {description}" && git push'
             subprocess.Popen(
-                ["git", "push"],
-                cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                cmd, shell=True, cwd=BASE_DIR,
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             )
         except Exception as e:
             logger.error("Auto-save failed: %s", e)
@@ -1069,10 +1069,12 @@ class TurnOrchestrator:
             user_actions: {player_id: action} (멀티 유저 모드, 선택)
                          미지정 시 user_action을 controlled_by="user" 캐릭터에 할당
         """
-        # Session startup (CLAUDE.md 절차 1-5)
-        session_log = self.ensure_session()
-        for entry in session_log:
-            logger.info("Session: %s", entry)
+        # Session startup — 첫 턴에만 full 실행, 이후 스킵
+        if not self._session_initialized:
+            session_log = self.ensure_session()
+            for entry in session_log:
+                logger.info("Session: %s", entry)
+            self._session_initialized = True
 
         # gm_turn start
         self._call_gm_turn("start")
@@ -1146,13 +1148,18 @@ class TurnOrchestrator:
 
         self._call_gm_turn("log", "narration", "completed")
 
-        # 위치 변경 시 맵 재생성
+        # 위치 변경 시 맵 재생성 (백그라운드)
         new_loc = self._last_location_change
         if new_loc and new_loc != context.current_location:
-            self._regenerate_map()
-            logger.info("Map regenerated for new location: %s", new_loc)
+            subprocess.Popen(
+                [self._get_sd_python(), "-c",
+                 "from core.map_generator import MapGenerator; MapGenerator().save_map(); "
+                 "from core.world_map import generate_world_map; generate_world_map()"],
+                cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+            logger.info("Map regeneration started (background): %s", new_loc)
 
-        # git commit + push (매 턴)
+        # git commit + push (백그라운드)
         self._auto_save(context.turn_number + 1, f"turn {context.turn_number + 1}")
 
         # gm_turn end

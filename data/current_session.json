@@ -2,7 +2,7 @@
   "active_scenario": "karendel_journey",
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
-  "turn": 30,
+  "turn": 31,
   "chapter": 1,
   "chapter_name": "trade_road",
   "party_summary": [
@@ -52,15 +52,15 @@
   ],
   "progress_notes": [
     "[GM] Session restore",
-    "[GM] Turn 25: saiki: 할란에게 출발하자고 말한다; lucena: 주변을 경계하며 사이키의 옆에 머문다. 오빠, 혹시 길에서 뭐 반짝이는 거라도 떨어져 있",
-    "[GM] Session restore",
     "[GM] Turn 26: saiki: 미라에게 웃으며 인사한다; lucena: 사이키와 미라에게 가까이 다가가며 투덜거린다 오빠는 미라한테만 그렇게 다정하게 인사해 주고",
     "[GM] Session restore",
     "[GM] Turn 27: saiki: 할란에게 출발하자고 말한다; lucena: 할란에게 출발을 제안한다 할란씨, 이제 출발해도 괜찮겠어요?; noel: 주변을 경계하며",
     "[GM] Session restore",
     "[GM] Turn 28: saiki: 할란에게 출발하자고 말한다; lucena: 마차에 타고 미라와 함께 경계 미라, 조심히 가자. hala씨가 앞을 잘 살펴주고 있지만",
     "[GM] Session restore",
-    "[GM] Turn 29: saiki: 미라에게 웃으며 인사한다; lucena: 미소를 지으며 사이키를 지지한다 미라, 사이키가 인사했으니 너도 인사해줘.; noel: 주"
+    "[GM] Turn 29: saiki: 미라에게 웃으며 인사한다; lucena: 미소를 지으며 사이키를 지지한다 미라, 사이키가 인사했으니 너도 인사해줘.; noel: 주",
+    "[GM] Session restore",
+    "[GM] Turn 30: saiki: 할란에게 출발하자고 말한다; lucena: 사이비의 발언에 동의하며 할란에게 출발하자고 말한다 네, 할란씨. 출발해도 좋을까요?; "
   ],
   "next_objective": "",
   "display_mode": "mobile",
