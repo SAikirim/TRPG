@@ -3,7 +3,7 @@
     "scenario_id": "karendel_journey",
     "slot": 1,
     "description": "자동 저장 (턴 24)",
-    "saved_at": "2026-03-28 00:22:11",
+    "saved_at": "2026-03-28 00:19:32",
     "turn_count": 24,
     "chapter": 2,
     "party_summary": [
@@ -317,6 +317,12 @@
     "events": [
       {
         "turn": 24,
+        "message": "[user] 미라에게 말을 건다",
+        "narrative": "미라에게 말을 건다",
+        "timestamp": "22:52:47"
+      },
+      {
+        "turn": 24,
         "message": "[GM] 사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
         "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
         "timestamp": "22:52:47",
@@ -421,22 +427,14 @@
         "user_input": "",
         "dialogues": [],
         "timestamp": "00:19:32"
-      },
-      {
-        "turn": 24,
-        "message": "[GM] Sync scene to game_state",
-        "narrative": "",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "00:22:11"
       }
     ],
     "current_scene": {
-      "background": "/static/illustrations/sd/background_trade_road_afternoon.webp",
+      "background": "/static/illustrations/pixel/default.png",
       "layers": [
         {
           "type": "portrait",
-          "image": "static/portraits/sd/portrait_mira.webp",
+          "image": "/static/portraits/sd/portrait_mira.webp",
           "position": "left",
           "name": "mira",
           "distance": 1,
@@ -444,7 +442,7 @@
         },
         {
           "type": "portrait",
-          "image": "static/portraits/sd/portrait_hallan.webp",
+          "image": "/static/portraits/sd/portrait_hallan.webp",
           "position": "center",
           "name": "hallan",
           "distance": 1,

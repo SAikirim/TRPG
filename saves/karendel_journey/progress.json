@@ -1,15 +1,8 @@
 {
   "scenario_id": "karendel_journey",
   "first_played": "2026-03-21 03:50:21",
-  "total_saves": 26,
+  "total_saves": 27,
   "history": [
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "",
-      "saved_at": "2026-03-25 10:13:24"
-    },
     {
       "slot": 1,
       "chapter": 2,
@@ -142,9 +135,16 @@
       "turn": 24,
       "description": "자동 저장 (턴 24)",
       "saved_at": "2026-03-28 00:19:32"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-28 00:22:11"
     }
   ],
-  "last_played": "2026-03-28 00:19:32",
+  "last_played": "2026-03-28 00:22:11",
   "last_chapter": 2,
   "last_turn": 24
 }

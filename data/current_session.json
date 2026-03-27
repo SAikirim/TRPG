@@ -51,7 +51,6 @@
     }
   ],
   "progress_notes": [
-    "[user] 미라에게 말을 건다",
     "[GM] 사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
     "[GM] 미라와 대화 테스트",
     "[GM] 턴 중간 기록 (pending flush)",
@@ -60,7 +59,8 @@
     "[GM] Session restore - trade road scene",
     "[GM] Restore character layers",
     "[GM] Scene restore - trade road background",
-    "[GM] Restore correct background"
+    "[GM] Restore correct background",
+    "[GM] Sync scene to game_state"
   ],
   "next_objective": "",
   "display_mode": "mobile",
