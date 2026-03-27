@@ -2,7 +2,7 @@
   "active_scenario": "karendel_journey",
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
-  "turn": 27,
+  "turn": 28,
   "chapter": 1,
   "chapter_name": "trade_road",
   "party_summary": [
@@ -51,8 +51,6 @@
     }
   ],
   "progress_notes": [
-    "[GM] Restore correct background",
-    "[GM] Sync scene to game_state",
     "[GM] Turn 25: Saiki flirts with Mira on the trade road",
     "[GM] Turn 26: Combat ability discussion, wolf attack memory",
     "[GM] Session restore",
@@ -60,7 +58,9 @@
     "[GM] Session restore",
     "[GM] Turn 25: saiki: 할란에게 출발하자고 말한다; lucena: 주변을 경계하며 사이키의 옆에 머문다. 오빠, 혹시 길에서 뭐 반짝이는 거라도 떨어져 있",
     "[GM] Session restore",
-    "[GM] Turn 26: saiki: 미라에게 웃으며 인사한다; lucena: 사이키와 미라에게 가까이 다가가며 투덜거린다 오빠는 미라한테만 그렇게 다정하게 인사해 주고"
+    "[GM] Turn 26: saiki: 미라에게 웃으며 인사한다; lucena: 사이키와 미라에게 가까이 다가가며 투덜거린다 오빠는 미라한테만 그렇게 다정하게 인사해 주고",
+    "[GM] Session restore",
+    "[GM] Turn 27: saiki: 할란에게 출발하자고 말한다; lucena: 할란에게 출발을 제안한다 할란씨, 이제 출발해도 괜찮겠어요?; noel: 주변을 경계하며"
   ],
   "next_objective": "",
   "display_mode": "mobile",

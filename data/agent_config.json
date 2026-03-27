@@ -1,9 +1,9 @@
 {
-  "_comment": "Google 4 keys + Groq 2 keys. NPC/Player → Gemini (speed), Local as fallback.",
+  "_comment": "Groq 3 keys (fast) + Google 4 keys. NPC/Player → Groq for speed. Local as fallback.",
   "rule_arbiter":  {"runner": "cloud", "provider": "google", "model": "gemini-2.5-flash",       "fallback": ["cloud", "local", "claude"], "fallback_provider": "groq"},
   "system":        {"runner": "cloud", "provider": "google", "model": "gemini-2.5-flash",       "fallback": ["cloud", "local", "claude"], "fallback_provider": "groq"},
-  "npc":           {"runner": "cloud", "provider": "google", "model": "gemini-2.5-flash",       "fallback": ["local", "cloud", "claude"], "fallback_provider": "groq"},
-  "player":        {"runner": "cloud", "provider": "google", "model": "gemini-2.5-flash",       "fallback": ["local", "cloud", "claude"], "fallback_provider": "groq"},
+  "npc":           {"runner": "cloud", "provider": "groq",   "model": "llama-3.3-70b-versatile", "fallback": ["local", "cloud", "claude"], "fallback_provider": "google"},
+  "player":        {"runner": "cloud", "provider": "groq",   "model": "llama-3.3-70b-versatile", "fallback": ["local", "cloud", "claude"], "fallback_provider": "google"},
   "worldbuilding": {"runner": "cloud", "provider": "groq",   "model": "llama-3.3-70b-versatile", "fallback": ["cloud", "local", "claude"], "fallback_provider": "google"},
   "worldmap":      {"runner": "cloud", "provider": "groq",   "model": "llama-3.3-70b-versatile", "fallback": ["cloud", "local", "claude"], "fallback_provider": "google"},
   "scenario":      {"runner": "cloud", "provider": "groq",   "model": "llama-3.3-70b-versatile", "fallback": ["cloud", "local", "claude"], "fallback_provider": "google"}

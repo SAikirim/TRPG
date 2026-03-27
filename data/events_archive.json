@@ -443,6 +443,24 @@
       "dialogues": [],
       "timestamp": "00:18:35",
       "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Restore correct background",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:19:32",
+      "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Sync scene to game_state",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:22:11",
+      "archived_at": "2026-03-28"
     }
   ]
 }

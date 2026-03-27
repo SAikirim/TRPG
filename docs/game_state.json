@@ -10,7 +10,7 @@
     "ending": null,
     "current_chapter": 1
   },
-  "current_location": "road_to_karendel_2",
+  "current_location": "road_to_karendel_3",
   "players": [
     {
       "id": 1,
@@ -284,24 +284,8 @@
       }
     ]
   },
-  "turn_count": 27,
+  "turn_count": 28,
   "events": [
-    {
-      "turn": 24,
-      "message": "[GM] Restore correct background",
-      "narrative": "",
-      "user_input": "",
-      "dialogues": [],
-      "timestamp": "00:19:32"
-    },
-    {
-      "turn": 24,
-      "message": "[GM] Sync scene to game_state",
-      "narrative": "",
-      "user_input": "",
-      "dialogues": [],
-      "timestamp": "00:22:11"
-    },
     {
       "turn": 24,
       "message": "[GM] Turn 25: Saiki flirts with Mira on the trade road",
@@ -492,6 +476,38 @@
         }
       ],
       "timestamp": "01:22:14"
+    },
+    {
+      "turn": 27,
+      "message": "[GM] Session restore",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "01:30:41"
+    },
+    {
+      "turn": 28,
+      "message": "[GM] Turn 27: saiki: 할란에게 출발하자고 말한다; lucena: 할란에게 출발을 제안한다 할란씨, 이제 출발해도 괜찮겠어요?; noel: 주변을 경계하며",
+      "narrative": "할란은 짧게 고삐를 잡아당기며 말에 앞으로 나아가라고 명령한다. 마차는 천천히 이동하기 시작하고, 할란은 앞을 응시하며 경계를 늦추지 않는다. 루세나는 할란에게 출발을 제안하고, 사이키도 할란에게 출발하자고 말한다. 노엘은 주변을 경계하며 준비한다.\n\n사익이와 루세나는 할란에게 출발을 제안하며, 노엘은 주변을 경계하며 준비한다. 할란은 고삐를 잡은 채로 앞을 응시하고 있다. 마차 안의 미라는 환한 미소로 사이키와 루세나를 맞이한다.",
+      "user_input": "saiki: 할란에게 출발하자고 말한다; lucena: 할란에게 출발을 제안한다 할란씨, 이제 출발해도 괜찮겠어요?; noel: 주변을 경계하며 준비한다 조심히 가야겠다. 아무도 없다고 생각하지 말자.",
+      "dialogues": [
+        {
+          "speaker": "hallan",
+          "line": "좋다, 출발하자. 더 이상 여기서 시간을 낭비할 수는 없다.",
+          "tone": "serious"
+        },
+        {
+          "speaker": "lucena",
+          "line": "할란씨, 이제 출발해도 괜찮겠어요?",
+          "tone": "polite"
+        },
+        {
+          "speaker": "noel",
+          "line": "조심히 가야겠다. 아무도 없다고 생각하지 말자.",
+          "tone": "cautious"
+        }
+      ],
+      "timestamp": "01:30:57"
     }
   ],
   "current_scene": {
