@@ -415,18 +415,49 @@ class TurnOrchestrator:
             calls=calls,
         )
 
-    # ─── Execute Dispatch ───
+    # ─── Execute Dispatch (runner별 병렬) ───
 
     def execute_dispatch(self, dispatch: AgentDispatch) -> dict[str, AgentResponse]:
-        """Execute all agent calls sequentially within groups to respect rate limits.
-        Groups are executed in dependency order (group 1 before group 2)."""
+        """Runner별 병렬 실행. 같은 runner는 순차, 다른 runner는 동시.
+        Dependency groups도 존중 (group 1 완료 후 group 2)."""
         results: dict[str, AgentResponse] = {}
 
         for group in dispatch.parallel_groups():
+            # Runner별로 분류
+            runner_groups: dict[str, list[AgentCall]] = {}
             for call in group:
-                request = self._build_request(call, dispatch.context)
-                response = self._execute_single(call, request)
-                results[call.agent_type.value] = response
+                cfg = self.registry.config.get(call.agent_type)
+                runner_key = cfg.runner.value if cfg else "claude"
+                runner_groups.setdefault(runner_key, []).append(call)
+
+            def _run_runner_batch(calls: list[AgentCall]) -> list[tuple[str, AgentResponse]]:
+                """같은 runner의 call들을 순차 실행."""
+                batch_results = []
+                for call in calls:
+                    request = self._build_request(call, dispatch.context)
+                    response = self._execute_single(call, request)
+                    batch_results.append((call.agent_type.value, response))
+                return batch_results
+
+            if len(runner_groups) == 1:
+                # 단일 runner → 순차
+                for calls in runner_groups.values():
+                    for key, resp in _run_runner_batch(calls):
+                        results[key] = resp
+            else:
+                # 다른 runner끼리 병렬
+                with ThreadPoolExecutor(max_workers=len(runner_groups)) as executor:
+                    futures = {
+                        executor.submit(_run_runner_batch, calls): runner_key
+                        for runner_key, calls in runner_groups.items()
+                    }
+                    for future in as_completed(futures):
+                        try:
+                            for key, resp in future.result():
+                                results[key] = resp
+                        except Exception as e:
+                            runner_key = futures[future]
+                            logger.error("Runner batch %s failed: %s", runner_key, e)
 
         return results
 
@@ -956,10 +987,88 @@ class TurnOrchestrator:
         except Exception as e:
             logger.warning("gm_turn.py call failed: %s", e)
 
+    # ─── Action Collection (행동 수집) ───
+
+    def _collect_player_actions(
+        self, user_actions: dict[int, str], context: TurnContext
+    ) -> dict[int, str]:
+        """
+        모든 플레이어의 행동을 수집.
+        - user 캐릭터: user_actions에서 가져옴 (player_id → action text)
+        - ai 캐릭터: Player Agent로 자동 생성
+        Returns: {player_id: action_text} for all players.
+        """
+        game_state = _load_json(GAME_STATE_PATH)
+        all_actions: dict[int, str] = {}
+
+        # AI 플레이어 목록
+        ai_player_ids = []
+        for p in game_state.get("players", []):
+            pid = p.get("id")
+            if pid in user_actions:
+                all_actions[pid] = user_actions[pid]
+            elif p.get("controlled_by") == "ai":
+                ai_player_ids.append(pid)
+
+        # AI 플레이어 행동 생성 (Player Agent)
+        if ai_player_ids:
+            # 유저 행동을 상황 정보로 전달
+            user_action_summary = "; ".join(
+                f"{self._get_player_name(game_state, pid)}: {action}"
+                for pid, action in user_actions.items()
+            )
+
+            req = AgentRequest(
+                agent_type=AgentType.PLAYER,
+                context=context.model_copy(update={
+                    "gm_direction": f"User actions this turn: {user_action_summary}",
+                }),
+                payload={
+                    "player_ids": ai_player_ids,
+                    "user_actions": user_action_summary,
+                    "situation": context.gm_direction,
+                    "is_combat": False,
+                },
+                required_files=[
+                    "agents/",
+                    f"entities/{context.scenario_id}/players/",
+                ],
+            )
+            resp = self.registry.dispatch(req)
+            if resp.success:
+                # 에이전트 응답에서 각 AI 플레이어 행동 추출
+                for action_data in resp.payload.get("actions", []):
+                    pid = action_data.get("player_id")
+                    action_text = action_data.get("action", "")
+                    dialogue = action_data.get("dialogue", "")
+                    if pid and (action_text or dialogue):
+                        all_actions[pid] = f"{action_text} {dialogue}".strip()
+
+                # 행동이 생성 안 된 AI 플레이어 → 기본 행동
+                for pid in ai_player_ids:
+                    if pid not in all_actions:
+                        all_actions[pid] = "주변을 경계하며 따라간다."
+
+        return all_actions
+
+    @staticmethod
+    def _get_player_name(game_state: dict, player_id: int) -> str:
+        for p in game_state.get("players", []):
+            if p.get("id") == player_id:
+                return p.get("name", f"player_{player_id}")
+        return f"player_{player_id}"
+
     # ─── Full Turn Pipeline ───
 
-    def run_turn(self, user_action: str) -> TurnSynthesis:
-        """Full turn pipeline: context → plan → dispatch → execute → synthesize → gm-update."""
+    def run_turn(self, user_action: str, user_actions: Optional[dict[int, str]] = None) -> TurnSynthesis:
+        """
+        Full turn pipeline — 모든 플레이어 행동 수집 후 턴 처리.
+
+        Args:
+            user_action: 유저의 행동 텍스트 (단일 유저 모드)
+            user_actions: {player_id: action} (멀티 유저 모드, 선택)
+                         미지정 시 user_action을 controlled_by="user" 캐릭터에 할당
+        """
         # Session startup (CLAUDE.md 절차 1-5)
         session_log = self.ensure_session()
         for entry in session_log:
@@ -971,18 +1080,50 @@ class TurnOrchestrator:
         # Phase 0: build context
         context = self.build_context()
 
-        # Phase 1a: plan
-        self._call_gm_turn("phase", "1a", "GM direction setting")
-        plan = self.plan_turn(user_action, context)
+        # ─── 행동 수집 단계 ───
+        # user_actions가 없으면 user_action을 user 캐릭터에 할당
+        if user_actions is None:
+            game_state = _load_json(GAME_STATE_PATH)
+            user_actions = {}
+            for p in game_state.get("players", []):
+                if p.get("controlled_by") == "user":
+                    user_actions[p["id"]] = user_action
 
-        # Phase 1b: dispatch + execute
+        # 모든 플레이어 행동 수집 (user + AI)
+        all_actions = self._collect_player_actions(user_actions, context)
+        all_actions_summary = "; ".join(
+            f"{self._get_player_name(_load_json(GAME_STATE_PATH), pid)}: {act}"
+            for pid, act in all_actions.items()
+        )
+        logger.info("Actions collected: %s", all_actions_summary)
+
+        # Phase 1a: plan (전체 행동 기반)
+        self._call_gm_turn("phase", "1a", "GM direction setting")
+        plan = self.plan_turn(all_actions_summary, context)
+
+        # Phase 1b: dispatch + execute (Player Agent 제외 — 이미 수집됨)
         self._call_gm_turn("phase", "1b", "Agent dispatch")
+        # Player는 이미 수집했으므로 agents_needed에서 제거
+        plan.agents_needed = [a for a in plan.agents_needed if a != AgentType.PLAYER]
         dispatch = self.build_dispatch(plan, context)
         results = self.execute_dispatch(dispatch)
 
         # 에이전트 호출 기록
         for agent_key in results:
             self._call_gm_turn("agent", agent_key, "completed")
+
+        # Player 행동을 결과에 추가 (synthesize에서 사용)
+        results[AgentType.PLAYER.value] = AgentResponse(
+            agent_type=AgentType.PLAYER,
+            success=True,
+            payload={
+                "narration": "",
+                "actions": [
+                    {"player_id": pid, "player_name": self._get_player_name(_load_json(GAME_STATE_PATH), pid), "action": act}
+                    for pid, act in all_actions.items()
+                ],
+            },
+        )
 
         # Phase 2: synthesize
         self._call_gm_turn("phase", "2", "Narration synthesis")
@@ -1011,7 +1152,7 @@ class TurnOrchestrator:
             self._regenerate_map()
             logger.info("Map regenerated for new location: %s", new_loc)
 
-        # git commit (매 턴) + push (3턴마다)
+        # git commit + push (매 턴)
         self._auto_save(context.turn_number + 1, f"turn {context.turn_number + 1}")
 
         # gm_turn end
