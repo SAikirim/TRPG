@@ -24,7 +24,18 @@
   },
   "relationships": {
     "mira": "Daughter. Teaching her the trade. Worries a lot.",
-    "saiki": "Young adventurer who saved him from wolves. Grateful."
+    "saiki": {
+      "description": "Young adventurer who saved him from wolves. Grateful.",
+      "affinity": 48,
+      "trust": 49,
+      "history": [
+        {
+          "turn": 24,
+          "change": -2,
+          "reason": "사이키의 잦은 질문과 끈질김"
+        }
+      ]
+    }
   },
   "stats": {
     "STR": 10,
