@@ -51,8 +51,6 @@
     }
   ],
   "progress_notes": [
-    "[GM] Mana wire cast + night watch rotation set (1st shift Lucena, 2nd shift Noel). Camp for the night.",
-    "[GM] Uneventful night. Morning wake-up. Long rest: all members HP/MP full.",
     "[GM] Peddler/swordsman join as travel companions. Departure toward Karendel.",
     "[GM] Turn 24: 할란에게 카렌델까지 얼마나 걸리냐고 묻는다",
     "[user] 미라에게 말을 건다",
@@ -60,13 +58,15 @@
     "[GM] 미라와 대화 테스트",
     "[GM] 턴 중간 기록 (pending flush)",
     "[GM] 미라와 대화",
-    "[GM] 턴 중간 기록 (pending flush)"
+    "[GM] 턴 중간 기록 (pending flush)",
+    "[GM] Session restore - trade road scene",
+    "[GM] Restore character layers"
   ],
   "next_objective": "",
   "display_mode": "mobile",
   "show_dice_result": false,
   "show_system_log": false,
   "sd_illustration": true,
-  "last_updated": "2026-03-27",
+  "last_updated": "2026-03-28",
   "difficulty": "normal"
 }
