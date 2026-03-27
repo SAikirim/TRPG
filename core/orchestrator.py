@@ -212,7 +212,7 @@ class TurnOrchestrator:
         except Exception as e:
             logger.error("Save failed: %s", e)
 
-        # 4. git commit
+        # 4. git commit + push (수동 저장은 반드시 push)
         try:
             subprocess.run(
                 ["git", "add", "-A"],
@@ -223,8 +223,14 @@ class TurnOrchestrator:
                 cwd=BASE_DIR, capture_output=True, timeout=10,
             )
             result["git"] = True
+            # push (백그라운드)
+            subprocess.Popen(
+                ["git", "push"],
+                cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+            result["pushed"] = True
         except Exception as e:
-            logger.error("Git commit failed: %s", e)
+            logger.error("Git commit/push failed: %s", e)
 
         return result
 
@@ -919,6 +925,29 @@ class TurnOrchestrator:
 
         return count
 
+    # ─── Auto Save (git commit + push) ───
+
+    def _auto_save(self, turn: int, description: str = "") -> None:
+        """매 턴 git commit, 3턴마다 push."""
+        try:
+            subprocess.run(
+                ["git", "add", "-A"],
+                cwd=BASE_DIR, capture_output=True, timeout=10,
+            )
+            subprocess.run(
+                ["git", "commit", "-m", f"turn {turn}: {description}"],
+                cwd=BASE_DIR, capture_output=True, timeout=10,
+            )
+            # 3턴마다 push (백그라운드)
+            if turn % 3 == 0:
+                subprocess.Popen(
+                    ["git", "push"],
+                    cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                )
+                logger.info("Git push (turn %d)", turn)
+        except Exception as e:
+            logger.error("Auto-save failed: %s", e)
+
     # ─── gm_turn.py Integration ───
 
     def _call_gm_turn(self, *args: str) -> None:
@@ -983,6 +1012,9 @@ class TurnOrchestrator:
         if new_loc and new_loc != context.current_location:
             self._regenerate_map()
             logger.info("Map regenerated for new location: %s", new_loc)
+
+        # git commit (매 턴) + push (3턴마다)
+        self._auto_save(context.turn_number + 1, f"turn {context.turn_number + 1}")
 
         # gm_turn end
         self._call_gm_turn("end")
