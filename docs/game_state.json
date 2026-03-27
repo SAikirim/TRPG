@@ -288,67 +288,6 @@
   "events": [
     {
       "turn": 24,
-      "message": "[GM] Peddler/swordsman join as travel companions. Departure toward Karendel.",
-      "narrative": "Saiki approached the peddler packing his things and the swordsman leaning against the wall.\n\n\"We're heading to Karendel. If you're going the same way, would you like to travel together?\"\n\nThe peddler frantically gathered his bundle and nodded repeatedly.\n\"Oh my, I was just worried about going alone! If you'd join me, nothing could be more welcome...\"\n\nThe swordsman, still in his position leaning against the wall with his hand on his sword, regarded Saiki for a moment.\n\"...Karendel.\"\nAfter a brief silence, he slowly stood up.\n\"I happen to have business that way. We merely share the same road, so don't mind me.\"\n\nHe glanced at the empty spot where the hooded figure had been, but said nothing.\n\nHallan said while hitching the pack horse.\n\"...No reason to object. The more of us there are, the less beasts will bother us.\"\n\nLucena sidled up to Saiki and whispered.\n\"The peddler is whatever, but that swordsman... he was really good at muffling his footsteps while pretending to sleep. He might not be a thief, but he's not ordinary either.\"\n\nNoel chimed in while slinging his axe over his shoulder.\n\"Having one more guy who can use a blade makes things a bit easier for me.\"\n\nThe party had grown. Hallan patted the pack horse's back, and the cart began to move slowly. Morning mist lay thin over the trade road. Half a day or so until Karendel.",
-      "user_input": "Suggest traveling together to the peddler and swordsman",
-      "dialogues": [
-        {
-          "speaker": "saiki",
-          "line": "We're heading to Karendel. If you're going the same way, would you like to travel together?",
-          "tone": "polite",
-          "type": "dialogue"
-        },
-        {
-          "speaker": "peddler",
-          "line": "Oh my, I was just worried about going alone! If you'd join me, nothing could be more welcome...",
-          "tone": "relieved",
-          "type": "dialogue"
-        },
-        {
-          "speaker": "swordsman",
-          "line": "I happen to have business that way. We merely share the same road, so don't mind me.",
-          "tone": "indifferent",
-          "type": "dialogue"
-        },
-        {
-          "speaker": "hallan",
-          "line": "...No reason to object. The more of us there are, the less beasts will bother us.",
-          "tone": "calm",
-          "type": "dialogue"
-        },
-        {
-          "speaker": "lucena",
-          "target": "saiki",
-          "line": "The peddler is whatever, but that swordsman... he was really good at muffling his footsteps while pretending to sleep. He might not be a thief, but he's not ordinary either.",
-          "tone": "whisper",
-          "type": "whisper"
-        },
-        {
-          "speaker": "noel",
-          "line": "Having one more guy who can use a blade makes things a bit easier for me.",
-          "tone": "casual",
-          "type": "dialogue"
-        }
-      ],
-      "timestamp": "09:55:00",
-      "dice_rolls": []
-    },
-    {
-      "turn": 24,
-      "message": "[GM] Turn 24: 할란에게 카렌델까지 얼마나 걸리냐고 묻는다",
-      "narrative": "할란은 카렌델까지의 거리에 대한 질문에 잠시 생각을 하더니 말합니다. 그는 손가락을 이용해 거리를 계산하고, 고개를 끄덕입니다.\n\n루세나가 할란에게 카렌델까지의 여정에 대해 묻습니다. 여행에 필요한 정보를 얻기 위해 할란에게 질문하는 것이 합리적입니다.",
-      "user_input": "할란에게 카렌델까지 얼마나 걸리냐고 묻는다",
-      "dialogues": [
-        {
-          "speaker": "hallan",
-          "line": "카렌델까지는 반나절 정도면 도착할 수 있습니다. 오늘 오후에 도착할 수 있으면 좋겠네요.",
-          "tone": "평静"
-        }
-      ],
-      "timestamp": "22:41:55"
-    },
-    {
-      "turn": 24,
       "message": "[user] 미라에게 말을 건다",
       "narrative": "미라에게 말을 건다",
       "timestamp": "22:52:47"
@@ -443,6 +382,22 @@
       "user_input": "",
       "dialogues": [],
       "timestamp": "00:15:46"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Scene restore - trade road background",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:18:35"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Restore correct background",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:19:32"
     }
   ],
   "current_scene": {

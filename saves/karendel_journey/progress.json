@@ -1,43 +1,8 @@
 {
   "scenario_id": "karendel_journey",
   "first_played": "2026-03-21 03:50:21",
-  "total_saves": 21,
+  "total_saves": 26,
   "history": [
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 21,
-      "description": "자동 저장 (턴 21)",
-      "saved_at": "2026-03-24 21:16:53"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 22,
-      "description": "자동 저장 (턴 22)",
-      "saved_at": "2026-03-25 09:30:00"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 22,
-      "description": "자동 저장 (턴 22)",
-      "saved_at": "2026-03-25 09:31:39"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 23,
-      "description": "자동 저장 (턴 23)",
-      "saved_at": "2026-03-25 09:43:13"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-25 09:49:08"
-    },
     {
       "slot": 1,
       "chapter": 2,
@@ -142,9 +107,44 @@
       "turn": 24,
       "description": "미라와 대화",
       "saved_at": "2026-03-27 22:54:42"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-28 00:10:12"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-28 00:15:38"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-28 00:15:46"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-28 00:18:35"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-28 00:19:32"
     }
   ],
-  "last_played": "2026-03-27 22:54:42",
+  "last_played": "2026-03-28 00:19:32",
   "last_chapter": 2,
   "last_turn": 24
 }

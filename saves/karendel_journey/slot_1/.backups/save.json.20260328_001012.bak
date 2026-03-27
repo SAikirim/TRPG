@@ -2,8 +2,8 @@
   "save_info": {
     "scenario_id": "karendel_journey",
     "slot": 1,
-    "description": "자동 저장 (턴 24)",
-    "saved_at": "2026-03-27 22:41:55",
+    "description": "미라와 대화",
+    "saved_at": "2026-03-27 22:54:42",
     "turn_count": 24,
     "chapter": 2,
     "party_summary": [
@@ -316,36 +316,6 @@
     "turn_count": 24,
     "events": [
       {
-        "turn": 16,
-        "message": "[GM] Saiki says \"I have something to experiment with\" and switches seats with Lucena again.",
-        "narrative": "Saiki spoke to Lucena. \"I have something to experiment with.\" Lucena blinked and moved aside. \"Again? What is it, tell me.\"\n\nAfter switching seats on the cart, Saiki ended up sitting next to Mira. Mira tilted her head curiously. \"An experiment? Something magic-related?\"\n\nHallan glanced back while holding the reins. \"...You're not going to blow something up on the cart, are you?\"",
-        "timestamp": "02:15:36"
-      },
-      {
-        "turn": 17,
-        "message": "[GM] Saiki asked about the distance to Karendel. Hallan explains the terrain.",
-        "narrative": "Saiki looked around. Oak forests still stretched along both sides of the trade road.\n\nHallan gestured with his chin toward a signpost by the road while holding the reins.\n\"...See that fork up ahead? That's the halfway point. Head south from there and you reach the port; keep going east and it's Karendel.\"\n\nMira looked up at the sky and said,\n\"Once the sun drops a bit more, we'll arrive at the crossroads rest stop. We'll stay the night there, and by tomorrow afternoon, we'll see Karendel's gates.\"\n\nHallan added briefly,\n\"...As long as we don't run into bandits or beasts.\"",
-        "timestamp": "02:20:52"
-      },
-      {
-        "turn": 18,
-        "message": "[GM] Saiki asked about directions. Hallan explains the crossroads geography in detail.",
-        "narrative": "Hallan nodded while gripping the reins.\n\"That's roughly right. This trade road goes straight east and then turns at the crossroads. From there, go left — that is, north — and you reach Karendel.\"\n\nMira chimed in.\n\"The south road goes down toward the coast. There's a port town there... what was its name again.\"\n\nHallan answered briefly.\n\"...Seren. A small fishing harbor. You can take a ship from there along the coast to western cities, but we have no business there.\"\n\nThe cart rattled forward. Ahead on the trade road, the point where the path splits into two was faintly coming into view.",
-        "timestamp": "15:43:08"
-      },
-      {
-        "turn": 19,
-        "message": "[GM] Saiki takes a short rest on the cart. MP 37→40 recovered.",
-        "narrative": "Saiki pulled his robe tighter and leaned against one side of the cart. Closing his eyes and steadying his breath, the faintly scattered mana began to slowly gather back into his body.\n\nMira glanced sideways at him briefly, then turned her gaze forward.\n\nLucena sat on the edge of the cart with her legs dangling, chewing on a fruit.\n\"Don't fall off while you sleep. Old man Hallan won't stop for you.\"\n\nHallan snorted without looking back.\n\"...If you fall, you'll wake up.\"\n\nThe cart slowly continued east along the trade road. Wind rustled the leaves, and the afternoon sun was warm.",
-        "timestamp": "15:49:39"
-      },
-      {
-        "turn": 20,
-        "message": "[GM] Saiki asked about stopping at the crossroads rest stop. Hallan explains practical reasons.",
-        "narrative": "Hallan thought for a moment while gripping the reins, then spoke.\n\"...I understand the hurry, but there are reasons.\"\n\nHallan counted on his fingers.\n\"First, the pack horse is tired. We came all the way from Harun without stopping. If the horse collapses, the cart stops too.\"\n\"Second, the road from the crossroads to Karendel has mountain paths mixed in. If a wheel gets stuck in the dark, we're done for.\"\n\"Third...\" Hallan lowered his voice. \"Merchants always gather at the crossroads rest stop. If there's a group heading to Karendel together, it's safer.\"\n\nMira chimed in.\n\"And the rest stop has a well. We need to refill the water barrel too.\"\n\nHallan added briefly.\n\"...Of course, it's your call. If you want to travel through the night, I won't stop you, but I wouldn't recommend it.\"",
-        "timestamp": "18:24:35"
-      },
-      {
         "turn": 21,
         "message": "[GM] Crossroads rest stop camp (night). Lucena returns from scouting. Noel stands guard.",
         "narrative": "Lucena slipped away from the campfire and melted into the darkness. She circled the rest stop, checking the travelers' belongings, but could only make out silhouettes in the dark. When she passed near the peddler's bundle, she felt a gaze from the swordsman's direction. She paused for a moment, then casually turned back.\n\nReturning to the campfire, Lucena scooted up next to Saiki and whispered softly.\n\"I checked everything out~ The peddler's lock is toy-level, and the sword guy is the type who won't let go of his blade even in his sleep. But that hooded person over there... has zero luggage. Isn't that suspicious?\"\n\nNoel silently added a log to the fire. The flames leapt up and brightened the surroundings. With his axe resting on his knees, he'd been scanning the darkness, then placed a blanket on Saiki.\n\"...Cover up.\"\n\nBeyond the campfire, the hooded figure's shadow sat motionless. The swordsman was still in the same posture, sipping from his cup. The night was deepening.",
@@ -529,6 +499,87 @@
           }
         ],
         "timestamp": "22:41:55"
+      },
+      {
+        "turn": 24,
+        "message": "[user] 미라에게 말을 건다",
+        "narrative": "미라에게 말을 건다",
+        "timestamp": "22:52:47"
+      },
+      {
+        "turn": 24,
+        "message": "[GM] 사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
+        "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
+        "timestamp": "22:52:47",
+        "dialogues": [
+          {
+            "speaker": "saiki",
+            "line": "미라, 오늘 날씨 좋지 않아?",
+            "tone": "playful",
+            "target": "mira"
+          },
+          {
+            "speaker": "mira",
+            "line": "네? 아, 네... 좋네요.",
+            "tone": "shy"
+          }
+        ]
+      },
+      {
+        "turn": 24,
+        "message": "[GM] 미라와 대화 테스트",
+        "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "22:52:49"
+      },
+      {
+        "turn": 24,
+        "message": "[GM] 턴 중간 기록 (pending flush)",
+        "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
+        "user_input": "미라에게 말을 건다",
+        "dialogues": [
+          {
+            "speaker": "saiki",
+            "line": "미라, 오늘 날씨 좋지 않아?",
+            "tone": "playful",
+            "target": "mira"
+          },
+          {
+            "speaker": "mira",
+            "line": "네? 아, 네... 좋네요.",
+            "tone": "shy"
+          }
+        ],
+        "timestamp": "22:53:42"
+      },
+      {
+        "turn": 24,
+        "message": "[GM] 미라와 대화",
+        "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "22:53:44"
+      },
+      {
+        "turn": 24,
+        "message": "[GM] 턴 중간 기록 (pending flush)",
+        "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
+        "user_input": "미라에게 말을 건다",
+        "dialogues": [
+          {
+            "speaker": "saiki",
+            "line": "미라, 오늘 날씨 좋지 않아?",
+            "tone": "playful",
+            "target": "mira"
+          },
+          {
+            "speaker": "mira",
+            "line": "네? 아, 네... 좋네요.",
+            "tone": "shy"
+          }
+        ],
+        "timestamp": "22:54:40"
       }
     ],
     "current_scene": {

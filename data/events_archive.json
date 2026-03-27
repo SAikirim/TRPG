@@ -139,6 +139,196 @@
       "narrative": "Hallan thought for a moment while gripping the reins, then spoke.\n\"...I understand the hurry, but there are reasons.\"\n\nHallan counted on his fingers.\n\"First, the pack horse is tired. We came all the way from Harun without stopping. If the horse collapses, the cart stops too.\"\n\"Second, the road from the crossroads to Karendel has mountain paths mixed in. If a wheel gets stuck in the dark, we're done for.\"\n\"Third...\" Hallan lowered his voice. \"Merchants always gather at the crossroads rest stop. If there's a group heading to Karendel together, it's safer.\"\n\nMira chimed in.\n\"And the rest stop has a well. We need to refill the water barrel too.\"\n\nHallan added briefly.\n\"...Of course, it's your call. If you want to travel through the night, I won't stop you, but I wouldn't recommend it.\"",
       "timestamp": "18:24:35",
       "archived_at": "2026-03-27"
+    },
+    {
+      "turn": 21,
+      "message": "[GM] Crossroads rest stop camp (night). Lucena returns from scouting. Noel stands guard.",
+      "narrative": "Lucena slipped away from the campfire and melted into the darkness. She circled the rest stop, checking the travelers' belongings, but could only make out silhouettes in the dark. When she passed near the peddler's bundle, she felt a gaze from the swordsman's direction. She paused for a moment, then casually turned back.\n\nReturning to the campfire, Lucena scooted up next to Saiki and whispered softly.\n\"I checked everything out~ The peddler's lock is toy-level, and the sword guy is the type who won't let go of his blade even in his sleep. But that hooded person over there... has zero luggage. Isn't that suspicious?\"\n\nNoel silently added a log to the fire. The flames leapt up and brightened the surroundings. With his axe resting on his knees, he'd been scanning the darkness, then placed a blanket on Saiki.\n\"...Cover up.\"\n\nBeyond the campfire, the hooded figure's shadow sat motionless. The swordsman was still in the same posture, sipping from his cup. The night was deepening.",
+      "user_input": "",
+      "dialogues": [
+        {
+          "speaker": "lucena",
+          "target": "saiki",
+          "line": "I checked everything out~ The peddler's lock is toy-level, and the sword guy is the type who won't let go of his blade even in his sleep. But that hooded person over there... has zero luggage. Isn't that suspicious?",
+          "tone": "playful+whisper",
+          "type": "whisper"
+        },
+        {
+          "speaker": "noel",
+          "target": "saiki",
+          "line": "...Cover up.",
+          "tone": "calm",
+          "action": "placing a blanket",
+          "type": "dialogue"
+        }
+      ],
+      "timestamp": "21:16:53",
+      "dice_rolls": [
+        {
+          "character": "lucena",
+          "type": "DEX",
+          "dc": 12,
+          "roll": 6,
+          "modifier": 5,
+          "total": 11,
+          "result": "fail",
+          "margin": -1,
+          "context": "Stealth scouting - slightly noticed by the swordsman"
+        },
+        {
+          "character": "lucena",
+          "type": "INT",
+          "dc": 11,
+          "roll": 8,
+          "modifier": 0,
+          "total": 8,
+          "result": "fail",
+          "margin": -3,
+          "context": "Cargo appraisal - failed to assess value in the dark"
+        }
+      ],
+      "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 22,
+      "message": "[GM] Mana wire cast + night watch rotation set (1st shift Lucena, 2nd shift Noel). Camp for the night.",
+      "narrative": "Saiki draped the blanket over his shoulders and said,\n\"If we want to wake up early tomorrow, we should sleep early.\"\n\nHallan cut in briefly.\n\"...We need to set a watch. There are strangers mixed in here.\"\n\nSaiki nodded, then pulled out his staff and slowly traced a circle on the ground around the camp. A thin thread of mana unwound from the tip of the staff and seeped between the blades of grass. An invisible detection line settled into place around the campsite.\n\nLucena's eyes sparkled as she asked.\n\"Oh, what's that? A trap?\"\n\n\"Mana wire. If someone crosses it, I'll sense it.\"\n\nLucena nodded, then twirled a dagger between her fingers and settled by the campfire.\n\"Alright, but we still need a watch. That hooded person earlier was really suspicious. I'm not sleepy yet, so I'll take the first shift.\"\n\nNoel replied briefly.\n\"...Second shift.\"\n\nHe glanced at Saiki and nodded once — meaning, get some good sleep.\n\nSaiki pulled the blanket over himself and lay down by the campfire. He could faintly sense the mana threads surrounding the area. Lucena added another log to the fire. Flames rose and warmed the night air.\n\nDeep in the night. An owl's cry echoed from the forest.",
+      "user_input": "Cast mana wire and sleep",
+      "dialogues": [
+        {
+          "speaker": "saiki",
+          "line": "If we want to wake up early tomorrow, we should sleep early.",
+          "tone": "calm",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "hallan",
+          "line": "...We need to set a watch. There are strangers mixed in here.",
+          "tone": "wary",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "lucena",
+          "line": "Oh, what's that? A trap?",
+          "tone": "curious",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "saiki",
+          "line": "Mana wire. If someone crosses it, I'll sense it.",
+          "tone": "calm",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "lucena",
+          "line": "Alright, but we still need a watch. That hooded person earlier was really suspicious. I'm not sleepy yet, so I'll take the first shift.",
+          "tone": "confident",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "noel",
+          "line": "...Second shift.",
+          "tone": "calm",
+          "action": "nodding while looking at Saiki",
+          "type": "dialogue"
+        }
+      ],
+      "timestamp": "09:28:53",
+      "dice_rolls": [],
+      "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 23,
+      "message": "[GM] Uneventful night. Morning wake-up. Long rest: all members HP/MP full.",
+      "narrative": "The night was quiet.\n\nThe mana wire vibrated faintly a couple of times, but it was only small wild animals passing through. The campfire gradually died down, and stars filled the sky.\n\nAt shift change, Lucena approached Noel and whispered softly.\n\"That hooded one was only pretending to sleep. Tell Saiki too.\"\nNoel nodded and gripped his axe. Lucena clutched her daggers to her chest and fell into a light sleep.\n\nAt dawn. Noel detected movement in the darkness. The hooded figure quietly rose and slipped out of the rest stop, returning shortly after. When they returned, he could see them wiping their hands on their clothes.\n\nBefore long, dawn broke.\n\nWith birdsong and morning sunlight illuminating the rest stop, Saiki opened his eyes. The mana wire's sensation had faded — its effect had expired. His body felt light. A full night's sleep had completely restored his mana.\n\nNoel looked toward Saiki and said briefly.\n\"...The hooded one went out once at dawn.\"\n\nLooking around, the hooded figure's spot was empty. No one knew when they had left. The swordsman was still leaning against the wall with his sword in his arms, and the peddler was packing up and preparing to depart.\n\nHallan said while watering the pack horse.\n\"...We can leave in about an hour. We'll reach Karendel today.\"",
+      "user_input": "",
+      "dialogues": [
+        {
+          "speaker": "lucena",
+          "target": "noel",
+          "line": "That hooded one was only pretending to sleep. Tell Saiki too.",
+          "tone": "whisper",
+          "type": "whisper"
+        },
+        {
+          "speaker": "noel",
+          "target": "saiki",
+          "line": "...The hooded one went out once at dawn.",
+          "tone": "calm",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "hallan",
+          "line": "...We can leave in about an hour. We'll reach Karendel today.",
+          "tone": "calm",
+          "type": "dialogue"
+        }
+      ],
+      "timestamp": "09:43:13",
+      "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Peddler/swordsman join as travel companions. Departure toward Karendel.",
+      "narrative": "Saiki approached the peddler packing his things and the swordsman leaning against the wall.\n\n\"We're heading to Karendel. If you're going the same way, would you like to travel together?\"\n\nThe peddler frantically gathered his bundle and nodded repeatedly.\n\"Oh my, I was just worried about going alone! If you'd join me, nothing could be more welcome...\"\n\nThe swordsman, still in his position leaning against the wall with his hand on his sword, regarded Saiki for a moment.\n\"...Karendel.\"\nAfter a brief silence, he slowly stood up.\n\"I happen to have business that way. We merely share the same road, so don't mind me.\"\n\nHe glanced at the empty spot where the hooded figure had been, but said nothing.\n\nHallan said while hitching the pack horse.\n\"...No reason to object. The more of us there are, the less beasts will bother us.\"\n\nLucena sidled up to Saiki and whispered.\n\"The peddler is whatever, but that swordsman... he was really good at muffling his footsteps while pretending to sleep. He might not be a thief, but he's not ordinary either.\"\n\nNoel chimed in while slinging his axe over his shoulder.\n\"Having one more guy who can use a blade makes things a bit easier for me.\"\n\nThe party had grown. Hallan patted the pack horse's back, and the cart began to move slowly. Morning mist lay thin over the trade road. Half a day or so until Karendel.",
+      "user_input": "Suggest traveling together to the peddler and swordsman",
+      "dialogues": [
+        {
+          "speaker": "saiki",
+          "line": "We're heading to Karendel. If you're going the same way, would you like to travel together?",
+          "tone": "polite",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "peddler",
+          "line": "Oh my, I was just worried about going alone! If you'd join me, nothing could be more welcome...",
+          "tone": "relieved",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "swordsman",
+          "line": "I happen to have business that way. We merely share the same road, so don't mind me.",
+          "tone": "indifferent",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "hallan",
+          "line": "...No reason to object. The more of us there are, the less beasts will bother us.",
+          "tone": "calm",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "lucena",
+          "target": "saiki",
+          "line": "The peddler is whatever, but that swordsman... he was really good at muffling his footsteps while pretending to sleep. He might not be a thief, but he's not ordinary either.",
+          "tone": "whisper",
+          "type": "whisper"
+        },
+        {
+          "speaker": "noel",
+          "line": "Having one more guy who can use a blade makes things a bit easier for me.",
+          "tone": "casual",
+          "type": "dialogue"
+        }
+      ],
+      "timestamp": "09:55:00",
+      "dice_rolls": [],
+      "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Turn 24: 할란에게 카렌델까지 얼마나 걸리냐고 묻는다",
+      "narrative": "할란은 카렌델까지의 거리에 대한 질문에 잠시 생각을 하더니 말합니다. 그는 손가락을 이용해 거리를 계산하고, 고개를 끄덕입니다.\n\n루세나가 할란에게 카렌델까지의 여정에 대해 묻습니다. 여행에 필요한 정보를 얻기 위해 할란에게 질문하는 것이 합리적입니다.",
+      "user_input": "할란에게 카렌델까지 얼마나 걸리냐고 묻는다",
+      "dialogues": [
+        {
+          "speaker": "hallan",
+          "line": "카렌델까지는 반나절 정도면 도착할 수 있습니다. 오늘 오후에 도착할 수 있으면 좋겠네요.",
+          "tone": "평静"
+        }
+      ],
+      "timestamp": "22:41:55",
+      "archived_at": "2026-03-28"
     }
   ]
 }
