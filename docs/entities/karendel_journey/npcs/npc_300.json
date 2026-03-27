@@ -26,8 +26,8 @@
     "mira": "Daughter. Teaching her the trade. Worries a lot.",
     "saiki": {
       "description": "Young adventurer who saved him from wolves. Grateful.",
-      "affinity": 50,
-      "trust": 50,
+      "affinity": 52,
+      "trust": 51,
       "history": [
         {
           "turn": 24,
@@ -38,17 +38,27 @@
           "turn": 27,
           "change": 2,
           "reason": "출발을 결정했다."
+        },
+        {
+          "turn": 28,
+          "change": 2,
+          "reason": "출발 후 경계와 안전에 대한 대화"
         }
       ]
     },
     "lucena": {
-      "affinity": 51,
-      "trust": 51,
+      "affinity": 52,
+      "trust": 52,
       "history": [
         {
           "turn": 27,
           "change": 1,
           "reason": "출발을 제안했다."
+        },
+        {
+          "turn": 28,
+          "change": 1,
+          "reason": "루세나의 경계와 출발 후 대화"
         }
       ]
     }
