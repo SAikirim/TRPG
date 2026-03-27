@@ -626,6 +626,15 @@
       ],
       "timestamp": "01:21:10",
       "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 26,
+      "message": "[GM] Session restore",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "01:21:42",
+      "archived_at": "2026-03-28"
     }
   ]
 }

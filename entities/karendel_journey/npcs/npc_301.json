@@ -36,8 +36,8 @@
     "hallan": "Father. Worried about him but respects him.",
     "saiki": {
       "description": "Adventurer who rescued them. Favorable impression.",
-      "affinity": 56,
-      "trust": 54,
+      "affinity": 58,
+      "trust": 55,
       "history": [
         {
           "turn": 26,
@@ -53,12 +53,17 @@
           "turn": 29,
           "change": 2,
           "reason": "사익이의 웃으며 인사"
+        },
+        {
+          "turn": 31,
+          "change": 2,
+          "reason": "사익이의 웃으며 인사"
         }
       ]
     },
     "lucena": {
-      "affinity": 57,
-      "trust": 55,
+      "affinity": 58,
+      "trust": 56,
       "history": [
         {
           "turn": 25,
@@ -79,6 +84,22 @@
           "turn": 29,
           "change": 1,
           "reason": "루세나의 미소 지음"
+        },
+        {
+          "turn": 31,
+          "change": 1,
+          "reason": "루세나의 미소"
+        }
+      ]
+    },
+    "noel": {
+      "affinity": 51,
+      "trust": 51,
+      "history": [
+        {
+          "turn": 31,
+          "change": 1,
+          "reason": "노엘의 인사"
         }
       ]
     }
