@@ -1087,12 +1087,15 @@ def generate_world_map():
     main_types = {"village", "trade_city", "port_village"}
     drawn_connections = set()
     for loc_id, loc in placed.items():
-        for target_name, conn in loc["connections"].items():
-            target_id = None
-            for tid, tdata in placed.items():
-                if tdata["name"] == target_name:
-                    target_id = tid
-                    break
+        for target_key, conn in loc["connections"].items():
+            # target_key는 location ID (e.g. "karendel") — placed dict의 key와 직접 매칭
+            target_id = target_key if target_key in placed else None
+            if not target_id:
+                # fallback: name으로 검색
+                for tid, tdata in placed.items():
+                    if tdata["name"] == target_key:
+                        target_id = tid
+                        break
             if not target_id:
                 continue
             pair = tuple(sorted([loc_id, target_id]))

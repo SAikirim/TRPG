@@ -1,6 +1,6 @@
 {
   "id": 305,
-  "name": "후드 인물",
+  "name": "hooded_figure",
   "type": "neutral",
   "status": "alive",
   "location": "crossroads_rest",
@@ -22,8 +22,8 @@
     "INT": 14,
     "CON": 10
   },
-  "hp": 12,
-  "max_hp": 12,
+  "hp": 25,
+  "max_hp": 25,
   "mp": 5,
   "max_mp": 5,
   "position": [

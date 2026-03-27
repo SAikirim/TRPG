@@ -1,0 +1,93 @@
+{
+  "scenario_info": {
+    "title": "잃어버린 보물의 숲 던전",
+    "description": "고대 숲 깊은 곳에 잠든 전설의 보물. 세 명의 모험가가 위험을 무릅쓰고 던전에 발을 들인다.",
+    "difficulty": "normal",
+    "recommended_level": 1,
+    "party_size": {"min": 3, "max": 3, "recommended": 3},
+    "backstory": "하룬 마을 근처의 고대 숲. 오래전부터 숲 깊은 곳에 전설의 보물이 잠들어 있다는 소문이 있었다. 마을에서 자란 세 명의 젊은 모험가가 보물을 찾기 위해 숲으로 향한다."
+  },
+  "opening": {
+    "new_game": "새 게임 시작 — 레벨 1 캐릭터로 시작합니다.",
+    "narrative": "하룬 마을 외곽의 숲. 고대 던전의 입구가 덤불 사이로 어렴풋이 보인다. 세 명의 모험가가 횃불을 들고 입구 앞에 섰다."
+  },
+  "default_party": {
+    "description": "새 게임 시작 시 사용할 기본 파티 (레벨 1)",
+    "players": [
+      {
+        "id": 1,
+        "name": "",
+        "class": "마법사",
+        "race": "인간",
+        "appearance": {"age": "20대 초반", "build": "마른 체형", "skin": "창백한 흰 피부", "hair": "긴 은회색 머리, 느슨하게 묶음", "face": "지적인 눈빛, 날카로운 이목구비", "outfit": "남색 로브, 허리띠에 매달린 마법 부적", "notable": "손에 항상 마법 지팡이를 들고 있음"},
+        "level": 1,
+        "xp": 0,
+        "stats": {"STR": 8, "DEX": 14, "INT": 18, "CON": 10},
+        "hp_base": 10,
+        "mp_base": 12,
+        "starting_inventory": ["마법 지팡이", "마나 포션"],
+        "controlled_by": "user"
+      },
+      {
+        "id": 2,
+        "name": "",
+        "class": "도적",
+        "race": "인간",
+        "appearance": {"age": "20대 중반", "build": "날씬하고 민첩한 체형", "skin": "약간 그을린 살구색", "hair": "짧은 검은 머리, 한쪽으로 넘김", "face": "날카로운 눈매, 약삭빠른 인상", "outfit": "검은 가죽 갑옷, 허리에 단검 두 자루", "notable": "그림자 속에 녹아드는 듯한 움직임"},
+        "level": 1,
+        "xp": 0,
+        "stats": {"STR": 8, "DEX": 18, "INT": 10, "CON": 14},
+        "hp_base": 15,
+        "mp_base": 5,
+        "starting_inventory": ["단검 x2", "도둑 도구", "밧줄"],
+        "controlled_by": "ai"
+      },
+      {
+        "id": 3,
+        "name": "",
+        "class": "전사",
+        "race": "인간",
+        "appearance": {"age": "20대 후반", "build": "근육질의 건장한 체형", "skin": "구릿빛 피부", "hair": "짧게 깎은 갈색 머리", "face": "강인한 턱선, 투박하지만 믿음직한 인상", "outfit": "쇠사슬 갑옷, 등에 철검, 왼팔에 가죽 방패", "notable": "팔뚝에 오래된 전투 흉터"},
+        "level": 1,
+        "xp": 0,
+        "stats": {"STR": 16, "DEX": 12, "INT": 8, "CON": 14},
+        "hp_base": 25,
+        "mp_base": 5,
+        "starting_inventory": ["철검", "가죽 방패"],
+        "controlled_by": "ai"
+      }
+    ]
+  },
+  "default_npcs": [],
+  "chapters": [
+    {
+      "id": 1,
+      "name": "숲의 입구",
+      "description": "고대 숲으로 들어서는 길. 나무가 빽빽하고 빛이 잘 들지 않는다. 약초와 함정이 곳곳에 있다.",
+      "map_area": "forest_entrance"
+    },
+    {
+      "id": 2,
+      "name": "고대 던전",
+      "description": "숲 깊은 곳의 돌로 된 던전. 오크와 슬라임이 서식하며, 고대 비문과 숨겨진 열쇠가 있다.",
+      "map_area": "ancient_dungeon"
+    },
+    {
+      "id": 3,
+      "name": "보물실",
+      "description": "던전 최심부의 황금 방. 독 가스 함정이 걸린 보물 상자와 수호자 골렘이 기다린다.",
+      "map_area": "treasure_room"
+    },
+    {
+      "id": 4,
+      "name": "에필로그",
+      "description": "보물을 손에 넣고 던전을 탈출한 후. 마을로 귀환하여 다음 여정을 준비한다.",
+      "map_area": "harun_village"
+    }
+  ],
+  "endings": [
+    {"id": "perfect", "condition": "all_alive_with_treasure", "title": "완벽한 승리", "narrative": "세 명의 모험가 모두 살아서 전설의 보물을 가지고 마을로 돌아왔다."},
+    {"id": "pyrrhic", "condition": "treasure_with_casualties", "title": "값비싼 대가", "narrative": "보물은 손에 넣었지만, 대가가 컸다."},
+    {"id": "escape", "condition": "alive_no_treasure", "title": "목숨만 건짐", "narrative": "보물을 포기하고 던전에서 탈출했다. 살아있는 것만으로도 충분하다."}
+  ]
+}

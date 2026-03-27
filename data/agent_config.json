@@ -1,0 +1,10 @@
+{
+  "_comment": "1:1:1 split — Claude:Groq:Local. All Groq agents use 70B (8B has 6K TPM limit too low).",
+  "rule_arbiter":  {"runner": "cloud", "provider": "groq", "model": "llama-3.3-70b-versatile", "fallback": ["local", "claude"]},
+  "worldbuilding": {"runner": "cloud", "provider": "groq", "model": "llama-3.3-70b-versatile", "fallback": ["local", "claude"]},
+  "worldmap":      {"runner": "cloud", "provider": "groq", "model": "llama-3.3-70b-versatile", "fallback": ["local", "claude"]},
+  "npc":           {"runner": "local", "model": "gemma3:12b", "provider": "groq",               "fallback": ["cloud", "claude"]},
+  "player":        {"runner": "local", "model": "gemma3:12b", "provider": "groq",               "fallback": ["cloud", "claude"]},
+  "system":        {"runner": "claude", "model": "sonnet",    "provider": "groq",               "fallback": ["cloud", "local"]},
+  "scenario":      {"runner": "claude", "model": "sonnet",    "provider": "groq",               "fallback": ["cloud", "local"]}
+}

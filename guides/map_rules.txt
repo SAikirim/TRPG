@@ -1,75 +1,75 @@
-맵 관련 규칙 상세
+Map Rules (Detailed)
 ===
-이 파일은 맵 표시 전략, 맵 시스템, 엔티티 표시, 미니맵 크롭, 좌표 기반 거리 시스템을 다룬다.
-맵/위치 관련 에이전트만 이 파일을 읽으면 된다.
-GM 나레이션/웹 반영/주사위/이벤트 등 핵심 규칙은 guides/gm_rules.txt 참조.
+This file covers map display strategy, map system, entity display, minimap cropping, and coordinate-based distance system.
+Only map/location-related agents need to read this file.
+For core rules on GM narration, web rendering, dice, events, etc., refer to guides/gm_rules.txt.
 
-맵 표시 전략
+Map Display Strategy
 ===
-- 위치 정보 제공 시 맵 필수 -- 캐릭터 위치, 이동, 전투 배치 등을 알려줄 때 반드시 맵도 함께 표시
-- 표시 모드 (current_session.json의 display_mode 확인):
-  - "terminal": python ascii_map.py 실행 (ANSI 색상+이모지, 네이티브 터미널용)
-  - "mobile": GM이 직접 이모지 텍스트 맵을 응답에 작성 (Bash 코드 블록 사용 금지, ANSI 코드 깨짐 방지)
+- Map is required when providing location information -- always display a map when conveying character positions, movement, combat placement, etc.
+- Display modes (check display_mode in current_session.json):
+  - "terminal": run python ascii_map.py (ANSI colors + emoji, for native terminal)
+  - "mobile": GM writes emoji text map directly in the response (no Bash code blocks, to prevent ANSI code corruption)
 
-블록맵 (터미널 블록맵)
+Block Map (Terminal Block Map)
 ---
-유저가 "블록맵", "블록맵 출력"이라고 요청할 때만 `python core/ascii_map.py`를 실행한다.
-- 웹 UI를 볼 수 없는 상황에서 유저가 터미널로 맵을 확인하기 위한 용도
-- 매 턴 자동 출력이 아님 — 유저 요청 시에만 실행
-- 웹 UI의 PIL 이미지 맵과는 별개 — 터미널 전용 텍스트 맵
-- show_all(): 맵 + 파티 상태 + 이벤트 로그 한 번에 출력
-- show_emoji_map(): 맵만 출력
+Only run `python core/ascii_map.py` when the user specifically requests "block map" or "show block map".
+- Used for the user to check the map via terminal when the web UI is unavailable
+- Not automatically displayed every turn -- only executed on user request
+- Separate from the PIL image map on web UI -- terminal-only text map
+- show_all(): outputs map + party status + event log all at once
+- show_emoji_map(): outputs map only
 
-mobile 모드 맵 형식 예시:
-  **챕터 N -- 지역명 (턴 T)**
+Mobile mode map format example:
+  **Chapter N -- Area Name (Turn T)**
       14 15 16 17 18 19
   10  .. .. .. .. .. ..
   11  R  G  .. .. .. ..
   12  B  .. X  .. .. ..
-  B 사이키 [14,12] / G 루체나 [15,11] / R 노을 [14,11]
-  X 보물 상자 [16,12]
+  B Psyche [14,12] / G Lucena [15,11] / R Noel [14,11]
+  X Treasure Chest [16,12]
 
-- 전체 맵이 아닌 현재 관련 영역만 잘라서 표시 (토큰 절약)
-- 범례는 맵 아래에 한 줄로 간결하게
-- 자동 감지 불가 -- 세션 시작 시 유저에게 확인하거나 current_session.json의 display_mode 값 사용
-- 웹 UI (http://localhost:5000): PIL 이미지 자동 갱신 (표시 전용)
-- 커스텀 이미지: static/custom/ 폴더에 파일 두면 PIL 생성본 대신 사용
+- Display only the currently relevant area, not the entire map (to save tokens)
+- Legend should be concise, on a single line below the map
+- Cannot be auto-detected -- confirm with the user at session start or use the display_mode value from current_session.json
+- Web UI (http://localhost:5000): PIL image auto-refreshes (display only)
+- Custom images: place files in the static/custom/ folder to use instead of PIL-generated images
 
-맵 시스템
+Map System
 ===
-- worldbuilding.json에 장소별 맵 템플릿 저장 (25x25 타일, tile 40px)
-- current_location 기반 맵 자동 전환, 재방문 시 재활용
-- 전체 맵 (map.png): 모든 타일 표시, 클릭 확대용 (~1000x1000px)
-- 미니맵 (map_mini.png): 플레이어 중심 크롭, 사이드바 표시용 (~412px 너비)
-- 맵 갱신: gm-update 또는 position 변경 시 update_map_image() 자동 호출
+- Map templates per location stored in worldbuilding.json (25x25 tiles, tile 40px)
+- Automatic map switching based on current_location, reused on revisit
+- Full map (map.png): displays all tiles, for click-to-zoom (~1000x1000px)
+- Minimap (map_mini.png): player-centered crop, for sidebar display (~412px width)
+- Map refresh: update_map_image() is automatically called on gm-update or position change
 
-엔티티 표시
+Entity Display
 ===
-- 플레이어: 이모지 아이콘 (⚔️전사, 🔮마법사, 🗡️도적, 🏹궁수, ✝️성직자) + 클래스 색상 배경
-- NPC: 이모지 아이콘 (😊friendly, 👹monster, 👤neutral)
-- 라벨 충돌 회피: 장소 라벨/인물 이름이 아이콘과 겹치면 자동으로 위치 조정
-  - 장소 라벨: 영역 상단 기본, 충돌 시 위로 이동, 반투명 배경 박스
-  - 인물 이름: 아이콘 아래 기본, 충돌 시 위 → 옆으로 유동 배치
-- fled NPC만 맵에서 제외. dead NPC(시체)는 💀 아이콘으로 맵에 표시
-- 시체는 루팅/해체/매장 등 상호작용 가능. 명시적 제거 행동 전까지 맵에 유지
-- 시체 상태: dead → looted (루팅 완료) → 제거는 장소 이동 또는 매장 시에만
-- 다른 location의 NPC는 표시하지 않음
+- Players: emoji icon (⚔️warrior, 🔮mage, 🗡️rogue, 🏹archer, ✝️cleric) + class color background
+- NPCs: emoji icon (😊friendly, 👹monster, 👤neutral)
+- Label collision avoidance: automatically adjust position when location labels/character names overlap with icons
+  - Location labels: default at top of area, move upward on collision, semi-transparent background box
+  - Character names: default below icon, float upward then sideways on collision
+- Only fled NPCs are removed from the map. Dead NPCs (corpses) are displayed on the map with a 💀 icon
+- Corpses can be interacted with (looting/dismantling/burial). They remain on the map until explicitly removed
+- Corpse states: dead → looted → removal only on location change or burial
+- NPCs from other locations are not displayed
 
-미니맵 크롭
+Minimap Cropping
 ===
-- 플레이어 중심 좌표에서 가로 7타일, 세로 5타일 반경 크롭
-- 사이드바 너비(412px)에 맞게 LANCZOS 리사이즈
-- 좌표 표시: 14px Bold, 타일 중앙 배치
-- 웹 사이드바에서 원본 비율 표시 (object-fit 없음)
-- 클릭 시 전체 맵 오버레이 (95vw/95vh)
+- Crop 7 tiles horizontally and 5 tiles vertically from the player's center coordinates
+- LANCZOS resize to fit sidebar width (412px)
+- Coordinate display: 14px Bold, centered on tile
+- Display at original aspect ratio on web sidebar (no object-fit)
+- Click to show full map overlay (95vw/95vh)
 
-좌표 기반 거리 시스템
+Coordinate-Based Distance System
 ===
-- 거리 = 맨하탄 거리 (|x1-x2| + |y1-y2|)
-- 근접 공격: 1칸 이내
-- 원거리 공격: 10칸 (6칸 초과 시 명중 -2)
-- 마법 공격: 8칸
-- 범위 공격 (파이어볼): 반경 2칸 내 모든 대상
-- 이동: 턴당 3칸, 대시 6칸
-- 시각 인식: 8칸, 은신 시 거리 2칸당 DC -1
-- 도주 성공 시 적에게서 3칸 이상 이격 필요
+- Distance = Manhattan distance (|x1-x2| + |y1-y2|)
+- Melee attack: within 1 tile
+- Ranged attack: 10 tiles (hit penalty -2 beyond 6 tiles)
+- Magic attack: 8 tiles
+- Area attack (fireball): all targets within 2-tile radius
+- Movement: 3 tiles per turn, dash 6 tiles
+- Visual perception: 8 tiles, stealth DC -1 per 2 tiles of distance
+- Successful flee requires 3+ tiles of separation from enemy

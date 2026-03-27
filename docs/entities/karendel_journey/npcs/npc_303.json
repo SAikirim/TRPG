@@ -1,6 +1,6 @@
 {
   "id": 303,
-  "name": "후드 인물",
+  "name": "hooded_figure",
   "type": "neutral",
   "status": "fled",
   "location": "crossroads_rest",
@@ -15,18 +15,18 @@
   "memory": {
     "dialogue_history": [],
     "key_events": [
-      "새벽에 쉼터를 몰래 떠남 (turn 23)"
+      "Secretly left the shelter at dawn (turn 23)"
     ]
   },
-  "note": "새벽에 쉼터를 떠남",
+  "note": "Left the shelter at dawn",
   "stats": {
     "STR": 12,
     "DEX": 8,
     "INT": 8,
     "CON": 10
   },
-  "hp": 8,
-  "max_hp": 8,
+  "hp": 15,
+  "max_hp": 15,
   "mp": 0,
   "max_mp": 0,
   "position": [

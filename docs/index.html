@@ -1221,13 +1221,7 @@
         }
 
         function filterNpcNames(text) {
-            if (!gameState || !gameState.npcs) return text;
-            gameState.npcs.forEach(npc => {
-                if (!npc.known && npc.name) {
-                    const regex = new RegExp(npc.name, 'g');
-                    text = text.replace(regex, '???');
-                }
-            });
+            // known: false인 NPC도 특징명(name)을 그대로 표시
             return text;
         }
 
@@ -1373,7 +1367,7 @@
                     data.layers.forEach((layer, idx) => {
                         const posClass = 'pos-' + (layer.position || 'center');
                         const sizeClass = 'size-' + (layer.size_class || 'd2');
-                        const displayName = gameState?.npcs?.find(n => n.name === layer.name)?.known === false ? '???' : (layer.name || '');
+                        const displayName = layer.name || '';
                         if (layer.type === 'portrait') {
                             html += '<div class="portrait-wrapper ' + posClass + ' ' + sizeClass + '">';
                             html += '<span class="layer-name">' + displayName + '</span>';

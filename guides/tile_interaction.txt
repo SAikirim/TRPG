@@ -1,0 +1,137 @@
+Tile & Environment Interaction System
+===
+
+Overview
+===
+Defines how entities interact with tiles, objects, and environmental effects.
+All position changes (movement, pushing, teleportation) must undergo interaction checks.
+
+Entity Overlap Prevention
+===
+- Two entities (players, NPCs) cannot occupy the same tile simultaneously
+- When placing an entity on an occupied tile, automatically relocate to the nearest empty adjacent tile
+- Priority: cardinal directions first (up/down/left/right), then diagonals
+- If all 8 adjacent tiles are occupied, warn the GM and skip placement
+- Objects are an exception: multiple objects can share a tile, and entities can stand on object tiles
+- Exception: entities in dead/fled status do not block tiles
+
+Tile Properties
+===
+Properties that objects and terrain elements can define:
+
+| Property | Type | Description |
+| passable | bool | Whether entry is allowed. Default: true |
+| on_enter | effect | Triggers once when an entity enters the tile |
+| on_stay | effect | Triggers every turn while an entity remains on the tile |
+| on_exit | effect | Triggers when an entity leaves the tile |
+| terrain_modifier | check | Movement check required on entry (e.g., ice DEX check) |
+| element | string | Element type: fire, water, ice, electric, poison, oil, etc. |
+
+Effect format:
+  { "type": "damage/status/check", "value": ..., "stat": ..., "dc": ... }
+
+Examples:
+  Campfire:       { passable: true, on_enter: {type: "damage", element: "fire", value: "1d6"}, element: "fire" }
+  Well:           { passable: false, on_enter: {type: "check", stat: "DEX", dc: 14, fail: "fall_damage_2d6"} }
+  Poison puddle:  { passable: true, on_enter: {type: "status", effect: "poisoned"}, on_stay: {type: "damage", element: "poison", value: "1d4"} }
+  Ice:            { passable: true, terrain_modifier: {stat: "DEX", dc: 12, fail: "prone"}, element: "ice" }
+  Oil puddle:     { passable: true, on_enter: {type: "status", effect: "oiled"}, element: "oil" }
+  Deep water:     { passable: true, on_enter: {type: "status", effect: "wet"}, element: "water" }
+  Shallow water:  { passable: true, on_enter: {type: "status", effect: "wet"}, element: "water" }
+  Trap (hidden):  { passable: true, on_enter: {type: "check", stat: "DEX", dc: 13, fail: "damage_1d8"}, visible: false }
+
+Environmental Status Effects
+===
+Status effects caused by environmental interactions. These stack with combat status effects.
+
+| Status | Duration | Effect |
+| wet | 3 turns or until dried | Electricity vulnerability (+50% damage), cold vulnerability (+50% damage), fire resistance (-50% damage). Removal: fire exposure, 3-turn natural drying |
+| burning | 3 turns or until extinguished | 1d4 fire damage per turn. Removal: water/wet (instant), roll on ground (action + DEX DC 10) |
+| oiled | Until removed | Fire vulnerability (+100% damage). On fire hit: ignites → burning. Removal: water/washing |
+| poisoned | 3 turns | 1d4 poison damage per turn. -2 to all checks. Removal: antidote, healing magic |
+| frozen | 2 turns | Cannot move. Vulnerable to fire (+50%). Physical attacks against frozen targets: +2 to hit |
+| prone | 1 turn | Knocked down. Melee attacks: +2 to hit. Ranged attacks: -2 to hit. Standing up costs half movement |
+| electrified | 1 turn | 1d6 electric damage. If wet: double damage. On CON DC 13 failure: stunned (lose next action) |
+| poisoned | 3 turns | 1d4 poison damage per turn. -2 to all checks. Dispersed by fire, diluted by water (DC -2) |
+| infected | 3 turns | No direct damage. Evolves to diseased after 3 turns if untreated. Cure: disinfect, alcohol, herbs, cure spell |
+| diseased | 10 turns | 1 damage per turn. -1 to all stats. Cure: cure spell, herb treatment, temple |
+| cursed | until dispelled | -2 to all stats. Luck checks at disadvantage. Cure: dispel curse, temple, special item |
+| madness | 3 turns | Random actions each turn (may attack allies). AI takes control. Cure: sedative, sleep, cure spell |
+| blinded | 3 turns | Attack -5, Dodge -3. DEX DC 10 to move or fall prone. Cure: cure spell, natural recovery (3 turns) |
+| petrified | until cured | Cannot act. Defense +10. Risk of shattering from physical damage. Cure: depetrify spell, special potion |
+
+Elemental Interaction Chains
+===
+Chain reactions occur when elements meet status effects or other elements.
+
+[Fire Interactions]
+- Fire + wet entity → half damage, wet removed
+- Fire + oiled entity → double damage, burning applied (3 turns)
+- Fire + oil tile → tile converts to fire tile (spreads to adjacent oil)
+- Fire + ice tile → ice melts → converts to water tile → entities on it become wet
+- Fire + burning entity → no additional effect (already burning)
+- Fire + frozen entity → +50% damage, frozen removed
+
+[Water/Ice Interactions]
+- Water + entity → wet status applied
+- Water + burning entity → burning instantly removed
+- Water + fire tile → fire extinguished, tile converts to steam (1-turn vision block)
+- Water + electricity → electric damage to all entities in water (chain lightning)
+- Cold + water tile → water freezes → converts to ice tile
+- Cold + wet entity → chance of freezing (frozen on CON DC 13 failure)
+
+[Electricity Interactions]
+- Electricity + water tile → 1d6 electric damage to all entities on connected water tiles
+- Electricity + wet entity → double damage (1d6 → 2d6)
+- Electricity + dry entity → normal damage (1d6)
+- Electricity + metal armor → +2 damage
+
+[Poison Interactions]
+- Poison + entity → poisoned status
+- Poison + fire → poison cloud dispersed (removed)
+- Poison + water → poison diluted (DC reduced by 2)
+
+[Oil Interactions]
+- Oil + fire → explosion (2d6 fire damage in radius, fire tile remains)
+- Oil + water → oil floats on water surface (oil effect persists)
+- Oil + entity → oiled status (fire vulnerability)
+
+Disease & Curse Interactions
+===
+[Infection progression]
+- infected (3 turns untreated) → evolves to diseased
+- infected + disinfect/alcohol → cured before progression
+- diseased + temple/cure spell → fully cured
+
+[Curse interactions]
+- cursed + dispel magic → removed
+- cursed + death → curse may transfer to killer (GM discretion)
+- cursed item equipped → cursed status, cannot unequip without dispel
+
+[Petrification interactions]
+- petrified + physical damage exceeding max_hp → entity shatters (permanent death)
+- petrified + depetrify → restored with HP at time of petrification
+- petrified + fire/ice → no effect (stone is immune to temperature)
+
+[Madness interactions]
+- madness + sleep → removed (forced unconsciousness breaks the episode)
+- madness + fear → fear overrides madness (flees instead of random action)
+- madness + ally in range → 50% chance to attack nearest ally on random action
+
+Movement & Terrain Checks
+===
+- Ice: DEX DC 12 on entry. Failure → prone (knocked down, action lost)
+- Steep slope: DEX DC 10 on entry. Failure → slide 1 tile downward
+- Deep water: STR DC 12 swimming check each turn. Failure → drowning begins (1d6 per turn)
+- Debris: double movement cost (moving 1 tile costs 2 tiles of movement)
+- Mud: DEX DC 10 to escape. Failure → feet stuck (cannot move this turn)
+
+Implementation Notes
+===
+- Checks are executed via check_tile_interaction(entity_id, target_pos, state) in game_mechanics.py
+- Returns: {allowed: bool, effects: [...], warnings: [...]}
+- GM must call this function before all position changes
+- Chain reactions are handled recursively (max depth 3 to prevent infinite loops)
+- Environmental effects are applied before combat actions in the same turn
+- Objects define tile properties in entity JSON: "tile_properties": { ... }
+- Terrain elements define properties in worldbuilding.json terrain data

@@ -1,8 +1,8 @@
 {
   "game_info": {
-    "title": "카렌델로 가는 길",
+    "title": "The Road to Karendel",
     "scenario_id": "karendel_journey",
-    "scenario": "전설의 보물을 손에 넣은 세 모험가가 감정을 위해 교역도시 카렌델로 향한다",
+    "scenario": "Having obtained the legendary treasure, three adventurers head to the trade city of Karendel for appraisal",
     "ruleset": "fantasy_basic",
     "difficulty": "normal",
     "stat_pool": 50,
@@ -11,18 +11,18 @@
   },
   "players": [],
   "npcs": [
-    {"id": 300, "name": "할란", "type": "friendly", "stats": {"STR": 10, "DEX": 8, "INT": 14, "CON": 10}, "hp": 8, "max_hp": 12, "mp": 3, "max_mp": 3, "position": [9, 5], "status": "alive", "location": "trade_road_karendel"},
-    {"id": 301, "name": "미라", "type": "friendly", "stats": {"STR": 8, "DEX": 14, "INT": 12, "CON": 10}, "hp": 10, "max_hp": 10, "mp": 5, "max_mp": 5, "position": [10, 5], "status": "alive", "location": "trade_road_karendel"}
+    {"id": 300, "name": "Hallan", "type": "friendly", "stats": {"STR": 10, "DEX": 8, "INT": 14, "CON": 10}, "hp": 8, "max_hp": 12, "mp": 3, "max_mp": 3, "position": [9, 5], "status": "alive", "location": "trade_road_karendel"},
+    {"id": 301, "name": "Mira", "type": "friendly", "stats": {"STR": 8, "DEX": 14, "INT": 12, "CON": 10}, "hp": 10, "max_hp": 10, "mp": 5, "max_mp": 5, "position": [10, 5], "status": "alive", "location": "trade_road_karendel"}
   ],
   "map": {
     "width": 20,
     "height": 10,
     "tile_size": 40,
     "locations": [
-      {"name": "교역로", "type": "road", "area": {"x1": 0, "y1": 3, "x2": 19, "y2": 6}},
-      {"name": "숲 (남쪽)", "type": "grass", "area": {"x1": 0, "y1": 7, "x2": 19, "y2": 9}},
-      {"name": "숲 (북쪽)", "type": "grass", "area": {"x1": 0, "y1": 0, "x2": 19, "y2": 2}},
-      {"name": "수레 정차 지점", "type": "village", "area": {"x1": 8, "y1": 4, "x2": 11, "y2": 5}}
+      {"name": "trade_road", "type": "road", "area": {"x1": 0, "y1": 3, "x2": 19, "y2": 6}},
+      {"name": "forest_south", "type": "grass", "area": {"x1": 0, "y1": 7, "x2": 19, "y2": 9}},
+      {"name": "forest_north", "type": "grass", "area": {"x1": 0, "y1": 0, "x2": 19, "y2": 2}},
+      {"name": "cart_stop", "type": "village", "area": {"x1": 8, "y1": 4, "x2": 11, "y2": 5}}
     ]
   },
   "current_location": "trade_road_karendel",
@@ -30,8 +30,8 @@
   "events": [
     {
       "turn": 0,
-      "message": "세 명의 모험가가 숲의 던전에서 전설의 보물을 손에 넣었다. 정체를 알 수 없는 고대 장식함. 감정을 위해 교역도시 카렌델로 향하던 중, 교역로에서 늑대에게 습격당한 상인 일행을 발견한다.",
-      "timestamp": "게임 시작"
+      "message": "Three adventurers obtained the legendary treasure from the forest dungeon. An ancient ornamental chest of unknown origin. On their way to the trade city of Karendel for appraisal, they discover a merchant party that was attacked by wolves on the trade road.",
+      "timestamp": "Game start"
     }
   ]
 }

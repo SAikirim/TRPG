@@ -1,16 +1,16 @@
 {
   "id": 2,
-  "name": "세라핀",
-  "class": "성직자",
+  "name": "seraphine",
+  "class": "cleric",
   "controlled_by": "ai",
   "agent_id": "agent_b",
   "background": {
-    "origin": "어린 시절 역병으로 마을이 쓸렸고, 혼자 살아남은 이후 치유술을 독학으로 익혀 성직자 길드에 들어왔다.",
-    "motivation": "기적을 기다리기 전에 내가 먼저 손을 쓴다. 신앙심보다 실용성으로 신을 섬긴다.",
-    "personality": "말수는 적은데 판단은 빠르다. 차가워 보이지만 파티원의 상태를 가장 주의 깊게 살핀다.",
+    "origin": "A plague wiped out her village in childhood. After surviving alone, she self-taught healing arts and joined the clergy guild.",
+    "motivation": "Acts before waiting for miracles. Serves the gods with pragmatism over piety.",
+    "personality": "Few words but quick judgment. Appears cold but watches party members' conditions most carefully.",
     "relationships": {
-      "가온": "파티 탱커. 앞에서 버텨주면 내가 뒤에서 커버한다.",
-      "여울": "파티 도적. 무모하게 나서면 힐이 늦을 수 있으니 조심시켜야 한다."
+      "gaon": "Party tank. If he holds the front, I cover from behind.",
+      "yeoul": "Party rogue. Need to warn him — if he charges in recklessly, healing may come late."
     }
   },
   "stats": {
@@ -29,27 +29,27 @@
   ],
   "status_effects": [],
   "inventory": [
-    "철퇴",
-    "성스러운 부적"
+    "mace",
+    "holy_amulet"
   ],
   "equipment": {
     "weapon": {
-      "name": "철퇴",
+      "name": "mace",
       "rarity": "common",
       "properties": {}
     },
     "armor": null,
     "accessory": {
-      "name": "성스러운 부적",
+      "name": "holy_amulet",
       "rarity": "common",
       "properties": {}
     }
   },
   "available_actions": [
-    "공격",
-    "치유",
-    "축복",
-    "정화"
+    "attack",
+    "healing",
+    "blessing",
+    "purify"
   ],
   "combat_state": {
     "is_in_combat": false,
@@ -77,14 +77,14 @@
     "learned_skills": [],
     "xp_log": []
   },
-  "party_role": "후열 힐러/서포터",
+  "party_role": "backline_healer_support",
   "appearance": {
-    "age": "20대 초반",
-    "build": "단정하고 슬림한 체형",
-    "skin": "밝은 피부",
-    "hair": "은빛 머리카락을 단정하게 묶음",
-    "face": "날카롭고 차가운 눈빛, 지적인 인상",
-    "outfit": "청백색 사제복, 가벼운 사슬 갑옷",
-    "notable": "은빛 성흔 목걸이, 손에 낡은 성전"
+    "age": "early 20s",
+    "build": "neat and slim build",
+    "skin": "fair skin",
+    "hair": "silver hair neatly tied back",
+    "face": "sharp and cold gaze, intellectual impression",
+    "outfit": "pale blue-white priestly robes, light chain armor",
+    "notable": "silver holy symbol necklace, worn scripture in hand"
   }
 }

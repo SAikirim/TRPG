@@ -1,7 +1,7 @@
 {
   "id": 2,
-  "name": "루체나",
-  "class": "도적",
+  "name": "lucena",
+  "class": "rogue",
   "level": 3,
   "xp": 315,
   "hp": 30,
@@ -20,15 +20,15 @@
   ],
   "status_effects": [],
   "inventory": [
-    "단검 x2",
-    "도둑 도구",
-    "밧줄"
+    "dual_daggers",
+    "thieves_tools",
+    "rope"
   ],
   "controlled_by": "ai",
   "original_image": "/static/portraits/original/player_2_luchena.png",
   "equipment": {
     "weapon": {
-      "name": "단검 x2",
+      "name": "dual_daggers",
       "rarity": "common",
       "properties": {}
     },
@@ -36,10 +36,10 @@
     "accessory": null
   },
   "available_actions": [
-    "공격",
-    "습격",
-    "도주",
-    "독 바르기"
+    "attack",
+    "ambush",
+    "flee",
+    "poison_apply"
   ],
   "growth": {
     "level": 3,
@@ -47,31 +47,31 @@
     "xp_to_next": 600,
     "stat_points_available": 0,
     "learned_skills": [
-      "독 바르기"
+      "poison_apply"
     ],
     "xp_log": [
       {
-        "source": "오크 처치 (high)",
+        "source": "orc kill (high)",
         "amount": 60
       },
       {
-        "source": "챕터1 완료",
+        "source": "chapter 1 complete",
         "amount": 100
       },
       {
-        "source": "함정 해제 (퍼즐)",
+        "source": "trap disarm (puzzle)",
         "amount": 25
       },
       {
-        "source": "보물 상자 획득 (퀘스트)",
+        "source": "treasure chest obtained (quest)",
         "amount": 50
       },
       {
-        "source": "탐색/RP (숲, 던전, 비문)",
+        "source": "exploration/RP (forest, dungeon, inscription)",
         "amount": 50
       },
       {
-        "source": "늑대 처치 (medium)",
+        "source": "wolf kill (medium)",
         "amount": 30
       }
     ]
@@ -80,25 +80,25 @@
     "actions_taken": [
       {
         "turn": 3,
-        "action": "습격",
-        "target": "어두운 오크",
-        "roll": "자동명중(은신)",
+        "action": "ambush",
+        "target": "dark orc",
+        "roll": "auto hit (stealth)",
         "damage": 14,
-        "result": "처치"
+        "result": "killed"
       },
       {
         "turn": 7,
-        "action": "함정 해제",
-        "target": "보물 상자 독 가스 함정",
-        "roll": "성공",
+        "action": "trap disarm",
+        "target": "treasure chest poison gas trap",
+        "roll": "success",
         "damage": 0,
-        "result": "함정 해제 완료"
+        "result": "trap disarmed"
       }
     ],
     "damage_dealt_total": 14,
     "damage_received_total": 0,
     "kills": [
-      "어두운 오크"
+      "dark orc"
     ],
     "items_used": [],
     "turns_played": 2

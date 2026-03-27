@@ -1,15 +1,8 @@
 {
   "scenario_id": "karendel_journey",
   "first_played": "2026-03-21 03:50:21",
-  "total_saves": 7,
+  "total_saves": 21,
   "history": [
-    {
-      "slot": 1,
-      "chapter": 1,
-      "turn": 21,
-      "description": "턴20 갈림길 쉼터 정차 논의 — 할란/미라/짐말 동행 중",
-      "saved_at": "2026-03-22 00:00:00"
-    },
     {
       "slot": 1,
       "chapter": 2,
@@ -51,9 +44,107 @@
       "turn": 24,
       "description": "",
       "saved_at": "2026-03-25 10:13:24"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-25 21:04:40"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-25 21:36:13"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-25 22:07:43"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-25 22:15:47"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-25 22:24:18"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-25 22:29:12"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-25 22:31:39"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "turn28 trade road - mira conversation",
+      "saved_at": "2026-03-26 00:19:24"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-27 22:41:55"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-27 22:52:49"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "미라와 대화 테스트",
+      "saved_at": "2026-03-27 22:52:53"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-27 22:53:44"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "미라와 대화",
+      "saved_at": "2026-03-27 22:53:48"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "미라와 대화",
+      "saved_at": "2026-03-27 22:54:42"
     }
   ],
-  "last_played": "2026-03-25 10:13:24",
+  "last_played": "2026-03-27 22:54:42",
   "last_chapter": 2,
   "last_turn": 24
 }

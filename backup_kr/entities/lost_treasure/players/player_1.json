@@ -1,0 +1,89 @@
+{
+  "id": 1,
+  "name": "가온",
+  "class": "전사",
+  "controlled_by": "ai",
+  "agent_id": "agent_a",
+  "background": {
+    "origin": "용병 출신. 파티를 여럿 잃은 뒤 혼자 일했는데, 이번에 다시 팀을 꾸리게 됐다.",
+    "motivation": "동료를 지키는 것이 최고의 전략이라는 걸 몸으로 배웠다. 이번에는 아무도 잃지 않겠다.",
+    "personality": "말이 없고 먼저 움직이는 타입. 전략을 짜는 건 머릿속에서만 하고, 실행은 몸으로 보여준다.",
+    "relationships": {
+      "세라핀": "파티 힐러. 뒤를 맡길 수 있는 사람.",
+      "여울": "파티 도적. 앞에서 막아줘야 할 대상."
+    }
+  },
+  "stats": {
+    "hp": 33,
+    "max_hp": 33,
+    "mp": 5,
+    "max_mp": 5,
+    "STR": 18,
+    "DEX": 10,
+    "INT": 6,
+    "CON": 16
+  },
+  "position": [
+    12,
+    11
+  ],
+  "status_effects": [],
+  "inventory": [
+    "철검",
+    "가죽 방패"
+  ],
+  "equipment": {
+    "weapon": {
+      "name": "철검",
+      "rarity": "common",
+      "properties": {}
+    },
+    "armor": {
+      "name": "쇠사슬 갑옷",
+      "rarity": "common",
+      "properties": {}
+    },
+    "accessory": null
+  },
+  "available_actions": [
+    "공격",
+    "방어",
+    "도발"
+  ],
+  "combat_state": {
+    "is_in_combat": false,
+    "defense_bonus": 0,
+    "next_turn_penalty": 0
+  },
+  "history": {
+    "actions_taken": [],
+    "damage_dealt_total": 0,
+    "damage_received_total": 0,
+    "kills": [],
+    "items_used": [],
+    "turns_played": 0
+  },
+  "conditions": {
+    "alive": true,
+    "conscious": true,
+    "death_save_turns": 0
+  },
+  "growth": {
+    "level": 1,
+    "xp": 0,
+    "xp_to_next": 100,
+    "stat_points_available": 0,
+    "learned_skills": [],
+    "xp_log": []
+  },
+  "party_role": "전열 탱커/근접딜",
+  "appearance": {
+    "age": "20대 중반",
+    "build": "단단하고 다부진 체형",
+    "skin": "햇볕에 그을린 피부",
+    "hair": "짧게 자른 흑발",
+    "face": "날카로운 눈빛, 과묵한 인상",
+    "outfit": "낡은 쇠사슬 갑옷, 등에 철검, 왼팔에 가죽 방패",
+    "notable": "갑옷 위로 드러난 오래된 흉터"
+  }
+}

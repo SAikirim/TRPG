@@ -1,13 +1,16 @@
 {
   "id": "obj_003",
-  "name": "장작더미",
+  "name": "firewood_pile",
   "type": "resource",
   "status": "available",
-  "position": [13, 13],
+  "position": [
+    13,
+    13
+  ],
   "location": "crossroads_rest",
-  "description": "노을이 모은 장작 한 아름. 모닥불 옆에 쌓여 있다.",
+  "description": "An armful of firewood gathered by Noel. Stacked next to the campfire.",
   "interactable": true,
-  "interaction": "모닥불에 장작을 추가할 수 있다.",
+  "interaction": "Can add firewood to the campfire.",
   "icon": "🔶",
   "tactical": {
     "cover": "half",
@@ -16,6 +19,6 @@
     "destructible": true,
     "hp": 8,
     "flammable": true,
-    "description": "장작더미 뒤에 반 엄폐. 가연성 — 불 붙으면 주변에 화상 피해."
+    "description": "Half cover behind the firewood pile. Flammable — causes burn damage to surroundings if ignited."
   }
 }

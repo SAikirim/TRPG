@@ -1,12 +1,12 @@
 {
-  "description": "세계관 목록. 시나리오에서 worldbuilding 필드로 참조한다.",
+  "description": "Worldbuilding catalog. Referenced by scenarios via the worldbuilding field.",
   "worldbuildings": [
     {
       "id": "karendel_world",
-      "name": "카렌델 세계",
-      "description": "검과 마법이 공존하는 중세 판타지 세계. 하룬 마을, 카렌델 교역도시 등.",
+      "name": "Karendel World",
+      "description": "A medieval fantasy world where sword and magic coexist. Includes Harun Village, Karendel trade city, etc.",
       "file": "worldbuildings/karendel_world.json",
-      "genre": "판타지"
+      "genre": "fantasy"
     }
   ]
 }

@@ -408,6 +408,16 @@ def new_game(scenario_id, skip_mode_select=False, party=None):
     # 세계관 활성화 (worldbuildings/ → data/worldbuilding.json)
     _activate_worldbuilding(scenario_entry)
 
+    # 세계 지도 지형 검증
+    try:
+        from core.worldmap_agent import check_and_warn as worldmap_check
+        worldmap_warnings = worldmap_check(state)
+        if worldmap_warnings:
+            for w in worldmap_warnings:
+                print(f"  [WARN] 세계지도: {w}")
+    except Exception as e:
+        print(f"  [WARN] 세계지도 검증 실패: {e}")
+
     # 맵 생성
     try:
         from core.map_generator import MapGenerator
@@ -541,6 +551,9 @@ def continue_game(scenario_id, from_scenario):
 
     print(f"\n  [OK] '{from_scenario}' 에서 캐릭터 데이터 이어받기 완료")
     _print_state_summary(state)
+
+    # Flask 장면 복원 시도
+    _try_restore_scene()
 
     # 정적 웹 동기화 (캐리오버 데이터 반영)
     _sync_docs()
@@ -1107,6 +1120,58 @@ def _activate_worldbuilding(scenario_entry):
         print(f"  [WARN] 세계관 파일 없음: {wb_file}")
 
 
+def _start_flask_server():
+    """Flask 서버가 미실행이면 백그라운드로 자동 시작."""
+    import socket
+    # 포트 5000 점유 확인
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.settimeout(1)
+        s.connect(("localhost", 5000))
+        s.close()
+        return True  # 이미 실행 중
+    except (ConnectionRefusedError, OSError):
+        pass
+    finally:
+        s.close()
+
+    # Flask 서버 백그라운드 시작
+    import subprocess
+    sd_python = r"C:\git\WebUI\stable-diffusion-webui\venv\Scripts\Python.exe"
+    if not os.path.exists(sd_python):
+        print(f"  [WARN] SD venv Python 없음: {sd_python}")
+        return False
+
+    try:
+        subprocess.Popen(
+            [sd_python, "app.py"],
+            cwd=BASE_DIR,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
+        )
+        # 서버 준비 대기 (최대 10초)
+        import time
+        for i in range(20):
+            time.sleep(0.5)
+            try:
+                s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s2.settimeout(1)
+                s2.connect(("localhost", 5000))
+                s2.close()
+                print(f"  [OK] Flask 서버 자동 시작 완료 (localhost:5000)")
+                return True
+            except (ConnectionRefusedError, OSError):
+                continue
+            finally:
+                s2.close()
+        print(f"  [WARN] Flask 서버 시작 대기 시간 초과 (10초)")
+        return False
+    except Exception as e:
+        print(f"  [WARN] Flask 서버 시작 실패: {e}")
+        return False
+
+
 def _try_restore_scene(scenario_id=None, slot=None):
     """Flask 서버가 실행 중이면 /api/load를 호출하여 장면+맵 복원."""
     try:
@@ -1142,8 +1207,39 @@ def _try_restore_scene(scenario_id=None, slot=None):
         else:
             print(f"  [INFO] 웹 UI 장면 복원: 브라우저 새로고침 필요")
     except Exception as e:
-        print(f"  [INFO] Flask 서버 미실행 또는 복원 실패: {e}")
-        print(f"         start_server.bat 실행 시 자동 복원됩니다.")
+        # Flask 미실행 — 자동 시작 시도
+        if _start_flask_server():
+            # 시작 성공 후 장면 복원 재시도
+            try:
+                import urllib.request
+                if scenario_id and slot is not None:
+                    import json as _json
+                    slot_num = slot
+                    if isinstance(slot, str):
+                        slot_num = slot.replace("slot_", "")
+                        try:
+                            slot_num = int(slot_num)
+                        except ValueError:
+                            slot_num = slot
+                    payload = _json.dumps({"scenario_id": scenario_id, "slot": slot_num}).encode("utf-8")
+                    req2 = urllib.request.Request(
+                        "http://localhost:5000/api/load",
+                        data=payload,
+                        headers={"Content-Type": "application/json"},
+                        method="POST"
+                    )
+                    resp = urllib.request.urlopen(req2, timeout=10)
+                    result = _json.loads(resp.read().decode("utf-8"))
+                    if result.get("success"):
+                        print(f"  [OK] 웹 UI 장면 + 맵 복원 완료")
+                    else:
+                        print(f"  [WARN] 웹 UI 복원 응답: {result}")
+                else:
+                    print(f"  [INFO] 웹 UI 장면 복원: 브라우저 새로고침 필요")
+            except Exception as e2:
+                print(f"  [WARN] Flask 시작 후 장면 복원 실패: {e2}")
+        else:
+            print(f"  [WARN] Flask 서버 자동 시작 실패. 수동 실행 필요: start_server.bat")
 
 
 def _print_state_summary(state):

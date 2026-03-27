@@ -130,6 +130,8 @@ def create_npc_entity(npc_data, state=None):
             "dialogue_history": [],
             "key_events": []
         }),
+        "description": npc_data.get("description", ""),
+        "known": npc_data.get("known", False),
     }
 
     # 몬스터면 전투 스탯 포함
@@ -143,13 +145,25 @@ def create_npc_entity(npc_data, state=None):
         entity["threat_level"] = npc_data.get("threat_level", "medium")
         entity["position"] = npc_data.get("position", [0, 0])
 
-    # friendly NPC면 HP만
-    if npc_type == "friendly":
+    else:
+        # 비몬스터 NPC도 game_state의 HP/stats 복사
         if npc_data.get("hp") or npc_data.get("max_hp"):
-            entity["stats"] = {
-                "hp": npc_data.get("hp", 10),
-                "max_hp": npc_data.get("max_hp", 10),
-            }
+            entity["hp"] = npc_data.get("hp", npc_data.get("max_hp", 10))
+            entity["max_hp"] = npc_data.get("max_hp", 10)
+        if npc_data.get("stats"):
+            entity["stats"] = npc_data["stats"]
+        if npc_data.get("attack") is not None:
+            entity["attack"] = npc_data["attack"]
+        if npc_data.get("defense") is not None:
+            entity["defense"] = npc_data["defense"]
+        if npc_data.get("position"):
+            entity["position"] = npc_data.get("position", [0, 0])
+        if npc_data.get("race"):
+            entity["race"] = npc_data["race"]
+        if npc_data.get("note"):
+            entity["note"] = npc_data["note"]
+        if npc_data.get("threat_level"):
+            entity["threat_level"] = npc_data["threat_level"]
 
     # 추가 필드 병합 (personality 등 커스텀 데이터)
     for key in ("conditions", "equipment", "inventory"):
@@ -294,6 +308,37 @@ def get_move_range(position, max_distance, state):
                 if new_pos[0] >= 0 and new_pos[1] >= 0:
                     valid.append(new_pos)
     return valid
+
+
+def _find_nearest_empty(position, entity_id, state):
+    """Find nearest empty tile around *position* that no other entity occupies.
+
+    Returns [x, y] of the nearest unoccupied tile, or None if nothing found
+    within a reasonable radius (search up to Manhattan distance 5).
+    """
+    occupied = set()
+    for p in state.get("players", []):
+        if p.get("id") != entity_id:
+            pos = p.get("position")
+            if pos:
+                occupied.add(tuple(pos))
+    for n in state.get("npcs", []):
+        if n.get("id") != entity_id and n.get("status") not in ("dead", "fled", "gone"):
+            pos = n.get("position")
+            if pos:
+                occupied.add(tuple(pos))
+
+    # BFS-like expansion by Manhattan distance
+    for dist in range(1, 6):
+        for dx in range(-dist, dist + 1):
+            dy_abs = dist - abs(dx)
+            for dy in [dy_abs, -dy_abs] if dy_abs != 0 else [0]:
+                candidate = [position[0] + dx, position[1] + dy]
+                if candidate[0] < 0 or candidate[1] < 0:
+                    continue
+                if tuple(candidate) not in occupied:
+                    return candidate
+    return None
 
 
 def check_detection(observer_pos, target_pos, observer_int=10):
@@ -1431,38 +1476,235 @@ def get_last_result():
     return None
 
 
-# ─── 위험 타일 시스템 ───
+# ─── 타일 상호작용 시스템 ───
 
-def check_hazard_tile(entity_id, new_position, state):
-    """엔티티가 위험 타일 위로 이동했는지 확인하고 상태이상 적용"""
-    HAZARD_TILES = {
-        '모닥불': '화상',
-        '용암': '화상',
-        '독늪': '중독',
+def check_tile_interaction(entity_id, target_pos, state=None):
+    """Check tile interaction when entity moves to target_pos.
+    Returns: {allowed: bool, effects: [...], warnings: [...]}
+    """
+    if state is None:
+        state = load_game_state()
+
+    results = {"allowed": True, "effects": [], "warnings": []}
+    target_pos = list(target_pos)
+
+    # 1. Entity overlap check
+    overlap = _check_entity_overlap(target_pos, entity_id, state)
+    if overlap:
+        alt_pos = _find_nearest_empty(target_pos, entity_id, state)
+        if alt_pos:
+            results["warnings"].append(f"Position {target_pos} occupied by {overlap}. Relocated to {alt_pos}.")
+            target_pos = alt_pos
+        else:
+            results["allowed"] = False
+            results["warnings"].append(f"Position {target_pos} occupied. No adjacent empty tile.")
+            return results
+
+    # 2. Check object tile properties at target
+    objects = _get_objects_at(target_pos, state)
+    for obj in objects:
+        props = obj.get("tile_properties", {})
+
+        # Passable check
+        if not props.get("passable", True):
+            results["allowed"] = False
+            results["warnings"].append(f"Tile blocked by {obj.get('name', '?')}.")
+            return results
+
+        # Terrain modifier (movement check)
+        tm = props.get("terrain_modifier")
+        if tm:
+            results["effects"].append({
+                "type": "check",
+                "stat": tm["stat"],
+                "dc": tm["dc"],
+                "fail_effect": tm.get("fail", "none"),
+                "source": obj.get("name", "?")
+            })
+
+        # On-enter effect
+        on_enter = props.get("on_enter")
+        if on_enter:
+            results["effects"].append({
+                **on_enter,
+                "source": obj.get("name", "?"),
+                "trigger": "on_enter"
+            })
+
+    # 3. Check map location hazards (legacy support)
+    map_info = state.get("map", {})
+    for loc in map_info.get("locations", []):
+        area = loc.get("area", {})
+        if (area.get("x1") == area.get("x2") == target_pos[0] and
+            area.get("y1") == area.get("y2") == target_pos[1]):
+            hazard = _check_location_hazard(loc)
+            if hazard:
+                results["effects"].append(hazard)
+
+    results["final_position"] = target_pos
+    return results
+
+
+def _check_entity_overlap(pos, exclude_id, state):
+    """Check if any living entity occupies the position."""
+    for p in state.get("players", []):
+        if p.get("id") != exclude_id and p.get("position") == list(pos):
+            return p.get("name", f"player_{p['id']}")
+    for n in state.get("npcs", []):
+        if n.get("id") != exclude_id and n.get("status") not in ("dead", "fled", "gone"):
+            if n.get("position") == list(pos):
+                return n.get("name", f"npc_{n['id']}")
+    return None
+
+
+def _find_nearest_empty(pos, exclude_id, state):
+    """Find nearest empty adjacent tile. Cardinal first, then diagonal."""
+    directions = [(0,-1),(0,1),(-1,0),(1,0),(-1,-1),(1,-1),(-1,1),(1,1)]
+    for dx, dy in directions:
+        candidate = [pos[0]+dx, pos[1]+dy]
+        if not _check_entity_overlap(candidate, exclude_id, state):
+            return candidate
+    return None
+
+
+def _get_objects_at(pos, state):
+    """Get objects at the given position."""
+    scenario_id = state.get("game_info", {}).get("scenario_id", "")
+    if not scenario_id:
+        return []
+    obj_dir = os.path.join(BASE_DIR, "entities", scenario_id, "objects")
+    if not os.path.isdir(obj_dir):
+        return []
+
+    objects = []
+    current_loc = state.get("current_location", "")
+    for fname in os.listdir(obj_dir):
+        if not fname.endswith(".json"):
+            continue
+        try:
+            with open(os.path.join(obj_dir, fname), "r", encoding="utf-8") as f:
+                obj = json.load(f)
+            obj_loc = obj.get("location", "")
+            if current_loc and obj_loc and obj_loc != current_loc:
+                continue
+            if obj.get("position") == list(pos):
+                objects.append(obj)
+        except Exception:
+            pass
+    return objects
+
+
+def _check_location_hazard(loc):
+    """Legacy hazard check from map locations."""
+    HAZARD_MAP = {
+        "모닥불": {"type": "damage", "element": "fire", "value": "1d6", "source": loc.get("name", "?")},
+        "용암": {"type": "damage", "element": "fire", "value": "2d6", "source": loc.get("name", "?")},
+        "독늪": {"type": "status", "effect": "poisoned", "source": loc.get("name", "?")},
     }
+    name = loc.get("name", "")
+    for keyword, effect in HAZARD_MAP.items():
+        if keyword in name:
+            return effect
+    return None
 
-    map_info = state.get('map', {})
-    locations = map_info.get('locations', [])
 
-    for loc in locations:
-        area = loc.get('area', {})
-        # 단일 타일만 체크
-        if area.get('x1') != area.get('x2') or area.get('y1') != area.get('y2'):
+def process_elemental_chain(element, target_entity, target_pos, state, depth=0):
+    """Process elemental chain reactions. Max depth 3.
+    Returns list of additional effects."""
+    if depth >= 3:
+        return []
+
+    effects = []
+    entity_status = []
+
+    # Get entity's current status effects
+    for p in state.get("players", []):
+        if p.get("id") == target_entity:
+            entity_status = [s.get("name", "") if isinstance(s, dict) else s for s in p.get("status_effects", [])]
+            break
+    else:
+        for n in state.get("npcs", []):
+            if n.get("id") == target_entity:
+                entity_status = [s.get("name", "") if isinstance(s, dict) else s for s in n.get("status_effects", [])]
+                break
+
+    # Fire interactions
+    if element == "fire":
+        if "wet" in entity_status:
+            effects.append({"type": "modifier", "damage_mult": 0.5, "remove_status": "wet", "desc": "Wet reduces fire damage by 50%, wet removed"})
+        if "oiled" in entity_status:
+            effects.append({"type": "modifier", "damage_mult": 2.0, "apply_status": "burning", "remove_status": "oiled", "desc": "Oiled doubles fire damage, ignited"})
+        if "frozen" in entity_status:
+            effects.append({"type": "modifier", "damage_mult": 1.5, "remove_status": "frozen", "desc": "Fire melts frozen, +50% damage"})
+
+    # Electric interactions
+    elif element == "electric":
+        if "wet" in entity_status:
+            effects.append({"type": "modifier", "damage_mult": 2.0, "desc": "Wet doubles electric damage"})
+        # Check if on water tile - chain to all entities in water
+        water_entities = _get_entities_in_connected_water(target_pos, state)
+        for eid in water_entities:
+            if eid != target_entity:
+                effects.append({"type": "chain_damage", "target": eid, "element": "electric", "value": "1d6", "desc": f"Chain lightning via water to entity {eid}"})
+
+    # Cold interactions
+    elif element == "cold":
+        if "wet" in entity_status:
+            effects.append({"type": "freeze_check", "stat": "CON", "dc": 13, "on_fail": "frozen", "desc": "Wet + cold: CON DC 13 or frozen"})
+
+    # Water interactions
+    elif element == "water":
+        if "burning" in entity_status:
+            effects.append({"type": "remove_status", "status": "burning", "desc": "Water extinguishes burning"})
+        effects.append({"type": "apply_status", "status": "wet", "desc": "Water applies wet"})
+
+    return effects
+
+
+def _get_entities_in_connected_water(pos, state):
+    """Get all entity IDs standing on water tiles connected to pos."""
+    water_entities = []
+    objects = _get_objects_at(pos, state)
+    is_water = any(o.get("tile_properties", {}).get("element") == "water" for o in objects)
+    if not is_water:
+        return []
+
+    for p in state.get("players", []):
+        p_objs = _get_objects_at(p.get("position", []), state)
+        if any(o.get("tile_properties", {}).get("element") == "water" for o in p_objs):
+            water_entities.append(p["id"])
+    for n in state.get("npcs", []):
+        if n.get("status") in ("dead", "fled"):
             continue
-        if [area['x1'], area['y1']] != list(new_position):
-            continue
+        n_objs = _get_objects_at(n.get("position", []), state)
+        if any(o.get("tile_properties", {}).get("element") == "water" for o in n_objs):
+            water_entities.append(n["id"])
 
-        name = loc.get('name', '')
-        for keyword, effect_name in HAZARD_TILES.items():
-            if keyword in name:
-                return {
-                    'hazard': True,
-                    'tile': name,
-                    'effect': effect_name,
-                    'entity_id': entity_id,
-                    'message': f'{name} 위로 이동! {effect_name} 상태이상 적용.'
-                }
+    return water_entities
 
+
+# Legacy wrapper for backward compatibility
+def check_hazard_tile(entity_id, new_position, state):
+    """Legacy wrapper: delegates to check_tile_interaction."""
+    result = check_tile_interaction(entity_id, new_position, state)
+    # Convert to old format for backward compatibility
+    for eff in result.get("effects", []):
+        if eff.get("type") == "damage" and eff.get("element") == "fire":
+            return {
+                'hazard': True,
+                'tile': eff.get("source", "?"),
+                'effect': '화상',
+                'entity_id': entity_id,
+                'message': f'{eff.get("source", "?")} 위로 이동! 화상 상태이상 적용.'
+            }
+        elif eff.get("type") == "status" and eff.get("effect") == "poisoned":
+            return {
+                'hazard': True,
+                'tile': eff.get("source", "?"),
+                'effect': '중독',
+                'entity_id': entity_id,
+                'message': f'{eff.get("source", "?")} 위로 이동! 중독 상태이상 적용.'
+            }
     return {'hazard': False}
 
 
@@ -1488,66 +1730,94 @@ def turn_start_check(state=None):
     results = {
         "action": "turn_start_check",
         "hazards": [],
+        "tile_interactions": [],
         "status_ticks": [],
         "knockouts": [],
     }
 
-    # 1. 환경 효과: 플레이어 위치 → 위험 타일 체크
+    # 1. 환경 효과: check_tile_interaction으로 통합 처리
+    all_entities = []
     for p in state["players"]:
-        pos = p.get("position")
-        if not pos:
-            continue
-        hazard = check_hazard_tile(p["id"], pos, state)
-        if hazard.get("hazard"):
-            # 상태이상 적용 (중복 체크)
-            effect_name = hazard["effect"]
-            existing = [e.get("name") if isinstance(e, dict) else e
-                       for e in p.get("status_effects", [])]
-            if effect_name not in existing:
-                # status_effects.json에서 기본 지속시간 가져오기
-                try:
-                    se_path = os.path.join(BASE_DIR, "data", "status_effects.json")
-                    se_data = _load_json(se_path)
-                    duration = se_data.get("effects", {}).get(effect_name, {}).get("duration", 2)
-                except Exception:
-                    duration = 2
-                _apply_status(p, effect_name, duration)
-                hazard["applied"] = True
-                hazard["entity_name"] = p["name"]
-            else:
-                hazard["applied"] = False
-                hazard["entity_name"] = p["name"]
-                hazard["message"] = f'{p["name"]}이(가) 이미 {effect_name} 상태.'
-            results["hazards"].append(hazard)
-
-    # NPC도 동일하게 체크
+        if p.get("position"):
+            all_entities.append(p)
     for n in state.get("npcs", []):
-        if n.get("status") == "dead":
-            continue
-        pos = n.get("position")
-        if not pos:
-            continue
-        hazard = check_hazard_tile(n["id"], pos, state)
-        if hazard.get("hazard"):
-            effect_name = hazard["effect"]
-            existing = [e.get("name") if isinstance(e, dict) else e
-                       for e in n.get("status_effects", [])]
-            if effect_name not in existing:
-                try:
-                    se_path = os.path.join(BASE_DIR, "data", "status_effects.json")
-                    se_data = _load_json(se_path)
-                    duration = se_data.get("effects", {}).get(effect_name, {}).get("duration", 2)
-                except Exception:
-                    duration = 2
-                if "status_effects" not in n:
-                    n["status_effects"] = []
-                _apply_status(n, effect_name, duration)
-                hazard["applied"] = True
-                hazard["entity_name"] = n["name"]
-            else:
-                hazard["applied"] = False
-                hazard["entity_name"] = n["name"]
-            results["hazards"].append(hazard)
+        if n.get("status") not in ("dead", "fled", "gone") and n.get("position"):
+            all_entities.append(n)
+
+    for entity in all_entities:
+        pos = entity.get("position")
+        eid = entity.get("id")
+        tile_result = check_tile_interaction(eid, pos, state)
+
+        if tile_result.get("effects"):
+            interaction_entry = {
+                "entity_id": eid,
+                "entity_name": entity.get("name", "?"),
+                "position": pos,
+                "effects": tile_result["effects"],
+                "warnings": tile_result.get("warnings", []),
+            }
+
+            # Process each effect
+            for eff in tile_result["effects"]:
+                eff_type = eff.get("type")
+
+                # Damage effects → apply status (legacy behavior)
+                if eff_type == "damage":
+                    element = eff.get("element", "")
+                    # Map element to Korean status name for legacy compatibility
+                    status_map = {"fire": "화상", "poison": "중독"}
+                    effect_name = status_map.get(element, element)
+                    existing = [e.get("name") if isinstance(e, dict) else e
+                               for e in entity.get("status_effects", [])]
+                    if effect_name not in existing:
+                        try:
+                            se_path = os.path.join(BASE_DIR, "data", "status_effects.json")
+                            se_data = _load_json(se_path)
+                            duration = se_data.get("effects", {}).get(effect_name, {}).get("duration", 2)
+                        except Exception:
+                            duration = 2
+                        if "status_effects" not in entity:
+                            entity["status_effects"] = []
+                        _apply_status(entity, effect_name, duration)
+                        interaction_entry["applied"] = True
+                    else:
+                        interaction_entry["applied"] = False
+
+                    # Process elemental chain reactions
+                    chains = process_elemental_chain(element, eid, pos, state)
+                    if chains:
+                        interaction_entry["chain_effects"] = chains
+
+                # Status effects → apply directly
+                elif eff_type == "status":
+                    effect_name = eff.get("effect", "")
+                    existing = [e.get("name") if isinstance(e, dict) else e
+                               for e in entity.get("status_effects", [])]
+                    if effect_name not in existing:
+                        try:
+                            se_path = os.path.join(BASE_DIR, "data", "status_effects.json")
+                            se_data = _load_json(se_path)
+                            duration = se_data.get("effects", {}).get(effect_name, {}).get("duration", 2)
+                        except Exception:
+                            duration = 2
+                        if "status_effects" not in entity:
+                            entity["status_effects"] = []
+                        _apply_status(entity, effect_name, duration)
+                        interaction_entry["applied"] = True
+                    else:
+                        interaction_entry["applied"] = False
+
+            results["tile_interactions"].append(interaction_entry)
+
+            # Also add to hazards for backward compatibility
+            results["hazards"].append({
+                "hazard": True,
+                "entity_id": eid,
+                "entity_name": entity.get("name", "?"),
+                "effects": tile_result["effects"],
+                "applied": interaction_entry.get("applied", False),
+            })
 
     # 2. 상태이상 tick (기존 tick_status_effects 로직 재활용)
     tick_result = tick_status_effects(state)
@@ -1946,6 +2216,7 @@ def main():
         print("  [NPC]")
         print("  npcs                   NPC 엔티티 목록")
         print("  check_npcs             누락 엔티티 검증 + 자동 생성")
+        print("  check_tile <id> <x> <y>  타일 상호작용 검사")
         print()
         print("  [장비]")
         print("  equip                  파티 장비 상태")
@@ -2040,6 +2311,16 @@ def main():
                 print(f"  ✅ 생성: npc_{c['id']}.json — {c['name']}")
         else:
             print("  모든 NPC 엔티티 정상")
+
+    elif cmd == "check_tile":
+        # check_tile <entity_id> <x> <y>
+        if len(sys.argv) < 5:
+            print("Usage: check_tile <entity_id> <x> <y>")
+            sys.exit(1)
+        eid = int(sys.argv[2])
+        tx, ty = int(sys.argv[3]), int(sys.argv[4])
+        result = check_tile_interaction(eid, [tx, ty])
+        print(json.dumps(result, ensure_ascii=False, indent=2))
 
     elif cmd == "equip":
         state = load_game_state()

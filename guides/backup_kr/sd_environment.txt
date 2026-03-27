@@ -1,0 +1,41 @@
+SD WebUI 환경
+===
+
+경로 및 실행
+===
+| 항목         | 값                                                          |
+| 경로         | C:\git\WebUI\stable-diffusion-webui\                        |
+| venv Python  | C:\git\WebUI\stable-diffusion-webui\venv\Scripts\Python.exe |
+| API 주소     | http://127.0.0.1:7860                                       |
+| GPU          | RTX 3070 Ti 8GB                                             |
+| 본체 버전    | v1.10.1 (82a973c0)                                          |
+| torch        | 2.1.2+cu121                                                 |
+| xformers     | 0.0.23.post1                                                |
+
+실행 명령:
+  ./venv/Scripts/Python.exe launch.py --theme dark --xformers --xformers-flash-attention --deepdanbooru --no-half-vae --api --cors-allow-origins="http://127.0.0.1:7860" --listen --enable-insecure-extension-access
+
+모델, VAE, 확장 목록
+===
+- 활성 체크포인트: dreamshaper_8.safetensors (세미리얼 판타지 올라운더)
+- VAE: vae-ft-mse-840000-ema-pruned.safetensors
+- CLIP skip: 2
+- 모델 37개, LoRA 152개, 임베딩 3개 (bad_prompt_version2, badhandv4, EasyNegativeV2)
+
+SDXL 모델 (월드맵 전용)
+===
+- 체크포인트: sd_xl_base_1.0.safetensors (SDXL 1.0)
+- LoRA: fantasy map-heavy.safetensors (Fantasy Map Heavy, 218MB)
+- 트리거: "fantasy map"
+- 용도: 월드맵 배경 생성 시에만 사용. 생성 후 dreamshaper_8로 자동 복귀.
+- 해상도: 1024x1024 (VRAM 부족 시 768x768 폴백)
+- denoising_strength: 0.65
+
+확장 (활성 17개):
+ControlNet, ADetailer, DDSD, Dynamic Thresholding, Dynamic Prompts, TagComplete, Random, Civitai Helper, multidiffusion-upscaler, haku-img, localization-ko, easy-prompt-selector, two-shot, ebsynth, AR, infinity-grid, AnimateDiff
+
+호환성 수정 파일
+===
+- extensions/sd-webui-ddsd/scripts/ddsd.py: upscaler_index 문자열/정수 호환 처리
+- venv/lib/site-packages/pixeloe/torch/utils.py: torch.compile try/except 폴백
+- haku-img 확장: torch.compile 폴백

@@ -1,13 +1,16 @@
 {
   "id": "obj_002",
-  "name": "물통",
+  "name": "water_barrel",
   "type": "container",
   "status": "full",
-  "position": [13, 11],
+  "position": [
+    13,
+    11
+  ],
   "location": "crossroads_rest",
-  "description": "미라가 우물에서 채운 물통 두 개. 나무로 만든 통에 뚜껑이 덮여 있다.",
+  "description": "Two water barrels filled by Mira from the well. Wooden barrels with lids.",
   "interactable": true,
-  "interaction": "물을 마실 수 있다. 물통을 가져갈 수도 있다.",
+  "interaction": "Can drink water. Can take the water barrel.",
   "icon": "💦",
   "tactical": {
     "cover": "half",
@@ -17,6 +20,6 @@
     "hp": 10,
     "flammable": false,
     "special": "extinguish_fire",
-    "description": "물통 뒤에 숨으면 반 엄폐. 불을 끄는 데 사용 가능."
+    "description": "Half cover behind the water barrel. Can be used to extinguish fires."
   }
 }

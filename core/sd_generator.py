@@ -399,11 +399,24 @@ def _appearance_to_prompt(entity):
     return prompt
 
 
+def _get_ko_name_sd(en_name):
+    """ko.json에서 영어→한국어 이름 변환 (sd_generator용)."""
+    ko_path = os.path.join(BASE_DIR, "lang", "ko.json")
+    try:
+        with open(ko_path, "r", encoding="utf-8") as f:
+            ko = json.load(f)
+        return ko.get("npcs", {}).get(en_name, "") or ko.get("creatures", {}).get(en_name, "")
+    except Exception:
+        return ""
+
+
 def _find_existing_image(illustration_type, name):
-    """Check if a reusable image already exists for this name."""
+    """Check if a reusable image already exists for this name.
+    Searches both English and Korean (ko.json) names."""
     if not name:
         return None
     safe_name = name.replace(" ", "_")
+    ko_name = _get_ko_name_sd(name)
 
     # Check SD images first (higher quality)
     search_dirs = []
@@ -412,14 +425,18 @@ def _find_existing_image(illustration_type, name):
     else:
         search_dirs = [SD_ILLUSTRATIONS_DIR, os.path.join(BASE_DIR, "static", "illustrations", "pixel")]
 
+    search_names = [safe_name.lower()]
+    if ko_name:
+        search_names.append(ko_name.lower())
+
     for search_dir in search_dirs:
         if not os.path.exists(search_dir):
             continue
         for f in os.listdir(search_dir):
             fname_lower = f.lower()
-            name_lower = safe_name.lower()
-            if name_lower in fname_lower and (f.endswith(".webp") or f.endswith(".png")):
-                return os.path.join(search_dir, f)
+            for try_name in search_names:
+                if try_name in fname_lower and (f.endswith(".webp") or f.endswith(".png")):
+                    return os.path.join(search_dir, f)
     return None
 
 

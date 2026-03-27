@@ -3,107 +3,142 @@
   "archived_events": [
     {
       "turn": 0,
-      "message": "새 시나리오: 카렌델로 가는 길. 교역로에서 상인 할란, 미라와 동행 중.",
-      "timestamp": "시나리오 시작",
+      "message": "New scenario: The Road to Karendel. Traveling with merchant Hallan and Mira on the trade road.",
+      "timestamp": "scenario start",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 2,
-      "message": "[GM] [로드] 카렌델로 가는 길 — 챕터 1: 교역로. 상인 할란, 미라와 동행 중.",
+      "message": "[GM] [Load] The Road to Karendel — Chapter 1: Trade Road. Traveling with merchant Hallan and Mira.",
       "narrative": "",
       "timestamp": "19:07:38",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 3,
-      "message": "[GM] [로드] 카렌델로 가는 길 — 교역로, 상인 할란/미라와 동행 중.",
+      "message": "[GM] [Load] The Road to Karendel — Trade road, traveling with merchant Hallan/Mira.",
       "narrative": "",
       "timestamp": "21:31:11",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 4,
-      "message": "[GM] [로드] 카렌델로 가는 길 — 교역로, 상인 할란/미라와 동행 중.",
+      "message": "[GM] [Load] The Road to Karendel — Trade road, traveling with merchant Hallan/Mira.",
       "narrative": "",
       "timestamp": "21:54:38",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 5,
-      "message": "[GM] 출발 준비 완료. 수레 수리됨. 할란의 다리 부상으로 이동 속도 느림.",
-      "narrative": "수레 바퀴 수리가 끝났다. 할란이 다리를 절며 수레에 올라탔다. 미라가 짐을 정리하며 파티를 돌아보았다. \"이제 출발할 수 있어요. 카렌델까지 하루 정도... 아버지 다리 때문에 좀 느릴 거예요.\" 교역로 동쪽으로 길이 이어진다. 해가 아직 높다.",
+      "message": "[GM] Departure preparations complete. Cart repaired. Hallan's leg injury slows travel speed.",
+      "narrative": "The cart wheel repair was finished. Hallan limped onto the cart. Mira organized the luggage and looked at the party. \"We can leave now. About a day to Karendel... it'll be a bit slow because of father's leg.\" The road continues east along the trade route. The sun is still high.",
       "timestamp": "22:26:04",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 6,
-      "message": "[GM] 출발 준비. 사이키가 노을에게 땅에 떨어진 물건을 챙기자고 한다. 할란과 미라가 반응한다.",
-      "narrative": "할란이 수레에서 고개를 돌렸다. \"그거? 늑대가 짓밟은 거라 상품 가치는 없어. 챙길 거면 챙겨.\" 잠시 뜸을 들이더니 덧붙였다. \"...진짜 쓸만한 건 이미 수레에 실었으니까. 도와줘서 고맙다.\" 미라가 가방을 뒤지더니 작은 약병 하나를 꺼내 노을에게 건넸다. \"이건 아버지 치료하려고 가져온 건데, 하나 남았어요. 도와줘서 감사한 마음이에요.\" 노을이 약병을 받으며 고개를 끄덕였다. 땅에 흩어진 물건들 — 찢어진 천 조각, 깨진 도자기 파편, 으깨진 건과일 몇 줌. 쓸만한 것은 거의 없었지만, 노을이 꼼꼼히 뒤지자 밧줄 한 타래와 부싯돌 하나가 나왔다.",
+      "message": "[GM] Departure preparation. Saiki suggests to Noel to pick up items dropped on the ground. Hallan and Mira react.",
+      "narrative": "Hallan turned from the cart. \"That stuff? Got trampled by wolves, so it's worthless as merchandise. Take it if you want.\" He paused, then added, \"...The actually useful stuff is already on the cart. Thanks for the help.\" Mira rummaged through her bag and pulled out a small vial, handing it to Noel. \"I brought this to treat father, but there's one left. It's a thank-you for your help.\" Noel nodded as he took the vial. Scattered on the ground were torn cloth scraps, broken pottery shards, and a few handfuls of crushed dried fruit. Hardly anything useful, but as Noel searched thoroughly, he found a coil of rope and a flint.",
       "timestamp": "22:36:53",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 7,
-      "message": "[GM] [테스트] 짐말 초상화 재생성",
+      "message": "[GM] [Test] Pack horse portrait regeneration",
       "narrative": "",
       "timestamp": "23:52:13",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 8,
-      "message": "[GM] [재생성] 짐말 초상화",
+      "message": "[GM] [Regeneration] Pack horse portrait",
       "narrative": "",
       "timestamp": "23:55:19",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 9,
-      "message": "[GM] [재생성] 짐말 초상화 (배경 제거 테스트)",
+      "message": "[GM] [Regeneration] Pack horse portrait (background removal test)",
       "narrative": "",
       "timestamp": "00:00:42",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 10,
-      "message": "[GM] [재생성] 짐말 초상화 (배경 제거 테스트)",
+      "message": "[GM] [Regeneration] Pack horse portrait (background removal test)",
       "narrative": "",
       "timestamp": "00:02:09",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 11,
-      "message": "[GM] [재생성] 짐말 초상화 (배경 제거 테스트)",
+      "message": "[GM] [Regeneration] Pack horse portrait (background removal test)",
       "narrative": "",
       "timestamp": "00:03:56",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 12,
-      "message": "[GM] [재생성] 짐말 초상화 (배경 제거 테스트)",
+      "message": "[GM] [Regeneration] Pack horse portrait (background removal test)",
       "narrative": "",
       "timestamp": "00:07:37",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 13,
-      "message": "[GM] 일행이 마차에 올라타 교역로를 따라 카렌델로 출발한다.",
-      "narrative": "할란이 고삐를 잡고 마차에 올랐다. 다친 왼쪽 다리를 조심스럽게 접으며 자리를 잡더니, 짐말의 등을 한 번 툭 쳤다. 짐말이 콧바람을 불며 느릿느릿 걷기 시작했다.\n\n미라가 마차 뒤쪽에서 짐을 정리하며 밝은 목소리로 말했다.\n\"갈림길 쉼터에서 하룻밤 자면, 내일 오후면 카렌델에 도착할 거예요. 오늘은 해가 지기 전에 쉼터에서 야영하는 게 좋을 것 같아요.\"\n\n할란이 짧게 끄덕였다.\n\"...순풍이면 내일 오후엔 닿는다.\"\n\n교역로 양쪽으로 참나무 숲이 이어졌다. 바람이 나뭇잎을 흔들고, 새소리가 들렸다. 수레바퀴가 흙길 위에서 덜컹거리며 앞으로 나아갔다. 평화로운 오후였다.",
+      "message": "[GM] The party boards the cart and departs along the trade road toward Karendel.",
+      "narrative": "Hallan took the reins and climbed onto the cart. He carefully folded his injured left leg and settled in, then patted the pack horse's back once. The horse snorted and began plodding forward.\n\nMira organized the luggage from the back of the cart and said cheerfully,\n\"If we stay the night at the crossroads rest stop, we'll arrive at Karendel by tomorrow afternoon. I think it's best to camp at the rest stop before sunset.\"\n\nHallan nodded briefly.\n\"...With good winds, we'll get there by tomorrow afternoon.\"\n\nOak forests stretched along both sides of the trade road. Wind rustled the leaves, and birdsong could be heard. The cart wheels rattled along the dirt path, moving forward. It was a peaceful afternoon.",
       "timestamp": "00:28:51",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 14,
-      "message": "[GM] 늑대 시체 해체. 고기와 가죽을 할란에게 전달.",
-      "narrative": "노을이 능숙하게 늑대 시체를 해체했다. 가죽 한 장과 고기 몇 점이 나왔다. 할란이 고개를 끄덕이며 받아들었다. \"고맙다. 카렌델에서 팔면 몇 닢은 되겠군.\" 미라가 고기를 천으로 감싸 수레에 실었다. \"오늘 저녁은 고기 구이네요!\"",
+      "message": "[GM] Wolf carcass butchered. Meat and hide given to Hallan.",
+      "narrative": "Noel skillfully butchered the wolf carcass. A hide and some cuts of meat were produced. Hallan nodded and accepted them. \"Thanks. Should fetch a few coins at Karendel.\" Mira wrapped the meat in cloth and loaded it onto the cart. \"Grilled meat for dinner tonight!\"",
       "timestamp": "00:35:11",
       "archived_at": "2026-03-25"
     },
     {
       "turn": 15,
-      "message": "[GM] 사이키가 루체나와 자리를 바꾼다.",
-      "narrative": "루체나가 자리를 옮기며 씩 웃었다. \"뭐야, 갑자기? 경치가 더 좋은 쪽이 있어?\"",
+      "message": "[GM] Saiki switches seats with Lucena.",
+      "narrative": "Lucena grinned as she moved to the new seat. \"What, suddenly? Is the view better on that side?\"",
       "timestamp": "00:46:59",
       "archived_at": "2026-03-25"
+    },
+    {
+      "turn": 16,
+      "message": "[GM] Saiki says \"I have something to experiment with\" and switches seats with Lucena again.",
+      "narrative": "Saiki spoke to Lucena. \"I have something to experiment with.\" Lucena blinked and moved aside. \"Again? What is it, tell me.\"\n\nAfter switching seats on the cart, Saiki ended up sitting next to Mira. Mira tilted her head curiously. \"An experiment? Something magic-related?\"\n\nHallan glanced back while holding the reins. \"...You're not going to blow something up on the cart, are you?\"",
+      "timestamp": "02:15:36",
+      "archived_at": "2026-03-27"
+    },
+    {
+      "turn": 17,
+      "message": "[GM] Saiki asked about the distance to Karendel. Hallan explains the terrain.",
+      "narrative": "Saiki looked around. Oak forests still stretched along both sides of the trade road.\n\nHallan gestured with his chin toward a signpost by the road while holding the reins.\n\"...See that fork up ahead? That's the halfway point. Head south from there and you reach the port; keep going east and it's Karendel.\"\n\nMira looked up at the sky and said,\n\"Once the sun drops a bit more, we'll arrive at the crossroads rest stop. We'll stay the night there, and by tomorrow afternoon, we'll see Karendel's gates.\"\n\nHallan added briefly,\n\"...As long as we don't run into bandits or beasts.\"",
+      "timestamp": "02:20:52",
+      "archived_at": "2026-03-27"
+    },
+    {
+      "turn": 18,
+      "message": "[GM] Saiki asked about directions. Hallan explains the crossroads geography in detail.",
+      "narrative": "Hallan nodded while gripping the reins.\n\"That's roughly right. This trade road goes straight east and then turns at the crossroads. From there, go left — that is, north — and you reach Karendel.\"\n\nMira chimed in.\n\"The south road goes down toward the coast. There's a port town there... what was its name again.\"\n\nHallan answered briefly.\n\"...Seren. A small fishing harbor. You can take a ship from there along the coast to western cities, but we have no business there.\"\n\nThe cart rattled forward. Ahead on the trade road, the point where the path splits into two was faintly coming into view.",
+      "timestamp": "15:43:08",
+      "archived_at": "2026-03-27"
+    },
+    {
+      "turn": 19,
+      "message": "[GM] Saiki takes a short rest on the cart. MP 37→40 recovered.",
+      "narrative": "Saiki pulled his robe tighter and leaned against one side of the cart. Closing his eyes and steadying his breath, the faintly scattered mana began to slowly gather back into his body.\n\nMira glanced sideways at him briefly, then turned her gaze forward.\n\nLucena sat on the edge of the cart with her legs dangling, chewing on a fruit.\n\"Don't fall off while you sleep. Old man Hallan won't stop for you.\"\n\nHallan snorted without looking back.\n\"...If you fall, you'll wake up.\"\n\nThe cart slowly continued east along the trade road. Wind rustled the leaves, and the afternoon sun was warm.",
+      "timestamp": "15:49:39",
+      "archived_at": "2026-03-27"
+    },
+    {
+      "turn": 20,
+      "message": "[GM] Saiki asked about stopping at the crossroads rest stop. Hallan explains practical reasons.",
+      "narrative": "Hallan thought for a moment while gripping the reins, then spoke.\n\"...I understand the hurry, but there are reasons.\"\n\nHallan counted on his fingers.\n\"First, the pack horse is tired. We came all the way from Harun without stopping. If the horse collapses, the cart stops too.\"\n\"Second, the road from the crossroads to Karendel has mountain paths mixed in. If a wheel gets stuck in the dark, we're done for.\"\n\"Third...\" Hallan lowered his voice. \"Merchants always gather at the crossroads rest stop. If there's a group heading to Karendel together, it's safer.\"\n\nMira chimed in.\n\"And the rest stop has a well. We need to refill the water barrel too.\"\n\nHallan added briefly.\n\"...Of course, it's your call. If you want to travel through the night, I won't stop you, but I wouldn't recommend it.\"",
+      "timestamp": "18:24:35",
+      "archived_at": "2026-03-27"
     }
   ]
 }

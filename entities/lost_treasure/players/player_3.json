@@ -1,16 +1,16 @@
 {
   "id": 3,
-  "name": "여울",
-  "class": "도적",
+  "name": "yeoul",
+  "class": "rogue",
   "controlled_by": "ai",
   "agent_id": "agent_c",
   "background": {
-    "origin": "시장 골목에서 잔뼈가 굵었다. 손버릇보다 입버릇이 더 나쁘다는 소리를 들으며 컸다.",
-    "motivation": "보물이 있다면 가야지. 위험? 그게 재밌잖아.",
-    "personality": "위험한 상황일수록 오히려 실실 웃는 타입. 겁이 없는 건지, 겁을 숨기는 게 습관이 된 건지 본인도 모른다.",
+    "origin": "Grew up hardened in market alleys. Was told his mouth was worse than his sticky fingers.",
+    "motivation": "If there's treasure, gotta go. Danger? That's the fun part.",
+    "personality": "The type who grins more in dangerous situations. Doesn't know if he's fearless or just used to hiding fear.",
     "relationships": {
-      "가온": "파티 탱커. 든든하긴 한데 너무 딱딱해. 좀 풀어줘야 해.",
-      "세라핀": "파티 힐러. 잔소리 많지만 결국 다 챙겨주는 타입."
+      "gaon": "Party tank. Reliable but too stiff. Need to loosen him up.",
+      "seraphine": "Party healer. Nags a lot but always takes care of everyone in the end."
     }
   },
   "stats": {
@@ -29,28 +29,28 @@
   ],
   "status_effects": [],
   "inventory": [
-    "단검 x2",
-    "도둑 도구",
-    "밧줄"
+    "dual_daggers",
+    "thieves_tools",
+    "rope"
   ],
   "equipment": {
     "weapon": {
-      "name": "단검 x2",
+      "name": "dual_daggers",
       "rarity": "common",
       "properties": {}
     },
     "armor": {
-      "name": "가죽 갑옷",
+      "name": "leather_armor",
       "rarity": "common",
       "properties": {}
     },
     "accessory": null
   },
   "available_actions": [
-    "공격",
-    "습격",
-    "도주",
-    "함정 탐지"
+    "attack",
+    "ambush",
+    "flee",
+    "trap_detect"
   ],
   "combat_state": {
     "is_in_combat": false,
@@ -78,14 +78,14 @@
     "learned_skills": [],
     "xp_log": []
   },
-  "party_role": "중열 기습/유틸",
+  "party_role": "midline_ambush_utility",
   "appearance": {
-    "age": "20대 초반",
-    "build": "가볍고 민첩한 체형",
-    "skin": "약간 그을린 피부",
-    "hair": "짧게 자른 흑발, 날카로운 눈매",
-    "face": "비실비실 웃는 입꼬리, 약삭빠른 인상",
-    "outfit": "다크그린 레더아머, 허리에 단검 두 자루",
-    "notable": "그림자 속에 녹아드는 듯한 움직임"
+    "age": "early 20s",
+    "build": "light and agile build",
+    "skin": "slightly tanned skin",
+    "hair": "short-cropped black hair, sharp eyes",
+    "face": "sly smirk, cunning impression",
+    "outfit": "dark green leather armor, two daggers at the waist",
+    "notable": "movements that seem to melt into shadows"
   }
 }

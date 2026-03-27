@@ -1,147 +1,294 @@
 {
-  "description": "생물체 템플릿. 몬스터, 동물, 소환수 등 새 NPC 생성 시 이 템플릿을 기반으로 개별 변형(이름, 능력치 ±, 성격)을 적용한다.",
+  "description": "Creature templates. Base templates for monsters, animals, and summons. Individual variations (name, stat adjustments, personality) are applied on top when creating new NPCs.",
   "templates": {
-    "늑대": {
-      "race": "늑대",
+    "wolf": {
+      "race": "wolf",
       "type": "monster",
       "tier": "weak",
-      "stats": {"STR": 12, "DEX": 14, "INT": 4, "CON": 10},
+      "stats": {
+        "STR": 12,
+        "DEX": 14,
+        "INT": 4,
+        "CON": 10
+      },
       "hp_base": 15,
       "mp_base": 0,
       "attacks": {
-        "물기": {"damage": "1d6 + STR", "range": 1, "desc": "날카로운 이빨로 물어뜯기"}
+        "bite": {
+          "damage": "1d6 + STR",
+          "range": 1,
+          "desc": "Bite with sharp teeth"
+        }
       },
       "defense": 11,
       "speed": 5,
-      "behavior": "무리 사냥. 약한 대상을 집중 공격. HP 30% 이하 시 도주.",
-      "drops": ["늑대 가죽", "늑대 이빨"],
+      "behavior": "Pack hunter. Focuses on weak targets. Flees when HP below 30%.",
+      "drops": [
+        "wolf_hide",
+        "wolf_fang"
+      ],
       "xp": 30,
-      "appearance": {"build": "날렵한 회색 늑대", "notable": "노란 눈, 날카로운 이빨"}
+      "appearance": {
+        "build": "Sleek gray wolf",
+        "notable": "Yellow eyes, sharp teeth"
+      }
     },
-    "오크": {
-      "race": "오크",
+    "orc": {
+      "race": "orc",
       "type": "monster",
       "tier": "strong",
-      "stats": {"STR": 16, "DEX": 8, "INT": 6, "CON": 14},
+      "stats": {
+        "STR": 16,
+        "DEX": 8,
+        "INT": 6,
+        "CON": 14
+      },
       "hp_base": 25,
       "mp_base": 0,
       "attacks": {
-        "도끼 휘두르기": {"damage": "1d8 + STR", "range": 1, "desc": "거대한 도끼로 내려치기"},
-        "돌진": {"damage": "1d6 + STR", "range": 2, "desc": "돌진 후 타격. 사용 후 1턴 행동 불가"}
+        "axe_swing": {
+          "damage": "1d8 + STR",
+          "range": 1,
+          "desc": "Slam down with a massive axe"
+        },
+        "charge": {
+          "damage": "1d6 + STR",
+          "range": 2,
+          "desc": "Charge and strike. Cannot act for 1 turn after use"
+        }
       },
       "defense": 13,
       "speed": 3,
-      "behavior": "공격적. 가장 가까운 적을 공격. 도주하지 않음.",
-      "drops": ["오크의 도끼", "오크 가죽"],
+      "behavior": "Aggressive. Attacks nearest enemy. Never flees.",
+      "drops": [
+        "orc_axe",
+        "orc_hide"
+      ],
       "xp": 80,
-      "appearance": {"build": "거대하고 근육질", "skin": "짙은 녹색 피부", "notable": "송곳니, 전투 흉터"}
+      "appearance": {
+        "build": "Massive and muscular",
+        "skin": "Dark green skin",
+        "notable": "Tusks, battle scars"
+      }
     },
-    "슬라임": {
-      "race": "슬라임",
+    "slime": {
+      "race": "slime",
       "type": "monster",
       "tier": "weak",
-      "stats": {"STR": 6, "DEX": 10, "INT": 14, "CON": 8},
+      "stats": {
+        "STR": 6,
+        "DEX": 10,
+        "INT": 14,
+        "CON": 8
+      },
       "hp_base": 15,
       "mp_base": 10,
       "attacks": {
-        "산성 촉수": {"damage": "1d6 + INT", "range": 2, "desc": "산성 촉수로 공격"},
-        "마법 방울": {"damage": "1d4 + INT", "range": 6, "desc": "마법 에너지 탄환 발사"}
+        "acid_tentacle": {
+          "damage": "1d6 + INT",
+          "range": 2,
+          "desc": "Attack with acid tentacles"
+        },
+        "magic_droplet": {
+          "damage": "1d4 + INT",
+          "range": 6,
+          "desc": "Fire a magic energy projectile"
+        }
       },
       "defense": 8,
       "speed": 2,
-      "behavior": "느리지만 마법 공격. HP 50% 이하 시 분열 시도.",
-      "drops": ["슬라임 젤리", "마나 결정"],
+      "behavior": "Slow but uses magic attacks. Attempts to split when HP below 50%.",
+      "drops": [
+        "slime_jelly",
+        "mana_crystal"
+      ],
       "xp": 50,
-      "appearance": {"build": "반투명 젤리 형태", "notable": "푸른 빛, 내부에 핵이 보임"}
+      "appearance": {
+        "build": "Semi-transparent jelly form",
+        "notable": "Blue glow, core visible inside"
+      }
     },
-    "골렘": {
-      "race": "골렘",
+    "golem": {
+      "race": "golem",
       "type": "monster",
       "tier": "boss",
-      "stats": {"STR": 18, "DEX": 6, "INT": 4, "CON": 18},
+      "stats": {
+        "STR": 18,
+        "DEX": 6,
+        "INT": 4,
+        "CON": 18
+      },
       "hp_base": 40,
       "mp_base": 0,
       "attacks": {
-        "돌 주먹": {"damage": "1d10 + STR", "range": 1, "desc": "거대한 돌 주먹으로 내려치기"},
-        "지진": {"damage": "1d6", "range": 0, "aoe": 3, "desc": "주변 3칸 모두에게 피해. 2턴 쿨다운"}
+        "stone_fist": {
+          "damage": "1d10 + STR",
+          "range": 1,
+          "desc": "Slam down with a massive stone fist"
+        },
+        "earthquake": {
+          "damage": "1d6",
+          "range": 0,
+          "aoe": 3,
+          "desc": "Damages all within 3 tiles. 2-turn cooldown"
+        }
       },
       "defense": 16,
       "speed": 2,
-      "behavior": "느리지만 강력. 보물 수호. 도주하지 않음. 범위 공격 사용.",
-      "drops": ["룬 조각", "마법석"],
+      "behavior": "Slow but powerful. Guards treasure. Never flees. Uses AoE attacks.",
+      "drops": [
+        "rune_fragment",
+        "magic_stone"
+      ],
       "xp": 200,
-      "appearance": {"build": "거대한 돌 인형", "notable": "빛나는 주황 눈, 고대 룬 문양"}
+      "appearance": {
+        "build": "Massive stone golem",
+        "notable": "Glowing orange eyes, ancient rune patterns"
+      }
     },
-    "고블린": {
-      "race": "고블린",
+    "goblin": {
+      "race": "goblin",
       "type": "monster",
       "tier": "weak",
-      "stats": {"STR": 8, "DEX": 14, "INT": 10, "CON": 8},
+      "stats": {
+        "STR": 8,
+        "DEX": 14,
+        "INT": 10,
+        "CON": 8
+      },
       "hp_base": 10,
       "mp_base": 2,
       "attacks": {
-        "단검 찌르기": {"damage": "1d4 + DEX", "range": 1, "desc": "작은 단검으로 빠르게 찌르기"}
+        "dagger_stab": {
+          "damage": "1d4 + DEX",
+          "range": 1,
+          "desc": "Quick stab with a small dagger"
+        }
       },
       "defense": 12,
       "speed": 4,
-      "behavior": "교활. 무리로 공격. HP 40% 이하 시 도주. 함정 설치.",
-      "drops": ["동전 주머니", "녹슨 단검"],
+      "behavior": "Cunning. Attacks in groups. Flees when HP below 40%. Sets traps.",
+      "drops": [
+        "coin_pouch",
+        "rusty_dagger"
+      ],
       "xp": 20,
-      "appearance": {"build": "작고 날쌘 체형", "skin": "초록 피부", "notable": "뾰족한 귀, 교활한 눈"}
+      "appearance": {
+        "build": "Small and agile build",
+        "skin": "Green skin",
+        "notable": "Pointed ears, cunning eyes"
+      }
     },
-    "산적": {
-      "race": "인간",
+    "bandit": {
+      "race": "human",
       "type": "monster",
       "tier": "medium",
-      "stats": {"STR": 12, "DEX": 12, "INT": 10, "CON": 12},
+      "stats": {
+        "STR": 12,
+        "DEX": 12,
+        "INT": 10,
+        "CON": 12
+      },
       "hp_base": 18,
       "mp_base": 2,
       "attacks": {
-        "검 공격": {"damage": "1d6 + STR", "range": 1, "desc": "낡은 검으로 베기"},
-        "석궁": {"damage": "1d6 + DEX", "range": 8, "desc": "석궁 사격"}
+        "sword_attack": {
+          "damage": "1d6 + STR",
+          "range": 1,
+          "desc": "Slash with an old sword"
+        },
+        "crossbow": {
+          "damage": "1d6 + DEX",
+          "range": 8,
+          "desc": "Crossbow shot"
+        }
       },
       "defense": 13,
       "speed": 3,
-      "behavior": "금품 요구. 수가 불리하면 도주. 항복 가능.",
-      "drops": ["동전 주머니", "낡은 검", "석궁 볼트"],
+      "behavior": "Demands valuables. Flees when outnumbered. Can surrender.",
+      "drops": [
+        "coin_pouch",
+        "old_sword",
+        "crossbow_bolt"
+      ],
       "xp": 60,
-      "appearance": {"build": "다양", "outfit": "낡은 가죽 갑옷, 두건", "notable": "흉터, 험악한 인상"}
+      "appearance": {
+        "build": "Varies",
+        "outfit": "Worn leather armor, hood",
+        "notable": "Scars, menacing appearance"
+      }
     },
-    "짐말": {
-      "race": "말",
+    "pack_horse": {
+      "race": "horse",
       "type": "friendly",
       "tier": "animal",
-      "stats": {"STR": 16, "DEX": 12, "INT": 2, "CON": 14},
+      "stats": {
+        "STR": 16,
+        "DEX": 12,
+        "INT": 2,
+        "CON": 14
+      },
       "hp_base": 20,
       "mp_base": 0,
       "attacks": {
-        "발차기": {"damage": "1d8 + STR", "range": 1, "desc": "뒷발로 강하게 차기"},
-        "돌진": {"damage": "1d10 + STR", "range": 2, "desc": "전력 돌진. 사용 후 1턴 행동 불가", "cooldown": 1}
+        "kick": {
+          "damage": "1d8 + STR",
+          "range": 1,
+          "desc": "Powerful rear kick"
+        },
+        "charge": {
+          "damage": "1d10 + STR",
+          "range": 2,
+          "desc": "Full charge. Cannot act for 1 turn after use",
+          "cooldown": 1
+        }
       },
       "defense": 12,
       "speed": 6,
-      "behavior": "온순. 주인을 따름. 포식자에 겁먹음. 위협 시 발차기 반격.",
+      "behavior": "Docile. Follows owner. Frightened by predators. Counterattacks with kick when threatened.",
       "drops": [],
       "xp": 0,
-      "appearance": {"build": "튼튼한 짐말 체형", "skin": "갈색 털", "notable": "온순한 눈, 마구 착용"}
+      "appearance": {
+        "build": "Sturdy pack horse build",
+        "skin": "Brown coat",
+        "notable": "Gentle eyes, wearing harness"
+      }
     },
-    "군마": {
-      "race": "말",
+    "war_horse": {
+      "race": "horse",
       "type": "friendly",
       "tier": "animal",
-      "stats": {"STR": 18, "DEX": 14, "INT": 3, "CON": 16},
+      "stats": {
+        "STR": 18,
+        "DEX": 14,
+        "INT": 3,
+        "CON": 16
+      },
       "hp_base": 30,
       "mp_base": 0,
       "attacks": {
-        "발차기": {"damage": "1d8 + STR", "range": 1, "desc": "강력한 뒷발차기"},
-        "돌진": {"damage": "2d6 + STR", "range": 3, "desc": "기수와 함께 전력 돌진", "cooldown": 1}
+        "kick": {
+          "damage": "1d8 + STR",
+          "range": 1,
+          "desc": "Powerful rear kick"
+        },
+        "charge": {
+          "damage": "2d6 + STR",
+          "range": 3,
+          "desc": "Full charge with rider",
+          "cooldown": 1
+        }
       },
       "defense": 14,
       "speed": 8,
-      "behavior": "훈련됨. 전투에 겁먹지 않음. 기수의 명령에 따름.",
+      "behavior": "Trained. Unfazed by combat. Follows rider's commands.",
       "drops": [],
       "xp": 0,
-      "appearance": {"build": "크고 근육질인 군마", "skin": "검은 털", "notable": "전투 마구, 갑옷 장착 가능"}
+      "appearance": {
+        "build": "Large and muscular war horse",
+        "skin": "Black coat",
+        "notable": "Battle harness, can be armored"
+      }
     }
   }
 }

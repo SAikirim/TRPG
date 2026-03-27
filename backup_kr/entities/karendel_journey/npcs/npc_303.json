@@ -1,0 +1,36 @@
+{
+  "id": 303,
+  "name": "후드 인물",
+  "type": "neutral",
+  "status": "fled",
+  "location": "crossroads_rest",
+  "personality": {
+    "temperament": "neutral",
+    "intelligence": "medium",
+    "behavior_pattern": "",
+    "speech_style": "",
+    "motivation": ""
+  },
+  "relationships": {},
+  "memory": {
+    "dialogue_history": [],
+    "key_events": [
+      "새벽에 쉼터를 몰래 떠남 (turn 23)"
+    ]
+  },
+  "note": "새벽에 쉼터를 떠남",
+  "stats": {
+    "STR": 12,
+    "DEX": 8,
+    "INT": 8,
+    "CON": 10
+  },
+  "hp": 15,
+  "max_hp": 15,
+  "mp": 0,
+  "max_mp": 0,
+  "position": [
+    14,
+    13
+  ]
+}

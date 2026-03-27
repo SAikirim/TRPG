@@ -1,7 +1,7 @@
 {
   "id": 3,
-  "name": "노을",
-  "class": "전사",
+  "name": "noel",
+  "class": "warrior",
   "level": 3,
   "xp": 315,
   "hp": 45,
@@ -20,32 +20,32 @@
   ],
   "status_effects": [],
   "inventory": [
-    "가죽 방패",
-    "오크의 도끼",
-    "상처 치료 약병"
+    "leather_shield",
+    "orc_axe",
+    "wound_treatment_vial"
   ],
   "controlled_by": "ai",
   "original_image": "/static/portraits/original/player_3_noeul.png",
   "equipment": {
     "weapon": {
-      "name": "오크의 도끼",
+      "name": "orc_axe",
       "rarity": "uncommon",
       "properties": {
         "attack_bonus": 1
       }
     },
     "armor": {
-      "name": "가죽 방패",
+      "name": "leather_shield",
       "rarity": "common",
       "properties": {}
     },
     "accessory": null
   },
   "available_actions": [
-    "공격",
-    "방어",
-    "도주",
-    "강타"
+    "attack",
+    "defend",
+    "flee",
+    "power_strike"
   ],
   "growth": {
     "level": 3,
@@ -53,31 +53,31 @@
     "xp_to_next": 600,
     "stat_points_available": 0,
     "learned_skills": [
-      "강타"
+      "power_strike"
     ],
     "xp_log": [
       {
-        "source": "오크 처치 (high)",
+        "source": "orc kill (high)",
         "amount": 60
       },
       {
-        "source": "챕터1 완료",
+        "source": "chapter 1 complete",
         "amount": 100
       },
       {
-        "source": "함정 해제 (퍼즐)",
+        "source": "trap disarm (puzzle)",
         "amount": 25
       },
       {
-        "source": "보물 상자 획득 (퀘스트)",
+        "source": "treasure chest obtained (quest)",
         "amount": 50
       },
       {
-        "source": "탐색/RP (숲, 던전, 비문)",
+        "source": "exploration/RP (forest, dungeon, inscription)",
         "amount": 50
       },
       {
-        "source": "늑대 처치 (medium)",
+        "source": "wolf kill (medium)",
         "amount": 30
       }
     ]
@@ -86,11 +86,11 @@
     "actions_taken": [
       {
         "turn": 3,
-        "action": "공격",
-        "target": "어두운 오크",
-        "roll": "18+3=21 명중",
+        "action": "attack",
+        "target": "dark orc",
+        "roll": "18+3=21 hit",
         "damage": 0,
-        "result": "대상 이미 사망"
+        "result": "target already dead"
       }
     ],
     "damage_dealt_total": 0,

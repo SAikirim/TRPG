@@ -4,68 +4,69 @@
   "ruleset": "fantasy_basic",
   "turn": 24,
   "chapter": 1,
-  "chapter_name": "교역로",
+  "chapter_name": "trade_road",
   "party_summary": [
     {
-      "name": "사이키",
-      "class": "마법사",
+      "name": "saiki",
+      "class": "mage",
       "hp": "21/21",
       "mp": "41/41",
       "key_items": [
-        "마법 지팡이",
-        "마나 포션",
-        "마나 결정",
-        "슬라임 젤리",
-        "약초",
-        "고대 열쇠",
-        "전설의 보물",
-        "에르네스의 소개장",
-        "약초 봉투 (볼프에게 전달)",
-        "노잣돈 (은화 10닢)",
-        "금화 1닢 (공용, 카렌델 환전 후 3등분)",
-        "밧줄",
-        "부싯돌"
+        "magic_staff",
+        "mana_potion",
+        "mana_crystal",
+        "slime_jelly",
+        "herb",
+        "ancient_key",
+        "legendary_treasure",
+        "ernes_letter",
+        "herb_bundle_for_volf",
+        "travel_money_silver_10",
+        "shared_gold_1",
+        "rope",
+        "flint"
       ]
     },
     {
-      "name": "루체나",
-      "class": "도적",
+      "name": "lucena",
+      "class": "rogue",
       "hp": "30/30",
       "mp": "14/14",
       "key_items": [
-        "단검 x2",
-        "도둑 도구",
-        "밧줄"
+        "dual_daggers",
+        "thieves_tools",
+        "rope"
       ]
     },
     {
-      "name": "노을",
-      "class": "전사",
+      "name": "noel",
+      "class": "warrior",
       "hp": "45/45",
       "mp": "7/7",
       "key_items": [
-        "가죽 방패",
-        "오크의 도끼",
-        "상처 치료 약병"
+        "leather_shield",
+        "orc_axe",
+        "wound_treatment_vial"
       ]
     }
   ],
   "progress_notes": [
-    "[GM] 사이키가 \"실험할게 있어\"라며 루체나와 다시 자리를 바꾼다.",
-    "[GM] 사이키가 카렌델까지의 거리를 물었다. 할란이 지형을 보며 설명한다.",
-    "[GM] 사이키가 방향을 물었다. 할란이 갈림길 지리를 상세히 설명한다.",
-    "[GM] 사이키가 수레 위에서 짧은 휴식. MP 37→40 회복.",
-    "[GM] 사이키가 갈림길 쉼터 정차 여부를 물었다. 할란이 현실적인 이유를 설명한다.",
-    "[GM] [GM] 갈림길 쉼터 야영 (밤). 루체나가 정찰 후 복귀. 노을이 경계 중.",
-    "[GM] 마나 와이어 시전 + 불침번 편성 (1교대 루체나, 2교대 노을). 야영 취침.",
-    "[GM] 무사 야영. 아침 기상. long rest 전원 HP/MP full.",
-    "[GM] 행상인/검객 동행 합류. 카렌델 향해 출발."
+    "[GM] Mana wire cast + night watch rotation set (1st shift Lucena, 2nd shift Noel). Camp for the night.",
+    "[GM] Uneventful night. Morning wake-up. Long rest: all members HP/MP full.",
+    "[GM] Peddler/swordsman join as travel companions. Departure toward Karendel.",
+    "[GM] Turn 24: 할란에게 카렌델까지 얼마나 걸리냐고 묻는다",
+    "[user] 미라에게 말을 건다",
+    "[GM] 사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
+    "[GM] 미라와 대화 테스트",
+    "[GM] 턴 중간 기록 (pending flush)",
+    "[GM] 미라와 대화",
+    "[GM] 턴 중간 기록 (pending flush)"
   ],
   "next_objective": "",
   "display_mode": "mobile",
   "show_dice_result": false,
-  "show_system_log": true,
+  "show_system_log": false,
   "sd_illustration": true,
-  "last_updated": "2026-03-25",
+  "last_updated": "2026-03-27",
   "difficulty": "normal"
 }

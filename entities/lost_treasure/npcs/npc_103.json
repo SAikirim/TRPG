@@ -1,15 +1,15 @@
 {
   "id": 103,
-  "name": "한트",
+  "name": "hunt",
   "type": "friendly",
   "status": "alive",
-  "location": "하룬 마을 입구",
+  "location": "harun_village village_entrance",
   "personality": {
     "temperament": "grumpy",
     "intelligence": "medium",
-    "behavior_pattern": "늙은 경비병. 투덜거리지만 성실. 마을 입구를 지킨다.",
-    "speech_style": "퉁명스럽고 짧은 말투.",
-    "motivation": "마을 경비. 은퇴하고 싶지만 후임이 없다."
+    "behavior_pattern": "Old guard. Grumbles but diligent. Guards the village entrance.",
+    "speech_style": "Blunt and curt manner of speaking.",
+    "motivation": "Village guard duty. Wants to retire but has no replacement."
   },
   "stats": {
     "STR": 12,

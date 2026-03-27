@@ -84,6 +84,23 @@ class MapGenerator:
     def generate_map(self):
         state = self.load_game_state()
 
+        # ko.json 로드 (맵 전체에서 번역 사용)
+        self._ko = {}
+        try:
+            ko_path = os.path.join(self.base_dir, "lang", "ko.json")
+            with open(ko_path, "r", encoding="utf-8") as f:
+                self._ko = json.load(f)
+        except Exception:
+            pass
+
+        def _t_name(en_name, *categories):
+            for cat in categories:
+                v = self._ko.get(cat, {}).get(en_name)
+                if v:
+                    return v
+            return en_name
+        self._t_name = _t_name
+
         # Try to load location-based map from worldbuilding
         current_loc = state.get("current_location", "")
         wb_map = None
@@ -320,17 +337,23 @@ class MapGenerator:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
 
             label_color = "#666" if is_dead else (color if npc_type != "monster" else "white")
-            # NPC name - show "???" if unknown
-            npc_name = npc["name"][:4] if npc.get("known", False) else "???"
+            # NPC name - always show name (translated via ko.json)
+            npc_name = self._t_name(npc["name"], "npcs", "creatures")[:4]
             entity_icons.append({"cx": cx, "cy": cy, "r": r, "name": npc_name, "color": label_color, "type": "npc"})
 
         # 플레이어 아이콘 그리기 + 위치 수집
-        player_colors = {"전사": "#e63946", "마법사": "#457be0", "도적": "#2ecc71", "궁수": "#e67e22", "성직자": "#f1c40f"}
+        player_colors = {
+            "전사": "#e63946", "warrior": "#e63946",
+            "마법사": "#457be0", "mage": "#457be0",
+            "도적": "#2ecc71", "rogue": "#2ecc71",
+            "궁수": "#e67e22", "ranger": "#e67e22",
+            "성직자": "#f1c40f", "cleric": "#f1c40f",
+        }
         for player in state["players"]:
             px, py = player["position"]
             cx = px * self.tile_size + self.tile_size // 2 + margin_left
             cy = py * self.tile_size + self.tile_size // 2 + margin_top
-            color = player_colors.get(player["class"], "white")
+            color = player_colors.get(player["class"], "#ffffff")
             if emoji_font:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color + "88", outline="white", width=2)
                 player_emoji = player_emojis.get(player["class"], "\u2694\ufe0f")
@@ -341,7 +364,7 @@ class MapGenerator:
                     draw.text((cx - 10, cy - 10), safe, font=emoji_font)
             else:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=3)
-            entity_icons.append({"cx": cx, "cy": cy, "r": r, "name": player["name"][:3], "color": "white", "type": "player"})
+            entity_icons.append({"cx": cx, "cy": cy, "r": r, "name": self._t_name(player["name"], "npcs")[:3], "color": "white", "type": "player"})
 
         # 2) 점유 영역 추적 (충돌 회피용)
         occupied = []  # [(x1, y1, x2, y2)] 이미 배치된 라벨/아이콘 영역
@@ -362,7 +385,7 @@ class MapGenerator:
             if (area["x1"] == area["x2"] and area["y1"] == area["y2"] and
                 (area["x1"], area["y1"]) in landmark_positions):
                 continue
-            text = loc["name"]
+            text = self._t_name(loc["name"], "area_names", "locations")
             tw = len(text) * 8 + 4
             label_cx = ((area["x1"] + area["x2"]) / 2) * self.tile_size + margin_left
             # 기본: 영역 상단
@@ -401,24 +424,26 @@ class MapGenerator:
         loc_name = ""
         if wb_map and current_loc:
             try:
-                loc_name = loc_data.get("name", current_loc)
+                raw_name = loc_data.get("name", current_loc)
+                loc_name = self._t_name(current_loc, "locations") if self._t_name(current_loc, "locations") != current_loc else raw_name
             except Exception:
-                loc_name = current_loc
+                loc_name = self._t_name(current_loc, "locations")
         info_text = f"Turn: {turn}"
         if loc_name:
             info_text += f"  |  {loc_name}"
         draw.rectangle([0, 0, max(250, len(info_text) * 9), 22], fill="#00000088")
         draw.text((4, 3), info_text, fill="yellow", font=font)
 
-        # === 범례 (하단) ===
+        # === 범례 (하단) — ko.json 번역 적용 ===
         legend_items = []
+        _t_name = self._t_name
 
         # 현재 맵에 존재하는 플레이어 클래스
         for p in state["players"]:
             cls = p.get("class", "")
             emoji = player_emojis.get(cls, "")
             if emoji:
-                legend_items.append((emoji, p["name"]))
+                legend_items.append((emoji, _t_name(p["name"], "npcs")))
 
         # 현재 맵에 존재하는 NPC
         for npc in state["npcs"]:
@@ -429,7 +454,7 @@ class MapGenerator:
                 continue
             npc_type = npc.get("type", "neutral")
             emoji = npc_emojis.get(npc_type, "\U0001f464")
-            npc_name = npc["name"][:4] if npc.get("known", False) else "???"
+            npc_name = _t_name(npc["name"], "npcs", "creatures")[:4]
             legend_items.append((emoji, npc_name))
 
         # 랜드마크
@@ -438,9 +463,10 @@ class MapGenerator:
                 area = loc["area"]
                 if (area["x1"], area["y1"]) == pos_tuple:
                     name = loc.get("name", "")
+                    disp_name = _t_name(name, "area_names", "locations")[:6]
                     for kw, em in LANDMARK_EMOJI.items():
-                        if kw in name:
-                            legend_items.append((em, name[:6]))
+                        if kw in name or kw in disp_name:
+                            legend_items.append((em, disp_name))
                             break
                     break
 
@@ -460,7 +486,8 @@ class MapGenerator:
                         obj_type = obj_leg.get("type", "")
                         emoji = obj_leg.get("icon", OBJ_EMOJI.get(obj_type, ""))
                         if emoji:
-                            legend_items.append((emoji, obj_leg.get("name", "?")[:6]))
+                            obj_name = _t_name(obj_leg.get("name", "?"), "objects")[:6]
+                            legend_items.append((emoji, obj_name))
                     except Exception:
                         pass
 

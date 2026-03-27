@@ -16,9 +16,34 @@ from core.scenario_agent import check_and_warn as scenario_check
 from core.npc_agent import check_and_warn as npc_check
 from core.worldmap_agent import check_and_warn as worldmap_check
 
+import time
+import signal
+import threading
+import subprocess as _subprocess
+
+# ─── 유휴 자동 종료 ───
+_last_state_change = time.time()
+_shutdown_armed = False
+_idle_timer = None
+_IDLE_TIMEOUT = 180  # 3분
+
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 GAME_STATE_PATH = os.path.join(BASE_DIR, "data", "game_state.json")
+
+
+_ko_cache = None
+def _get_ko_name(en_name):
+    """ko.json에서 영어→한국어 이름 변환."""
+    global _ko_cache
+    if _ko_cache is None:
+        ko_path = os.path.join(BASE_DIR, "lang", "ko.json")
+        try:
+            with open(ko_path, "r", encoding="utf-8") as f:
+                _ko_cache = json.load(f)
+        except Exception:
+            _ko_cache = {}
+    return _ko_cache.get("npcs", {}).get(en_name, "") or _ko_cache.get("creatures", {}).get(en_name, "")
 
 
 def _add_npc_layers(state):
@@ -44,12 +69,22 @@ def _add_npc_layers(state):
         if current_loc and npc_loc and npc_loc != current_loc:
             continue
         npc_name = npc.get("name", "")
-        # Portrait exists check
+        # ko.json에서 한국어 이름 조회 (portrait 파일이 한국어일 수 있음)
+        ko_name = _get_ko_name(npc_name)
+        # Portrait exists check — 영어 이름 + 한국어 이름 모두 시도
         portrait_exists = False
-        for ext in [".webp", ".png"]:
-            for prefix in ["portrait_", ""]:
-                if os.path.exists(os.path.join(BASE_DIR, "static", "portraits", "sd", f"{prefix}{npc_name}{ext}")):
-                    portrait_exists = True
+        portrait_path = ""
+        for try_name in [npc_name, ko_name]:
+            if not try_name:
+                continue
+            for ext in [".webp", ".png"]:
+                for prefix in ["portrait_", ""]:
+                    candidate = os.path.join(BASE_DIR, "static", "portraits", "sd", f"{prefix}{try_name}{ext}")
+                    if os.path.exists(candidate):
+                        portrait_exists = True
+                        portrait_path = candidate
+                        break
+                if portrait_exists:
                     break
             if portrait_exists:
                 break
@@ -67,10 +102,10 @@ def _add_npc_layers(state):
             size_class = "d3"
         else:
             size_class = "d4"
-        npcs_to_add.append((sort_key, npc_name, distance, size_class))
+        npcs_to_add.append((sort_key, npc_name, distance, size_class, portrait_path))
 
     npcs_to_add.sort(key=lambda x: x[0])
-    for idx, (sort_key, npc_name, distance, size_class) in enumerate(npcs_to_add[:4]):
+    for idx, (sort_key, npc_name, distance, size_class, portrait_path) in enumerate(npcs_to_add[:4]):
         # Map relative dx to screen position name
         # sort_key = -(npc_x - p1_x), mirrored: positive sort_key = right on screen
         if sort_key > 1:
@@ -384,6 +419,15 @@ def get_events():
 @app.route("/api/gm-update", methods=["POST"])
 def gm_update():
     data = request.get_json()
+
+    # 저장 후 활동 감지 → 타이머 해제 (다음 저장까지 서버 유지)
+    global _shutdown_armed, _idle_timer
+    if _shutdown_armed:
+        _shutdown_armed = False
+        if _idle_timer:
+            _idle_timer.cancel()
+            _idle_timer = None
+
     state = load_game_state()
 
     # 턴 추적기에 gm-update 실행 기록
@@ -560,6 +604,33 @@ def gm_update():
         clear_scene()
     if data.get("remove_layer"):
         remove_layer(data["remove_layer"])
+
+    # Entity overlap prevention — auto-relocate after position updates
+    try:
+        all_positions = {}
+        # Collect all current positions
+        for p in state.get("players", []):
+            pos_key = tuple(p.get("position", [0, 0]))
+            if pos_key in all_positions:
+                # Overlap detected - find nearest empty
+                alt = gm._find_nearest_empty(list(pos_key), p["id"], state)
+                if alt:
+                    p["position"] = alt
+            else:
+                all_positions[pos_key] = p.get("name", f"player_{p['id']}")
+
+        for n in state.get("npcs", []):
+            if n.get("status") in ("dead", "fled", "gone"):
+                continue
+            pos_key = tuple(n.get("position", [0, 0]))
+            if pos_key in all_positions:
+                alt = gm._find_nearest_empty(list(pos_key), n["id"], state)
+                if alt:
+                    n["position"] = alt
+            else:
+                all_positions[pos_key] = n.get("name", f"npc_{n['id']}")
+    except Exception:
+        pass  # Don't block gm-update on overlap check failure
 
     # scene_state를 game_state에 저장
     _save_scene_to_state(state)
@@ -760,6 +831,16 @@ def get_worldbuilding():
         return jsonify({"error": "JSON 파싱 실패"}), 500
 
 
+@app.route("/api/ko", methods=["GET"])
+def get_ko():
+    ko_path = os.path.join(BASE_DIR, "lang", "ko.json")
+    try:
+        with open(ko_path, "r", encoding="utf-8") as f:
+            return jsonify(json.load(f))
+    except FileNotFoundError:
+        return jsonify({"error": "ko.json not found"}), 404
+
+
 @app.route("/api/items", methods=["GET"])
 def get_items():
     items_path = os.path.join(BASE_DIR, "data", "items.json")
@@ -864,6 +945,28 @@ def list_saves():
     return jsonify(saves)
 
 
+@app.route("/api/save", methods=["POST"])
+def explicit_save():
+    """유저 명시적 저장 요청. 저장 후 유휴 타이머 시작."""
+    data = request.get_json() or {}
+    state = load_game_state()
+    scenario_id = state.get("game_info", {}).get("scenario_id", "default")
+    slot = data.get("slot", 1)
+    description = data.get("description", "")
+
+    result = save_manager.save_game(scenario_id, slot=slot, description=description)
+    if result is None:
+        return jsonify({"success": False, "message": "저장 실패"}), 400
+
+    # 명시적 저장 → 유휴 타이머 시작
+    global _shutdown_armed
+    _shutdown_armed = True
+    _start_idle_timer()
+    print(f"[AUTO] 유휴 자동 종료 타이머 시작 ({_IDLE_TIMEOUT}초)")
+
+    return jsonify({"success": True, "save_info": result})
+
+
 @app.route("/api/progress/<scenario_id>", methods=["GET"])
 def get_progress(scenario_id):
     progress = save_manager.get_progress(scenario_id)
@@ -932,6 +1035,64 @@ def reveal_npc():
     save_game_state(state)
     update_map_image()
     return jsonify({"success": True})
+
+
+@app.route("/api/idle-shutdown/disarm", methods=["POST"])
+def disarm_idle_shutdown():
+    """유휴 자동 종료 타이머 해제."""
+    global _shutdown_armed, _idle_timer
+    _shutdown_armed = False
+    if _idle_timer:
+        _idle_timer.cancel()
+        _idle_timer = None
+    return jsonify({"success": True, "message": "유휴 자동 종료 해제됨"})
+
+
+# ─── 유휴 자동 종료 시스템 ───
+
+def _start_idle_timer():
+    """저장 후 유휴 타이머 시작/리셋."""
+    global _idle_timer
+    if _idle_timer:
+        _idle_timer.cancel()
+    _idle_timer = threading.Timer(_IDLE_TIMEOUT, _check_and_shutdown)
+    _idle_timer.daemon = True
+    _idle_timer.start()
+
+
+def _check_and_shutdown():
+    """타이머 만료 시 서버 종료."""
+    if not _shutdown_armed:
+        return
+
+    print(f"\n[AUTO] {_IDLE_TIMEOUT}초간 게임 상태 변경 없음 — 서버 자동 종료")
+
+    # SD WebUI 종료 (포트 7860)
+    _kill_port_process(7860)
+
+    # Flask 자신 종료
+    os._exit(0)
+
+
+def _kill_port_process(port):
+    """지정 포트의 LISTEN 프로세스를 종료 (Windows)."""
+    try:
+        result = _subprocess.run(
+            ["netstat", "-ano"], capture_output=True, text=True, timeout=5
+        )
+        for line in result.stdout.splitlines():
+            if f":{port} " in line and "LISTEN" in line:
+                parts = line.strip().split()
+                pid = parts[-1]
+                try:
+                    pid_int = int(pid)
+                    if pid_int > 0 and pid_int != os.getpid():
+                        _subprocess.run(["taskkill", "/F", "/PID", pid], timeout=5)
+                        print(f"  [OK] 포트 {port} 프로세스 종료 (PID {pid})")
+                except (ValueError, Exception):
+                    pass
+    except Exception as e:
+        print(f"  [WARN] 포트 {port} 프로세스 종료 실패: {e}")
 
 
 if __name__ == "__main__":
