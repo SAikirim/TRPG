@@ -144,5 +144,14 @@
     ]
   },
   "party_role": "backline_ranged_heal",
-  "controlled_by": "user"
+  "controlled_by": "user",
+  "race": "human",
+  "appearance": {
+    "age": "18",
+    "build": "Slender and lean",
+    "hair": "Messy dark hair",
+    "face": "Calm, thoughtful deep blue eyes with quiet determination. Gentle but serious expression.",
+    "outfit": "Worn, patched traveler's robe — humble clothing showing poor background",
+    "notable": "Simple wooden staff with faintly glowing crystal at the top"
+  }
 }

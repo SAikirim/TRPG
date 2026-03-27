@@ -119,5 +119,14 @@
     ]
   },
   "party_role": "midline_ambush_util",
-  "controlled_by": "ai"
+  "controlled_by": "ai",
+  "race": "human",
+  "appearance": {
+    "age": "15",
+    "build": "Quick, agile posture",
+    "hair": "Short messy hair tied back loosely",
+    "face": "Sharp, mischievous eyes with a confident smirk. Tough exterior but youthful softness.",
+    "outfit": "Dark leather street clothes — not proper armor, street urchin's practical outfit with many hidden pockets",
+    "notable": "Dual-wields two small daggers. Lockpicking tools hanging from belt."
+  }
 }
