@@ -34,7 +34,18 @@
   "max_mp": 5,
   "relationships": {
     "hallan": "Father. Worried about him but respects him.",
-    "saiki": "Adventurer who rescued them. Favorable impression."
+    "saiki": "Adventurer who rescued them. Favorable impression.",
+    "lucena": {
+      "affinity": 53,
+      "trust": 52,
+      "history": [
+        {
+          "turn": 25,
+          "change": 3,
+          "reason": "루세나의 말에 동의하며 친근하게 대화함"
+        }
+      ]
+    }
   },
   "travel": {
     "origin": "Seren Port",

@@ -1,10 +1,10 @@
 {
-  "_comment": "1:1:1 split — Claude:Cloud:Local. Gemini for logic, Groq for validation, Local for RP.",
-  "rule_arbiter":  {"runner": "cloud", "provider": "google", "model": "gemini-2.5-flash",       "fallback": ["cloud", "claude"], "fallback_provider": "groq"},
-  "worldbuilding": {"runner": "cloud", "provider": "groq",   "model": "llama-3.3-70b-versatile", "fallback": ["cloud", "claude"], "fallback_provider": "google"},
-  "worldmap":      {"runner": "cloud", "provider": "groq",   "model": "llama-3.3-70b-versatile", "fallback": ["cloud", "claude"], "fallback_provider": "google"},
-  "npc":           {"runner": "local", "model": "gemma3:12b", "provider": "groq",                "fallback": ["cloud", "claude"]},
-  "player":        {"runner": "local", "model": "gemma3:12b", "provider": "groq",                "fallback": ["cloud", "claude"]},
-  "system":        {"runner": "cloud", "provider": "google", "model": "gemini-2.5-flash",       "fallback": ["cloud", "claude"], "fallback_provider": "groq"},
-  "scenario":      {"runner": "cloud", "provider": "groq",   "model": "llama-3.3-70b-versatile", "fallback": ["cloud", "claude"], "fallback_provider": "google"}
+  "_comment": "Google 4 keys + Groq 2 keys. NPC/Player → Gemini (speed), Local as fallback.",
+  "rule_arbiter":  {"runner": "cloud", "provider": "google", "model": "gemini-2.5-flash",       "fallback": ["cloud", "local", "claude"], "fallback_provider": "groq"},
+  "system":        {"runner": "cloud", "provider": "google", "model": "gemini-2.5-flash",       "fallback": ["cloud", "local", "claude"], "fallback_provider": "groq"},
+  "npc":           {"runner": "cloud", "provider": "google", "model": "gemini-2.5-flash",       "fallback": ["local", "cloud", "claude"], "fallback_provider": "groq"},
+  "player":        {"runner": "cloud", "provider": "google", "model": "gemini-2.5-flash",       "fallback": ["local", "cloud", "claude"], "fallback_provider": "groq"},
+  "worldbuilding": {"runner": "cloud", "provider": "groq",   "model": "llama-3.3-70b-versatile", "fallback": ["cloud", "local", "claude"], "fallback_provider": "google"},
+  "worldmap":      {"runner": "cloud", "provider": "groq",   "model": "llama-3.3-70b-versatile", "fallback": ["cloud", "local", "claude"], "fallback_provider": "google"},
+  "scenario":      {"runner": "cloud", "provider": "groq",   "model": "llama-3.3-70b-versatile", "fallback": ["cloud", "local", "claude"], "fallback_provider": "google"}
 }
