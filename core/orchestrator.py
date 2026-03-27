@@ -938,13 +938,11 @@ class TurnOrchestrator:
                 ["git", "commit", "-m", f"turn {turn}: {description}"],
                 cwd=BASE_DIR, capture_output=True, timeout=10,
             )
-            # 3턴마다 push (백그라운드)
-            if turn % 3 == 0:
-                subprocess.Popen(
-                    ["git", "push"],
-                    cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                )
-                logger.info("Git push (turn %d)", turn)
+            # 매 턴 push (백그라운드)
+            subprocess.Popen(
+                ["git", "push"],
+                cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
         except Exception as e:
             logger.error("Auto-save failed: %s", e)
 
