@@ -52,8 +52,8 @@
       ]
     },
     "lucena": {
-      "affinity": 53,
-      "trust": 53,
+      "affinity": 54,
+      "trust": 54,
       "history": [
         {
           "turn": 27,
@@ -69,17 +69,27 @@
           "turn": 30,
           "change": 1,
           "reason": "출발 결정"
+        },
+        {
+          "turn": 32,
+          "change": 1,
+          "reason": "루세나의 경계"
         }
       ]
     },
     "noel": {
-      "affinity": 51,
-      "trust": 51,
+      "affinity": 52,
+      "trust": 52,
       "history": [
         {
           "turn": 30,
           "change": 1,
           "reason": "조심히 가야겠다고 말함"
+        },
+        {
+          "turn": 32,
+          "change": 1,
+          "reason": "노엘의 안전 확인 요청"
         }
       ]
     }

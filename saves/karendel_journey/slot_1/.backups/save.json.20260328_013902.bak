@@ -2,9 +2,9 @@
   "save_info": {
     "scenario_id": "karendel_journey",
     "slot": 1,
-    "description": "자동 저장 (턴 33)",
-    "saved_at": "2026-03-28 01:39:02",
-    "turn_count": 33,
+    "description": "자동 저장 (턴 32)",
+    "saved_at": "2026-03-28 01:38:33",
+    "turn_count": 32,
     "chapter": 2,
     "party_summary": [
       {
@@ -39,7 +39,7 @@
       "ending": null,
       "current_chapter": 1
     },
-    "current_location": "road_to_karendel_7",
+    "current_location": "road_to_karendel_6",
     "players": [
       {
         "id": 1,
@@ -313,8 +313,32 @@
         }
       ]
     },
-    "turn_count": 33,
+    "turn_count": 32,
     "events": [
+      {
+        "turn": 27,
+        "message": "[GM] Turn 26: saiki: 미라에게 웃으며 인사한다; lucena: 사이키와 미라에게 가까이 다가가며 투덜거린다 오빠는 미라한테만 그렇게 다정하게 인사해 주고",
+        "narrative": "사이키가 미라에게 환한 미소를 지으며 인사하자, 마차 안에서 창밖을 보던 미라가 밝게 화답한다. 루세나는 그 모습을 보며 못마땅한 표정으로 사이키와 미라에게 가까이 다가와 투덜거린다. 마차를 몰던 할란은 묵묵히 앞을 응시하며 고삐를 쥐고 있다. 노엘은 여전히 마차 선두에서 주변을 꼼꼼히 살피며 경계를 늦추지 않는다.\n\n사익이는 미라에게 미소를 짓며 다정하게 인사한다. 루세나는 사이키와 미라에게 다가가며 투덜거린다. 오빠는 미라한테만 그렇게 다정하게 인사해 주고, 나한테는 늘 무뚝뚝하잖아? 노엘은 마차 선두에서 주변을 계속 경계한다. 일행은 조용한 분위기 속에서 카렌델을 향해 나아간다.",
+        "user_input": "saiki: 미라에게 웃으며 인사한다; lucena: 사이키와 미라에게 가까이 다가가며 투덜거린다 오빠는 미라한테만 그렇게 다정하게 인사해 주고... 나한테는 늘 무뚝뚝하잖아?; noel: 마차 선두에서 주변을 계속 경계한다",
+        "dialogues": [
+          {
+            "speaker": "mira",
+            "line": "사이키님, 안녕하세요! 좋은 아침이에요!",
+            "tone": "cheerful"
+          },
+          {
+            "speaker": "mira",
+            "line": "루세나 언니도 참! 사이키님은 언니에게도 분명 친절하실 거예요!",
+            "tone": "playful"
+          },
+          {
+            "speaker": "hallan",
+            "line": "흥, 잔말 말고 길이나 봐라.",
+            "tone": "gruff"
+          }
+        ],
+        "timestamp": "01:22:14"
+      },
       {
         "turn": 27,
         "message": "[GM] Session restore",
@@ -476,30 +500,6 @@
           }
         ],
         "timestamp": "01:38:33"
-      },
-      {
-        "turn": 33,
-        "message": "[GM] Turn 32: saiki: 주변을 둘러본다; lucena: 경계를 manten하며 주변을 살펴본다 주변에 이상한 것이 보이지 않나요?; noel: 할란씨에게 ",
-        "narrative": "사익이는 주변을 둘러보며, 루세나는 경계를 유지하며 주변을 살펴본다. 노엘은 할란씨에게 주변의 안전을 확인해달라고 말한다. 할란씨는 주변을 살펴본 뒤, 아무런 문제가 없다고 répond한다.\n\n사익이는 주변을 둘러본다. 루세나는 경계를 유지하며 주변을 살펴본다. 노엘은 할란에게 주변의 안전을 확인해달라고 말한다. 할란은 주변을 살펴본 후, 일행에게 안전하다고 말한다. 그러나 루세나는 주변에 이상한 것이 보이지는 않지만, 어딘가에서 비난하는 시선을 느끼며 경계한다.",
-        "user_input": "saiki: 주변을 둘러본다; lucena: 경계를 manten하며 주변을 살펴본다 주변에 이상한 것이 보이지 않나요?; noel: 할란씨에게 주변의 안전을 확인해달라고 말한다 할란씨, 주변에 문제가 없나요? 안전한가요?",
-        "dialogues": [
-          {
-            "speaker": "lucena",
-            "line": "주변에 이상한 것이 보이지 않나요?",
-            "tone": "cautious"
-          },
-          {
-            "speaker": "noel",
-            "line": "할란씨, 주변에 문제가 없나요? 안전한가요?",
-            "tone": "concerned"
-          },
-          {
-            "speaker": "hallan",
-            "line": "아무런 문제가 없습니다. 하지만 항상 경계는 필요합니다.",
-            "tone": "serious"
-          }
-        ],
-        "timestamp": "01:39:02"
       }
     ],
     "current_scene": {
