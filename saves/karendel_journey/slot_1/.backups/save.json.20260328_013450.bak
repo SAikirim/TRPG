@@ -2,9 +2,9 @@
   "save_info": {
     "scenario_id": "karendel_journey",
     "slot": 1,
-    "description": "자동 저장 (턴 30)",
-    "saved_at": "2026-03-28 01:34:50",
-    "turn_count": 30,
+    "description": "자동 저장 (턴 29)",
+    "saved_at": "2026-03-28 01:34:34",
+    "turn_count": 29,
     "chapter": 2,
     "party_summary": [
       {
@@ -39,7 +39,7 @@
       "ending": null,
       "current_chapter": 1
     },
-    "current_location": "road_to_karendel_5",
+    "current_location": "road_to_karendel_4",
     "players": [
       {
         "id": 1,
@@ -313,8 +313,32 @@
         }
       ]
     },
-    "turn_count": 30,
+    "turn_count": 29,
     "events": [
+      {
+        "turn": 25,
+        "message": "[GM] Turn 24: saiki: 할란에게 출발하자고 말한다; lucena: 마차를 출발시킨다; noel: 앞장서서 길을 안내한다",
+        "narrative": "사이키의 말에 할란은 퉁명스럽게 대답하며 마차를 출발시킨다. 루세나는 재미있다는 듯 웃음을 참지 못하고, 노엘은 묵묵히 앞을 걸어간다. 마차는 다시 덜컹거리는 길을 따라 나아간다. 할란은 고삐를 꽉 잡고 앞을 살피며, 미라는 주변 풍경을 구경하며 상쾌한 표정을 짓는다. 노엘은 앞장서서 길을 안내하며, 주변을 경계한다.\n\n마차가 교역로를 따라 덜컹거리며 나아간다. 아침 안개가 걷히고, 길 양쪽으로 드넓은 초원이 펼쳐진다. 사이키는 할란에게 출발하자고 말하고, 루세나는 마차를 출발시킨다. 노엘은 앞장서서 길을 안내한다. 할란은 무의식적으로 왼쪽 종아리의 붕대를 내려다보다가, 헛기침을 한 번 하고 앞을 바라본다. 일행은 조용한 분위기 속에서 카렌델을 향해 나아간다.",
+        "user_input": "saiki: 할란에게 출발하자고 말한다; lucena: 마차를 출발시킨다; noel: 앞장서서 길을 안내한다",
+        "dialogues": [
+          {
+            "speaker": "hallan",
+            "line": "출발이다.",
+            "tone": "gruff"
+          },
+          {
+            "speaker": "lucena",
+            "line": "오빠, 한 번에 세 개? 효율적이다~ 근데 그 순서는 좀 바꿔야 하지 않아?",
+            "tone": "teasing"
+          },
+          {
+            "speaker": "noel",
+            "line": "...",
+            "tone": "neutral"
+          }
+        ],
+        "timestamp": "01:05:37"
+      },
       {
         "turn": 25,
         "message": "[GM] Session restore",
@@ -440,35 +464,6 @@
         "user_input": "",
         "dialogues": [],
         "timestamp": "01:34:34"
-      },
-      {
-        "turn": 30,
-        "message": "[GM] Turn 29: saiki: 미라에게 웃으며 인사한다; lucena: 미소를 지으며 사이키를 지지한다 미라, 사이키가 인사했으니 너도 인사해줘.; noel: 주",
-        "narrative": "사익이는 미라에게 웃으며 인사한다. 미라는 환한 미소로 사이키를 맞이하며, 루세나는 미소를 지으며 사이키를 지지한다. 미라는 루세나의 말에 동의하며, 사이키에게도 따뜻한 미소를 보낸다. 노엘은 주변을 경계하며, 할란씨에게 조심히 가야겠다고 말한다. 할란씨는 고삐를 잡은 채로 앞을 응시하며, 경계를 늦추지 않는다.\n\n사익이는 미라에게 웃으며 인사하고, 루세나는 미소를 지으며 사이키를 지지한다. 미라는 환한 미소로 사이키와 루세나를 맞이한다. 노엘은 주변을 경계하며 할란씨에게 조심히 가야겠다고 말한다. 마차는 천천히 이동하기 시작하고, 할란은 앞을 응시하며 경계를 늦추지 않는다. 일행은 조심스럽게 길을 따라 계속 이동한다.",
-        "user_input": "saiki: 미라에게 웃으며 인사한다; lucena: 미소를 지으며 사이키를 지지한다 미라, 사이키가 인사했으니 너도 인사해줘.; noel: 주변 경계 할란씨, 조심히 가야겠어요. 아직 우리가 도착한 곳이 아니니까.",
-        "dialogues": [
-          {
-            "speaker": "saiki",
-            "line": "안녕, 미라. 오늘도 날씨가 좋네요.",
-            "tone": "friendly"
-          },
-          {
-            "speaker": "lucena",
-            "line": "미라, 사이키가 인사했으니 너도 인사해줘.",
-            "tone": "polite"
-          },
-          {
-            "speaker": "mira",
-            "line": "네, 안녕하세요! 사이키씨, 루세나씨. 오늘도 함께 여행할 수 있어서 기쁘네요.",
-            "tone": "friendly"
-          },
-          {
-            "speaker": "noel",
-            "line": "주변 경계 할란씨, 조심히 가야겠어요. 아직 우리가 도착한 곳이 아니니까.",
-            "tone": "cautious"
-          }
-        ],
-        "timestamp": "01:34:50"
       }
     ],
     "current_scene": {
