@@ -131,32 +131,82 @@ class CloudRunner(AbstractRunner):
             )
 
     def _execute_gemini(self, request: AgentRequest) -> AgentResponse:
-        """Google Gemini API call."""
+        """Google Gemini API call (google-genai SDK)."""
         try:
-            import google.generativeai as genai
+            from google import genai
         except ImportError:
             return AgentResponse(
                 agent_type=request.agent_type,
                 success=False,
-                errors=["google-generativeai package not installed: pip install google-generativeai"],
+                errors=["google-genai package not installed: pip install google-genai"],
             )
 
         api_key = self._get_api_key()
-        genai.configure(api_key=api_key)
+        client = genai.Client(api_key=api_key)
 
-        model = genai.GenerativeModel(self.config.model or "gemini-1.5-flash")
+        from core.runners.base import AGENT_PROMPTS
+        system_prompt = AGENT_PROMPTS.get(
+            request.agent_type,
+            f"You are the [{request.agent_type.value}] agent."
+        )
+        system_prompt += "\nRespond only with valid JSON."
+
         prompt = self.build_prompt(request)
+        model_name = self.config.model or "gemini-2.5-flash"
 
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.GenerationConfig(
-                temperature=self.config.temperature,
-                max_output_tokens=self.config.max_tokens,
-                response_mime_type="application/json",
-            ),
+        # Session support
+        session = self.sessions.get_or_create(request.agent_type, system_prompt)
+
+        if not session.initialized:
+            session.add_user(prompt)
+            session.initialized = True
+        else:
+            import json as _json
+            ctx = request.context
+            delta = (
+                f"Turn: {ctx.turn_number} | Location: {ctx.current_location} | Time: {ctx.time_of_day}\n"
+                f"GM Direction: {ctx.gm_direction}\n"
+                f"Request:\n{_json.dumps(request.payload, ensure_ascii=False, indent=2)}\n\n"
+                f"Return ONLY valid JSON matching your response schema. Include the \"narration\" key."
+            )
+            session.add_user(delta)
+
+        messages = session.get_messages()
+        session.turn_count += 1
+
+        # Convert to Gemini format (system instruction + contents)
+        contents = []
+        for msg in messages:
+            if msg["role"] == "system":
+                continue  # handled via config
+            role = "user" if msg["role"] == "user" else "model"
+            contents.append({"role": role, "parts": [{"text": msg["content"]}]})
+
+        response = client.models.generate_content(
+            model=model_name,
+            contents=contents,
+            config={
+                "system_instruction": system_prompt,
+                "temperature": self.config.temperature,
+                "max_output_tokens": self.config.max_tokens,
+                "response_mime_type": "application/json",
+            },
         )
 
-        return self._parse_llm_output(response.text, request)
+        raw = response.text
+        session.add_assistant(raw)
+        session.trim(max_messages=20)
+
+        # Token tracking
+        if hasattr(response, 'usage_metadata') and response.usage_metadata:
+            um = response.usage_metadata
+            session.usage.add(
+                prompt=getattr(um, 'prompt_token_count', 0),
+                completion=getattr(um, 'candidates_token_count', 0),
+                total=getattr(um, 'total_token_count', 0),
+            )
+
+        return self._parse_llm_output(raw, request)
 
     def _execute_groq(self, request: AgentRequest) -> AgentResponse:
         """Groq API call with session support."""
