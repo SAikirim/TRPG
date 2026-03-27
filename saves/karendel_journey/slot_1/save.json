@@ -2,9 +2,9 @@
   "save_info": {
     "scenario_id": "karendel_journey",
     "slot": 1,
-    "description": "자동 저장 (턴 26)",
-    "saved_at": "2026-03-28 01:21:10",
-    "turn_count": 26,
+    "description": "자동 저장 (턴 27)",
+    "saved_at": "2026-03-28 01:22:15",
+    "turn_count": 27,
     "chapter": 2,
     "party_summary": [
       {
@@ -313,24 +313,8 @@
         }
       ]
     },
-    "turn_count": 26,
+    "turn_count": 27,
     "events": [
-      {
-        "turn": 24,
-        "message": "[GM] Restore character layers",
-        "narrative": "",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "00:15:46"
-      },
-      {
-        "turn": 24,
-        "message": "[GM] Scene restore - trade road background",
-        "narrative": "",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "00:18:35"
-      },
       {
         "turn": 24,
         "message": "[GM] Restore correct background",
@@ -505,6 +489,38 @@
           }
         ],
         "timestamp": "01:21:10"
+      },
+      {
+        "turn": 26,
+        "message": "[GM] Session restore",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "01:21:42"
+      },
+      {
+        "turn": 27,
+        "message": "[GM] Turn 26: saiki: 미라에게 웃으며 인사한다; lucena: 사이키와 미라에게 가까이 다가가며 투덜거린다 오빠는 미라한테만 그렇게 다정하게 인사해 주고",
+        "narrative": "사이키가 미라에게 환한 미소를 지으며 인사하자, 마차 안에서 창밖을 보던 미라가 밝게 화답한다. 루세나는 그 모습을 보며 못마땅한 표정으로 사이키와 미라에게 가까이 다가와 투덜거린다. 마차를 몰던 할란은 묵묵히 앞을 응시하며 고삐를 쥐고 있다. 노엘은 여전히 마차 선두에서 주변을 꼼꼼히 살피며 경계를 늦추지 않는다.\n\n사익이는 미라에게 미소를 짓며 다정하게 인사한다. 루세나는 사이키와 미라에게 다가가며 투덜거린다. 오빠는 미라한테만 그렇게 다정하게 인사해 주고, 나한테는 늘 무뚝뚝하잖아? 노엘은 마차 선두에서 주변을 계속 경계한다. 일행은 조용한 분위기 속에서 카렌델을 향해 나아간다.",
+        "user_input": "saiki: 미라에게 웃으며 인사한다; lucena: 사이키와 미라에게 가까이 다가가며 투덜거린다 오빠는 미라한테만 그렇게 다정하게 인사해 주고... 나한테는 늘 무뚝뚝하잖아?; noel: 마차 선두에서 주변을 계속 경계한다",
+        "dialogues": [
+          {
+            "speaker": "mira",
+            "line": "사이키님, 안녕하세요! 좋은 아침이에요!",
+            "tone": "cheerful"
+          },
+          {
+            "speaker": "mira",
+            "line": "루세나 언니도 참! 사이키님은 언니에게도 분명 친절하실 거예요!",
+            "tone": "playful"
+          },
+          {
+            "speaker": "hallan",
+            "line": "흥, 잔말 말고 길이나 봐라.",
+            "tone": "gruff"
+          }
+        ],
+        "timestamp": "01:22:14"
       }
     ],
     "current_scene": {

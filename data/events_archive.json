@@ -425,6 +425,24 @@
       "dialogues": [],
       "timestamp": "00:15:38",
       "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Restore character layers",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:15:46",
+      "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Scene restore - trade road background",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:18:35",
+      "archived_at": "2026-03-28"
     }
   ]
 }
