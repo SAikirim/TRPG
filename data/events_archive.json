@@ -336,6 +336,35 @@
       "narrative": "미라에게 말을 건다",
       "timestamp": "22:52:47",
       "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] 사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
+      "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
+      "timestamp": "22:52:47",
+      "dialogues": [
+        {
+          "speaker": "saiki",
+          "line": "미라, 오늘 날씨 좋지 않아?",
+          "tone": "playful",
+          "target": "mira"
+        },
+        {
+          "speaker": "mira",
+          "line": "네? 아, 네... 좋네요.",
+          "tone": "shy"
+        }
+      ],
+      "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] 미라와 대화 테스트",
+      "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:52:49",
+      "archived_at": "2026-03-28"
     }
   ]
 }

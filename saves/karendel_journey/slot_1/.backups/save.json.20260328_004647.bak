@@ -3,7 +3,7 @@
     "scenario_id": "karendel_journey",
     "slot": 1,
     "description": "자동 저장 (턴 24)",
-    "saved_at": "2026-03-28 00:15:46",
+    "saved_at": "2026-03-28 00:42:41",
     "turn_count": 24,
     "chapter": 2,
     "party_summary": [
@@ -317,100 +317,6 @@
     "events": [
       {
         "turn": 24,
-        "message": "[GM] Peddler/swordsman join as travel companions. Departure toward Karendel.",
-        "narrative": "Saiki approached the peddler packing his things and the swordsman leaning against the wall.\n\n\"We're heading to Karendel. If you're going the same way, would you like to travel together?\"\n\nThe peddler frantically gathered his bundle and nodded repeatedly.\n\"Oh my, I was just worried about going alone! If you'd join me, nothing could be more welcome...\"\n\nThe swordsman, still in his position leaning against the wall with his hand on his sword, regarded Saiki for a moment.\n\"...Karendel.\"\nAfter a brief silence, he slowly stood up.\n\"I happen to have business that way. We merely share the same road, so don't mind me.\"\n\nHe glanced at the empty spot where the hooded figure had been, but said nothing.\n\nHallan said while hitching the pack horse.\n\"...No reason to object. The more of us there are, the less beasts will bother us.\"\n\nLucena sidled up to Saiki and whispered.\n\"The peddler is whatever, but that swordsman... he was really good at muffling his footsteps while pretending to sleep. He might not be a thief, but he's not ordinary either.\"\n\nNoel chimed in while slinging his axe over his shoulder.\n\"Having one more guy who can use a blade makes things a bit easier for me.\"\n\nThe party had grown. Hallan patted the pack horse's back, and the cart began to move slowly. Morning mist lay thin over the trade road. Half a day or so until Karendel.",
-        "user_input": "Suggest traveling together to the peddler and swordsman",
-        "dialogues": [
-          {
-            "speaker": "saiki",
-            "line": "We're heading to Karendel. If you're going the same way, would you like to travel together?",
-            "tone": "polite",
-            "type": "dialogue"
-          },
-          {
-            "speaker": "peddler",
-            "line": "Oh my, I was just worried about going alone! If you'd join me, nothing could be more welcome...",
-            "tone": "relieved",
-            "type": "dialogue"
-          },
-          {
-            "speaker": "swordsman",
-            "line": "I happen to have business that way. We merely share the same road, so don't mind me.",
-            "tone": "indifferent",
-            "type": "dialogue"
-          },
-          {
-            "speaker": "hallan",
-            "line": "...No reason to object. The more of us there are, the less beasts will bother us.",
-            "tone": "calm",
-            "type": "dialogue"
-          },
-          {
-            "speaker": "lucena",
-            "target": "saiki",
-            "line": "The peddler is whatever, but that swordsman... he was really good at muffling his footsteps while pretending to sleep. He might not be a thief, but he's not ordinary either.",
-            "tone": "whisper",
-            "type": "whisper"
-          },
-          {
-            "speaker": "noel",
-            "line": "Having one more guy who can use a blade makes things a bit easier for me.",
-            "tone": "casual",
-            "type": "dialogue"
-          }
-        ],
-        "timestamp": "09:55:00",
-        "dice_rolls": []
-      },
-      {
-        "turn": 24,
-        "message": "[GM] Turn 24: 할란에게 카렌델까지 얼마나 걸리냐고 묻는다",
-        "narrative": "할란은 카렌델까지의 거리에 대한 질문에 잠시 생각을 하더니 말합니다. 그는 손가락을 이용해 거리를 계산하고, 고개를 끄덕입니다.\n\n루세나가 할란에게 카렌델까지의 여정에 대해 묻습니다. 여행에 필요한 정보를 얻기 위해 할란에게 질문하는 것이 합리적입니다.",
-        "user_input": "할란에게 카렌델까지 얼마나 걸리냐고 묻는다",
-        "dialogues": [
-          {
-            "speaker": "hallan",
-            "line": "카렌델까지는 반나절 정도면 도착할 수 있습니다. 오늘 오후에 도착할 수 있으면 좋겠네요.",
-            "tone": "평静"
-          }
-        ],
-        "timestamp": "22:41:55"
-      },
-      {
-        "turn": 24,
-        "message": "[user] 미라에게 말을 건다",
-        "narrative": "미라에게 말을 건다",
-        "timestamp": "22:52:47"
-      },
-      {
-        "turn": 24,
-        "message": "[GM] 사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
-        "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
-        "timestamp": "22:52:47",
-        "dialogues": [
-          {
-            "speaker": "saiki",
-            "line": "미라, 오늘 날씨 좋지 않아?",
-            "tone": "playful",
-            "target": "mira"
-          },
-          {
-            "speaker": "mira",
-            "line": "네? 아, 네... 좋네요.",
-            "tone": "shy"
-          }
-        ]
-      },
-      {
-        "turn": 24,
-        "message": "[GM] 미라와 대화 테스트",
-        "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "22:52:49"
-      },
-      {
-        "turn": 24,
         "message": "[GM] 턴 중간 기록 (pending flush)",
         "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
         "user_input": "미라에게 말을 건다",
@@ -472,10 +378,134 @@
         "user_input": "",
         "dialogues": [],
         "timestamp": "00:15:46"
+      },
+      {
+        "turn": 24,
+        "message": "[GM] Scene restore - trade road background",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "00:18:35"
+      },
+      {
+        "turn": 24,
+        "message": "[GM] Restore correct background",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "00:19:32"
+      },
+      {
+        "turn": 24,
+        "message": "[GM] Sync scene to game_state",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "00:22:11"
+      },
+      {
+        "turn": 24,
+        "message": "[GM] Turn 25: Saiki flirts with Mira on the trade road",
+        "narrative": "마차가 교역로를 따라 덜컹거리며 나아간다. 아침 안개가 걷히고, 길 양쪽으로 드넓은 초원이 펼쳐진다.\n\n사이키가 마차 옆을 걸으며 미라에게 다가갔다.\n\n\"미라양, 혹시 나이가 어떻게 되시나요? 좋아하는 건요? 남자친구 있으세요?\"\n\n미라가 눈을 동그랗게 떴다. 손에 들고 있던 보따리를 떨어뜨릴 뻔하며, 볼이 빠르게 붉어진다. 포니테일 끝을 만지작거리며 아버지 쪽을 힐끗 확인했다.\n\n\"어, 어머 -- 갑자기 그런 걸 다 물어보시네요?!\"\n\n잠깐 당황하더니, 나이만큼은 솔직하게 대답했다.\n\n\"저... 스물둘이에요.\"\n\n목소리가 약간 올라갔다. 이어서 화제를 자기가 자신 있는 쪽으로 돌렸다.\n\n\"좋아하는 건... 여러 곳 돌아다니면서 처음 보는 물건 구경하는 거요. 상인 딸이라서 그런가봐요, 헤헤.\"\n\n살짝 들뜬 말투. 하지만 마지막 질문에 이르자 미라의 목소리가 확 작아졌다.\n\n\"남-- 남자친구 같은 건... 아버지한테 들리면 어떡해요!\"\n\n소곤거리듯 속삭이며 민망함 반, 웃음 반으로 손을 내저었다.\n\n그 때, 마차 위에서 할란의 헛기침 소리가 들렸다. 고삐를 잡은 채 뒤를 힐끗 돌아보더니, 눈썹 하나를 치켜올리고 사이키를 천천히 훑어본다. 그리고 소리 없이 시선을 앞으로 되돌렸다.\n\n\"...마차 길이 험하니까, 딴 데 신경 쓰다 혀 깨물지 말고.\"\n\n사이키에게 하는 말인지 혼잣말인지 모를 온도. 적대적이진 않지만, 분명히 들으라고 한 말이었다.\n\n뒤에서 루세나가 입을 틀어막았다. 어깨가 들썩이며 웃음을 참는 게 역력하더니, 사이키에게 속삭이듯 -- 하지만 충분히 들리게 말했다.\n\n\"오빠, 한 번에 세 개? 효율적이다~ 근데 그 순서는 좀 바꿔야 하지 않아?\"\n\n노엘은 정면을 보고 걷다가 딱 한 박자 멈추었다. 사이키 쪽으로 시선을 주지도 않고, 묵묵히 걸음을 재개했다. 표정 변화 없음. 다만 귀가 약간 붉었다.\n\n\"...용감하네.\"\n\n극도로 건조한 한마디였다.",
+        "user_input": "미라양, 혹시 나이가 어떻게 되시나요? 좋아하는 건요? 남자친구 있으세요?",
+        "dialogues": [
+          {
+            "speaker": "saiki",
+            "line": "미라양, 혹시 나이가 어떻게 되시나요? 좋아하는 건요? 남자친구 있으세요?",
+            "tone": "flirty",
+            "target": "mira"
+          },
+          {
+            "speaker": "mira",
+            "line": "어, 어머 -- 갑자기 그런 걸 다 물어보시네요?! 저... 스물둘이에요.",
+            "tone": "flustered",
+            "target": "saiki"
+          },
+          {
+            "speaker": "mira",
+            "line": "좋아하는 건... 여러 곳 돌아다니면서 처음 보는 물건 구경하는 거요. 상인 딸이라서 그런가봐요, 헤헤.",
+            "tone": "cheerful",
+            "target": "saiki"
+          },
+          {
+            "speaker": "mira",
+            "line": "남-- 남자친구 같은 건... 아버지한테 들리면 어떡해요!",
+            "tone": "whisper",
+            "target": "saiki",
+            "type": "whisper"
+          },
+          {
+            "speaker": "hallan",
+            "line": "...마차 길이 험하니까, 딴 데 신경 쓰다 혀 깨물지 말고.",
+            "tone": "gruff"
+          },
+          {
+            "speaker": "lucena",
+            "line": "오빠, 한 번에 세 개? 효율적이다~ 근데 그 순서는 좀 바꿔야 하지 않아?",
+            "tone": "teasing",
+            "target": "saiki"
+          },
+          {
+            "speaker": "noel",
+            "line": "...용감하네.",
+            "tone": "dry"
+          }
+        ],
+        "timestamp": "00:27:15"
+      },
+      {
+        "turn": 24,
+        "message": "[GM] Turn 26: Combat ability discussion, wolf attack memory",
+        "narrative": "사이키가 헛기침을 했다.\n\n\"크흠, 그냥 동행하게 되었으니, 친해질려고 하는겁니다.\"\n\n미라의 어깨에서 눈에 띄게 긴장이 풀렸다. 화제가 바뀌자 오히려 편한 듯 솔직하게 웃었다.\n\n\"그러고 보니, 전투 능력은 어떤가요? 아버지와 둘이서 상인을 하려면 위험할 텐데요.\"\n\n사이키는 말하면서, 저도 모르게 그때를 떠올렸다. 교역로 한복판에 뒤집어진 마차. 찢어진 짐짝 사이로 흩어진 약초와 직물. 할란의 종아리에서 흐르는 피. 그리고 이빨을 드러낸 늑대 무리.\n\n미라가 쓴웃음을 지으며 어깨를 으쓱했다.\n\n\"솔직히 말씀드리면... 저희 둘 다 싸움엔 영 젬병이에요.\"\n\n\"원래는 호위를 한 명 고용하려 했는데, 이번엔 사정이 여의치 않아서요. 이 길이 비교적 안전하다는 말을 믿었거든요...\"\n\n목소리가 한 톤 낮아졌다.\n\n\"그 늑대들을 만나기 전까지는요.\"\n\n마차 위에서 할란이 무의식적으로 왼쪽 종아리의 붕대를 내려다보았다. 헛기침 한 번.\n\n\"단도 하나 있지. 쓸 줄은 알아.\"\n\n잠깐 뜸을 들이더니, 낮고 무거운 목소리로.\n\n\"...그래도 그날, 둘이서는 역부족이었어. 덕분에 살았고.\"\n\n사이키 쪽을 직접 보지 않고, 앞 길을 바라보며 짧게 덧붙였다.\n\n\"다시는 그 꼴 안 당하려면, 이 다리부터 나아야겠지.\"\n\n루세나가 장난기를 거두고 조용히 말했다. 시선이 일행 뒤쪽을 걷는 검사에게로 향했다.\n\n\"카렌델까지 이 인원이면 괜찮겠지만... 그 이후는 모르겠네.\"\n\n노엘이 짧게 고개를 끄덕였다.\n\n\"...쓸 만하더군, 저 검사.\"\n\n무덤덤한 사실 확인이었다.",
+        "user_input": "크흠, 그냥 동행하게 되었으니, 친해질려고 하는겁니다. 그러고 보니, 전투 능력은 어떤가요? 아버지와 둘이서 상인을 하려면 위험할 텐데요.",
+        "dialogues": [
+          {
+            "speaker": "saiki",
+            "line": "그냥 동행하게 되었으니, 친해질려고 하는겁니다. 그러고 보니, 전투 능력은 어떤가요?",
+            "tone": "casual",
+            "target": "mira"
+          },
+          {
+            "speaker": "mira",
+            "line": "솔직히 말씀드리면... 저희 둘 다 싸움엔 영 젬병이에요.",
+            "tone": "frank"
+          },
+          {
+            "speaker": "mira",
+            "line": "원래는 호위를 한 명 고용하려 했는데, 이번엔 사정이 여의치 않아서요. 이 길이 비교적 안전하다는 말을 믿었거든요... 그 늑대들을 만나기 전까지는요.",
+            "tone": "rueful"
+          },
+          {
+            "speaker": "hallan",
+            "line": "단도 하나 있지. 쓸 줄은 알아.",
+            "tone": "gruff"
+          },
+          {
+            "speaker": "hallan",
+            "line": "...그래도 그날, 둘이서는 역부족이었어. 덕분에 살았고.",
+            "tone": "heavy"
+          },
+          {
+            "speaker": "hallan",
+            "line": "다시는 그 꼴 안 당하려면, 이 다리부터 나아야겠지.",
+            "tone": "quiet"
+          },
+          {
+            "speaker": "lucena",
+            "line": "카렌델까지 이 인원이면 괜찮겠지만... 그 이후는 모르겠네.",
+            "tone": "serious"
+          },
+          {
+            "speaker": "noel",
+            "line": "...쓸 만하더군, 저 검사.",
+            "tone": "dry"
+          }
+        ],
+        "timestamp": "00:42:41"
       }
     ],
     "current_scene": {
-      "background": "/static/illustrations/pixel/default.png",
+      "background": "/static/illustrations/sd/background_trade_road_afternoon.webp",
       "layers": [
         {
           "type": "portrait",
