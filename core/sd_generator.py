@@ -432,6 +432,9 @@ def _find_existing_image(illustration_type, name):
     for search_dir in search_dirs:
         if not os.path.exists(search_dir):
             continue
+        # SD ON일 때 pixel 디렉토리의 이미지는 재활용하지 않음 (SD 생성 트리거 필요)
+        if is_sd_enabled() and os.sep + "pixel" in search_dir:
+            continue
         for f in os.listdir(search_dir):
             fname_lower = f.lower()
             for try_name in search_names:

@@ -559,6 +559,12 @@ New game opening procedure:
 On save load:
 - If turn_count > 0, no opening is needed
 - Summarize current situation and wait for action
+- Display last turn's player actions from the most recent event's dialogues/user_input:
+  [Last Turn Player Actions]
+  - Saiki: (last user_input)
+  - Lucena: (last dialogue by lucena)
+  - Noel: (last dialogue by noel)
+  This helps the user recall where they left off.
 
 ⚠️ Asking the user for actions without an opening is prohibited.
    Characters must appear in the world before they can act.

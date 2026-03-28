@@ -262,6 +262,8 @@ def restore_scene():
         needs_fix = False
         if bg_path and not os.path.isfile(bg_path):
             needs_fix = True  # 파일 자체가 없음
+        elif background and "/pixel/" in background and is_sd_enabled():
+            needs_fix = True  # SD ON인데 Skia 이미지 사용 중 — SD로 교체 필요
 
         # 위치 키워드가 배경 파일명에 없으면 불일치 가능
         if not needs_fix:
@@ -280,6 +282,21 @@ def restore_scene():
             better_bg = _find_best_background(state)
             if better_bg:
                 background = better_bg
+            else:
+                # 기존 이미지도 없으면 SD/Skia로 새로 생성
+                location = state.get("current_location", "")
+                request_illustration(
+                    illustration_type="background",
+                    prompt=f"fantasy {location.replace('_', ' ')}, landscape orientation, wide angle",
+                    turn_count=state.get("turn_count", 0),
+                    name=location,
+                )
+                # request_illustration이 _scene_state를 갱신 → game_state에도 반영
+                _add_npc_layers(state)
+                _save_scene_to_state(state)
+                save_game_state(state)
+                save_manager._sync_docs(state)
+                return
 
         set_scene_state(
             background=background,
