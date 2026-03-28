@@ -25,12 +25,12 @@
   },
   "position": [
     12,
-    10
+    9
   ],
   "status_effects": [],
   "inventory": [
-    "mace",
-    "holy_amulet"
+    "철퇴",
+    "성스러운 부적"
   ],
   "equipment": {
     "weapon": {
@@ -85,6 +85,7 @@
     "hair": "silver hair neatly tied back",
     "face": "sharp and cold gaze, intellectual impression",
     "outfit": "pale blue-white priestly robes, light chain armor",
-    "notable": "silver holy symbol necklace, worn scripture in hand"
+    "notable": "silver holy symbol necklace, worn scripture in hand",
+    "gender": "female"
   }
 }

@@ -25,12 +25,12 @@
   },
   "position": [
     12,
-    11
+    10
   ],
   "status_effects": [],
   "inventory": [
-    "iron_sword",
-    "leather_shield"
+    "철검",
+    "가죽 방패"
   ],
   "equipment": {
     "weapon": {
@@ -84,6 +84,7 @@
     "hair": "short-cropped black hair",
     "face": "sharp gaze, taciturn impression",
     "outfit": "worn chainmail, iron sword on back, leather shield on left arm",
-    "notable": "old scars visible above the armor"
+    "notable": "old scars visible above the armor",
+    "gender": "female"
   }
 }

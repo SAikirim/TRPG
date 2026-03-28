@@ -25,13 +25,13 @@
   },
   "position": [
     13,
-    11
+    10
   ],
   "status_effects": [],
   "inventory": [
-    "dual_daggers",
-    "thieves_tools",
-    "rope"
+    "단검 x2",
+    "도둑 도구",
+    "밧줄"
   ],
   "equipment": {
     "weapon": {
@@ -86,6 +86,7 @@
     "hair": "short-cropped black hair, sharp eyes",
     "face": "sly smirk, cunning impression",
     "outfit": "dark green leather armor, two daggers at the waist",
-    "notable": "movements that seem to melt into shadows"
+    "notable": "movements that seem to melt into shadows",
+    "gender": "female"
   }
 }

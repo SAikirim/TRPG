@@ -919,7 +919,8 @@ def _auto_npc_proximity(state):
 
 
 def _auto_update_ko(state):
-    """game_state의 NPC/아이템/위치 등 새 키가 ko.json에 없으면 자동 추가."""
+    """game_state의 NPC/아이템/위치 등 새 키가 ko.json에 없으면 자동 추가.
+    이미 값(한국어)으로 존재하는 이름은 중복 추가하지 않는다."""
     ko_path = os.path.join(BASE_DIR, "lang", "ko.json")
     try:
         with open(ko_path, "r", encoding="utf-8") as f:
@@ -929,37 +930,42 @@ def _auto_update_ko(state):
 
     changed = False
 
+    def _is_known(name, section):
+        """키 또는 값에 이미 존재하면 True"""
+        data = ko.get(section, {})
+        return name in data or name in data.values()
+
     # NPC 이름
     for npc in state.get("npcs", []):
         name = npc.get("name", "")
-        if name and name not in ko.get("npcs", {}):
+        if name and not _is_known(name, "npcs"):
             ko.setdefault("npcs", {})[name] = name
             changed = True
 
     # 플레이어 이름
     for p in state.get("players", []):
         name = p.get("name", "")
-        if name and name not in ko.get("npcs", {}):
+        if name and not _is_known(name, "npcs"):
             ko.setdefault("npcs", {})[name] = name
             changed = True
 
     # 아이템 (전체 인벤토리 스캔)
     for p in state.get("players", []):
         for item in p.get("inventory", []):
-            if item and item not in ko.get("items", {}) and item not in ko.get("weapons", {}) and item not in ko.get("armor", {}):
+            if item and not _is_known(item, "items") and not _is_known(item, "weapons") and not _is_known(item, "armor"):
                 ko.setdefault("items", {})[item] = item
                 changed = True
 
     # 위치
     loc = state.get("current_location", "")
-    if loc and loc not in ko.get("locations", {}):
+    if loc and not _is_known(loc, "locations"):
         ko.setdefault("locations", {})[loc] = loc
         changed = True
 
     # 맵 area 이름
     for area in state.get("map", {}).get("locations", []):
         area_name = area.get("name", "")
-        if area_name and area_name not in ko.get("area_names", {}):
+        if area_name and not _is_known(area_name, "area_names"):
             ko.setdefault("area_names", {})[area_name] = area_name
             changed = True
 

@@ -178,8 +178,17 @@
   },
   "turn_count": 0,
   "current_scene": {
-    "background": "/static/illustrations/pixel/default.png",
-    "layers": []
+    "background": "/static/illustrations/sd/background_crossroads_rest_night.webp",
+    "layers": [
+      {
+        "type": "portrait",
+        "image": "/static/portraits/sd/portrait_yeoul.webp",
+        "position": "center",
+        "name": "yeoul",
+        "distance": 0,
+        "size_class": "close"
+      }
+    ]
   },
   "events": [
     {
@@ -204,6 +213,46 @@
         }
       ],
       "timestamp": "18:00:26"
+    },
+    {
+      "turn": 0,
+      "message": "[GM] Generate gaon portrait",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:28:04"
+    },
+    {
+      "turn": 0,
+      "message": "[GM] Generate seraphine portrait",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:28:09"
+    },
+    {
+      "turn": 0,
+      "message": "[GM] Generate yeoul portrait",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:28:14"
+    },
+    {
+      "turn": 0,
+      "message": "[GM] Regenerate gaon portrait (female)",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:34:17"
+    },
+    {
+      "turn": 0,
+      "message": "[GM] Regenerate yeoul portrait (female)",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:34:22"
     }
   ]
 }
