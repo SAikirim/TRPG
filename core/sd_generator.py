@@ -185,6 +185,13 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
             img = Image.open(io.BytesIO(img_data)).convert("RGB")
 
             if illustration_type in ("portrait", "object"):
+                # Save original (before background removal) to portraits/original/
+                original_dir = os.path.join(BASE_DIR, "static", "portraits", "original")
+                os.makedirs(original_dir, exist_ok=True)
+                original_path = os.path.join(original_dir, f"{safe_name}.png")
+                img.save(original_path, "PNG")
+                logger.info(f"Original portrait saved: {original_path}")
+
                 # Remove background for compositing on any scene
                 try:
                     from transparent_background import Remover
