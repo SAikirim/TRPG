@@ -973,6 +973,16 @@ def _auto_update_ko(state):
         with open(ko_path, "w", encoding="utf-8") as f:
             json.dump(ko, f, ensure_ascii=False, indent=2)
 
+    # 미번역 경고: 값이 키와 동일한 항목 (자동 추가됐지만 번역 안 된 것)
+    untranslated = []
+    for section in ["npcs", "items", "locations", "area_names", "objects"]:
+        for k, v in ko.get(section, {}).items():
+            if k == v and not any(ord(c) >= 0xAC00 for c in k):
+                # 키=값이고 한국어가 아닌 경우 (영어 키가 번역 안 됨)
+                untranslated.append(f"{section}.{k}")
+    if untranslated:
+        gm._log_to_tracker("ko", f"⚠️ ko.json 미번역 {len(untranslated)}건: {', '.join(untranslated[:5])}")
+
 
 @app.route("/api/ko", methods=["GET"])
 def get_ko():
