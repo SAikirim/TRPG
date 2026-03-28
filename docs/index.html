@@ -254,6 +254,7 @@
         }
         .detail-item {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
             padding: 4px 8px;
@@ -263,12 +264,11 @@
         }
         .detail-item:last-child { border-bottom: none; }
         .detail-item:hover { background: rgba(255,255,255,0.05); }
-        .detail-item .item-name { flex: 1; }
+        .detail-item .item-name { flex: 1; min-width: 60%; }
         .detail-item .item-stat {
             font-size: 0.75em;
             color: #ffd700;
             margin-left: 8px;
-            white-space: nowrap;
         }
         .detail-item .tooltip {
             display: none;
