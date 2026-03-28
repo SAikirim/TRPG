@@ -8,9 +8,9 @@
     "stat_pool": 50,
     "status": "in_progress",
     "ending": null,
-    "current_chapter": 1
+    "current_chapter": 2
   },
-  "current_location": "trade_road_karendel",
+  "current_location": "karendel",
   "players": [
     {
       "id": 1,
@@ -133,7 +133,7 @@
       ],
       "threat_level": "none",
       "status": "alive",
-      "location": "trade_road_karendel",
+      "location": "karendel",
       "known": true
     },
     {
@@ -158,7 +158,7 @@
       ],
       "threat_level": "none",
       "status": "alive",
-      "location": "trade_road_karendel",
+      "location": "karendel",
       "known": true
     },
     {
@@ -182,7 +182,7 @@
         23
       ],
       "status": "alive",
-      "location": "trade_road_karendel"
+      "location": "karendel"
     },
     {
       "id": 303,
@@ -216,7 +216,7 @@
         22
       ],
       "status": "alive",
-      "location": "trade_road_karendel",
+      "location": "karendel",
       "description": "A peddler carrying a bundle on their back. The lock is flimsy."
     },
     {
@@ -233,7 +233,7 @@
         23
       ],
       "status": "alive",
-      "location": "trade_road_karendel",
+      "location": "karendel",
       "description": "A swordsman sipping from a cup while never letting go of his sword. He noticed Lucena's scouting."
     }
   ],
@@ -324,36 +324,8 @@
       }
     ]
   },
-  "turn_count": 24,
+  "turn_count": 27,
   "events": [
-    {
-      "turn": 24,
-      "message": "[GM] 턴 중간 기록 (pending flush)",
-      "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
-      "user_input": "미라에게 말을 건다",
-      "dialogues": [
-        {
-          "speaker": "saiki",
-          "line": "미라, 오늘 날씨 좋지 않아?",
-          "tone": "playful",
-          "target": "mira"
-        },
-        {
-          "speaker": "mira",
-          "line": "네? 아, 네... 좋네요.",
-          "tone": "shy"
-        }
-      ],
-      "timestamp": "22:54:40"
-    },
-    {
-      "turn": 24,
-      "message": "[GM] Session restore - trade road scene",
-      "narrative": "",
-      "user_input": "",
-      "dialogues": [],
-      "timestamp": "00:15:38"
-    },
     {
       "turn": 24,
       "message": "[GM] Restore character layers",
@@ -572,27 +544,26 @@
         }
       ],
       "timestamp": "20:52:07"
+    },
+    {
+      "turn": 27,
+      "message": "[GM] Scene fix: Karendel city background",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "21:00:32"
+    },
+    {
+      "turn": 27,
+      "message": "[GM] Scene fix: Karendel city background (retry)",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "21:04:16"
     }
   ],
   "current_scene": {
-    "background": "/static/illustrations/sd/background_trade_road_afternoon.webp",
-    "layers": [
-      {
-        "type": "portrait",
-        "image": "static/portraits/sd/portrait_mira.webp",
-        "position": "left",
-        "name": "mira",
-        "distance": 1,
-        "size_class": "d1"
-      },
-      {
-        "type": "portrait",
-        "image": "static/portraits/sd/portrait_hallan.webp",
-        "position": "center",
-        "name": "hallan",
-        "distance": 1,
-        "size_class": "d1"
-      }
-    ]
+    "background": "/static/illustrations/pixel/default.png",
+    "layers": []
   }
 }

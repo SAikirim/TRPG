@@ -2,8 +2,8 @@
   "active_scenario": "karendel_journey",
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
-  "turn": 24,
-  "chapter": 1,
+  "turn": 27,
+  "chapter": 2,
   "chapter_name": "south_gate_harun",
   "party_summary": [
     {
@@ -51,8 +51,6 @@
     }
   ],
   "progress_notes": [
-    "[GM] 턴 중간 기록 (pending flush)",
-    "[GM] Session restore - trade road scene",
     "[GM] Restore character layers",
     "[GM] Scene restore - trade road background",
     "[GM] Restore correct background",
@@ -60,7 +58,9 @@
     "[GM] Turn 25: Saiki flirts with Mira on the trade road",
     "[GM] Turn 26: Combat ability discussion, wolf attack memory",
     "[GM] Rollback restore - turn 26 trade road scene",
-    "[GM] Turn 27: Travel montage + Karendel arrival"
+    "[GM] Turn 27: Travel montage + Karendel arrival",
+    "[GM] Scene fix: Karendel city background",
+    "[GM] Scene fix: Karendel city background (retry)"
   ],
   "next_objective": "",
   "display_mode": "mobile",

@@ -3,7 +3,7 @@
     "scenario_id": "karendel_journey",
     "slot": 1,
     "description": "자동 저장 (턴 27)",
-    "saved_at": "2026-03-28 21:04:16",
+    "saved_at": "2026-03-28 21:00:32",
     "turn_count": 27,
     "chapter": 2,
     "party_summary": [
@@ -357,6 +357,14 @@
     "events": [
       {
         "turn": 24,
+        "message": "[GM] Session restore - trade road scene",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "00:15:38"
+      },
+      {
+        "turn": 24,
         "message": "[GM] Restore character layers",
         "narrative": "",
         "user_input": "",
@@ -581,18 +589,10 @@
         "user_input": "",
         "dialogues": [],
         "timestamp": "21:00:32"
-      },
-      {
-        "turn": 27,
-        "message": "[GM] Scene fix: Karendel city background (retry)",
-        "narrative": "",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "21:04:16"
       }
     ],
     "current_scene": {
-      "background": "/static/illustrations/pixel/default.png",
+      "background": null,
       "layers": []
     }
   }

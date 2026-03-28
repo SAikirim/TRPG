@@ -1172,6 +1172,77 @@ def _start_flask_server():
         return False
 
 
+def _start_sd_webui():
+    """sd_illustration=true이면 SD WebUI가 미실행 시 백그라운드로 자동 시작."""
+    import socket
+
+    # current_session에서 sd_illustration 확인
+    try:
+        session_path = os.path.join(BASE_DIR, "data", "current_session.json")
+        with open(session_path, "r", encoding="utf-8") as f:
+            import json as _json
+            session = _json.load(f)
+        if not session.get("sd_illustration", False):
+            return True  # SD 불필요
+    except Exception:
+        return True  # 세션 파일 없으면 스킵
+
+    # 포트 7860 점유 확인
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.settimeout(2)
+        s.connect(("127.0.0.1", 7860))
+        s.close()
+        print("  [OK] SD WebUI 이미 실행 중 (localhost:7860)")
+        return True
+    except (ConnectionRefusedError, OSError):
+        pass
+    finally:
+        s.close()
+
+    # 프로세스 기반 중복 감지 (포트 바인딩 전 로딩 중인 경우)
+    try:
+        import subprocess as _sp
+        result = _sp.run(
+            ["wmic", "process", "where", "name='python.exe'", "get", "CommandLine"],
+            capture_output=True, text=True, timeout=5
+        )
+        if "launch.py" in result.stdout:
+            print("  [OK] SD WebUI 이미 로딩 중 (프로세스 감지)")
+            return True
+    except Exception:
+        pass
+
+    # SD WebUI 백그라운드 시작
+    import subprocess
+    sd_dir = r"C:\git\WebUI\stable-diffusion-webui"
+    sd_python = os.path.join(sd_dir, "venv", "Scripts", "Python.exe")
+    launch_py = os.path.join(sd_dir, "launch.py")
+
+    if not os.path.exists(sd_python) or not os.path.exists(launch_py):
+        print(f"  [WARN] SD WebUI 경로 없음: {sd_dir}")
+        return False
+
+    try:
+        subprocess.Popen(
+            [sd_python, launch_py,
+             "--theme", "dark", "--xformers", "--xformers-flash-attention",
+             "--deepdanbooru", "--no-half-vae", "--api",
+             "--cors-allow-origins=http://127.0.0.1:7860",
+             "--listen", "--enable-insecure-extension-access"],
+            cwd=sd_dir,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
+        )
+        print("  [INFO] SD WebUI 시작 중... (포트 7860, 로딩에 1~2분 소요)")
+        # SD는 로딩이 오래 걸리므로 대기하지 않음 — Skia 폴백으로 진행, SD 준비되면 자동 전환
+        return True
+    except Exception as e:
+        print(f"  [WARN] SD WebUI 시작 실패: {e}")
+        return False
+
+
 def _try_restore_scene(scenario_id=None, slot=None):
     """Flask 서버가 실행 중이면 /api/load를 호출하여 장면+맵 복원."""
     try:
@@ -1180,6 +1251,9 @@ def _try_restore_scene(scenario_id=None, slot=None):
         req = urllib.request.Request("http://localhost:5000/api/game-state", method="GET")
         urllib.request.urlopen(req, timeout=2)
         print(f"  [OK] Flask 서버 감지됨 (localhost:5000)")
+
+        # SD WebUI 자동 시작 (sd_illustration=true일 때)
+        _start_sd_webui()
 
         # /api/load 호출하여 서버 측 restore_scene + update_map_image 트리거
         if scenario_id and slot is not None:
@@ -1209,6 +1283,8 @@ def _try_restore_scene(scenario_id=None, slot=None):
     except Exception as e:
         # Flask 미실행 — 자동 시작 시도
         if _start_flask_server():
+            # SD WebUI 자동 시작 (sd_illustration=true일 때)
+            _start_sd_webui()
             # 시작 성공 후 장면 복원 재시도
             try:
                 import urllib.request

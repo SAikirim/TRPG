@@ -586,6 +586,12 @@ def gm_update():
             except Exception:
                 pass
 
+    # Handle scene management commands (clear BEFORE illustration to avoid wiping new background)
+    if data.get("clear_scene"):
+        clear_scene()
+    if data.get("remove_layer"):
+        remove_layer(data["remove_layer"])
+
     # Handle illustration request (재활용 체크 우선 — 즉시 적용)
     illustration_req = data.get("illustration")
     ill_result = None
@@ -598,12 +604,6 @@ def gm_update():
             position=illustration_req.get("position", "center"),
             name=illustration_req.get("name", ""),
         )
-
-    # Handle scene management commands
-    if data.get("clear_scene"):
-        clear_scene()
-    if data.get("remove_layer"):
-        remove_layer(data["remove_layer"])
 
     # Entity overlap prevention — auto-relocate after position updates
     try:
@@ -639,6 +639,12 @@ def gm_update():
     gm.sync_all_players(state)
     gm._log_to_tracker("state", "game_state 저장 + 엔티티 동기화")
     update_map_image()
+
+    # docs/ 동기화 (GitHub Pages용)
+    try:
+        save_manager._sync_docs(state)
+    except Exception:
+        pass
 
     # 월드맵 갱신 (세계관 변경 반영 — 파이프라인)
     try:

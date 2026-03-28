@@ -1,5 +1,5 @@
 {
-  "background": "static/illustrations/sd/background_trade_road_afternoon.webp",
+  "background": "static/illustrations/pixel/default.png",
   "layers": [
     {
       "type": "portrait",
@@ -27,8 +27,8 @@
   },
   "enabled": false,
   "default_bg": {
-    "sd": "static/illustrations/sd/ch1_forest.png",
-    "pixel": "static/illustrations/pixel/forest.png"
+    "sd": "static/illustrations/sd/ch2_dungeon.png",
+    "pixel": "static/illustrations/pixel/dungeon.png"
   },
-  "current_chapter": 1
+  "current_chapter": 2
 }

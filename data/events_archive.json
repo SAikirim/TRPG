@@ -395,6 +395,36 @@
       "dialogues": [],
       "timestamp": "22:53:44",
       "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] 턴 중간 기록 (pending flush)",
+      "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
+      "user_input": "미라에게 말을 건다",
+      "dialogues": [
+        {
+          "speaker": "saiki",
+          "line": "미라, 오늘 날씨 좋지 않아?",
+          "tone": "playful",
+          "target": "mira"
+        },
+        {
+          "speaker": "mira",
+          "line": "네? 아, 네... 좋네요.",
+          "tone": "shy"
+        }
+      ],
+      "timestamp": "22:54:40",
+      "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Session restore - trade road scene",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:15:38",
+      "archived_at": "2026-03-28"
     }
   ]
 }
