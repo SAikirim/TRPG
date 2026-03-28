@@ -452,9 +452,9 @@ def _find_existing_image(illustration_type, name):
     for search_dir in search_dirs:
         if not os.path.exists(search_dir):
             continue
-        # SD ON일 때 pixel 배경은 재활용하지 않음 (SD 생성 트리거 필요)
-        # 단, 초상화는 pixel이라도 표시 (SD 생성 중에도 보여야 함)
-        if is_sd_enabled() and os.sep + "pixel" in search_dir and illustration_type == "background":
+        # SD ON일 때 pixel 이미지는 재활용하지 않음 (SD 생성 트리거 필요)
+        # pixel 이미지는 _skia_placeholder에서 표시용으로 사용되지만, _find_existing_image에서는 skip
+        if is_sd_enabled() and os.sep + "pixel" in search_dir:
             continue
         for f in os.listdir(search_dir):
             fname_lower = f.lower()
