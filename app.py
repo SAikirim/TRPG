@@ -269,7 +269,8 @@ def restore_scene():
             needs_fix = True  # SD ON인데 Skia 이미지 사용 중 — SD로 교체 필요
 
         # 위치 키워드가 배경 파일명에 없으면 불일치 가능
-        if not needs_fix:
+        # 단, SD로 생성된 배경(/sd/ 경로)은 GM이 의도적으로 설정한 것이므로 유지
+        if not needs_fix and "/sd/" not in background:
             location = state.get("current_location", "")
             loc_keywords = [k.lower() for k in location.replace("-", "_").split("_") if len(k) > 2]
             bg_basename = os.path.basename(background).lower()
