@@ -260,7 +260,8 @@ python core/ascii_map.py    # 터미널 맵 확인
 
 | 파일 | 내용 |
 |------|------|
-| `guides/gm_rules.txt` | GM 운영 규칙: 나레이션, 에이전트, 턴 처리, 웹 반영, 시스템 로그 |
+| `guides/gm_rules.txt` | GM 운영 규칙: 나레이션, 턴 처리, 웹 반영, 시스템 로그 |
+| `guides/agents.txt` | 에이전트 역할, 호출 규칙, 최적화, 스키마 아키텍처, 경고 처리 |
 | `guides/game_rules.txt` | 인게임 규칙: 주사위, 커버, 낙하 데미지, 환경 위험, 시야, 무게 |
 | `guides/map_rules.txt` | 맵 표시 전략, 맵 시스템, 엔티티 표시, 미니맵 크롭, 좌표 기반 거리 시스템 |
 | `guides/save_rules.txt` | 저장 규칙 (commit/push 타이밍, 메시지 형식, 저장 대상 파일) |

@@ -300,7 +300,8 @@ python core/ascii_map.py    # Check terminal map
 
 | File | Contents |
 |------|----------|
-| `guides/gm_rules.txt` | GM operational rules: narration, agents, turn processing, web reflection, system log |
+| `guides/gm_rules.txt` | GM operational rules: narration, turn processing, web reflection, system log |
+| `guides/agents.txt` | Agent roles, call rules, optimization, schema architecture, warning handling |
 | `guides/game_rules.txt` | In-game mechanics: dice, cover, fall damage, hazards, LoS, encumbrance |
 | `guides/map_rules.txt` | Map display strategy, map system, entity display, minimap crop, coordinate-based distance system |
 | `guides/save_rules.txt` | Save rules (commit/push timing, message format, files to save) |
