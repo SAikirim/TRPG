@@ -10,7 +10,7 @@
     "ending": null,
     "current_chapter": 1
   },
-  "current_location": "forest_entrance",
+  "current_location": "lost_treasure_dungeon",
   "players": [
     {
       "id": 1,
@@ -30,7 +30,7 @@
       },
       "position": [
         12,
-        10
+        12
       ],
       "status_effects": [],
       "inventory": [
@@ -68,7 +68,7 @@
       },
       "position": [
         12,
-        9
+        11
       ],
       "status_effects": [],
       "inventory": [
@@ -105,8 +105,8 @@
         "CON": 10
       },
       "position": [
-        13,
-        10
+        12,
+        13
       ],
       "status_effects": [],
       "inventory": [
@@ -176,19 +176,10 @@
       }
     ]
   },
-  "turn_count": 0,
+  "turn_count": 1,
   "current_scene": {
-    "background": "/static/illustrations/sd/background_crossroads_rest_night.webp",
-    "layers": [
-      {
-        "type": "portrait",
-        "image": "/static/portraits/sd/portrait_yeoul.webp",
-        "position": "center",
-        "name": "yeoul",
-        "distance": 0,
-        "size_class": "close"
-      }
-    ]
+    "background": "/static/illustrations/sd/background_dungeon_corridor.webp",
+    "layers": []
   },
   "events": [
     {
@@ -253,6 +244,82 @@
       "user_input": "",
       "dialogues": [],
       "timestamp": "00:34:22"
+    },
+    {
+      "turn": 1,
+      "message": "[GM] Turn 1: Dungeon entry, trap found and disarmed by Yeoul",
+      "narrative": "어둠 속으로 첫 발을 내디뎠다.\n\n횃불이 축축한 석벽을 비추자, 천장에서 물방울이 똑 떨어졌다. 가온이 횃불을 높이 들어 통로 천장과 양쪽 벽면을 훑어본 뒤, 발소리를 죽이며 세 걸음 앞으로 나아갔다. 뒤따르는 일행에게 손으로 '잠깐' 신호를 보냈다.\n\n\"일단 멈춰. 냄새 맡아봐 -- 흙냄새만 나면 괜찮고, 썩은 내 섞이면 바로 알려.\"\n\n\"내가 5보 앞서간다. 간격 유지해. 몰려다니면 같이 죽어.\"\n\n퉁명스럽지만, 전장에 익숙한 사람의 말이었다.\n\n세라핀이 성스러운 부적에 손을 얹고 낮은 목소리로 주문을 중얼거렸다. 은은한 빛이 세 사람을 감싸며 얇은 보호 결계가 펼쳐졌다. 동시에 횃불 빛이 닿지 않는 벽면의 각문을 예리한 눈으로 훑었다.\n\n\"가온, 잠깐. 저 각문 -- 경고문이야. 이 복도, 함정 아니면 언데드 구역이에요.\"\n\n\"모두 붙어요. 축복을 걸었으니 2미터 이상 벌어지지 마세요.\"\n\n그 순간, 여울이 대열 앞으로 미끄러지듯 나섰다. 손가락 끝으로 바닥을 훑다가 세 번째 석판 이음새에서 멈췄다. 미세한 먼지 흔적이 끊겨 있었다 -- 누군가 최근에 밟은 자리.\n\n무릎을 꿇고 귀를 바닥에 가져다 대자, 석판 아래에서 금속 스프링 소리가 희미하게 느껴졌다.\n\n\"잠깐, 멈춰. 이 석판 -- 밟으면 재밌는 일이 생길 것 같은데.\"\n\n입꼬리가 올라갔다.\n\n\"스프링식이야. 아마 위에서 뭔가 떨어지거나... 아니면 옆에서. 벽 좀 봐줘.\"\n\n여울이 도둑 도구를 꺼내 석판 이음새에 집어넣었다. 숙련된 손놀림으로 스프링을 고정하고, 발동 핀을 비틀어 빼냈다. 딸깍. 금속이 잠기는 소리와 함께 석판이 미동도 없이 고정되었다.\n\n여울이 일어서며 먼지를 털었다.\n\n통로 안쪽으로, 더 깊은 어둠이 이어지고 있다.",
+      "user_input": "(AI 자동 진행)",
+      "dialogues": [
+        {
+          "speaker": "가온",
+          "line": "일단 멈춰. 냄새 맡아봐 -- 흙냄새만 나면 괜찮고, 썩은 내 섞이면 바로 알려.",
+          "tone": "commanding"
+        },
+        {
+          "speaker": "가온",
+          "line": "내가 5보 앞서간다. 간격 유지해. 몰려다니면 같이 죽어.",
+          "tone": "gruff"
+        },
+        {
+          "speaker": "세라핀",
+          "line": "가온, 잠깐. 저 각문 -- 경고문이야. 이 복도, 함정 아니면 언데드 구역이에요.",
+          "tone": "cold, alert"
+        },
+        {
+          "speaker": "세라핀",
+          "line": "모두 붙어요. 축복 걸었으니 2미터 이상 벌어지지 마세요.",
+          "tone": "practical"
+        },
+        {
+          "speaker": "여울",
+          "line": "잠깐, 멈춰. 이 석판 -- 밟으면 재밌는 일이 생길 것 같은데.",
+          "tone": "playful whisper"
+        },
+        {
+          "speaker": "여울",
+          "line": "스프링식이야. 아마 위에서 뭔가 떨어지거나... 아니면 옆에서. 벽 좀 봐줘.",
+          "tone": "focused but amused"
+        }
+      ],
+      "timestamp": "01:05:28",
+      "dice_rolls": [
+        {
+          "type": "skill_check",
+          "roller": "여울",
+          "stat": "DEX",
+          "roll": 18,
+          "modifier": 4,
+          "total": 22,
+          "dc": 12,
+          "result": "success",
+          "note": "trap disarm"
+        }
+      ]
+    },
+    {
+      "turn": 1,
+      "message": "[GM] Fix: dungeon entry scene + location update",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "01:15:35"
+    },
+    {
+      "turn": 1,
+      "message": "[GM] Fix: dungeon entry positions + trap object + skill correction",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "01:22:18"
+    },
+    {
+      "turn": 1,
+      "message": "[GM] Map refresh with objects + position fix",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "01:27:07"
     }
   ]
 }

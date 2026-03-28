@@ -78,6 +78,27 @@ def check_and_warn(game_state=None, mechanics_results=None):
             if isinstance(r, dict) and r.get("error"):
                 warnings.append(f"⚖️ 판정 오류: {r['error']}")
 
+    # 4. 플레이어 위치가 맵 영역 안에 있는지 체크
+    map_data = game_state.get("map", {})
+    map_w = map_data.get("width", 25)
+    map_h = map_data.get("height", 25)
+    for p in game_state.get("players", []):
+        pos = p.get("position", [0, 0])
+        name = p.get("name", "?")
+        if pos[0] < 0 or pos[0] >= map_w or pos[1] < 0 or pos[1] >= map_h:
+            warnings.append(f"⚖️ {name} 위치 {pos}가 맵 범위({map_w}x{map_h}) 밖")
+
+        # 위치가 현재 location의 맵 area 안에 있는지 체크
+        areas = map_data.get("locations", [])
+        in_area = False
+        for area in areas:
+            a = area.get("area", {})
+            if a.get("x1", 0) <= pos[0] <= a.get("x2", 99) and a.get("y1", 0) <= pos[1] <= a.get("y2", 99):
+                in_area = True
+                break
+        if not in_area and areas:
+            warnings.append(f"⚖️ {name} 위치 {pos}가 어떤 맵 영역에도 속하지 않음")
+
     return warnings
 
 

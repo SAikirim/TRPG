@@ -896,9 +896,10 @@
             return STATIC_PREFIX + 'portraits/sd/portrait_' + name + '.webp';
         }
         function getPlayerPortraitFull(p) {
-            if (p.original_image) return staticPath(p.original_image);
+            // 줌: original(배경 있음) > sd(배경 제거) > pixel
             const name = _resolvePortraitName(p.name);
-            return STATIC_PREFIX + 'portraits/sd/portrait_' + name + '.webp';
+            if (p.original_image) return staticPath(p.original_image);
+            return STATIC_PREFIX + 'portraits/original/' + name + '.webp';
         }
         function buildOriginalImageMap() {
             if (!gameState) return;
@@ -1310,7 +1311,10 @@
 
         function updateEventsList() {
             const container = document.getElementById('events-list');
-            const events = showFullLog ? [...gameState.events].reverse() : gameState.events.slice(-5).reverse();
+            if (!gameState || !gameState.events) return;
+            // narrative가 있는 이벤트만 표시 (시스템 이벤트 필터링)
+            const allEvents = (gameState.events || []).filter(e => e.narrative);
+            const events = showFullLog ? [...allEvents].reverse() : allEvents.slice(-5).reverse();
             container.innerHTML = events.map(e => {
                 const message = filterNpcNames(e.message || '');
                 const rawNarr = e.narrative ? filterNpcNames(e.narrative) : '';
