@@ -1,6 +1,15 @@
 {
   "background": "static/illustrations/sd/background_dungeon_corridor.webp",
-  "layers": [],
+  "layers": [
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_spring_trap_disarmed.webp",
+      "position": "center",
+      "name": "spring_trap_disarmed",
+      "distance": 2,
+      "size_class": "d2"
+    }
+  ],
   "generating": {
     "status": "idle",
     "type": null,

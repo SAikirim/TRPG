@@ -341,6 +341,23 @@ def _build_portrait_prompt_from_entity(name):
             except Exception:
                 continue
 
+    # Also check object entities
+    for scenario_dir in os.listdir(entities_dir) if os.path.exists(entities_dir) else []:
+        objects_dir = os.path.join(entities_dir, scenario_dir, "objects")
+        if not os.path.exists(objects_dir):
+            continue
+        for f in os.listdir(objects_dir):
+            filepath = os.path.join(objects_dir, f)
+            try:
+                with open(filepath, "r", encoding="utf-8") as fh:
+                    obj = json.load(fh)
+                if obj.get("name") == name:
+                    desc = obj.get("description", name)
+                    obj_type = obj.get("type", "object")
+                    return f"fantasy {obj_type}, {desc}, simple dark background, no people, no characters, masterpiece, best quality"
+            except Exception:
+                continue
+
     return ""
 
 

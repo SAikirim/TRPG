@@ -132,6 +132,39 @@ def _add_npc_layers(state):
             size_class=size_class,
         )
 
+    # 오브젝트 레이어 추가 (현재 위치의 오브젝트)
+    scenario_id = state.get("game_info", {}).get("scenario_id", "")
+    obj_dir = os.path.join(BASE_DIR, "entities", scenario_id, "objects")
+    if os.path.isdir(obj_dir):
+        for fname in os.listdir(obj_dir):
+            if not fname.endswith(".json"):
+                continue
+            try:
+                with open(os.path.join(obj_dir, fname), "r", encoding="utf-8") as fh:
+                    obj = json.load(fh)
+            except Exception:
+                continue
+            obj_loc = obj.get("location", "")
+            if current_loc and obj_loc and obj_loc != current_loc:
+                continue
+            obj_name = obj.get("name", "")
+            if not obj_name:
+                continue
+            obj_pos = obj.get("position", [0, 0])
+            distance = max(abs(obj_pos[0] - p1_x), abs(obj_pos[1] - p1_y))
+            if distance > 6:
+                continue
+            size_class = "d2" if distance <= 2 else "d3"
+            request_illustration(
+                illustration_type="object",
+                prompt="",
+                turn_count=state.get("turn_count", 0),
+                position="center",
+                name=obj_name,
+                distance=distance,
+                size_class=size_class,
+            )
+
 
 def load_game_state():
     try:
