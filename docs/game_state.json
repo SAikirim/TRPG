@@ -346,14 +346,6 @@
   "events": [
     {
       "turn": 27,
-      "message": "[GM] Scene fix: Karendel city background",
-      "narrative": "",
-      "user_input": "",
-      "dialogues": [],
-      "timestamp": "21:00:32"
-    },
-    {
-      "turn": 27,
       "message": "[GM] Scene fix: Karendel city background (retry)",
       "narrative": "",
       "user_input": "",
@@ -506,18 +498,26 @@
       "user_input": "",
       "dialogues": [],
       "timestamp": "22:52:24"
+    },
+    {
+      "turn": 29,
+      "message": "[GM] Fix: inn interior background",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:56:21"
     }
   ],
   "current_scene": {
-    "background": "/static/illustrations/sd/background_karendel.webp",
+    "background": "/static/illustrations/sd/background_red_chimney_inn.webp",
     "layers": [
       {
         "type": "portrait",
         "image": "/static/portraits/pixel/portrait_volf.png",
         "position": "center",
         "name": "volf",
-        "distance": 0,
-        "size_class": "close"
+        "distance": 1,
+        "size_class": "d1"
       }
     ]
   }

@@ -52,7 +52,6 @@
     }
   ],
   "progress_notes": [
-    "[GM] Scene fix: Karendel city background",
     "[GM] Scene fix: Karendel city background (retry)",
     "[GM] Turn 28: Farewell at south gate, party splits",
     "[GM] ko sync test",
@@ -61,7 +60,8 @@
     "[GM] Map refresh after NPC separation",
     "[GM] Fix: set inn interior background",
     "[GM] Fix: turn count + Volf portrait",
-    "[GM] Generate Volf portrait"
+    "[GM] Generate Volf portrait",
+    "[GM] Fix: inn interior background"
   ],
   "next_objective": "",
   "display_mode": "mobile",

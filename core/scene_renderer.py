@@ -90,9 +90,15 @@ class SceneRenderer:
             self._draw_village_scene(canvas, W, H)
         elif any(k in name_lower for k in ["night", "밤", "evening", "석양", "sunset", "dusk"]):
             self._draw_night_scene(canvas, W, H)
-        elif any(k in name_lower for k in ["market", "시장", "shop", "상점", "trade"]):
+        elif any(k in name_lower for k in ["market", "시장", "shop", "상점"]):
             self._draw_market_scene(canvas, W, H)
-        elif any(k in name_lower for k in ["road", "길", "path", "여행", "travel"]):
+        elif any(k in name_lower for k in ["camp", "야영", "rest", "쉼터", "crossroads", "bonfire"]):
+            self._draw_camp_scene(canvas, W, H)
+        elif any(k in name_lower for k in ["inn", "여관", "tavern", "chimney", "숙소"]):
+            self._draw_inn_scene(canvas, W, H)
+        elif any(k in name_lower for k in ["city", "도시", "karendel", "gate", "성문", "성벽"]):
+            self._draw_city_scene(canvas, W, H)
+        elif any(k in name_lower for k in ["road", "길", "path", "여행", "travel", "trade"]):
             self._draw_road_scene(canvas, W, H)
         else:
             self._draw_default_scene(canvas, W, H, scene_name)
@@ -692,6 +698,179 @@ class SceneRenderer:
         # Sun glow
         _draw_radial_gradient_circle(canvas, W * 0.5, H * 0.35, 200,
             [(10/200, (1.0, 0.95, 0.8, 0.2)), (1, (1.0, 0.9, 0.7, 0))])
+
+    def _draw_city_scene(self, canvas, W, H):
+        """Draw a medieval city/gate scene."""
+        # Sky
+        _draw_linear_gradient_rect(canvas, 0, 0, W, int(H * 0.5),
+            (0, 0), (0, H * 0.5),
+            [(0, (0.45, 0.60, 0.80)), (0.5, (0.55, 0.70, 0.85)), (1, (0.65, 0.75, 0.80))])
+        # City wall
+        _draw_linear_gradient_rect(canvas, 0, int(H * 0.3), W, int(H * 0.7),
+            (0, H * 0.3), (0, H),
+            [(0, (0.45, 0.40, 0.35)), (0.3, (0.40, 0.35, 0.28)), (1, (0.30, 0.25, 0.18))])
+        # Gate arch
+        gate_cx, gate_w, gate_h = W * 0.5, 180, 220
+        arch = skia.Path()
+        arch.moveTo(gate_cx - gate_w / 2, H * 0.75)
+        arch.lineTo(gate_cx - gate_w / 2, H * 0.35)
+        arch.arcTo(skia.Rect(gate_cx - gate_w / 2, H * 0.2, gate_cx + gate_w / 2, H * 0.5), 180, 180, False)
+        arch.lineTo(gate_cx + gate_w / 2, H * 0.75)
+        arch.close()
+        canvas.drawPath(arch, skia_paint(0.18, 0.15, 0.12))
+        # Gate inside (bright)
+        inner = skia.Path()
+        inner.moveTo(gate_cx - 70, H * 0.75)
+        inner.lineTo(gate_cx - 70, H * 0.4)
+        inner.arcTo(skia.Rect(gate_cx - 70, H * 0.28, gate_cx + 70, H * 0.52), 180, 180, False)
+        inner.lineTo(gate_cx + 70, H * 0.75)
+        inner.close()
+        canvas.drawPath(inner, skia_paint(0.65, 0.60, 0.50, 0.7))
+        # Towers
+        for tx in [W * 0.25, W * 0.75]:
+            canvas.drawRect(skia.Rect(tx - 30, H * 0.15, tx + 30, H * 0.75),
+                skia_paint(0.38, 0.33, 0.28))
+            # Battlement
+            for bx in range(int(tx - 30), int(tx + 30), 15):
+                canvas.drawRect(skia.Rect(bx, H * 0.12, bx + 8, H * 0.18),
+                    skia_paint(0.38, 0.33, 0.28))
+            # Window
+            canvas.drawRect(skia.Rect(tx - 8, H * 0.30, tx + 8, H * 0.38),
+                skia_paint(0.85, 0.75, 0.45))
+        # Flags
+        for tx in [W * 0.25, W * 0.75]:
+            pole_x = tx
+            canvas.drawLine(pole_x, H * 0.05, pole_x, H * 0.15,
+                skia_paint(0.3, 0.25, 0.2, style=skia.Paint.kStroke_Style, stroke_width=3))
+            flag = skia.Path()
+            flag.moveTo(pole_x, H * 0.05); flag.lineTo(pole_x + 30, H * 0.08); flag.lineTo(pole_x, H * 0.11)
+            flag.close()
+            canvas.drawPath(flag, skia_paint(0.8, 0.2, 0.2))
+        # Ground (cobblestone hint)
+        for gx in range(0, W, 25):
+            for gy in range(int(H * 0.72), H, 18):
+                canvas.drawRect(skia.Rect(gx, gy, gx + 20, gy + 14),
+                    skia_paint(0.35, 0.30, 0.22, 0.4))
+                canvas.drawRect(skia.Rect(gx, gy, gx + 20, gy + 14),
+                    skia_paint(0.25, 0.20, 0.15, 0.3, style=skia.Paint.kStroke_Style, stroke_width=1))
+
+    def _draw_inn_scene(self, canvas, W, H):
+        """Draw an inn/tavern interior scene."""
+        # Wall background
+        _draw_linear_gradient_rect(canvas, 0, 0, W, H,
+            (0, 0), (0, H),
+            [(0, (0.28, 0.20, 0.12)), (0.4, (0.32, 0.24, 0.15)), (1, (0.22, 0.16, 0.10))])
+        # Wooden floor
+        _draw_linear_gradient_rect(canvas, 0, int(H * 0.6), W, int(H * 0.4),
+            (0, H * 0.6), (0, H),
+            [(0, (0.35, 0.25, 0.15)), (0.5, (0.30, 0.22, 0.12)), (1, (0.25, 0.18, 0.10))])
+        # Floor planks
+        for fy in range(int(H * 0.6), H, 20):
+            canvas.drawLine(0, fy, W, fy,
+                skia_paint(0.20, 0.15, 0.08, 0.3, style=skia.Paint.kStroke_Style, stroke_width=1))
+        # Fireplace
+        fp_x, fp_w, fp_h = W * 0.5, 160, 140
+        canvas.drawRect(skia.Rect(fp_x - fp_w / 2, H * 0.15, fp_x + fp_w / 2, H * 0.15 + fp_h),
+            skia_paint(0.35, 0.30, 0.25))
+        # Fire opening
+        canvas.drawRect(skia.Rect(fp_x - 50, H * 0.25, fp_x + 50, H * 0.15 + fp_h),
+            skia_paint(0.12, 0.08, 0.05))
+        # Fire glow
+        _draw_radial_gradient_circle(canvas, fp_x, H * 0.35, 120,
+            [(0, (1.0, 0.6, 0.1, 0.6)), (0.5, (1.0, 0.4, 0.05, 0.2)), (1, (0.8, 0.3, 0.0, 0))])
+        # Flames
+        for i, (fx, fscale) in enumerate([(-20, 1.0), (0, 1.3), (20, 0.9), (-10, 0.7), (15, 1.1)]):
+            flame = skia.Path()
+            base_y = H * 0.15 + fp_h - 5
+            flame.moveTo(fp_x + fx - 8 * fscale, base_y)
+            flame.cubicTo(fp_x + fx - 5, base_y - 30 * fscale, fp_x + fx + 5, base_y - 40 * fscale, fp_x + fx, base_y - 50 * fscale)
+            flame.cubicTo(fp_x + fx + 8, base_y - 35 * fscale, fp_x + fx + 10, base_y - 20 * fscale, fp_x + fx + 8 * fscale, base_y)
+            flame.close()
+            alpha = 0.7 - i * 0.08
+            canvas.drawPath(flame, skia_paint(1.0, 0.5 + i * 0.05, 0.1, alpha))
+        # Chimney above
+        canvas.drawRect(skia.Rect(fp_x - 25, 0, fp_x + 25, H * 0.15),
+            skia_paint(0.30, 0.22, 0.15))
+        # Tables
+        for tx, tw in [(W * 0.15, 120), (W * 0.75, 130)]:
+            # Table top
+            canvas.drawRect(skia.Rect(tx, H * 0.55, tx + tw, H * 0.58),
+                skia_paint(0.40, 0.28, 0.15))
+            # Table legs
+            canvas.drawRect(skia.Rect(tx + 10, H * 0.58, tx + 16, H * 0.72),
+                skia_paint(0.35, 0.24, 0.12))
+            canvas.drawRect(skia.Rect(tx + tw - 16, H * 0.58, tx + tw - 10, H * 0.72),
+                skia_paint(0.35, 0.24, 0.12))
+        # Warm ambient glow
+        _draw_radial_gradient_circle(canvas, W * 0.5, H * 0.4, 400,
+            [(0, (1.0, 0.7, 0.3, 0.08)), (1, (0.5, 0.3, 0.1, 0))])
+        # Ceiling beams
+        for bx in range(0, W, int(W / 5)):
+            canvas.drawRect(skia.Rect(bx, 0, bx + 18, H * 0.04),
+                skia_paint(0.25, 0.18, 0.10))
+
+    def _draw_camp_scene(self, canvas, W, H):
+        """Draw a campsite/rest area at night."""
+        # Night sky
+        _draw_linear_gradient_rect(canvas, 0, 0, W, int(H * 0.55),
+            (0, 0), (0, H * 0.55),
+            [(0, (0.02, 0.02, 0.08)), (0.5, (0.05, 0.05, 0.15)), (1, (0.08, 0.10, 0.18))])
+        # Ground
+        _draw_linear_gradient_rect(canvas, 0, int(H * 0.5), W, int(H * 0.5),
+            (0, H * 0.5), (0, H),
+            [(0, (0.12, 0.15, 0.08)), (0.5, (0.10, 0.12, 0.06)), (1, (0.06, 0.08, 0.04))])
+        # Stars
+        seed = int(hashlib.md5(b"camp").hexdigest()[:8], 16)
+        for i in range(50):
+            sx = (seed * (i + 1) * 7) % W
+            sy = (seed * (i + 1) * 13) % int(H * 0.4)
+            brightness = 0.5 + (i % 5) * 0.1
+            canvas.drawCircle(sx, sy, 1 + (i % 3) * 0.3, skia_paint(1, 1, brightness, 0.7))
+        # Campfire glow
+        fire_x, fire_y = W * 0.5, H * 0.6
+        _draw_radial_gradient_circle(canvas, fire_x, fire_y, 200,
+            [(0, (1.0, 0.6, 0.15, 0.35)), (0.4, (1.0, 0.4, 0.05, 0.15)), (1, (0.5, 0.2, 0.0, 0))])
+        # Fire logs
+        canvas.drawRect(skia.Rect(fire_x - 25, fire_y + 5, fire_x + 25, fire_y + 12),
+            skia_paint(0.3, 0.15, 0.05))
+        canvas.drawRect(skia.Rect(fire_x - 18, fire_y, fire_x + 20, fire_y + 7),
+            skia_paint(0.25, 0.12, 0.04))
+        # Flames
+        for fx, fh in [(-12, 45), (0, 60), (12, 40), (-6, 35), (8, 50)]:
+            flame = skia.Path()
+            flame.moveTo(fire_x + fx - 6, fire_y)
+            flame.cubicTo(fire_x + fx - 3, fire_y - fh * 0.6, fire_x + fx + 3, fire_y - fh * 0.8, fire_x + fx, fire_y - fh)
+            flame.cubicTo(fire_x + fx + 5, fire_y - fh * 0.5, fire_x + fx + 8, fire_y - fh * 0.3, fire_x + fx + 6, fire_y)
+            flame.close()
+            canvas.drawPath(flame, skia_paint(1.0, 0.5, 0.1, 0.7))
+        # Tent
+        tent_x = W * 0.75
+        tent = skia.Path()
+        tent.moveTo(tent_x - 60, H * 0.55); tent.lineTo(tent_x, H * 0.30); tent.lineTo(tent_x + 60, H * 0.55)
+        tent.close()
+        canvas.drawPath(tent, skia_paint(0.45, 0.35, 0.20))
+        # Tent opening
+        tent_open = skia.Path()
+        tent_open.moveTo(tent_x - 15, H * 0.55); tent_open.lineTo(tent_x, H * 0.38); tent_open.lineTo(tent_x + 15, H * 0.55)
+        tent_open.close()
+        canvas.drawPath(tent_open, skia_paint(0.25, 0.18, 0.10))
+        # Tent glow from fire
+        _draw_radial_gradient_circle(canvas, tent_x, H * 0.45, 80,
+            [(0, (1.0, 0.6, 0.2, 0.1)), (1, (0.5, 0.3, 0.1, 0))])
+        # Tree silhouettes
+        for tx, th in [(W * 0.05, 200), (W * 0.15, 180), (W * 0.88, 190), (W * 0.95, 170)]:
+            trunk = skia.Path()
+            trunk.moveTo(tx - 4, H * 0.5); trunk.lineTo(tx + 4, H * 0.5)
+            trunk.lineTo(tx + 3, H * 0.5 - th * 0.4); trunk.lineTo(tx - 3, H * 0.5 - th * 0.4)
+            trunk.close()
+            canvas.drawPath(trunk, skia_paint(0.05, 0.05, 0.08))
+            # Canopy
+            canvas.drawCircle(tx, H * 0.5 - th * 0.5, th * 0.25,
+                skia_paint(0.04, 0.06, 0.08))
+            canvas.drawCircle(tx - 15, H * 0.5 - th * 0.4, th * 0.18,
+                skia_paint(0.04, 0.06, 0.08))
+            canvas.drawCircle(tx + 15, H * 0.5 - th * 0.4, th * 0.18,
+                skia_paint(0.04, 0.06, 0.08))
 
     def _draw_default_scene(self, canvas, W, H, name):
         # Moody gradient
