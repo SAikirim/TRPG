@@ -412,6 +412,13 @@ def _appearance_to_prompt(entity):
             cleaned = cleaned.strip(' ,')
             return cleaned
 
+        # Gender prefix (중요: SD가 성별을 정확히 생성하도록)
+        gender = appearance.get("gender", "")
+        if gender == "female":
+            parts.insert(0, "1woman, female")
+        elif gender == "male":
+            parts.insert(0, "1man, male")
+
         for field in ["age", "build", "skin", "hair", "face", "outfit", "notable"]:
             val = appearance.get(field, "")
             translated = translate_field(val)
