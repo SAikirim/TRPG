@@ -479,9 +479,10 @@
             font-size: 0.85em;
         }
         .event-item {
-            padding: 6px 8px;
+            padding: 8px 10px;
+            margin-bottom: 4px;
             border-bottom: 1px solid #1a1a2e;
-            line-height: 1.4;
+            line-height: 1.5;
         }
         .event-item .turn-badge {
             display: inline-block;
@@ -496,7 +497,10 @@
             display: block;
             color: #ffd700;
             font-style: italic;
-            margin-top: 3px;
+            margin-top: 6px;
+            line-height: 1.6;
+            white-space: pre-line;
+            padding: 4px 0;
         }
         /* Map in sidebar */
         .sidebar-map img {
@@ -1288,7 +1292,9 @@
             const events = showFullLog ? [...gameState.events].reverse() : gameState.events.slice(-10).reverse();
             container.innerHTML = events.map(e => {
                 const message = filterNpcNames(e.message || '');
-                const narrative = e.narrative ? `<span class="narrative">${filterNpcNames(e.narrative)}</span>` : '';
+                const rawNarr = e.narrative ? filterNpcNames(e.narrative) : '';
+                // 대사(따옴표) 하이라이트 + 빈 줄 정리
+                const narrative = rawNarr ? `<span class="narrative">${rawNarr.replace(/\"([^\"]+)\"/g, '<b style="color:#fff;font-style:normal">&ldquo;$1&rdquo;</b>')}</span>` : '';
                 return `
                 <div class="event-item">
                     <span class="turn-badge">T${e.turn}</span>
