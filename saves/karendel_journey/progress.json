@@ -1,92 +1,8 @@
 {
   "scenario_id": "karendel_journey",
   "first_played": "2026-03-21 03:50:21",
-  "total_saves": 36,
+  "total_saves": 48,
   "history": [
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-27 22:52:49"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "미라와 대화 테스트",
-      "saved_at": "2026-03-27 22:52:53"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-27 22:53:44"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "미라와 대화",
-      "saved_at": "2026-03-27 22:53:48"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "미라와 대화",
-      "saved_at": "2026-03-27 22:54:42"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-28 00:10:12"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-28 00:15:38"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-28 00:15:46"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-28 00:18:35"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-28 00:19:32"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-28 00:22:11"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-28 00:27:15"
-    },
     {
       "slot": 1,
       "chapter": 2,
@@ -142,9 +58,93 @@
       "turn": 27,
       "description": "자동 저장 (턴 27)",
       "saved_at": "2026-03-28 21:45:42"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 27,
+      "description": "자동 저장 (턴 27)",
+      "saved_at": "2026-03-28 21:59:30"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 27,
+      "description": "자동 저장 (턴 27)",
+      "saved_at": "2026-03-28 22:15:00"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 27,
+      "description": "자동 저장 (턴 27)",
+      "saved_at": "2026-03-28 22:25:27"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 27,
+      "description": "자동 저장 (턴 27)",
+      "saved_at": "2026-03-28 22:43:06"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 27,
+      "description": "자동 저장 (턴 27)",
+      "saved_at": "2026-03-28 22:44:00"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 27,
+      "description": "자동 저장 (턴 27)",
+      "saved_at": "2026-03-28 22:47:40"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 29,
+      "description": "자동 저장 (턴 29)",
+      "saved_at": "2026-03-28 22:52:04"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 29,
+      "description": "자동 저장 (턴 29)",
+      "saved_at": "2026-03-28 22:52:24"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 29,
+      "description": "자동 저장 (턴 29)",
+      "saved_at": "2026-03-28 22:56:21"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 29,
+      "description": "자동 저장 (턴 29)",
+      "saved_at": "2026-03-28 23:17:53"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 29,
+      "description": "자동 저장 (턴 29)",
+      "saved_at": "2026-03-28 23:23:11"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 29,
+      "description": "Turn 29: Red Chimney Inn, meet Volf",
+      "saved_at": "2026-03-29 00:12:08"
     }
   ],
-  "last_played": "2026-03-28 21:45:42",
+  "last_played": "2026-03-29 00:12:08",
   "last_chapter": 2,
-  "last_turn": 27
+  "last_turn": 29
 }

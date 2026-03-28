@@ -2,9 +2,9 @@
   "active_scenario": "karendel_journey",
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
-  "turn": 27,
+  "turn": 29,
   "chapter": 2,
-  "chapter_name": "south_gate_harun",
+  "chapter_name": "red_chimney_inn",
   "party_summary": [
     {
       "name": "saiki",
@@ -24,7 +24,8 @@
         "travel_money_silver_10",
         "shared_gold_1",
         "rope",
-        "flint"
+        "flint",
+        "spice_pouch"
       ]
     },
     {
@@ -51,21 +52,21 @@
     }
   ],
   "progress_notes": [
-    "[GM] Restore character layers",
-    "[GM] Scene restore - trade road background",
-    "[GM] Restore correct background",
-    "[GM] Sync scene to game_state",
-    "[GM] Turn 25: Saiki flirts with Mira on the trade road",
-    "[GM] Turn 26: Combat ability discussion, wolf attack memory",
-    "[GM] Rollback restore - turn 26 trade road scene",
-    "[GM] Turn 27: Travel montage + Karendel arrival",
-    "[GM] Scene fix: Karendel city background",
-    "[GM] Scene fix: Karendel city background (retry)"
+    "[GM] ko sync test",
+    "[GM] Turn 29: Farewell Mira, arrive Red Chimney Inn, meet Volf",
+    "[GM] Fix: remove separated NPCs from map",
+    "[GM] Map refresh after NPC separation",
+    "[GM] Fix: set inn interior background",
+    "[GM] Fix: turn count + Volf portrait",
+    "[GM] Generate Volf portrait",
+    "[GM] Fix: inn interior background",
+    "[GM] Generate Volf SD portrait",
+    "[GM] Regenerate Volf SD portrait (fix)"
   ],
   "next_objective": "",
   "display_mode": "mobile",
   "show_dice_result": false,
   "show_system_log": false,
   "sd_illustration": true,
-  "last_updated": "2026-03-28"
+  "last_updated": "2026-03-29"
 }

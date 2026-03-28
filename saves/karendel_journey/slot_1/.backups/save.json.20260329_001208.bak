@@ -2,8 +2,8 @@
   "save_info": {
     "scenario_id": "karendel_journey",
     "slot": 1,
-    "description": "Turn 29: Red Chimney Inn, meet Volf",
-    "saved_at": "2026-03-29 00:12:08",
+    "description": "자동 저장 (턴 29)",
+    "saved_at": "2026-03-28 23:23:11",
     "turn_count": 29,
     "chapter": 2,
     "party_summary": [
@@ -491,7 +491,7 @@
       "layers": [
         {
           "type": "portrait",
-          "image": "/static/portraits/sd/portrait_volf.webp",
+          "image": "/static/portraits/pixel/portrait_volf.png",
           "position": "center",
           "name": "volf",
           "distance": 0,
