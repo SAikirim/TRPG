@@ -159,9 +159,24 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
                 save_dir = SD_ILLUSTRATIONS_DIR
             os.makedirs(save_dir, exist_ok=True)
 
-            # Reusable naming: use name if provided, otherwise timestamp
-            safe_name = name.replace(" ", "_") if name else datetime.now().strftime("%H%M%S")
+            # Reusable naming: use name (mandatory for reuse), fallback to location from session
+            if name:
+                safe_name = name.replace(" ", "_")
+            else:
+                # location에서 이름 추출 (타임스탬프 사용 금지 — 재활용 불가)
+                try:
+                    with open(os.path.join(BASE_DIR, "data", "current_session.json"), "r", encoding="utf-8") as _sf:
+                        _sess = json.load(_sf)
+                    safe_name = _sess.get("chapter_name", "") or "unnamed"
+                except Exception:
+                    safe_name = "unnamed"
+                safe_name = safe_name.replace(" ", "_")
+                logger.warning(f"SD generation without name — using '{safe_name}'. Always provide a name for reuse!")
             filename = f"{illustration_type}_{safe_name}.webp"
+            # 같은 이름의 기존 파일이 있으면 덮어쓰기 (중복 방지)
+            existing_same = os.path.join(save_dir, filename)
+            if os.path.exists(existing_same):
+                logger.info(f"Overwriting existing SD image: {filename}")
             filepath = os.path.join(save_dir, filename)
 
             # Convert to WebP, remove background for portraits/objects
