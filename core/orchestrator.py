@@ -966,10 +966,10 @@ class TurnOrchestrator:
         return sd if os.path.isfile(sd) else sys.executable
 
     def _auto_save(self, turn: int, description: str = "") -> None:
-        """매 턴 git commit + push (전부 백그라운드, 턴 시간에 영향 없음)."""
+        """매 턴 git commit + push (백그라운드). 세이브 슬롯은 건드리지 않음.
+        [auto] 태그로 수동 save 커밋과 구분."""
         try:
-            # commit + push를 하나의 백그라운드 프로세스로
-            cmd = f'cd "{BASE_DIR}" && git add -A && git commit -m "turn {turn}: {description}" && git push'
+            cmd = f'cd "{BASE_DIR}" && git add -A && git commit -m "[auto] turn {turn}: {description}" && git push'
             subprocess.Popen(
                 cmd, shell=True, cwd=BASE_DIR,
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
