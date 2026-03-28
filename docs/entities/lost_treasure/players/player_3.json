@@ -1,23 +1,14 @@
 {
   "id": 3,
-  "name": "yeoul",
-  "class": "rogue",
-  "controlled_by": "ai",
-  "agent_id": "agent_c",
-  "background": {
-    "origin": "Grew up hardened in market alleys. Was told his mouth was worse than his sticky fingers.",
-    "motivation": "If there's treasure, gotta go. Danger? That's the fun part.",
-    "personality": "The type who grins more in dangerous situations. Doesn't know if he's fearless or just used to hiding fear.",
-    "relationships": {
-      "gaon": "Party tank. Reliable but too stiff. Need to loosen him up.",
-      "seraphine": "Party healer. Nags a lot but always takes care of everyone in the end."
-    }
-  },
+  "name": "여울",
+  "class": "도적",
+  "level": 1,
+  "xp": 0,
+  "hp": 20,
+  "max_hp": 20,
+  "mp": 12,
+  "max_mp": 12,
   "stats": {
-    "hp": 20,
-    "max_hp": 20,
-    "mp": 12,
-    "max_mp": 12,
     "STR": 8,
     "DEX": 18,
     "INT": 14,
@@ -25,14 +16,26 @@
   },
   "position": [
     13,
-    11
+    10
   ],
   "status_effects": [],
   "inventory": [
-    "dual_daggers",
-    "thieves_tools",
-    "rope"
+    "단검 x2",
+    "도둑 도구",
+    "밧줄"
   ],
+  "controlled_by": "ai",
+  "agent_id": "agent_c",
+  "race": "인간",
+  "appearance": {
+    "age": "20대 초반",
+    "build": "가볍고 민첩한 체형",
+    "skin": "약간 그을린 피부",
+    "hair": "짧게 자른 흑발, 날카로운 눈매",
+    "face": "비실비실 웃는 입꼬리, 약삭빠른 인상",
+    "outfit": "다크그린 레더아머, 허리에 단검 두 자루",
+    "notable": "그림자 속에 녹아드는 듯한 움직임"
+  },
   "equipment": {
     "weapon": {
       "name": "dual_daggers",
@@ -52,24 +55,6 @@
     "flee",
     "trap_detect"
   ],
-  "combat_state": {
-    "is_in_combat": false,
-    "defense_bonus": 0,
-    "next_turn_penalty": 0
-  },
-  "history": {
-    "actions_taken": [],
-    "damage_dealt_total": 0,
-    "damage_received_total": 0,
-    "kills": [],
-    "items_used": [],
-    "turns_played": 0
-  },
-  "conditions": {
-    "alive": true,
-    "conscious": true,
-    "death_save_turns": 0
-  },
   "growth": {
     "level": 1,
     "xp": 0,
@@ -78,14 +63,12 @@
     "learned_skills": [],
     "xp_log": []
   },
-  "party_role": "midline_ambush_utility",
-  "appearance": {
-    "age": "early 20s",
-    "build": "light and agile build",
-    "skin": "slightly tanned skin",
-    "hair": "short-cropped black hair, sharp eyes",
-    "face": "sly smirk, cunning impression",
-    "outfit": "dark green leather armor, two daggers at the waist",
-    "notable": "movements that seem to melt into shadows"
+  "history": {
+    "actions_taken": [],
+    "damage_dealt_total": 0,
+    "damage_received_total": 0,
+    "kills": [],
+    "items_used": [],
+    "turns_played": 0
   }
 }

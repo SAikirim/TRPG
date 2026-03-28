@@ -53,23 +53,31 @@ By swapping scenarios and rulesets, you can play in various settings including f
 
 ## Player vs Character (IC/OOC Distinction)
 
-> This system has two layers: **Players** (real people / AI personas) and **Characters** (in-game entities).
+> This system has three layers: **User** (real person), **AI Players** (AI personas), and **Characters** (in-game entities).
 
-| Layer | Identity | Examples | Speech Mode |
-|-------|----------|----------|-------------|
-| **Player (OOC)** | The person controlling the character | Junhyeok, Seoyeon, Minji | Out-of-character: strategy, opinions, meta-discussion |
-| **Character (IC)** | The in-game persona | Saiki, Lucena, Noel | In-character: dialogue, actions, roleplay |
+| Layer | Identity | Examples | Role |
+|-------|----------|----------|------|
+| **User** | The real person at the terminal | You (the human) | Controls characters directly, gives OOC orders to AI players, all final decisions |
+| **AI Player (OOC)** | AI personas that play as if human | Junhyeok, Seoyeon, Minji, Sua, Jihyun | Each has personality/play_style. Controls assigned character via Player Agent |
+| **Character (IC)** | In-game persona | Saiki, Lucena, Noel, Gaon, etc. | Exists in the game world. Controlled by User or AI Player |
 
-### Mapping
-- `agents/agent_a.json` (Junhyeok) → controls `player_1` (Saiki) — **user-controlled**
-- `agents/agent_b.json` (Seoyeon) → controls `player_2` (Lucena) — **AI Player Agent**
-- `agents/agent_c.json` (Minji) → controls `player_3` (Noel) — **AI Player Agent**
+### Mapping (per scenario)
+- AI Player ↔ Character mapping is defined by `current_character` in `agents/agent_*.json`
+- The user chooses which character to control directly (controlled_by: "user")
+- The user chooses which AI player controls which character — can reassign anytime
+- All 5 AI players (agent_a~e) are equal — none is "the user's avatar"
+
+### Current mappings (karendel_journey):
+- User → Saiki (controlled_by: "user")
+- agent_b (Seoyeon) → Lucena (controlled_by: "ai")
+- agent_c (Minji) → Noel (controlled_by: "ai")
 
 ### GM Detection Rules
 - **IC input**: Character name used, in-game action/dialogue → process as GM turn (narration)
-- **OOC input**: Player name used (민지, 서연), meta-discussion (strategy, rules, character sheet) → call Player Agent in OOC mode, respond as player persona (not character)
+- **OOC input**: AI player name used (민지, 서연), meta-discussion (strategy, rules) → call Player Agent in OOC mode, respond as AI player persona
+- **User directive**: User gives direct orders to AI players ("수아, 가온으로 정찰해") → AI player executes
 - OOC responses are NOT included in narration or event logs
-- Players may discuss strategy OOC, then switch to IC for the actual turn
+- AI players may discuss strategy OOC with each other or with the user, then switch to IC for the actual turn
 
 ---
 

@@ -1,23 +1,14 @@
 {
   "id": 1,
-  "name": "gaon",
-  "class": "warrior",
-  "controlled_by": "ai",
-  "agent_id": "agent_a",
-  "background": {
-    "origin": "Former mercenary. Worked alone after losing multiple parties, but has formed a team again.",
-    "motivation": "Learned through experience that protecting allies is the best strategy. This time, he won't lose anyone.",
-    "personality": "The quiet type who acts first. Plans strategy only in his head and shows it through action.",
-    "relationships": {
-      "seraphine": "Party healer. Someone he can trust to cover the rear.",
-      "yeoul": "Party rogue. Someone he needs to shield from the front."
-    }
-  },
+  "name": "가온",
+  "class": "전사",
+  "level": 1,
+  "xp": 0,
+  "hp": 33,
+  "max_hp": 33,
+  "mp": 5,
+  "max_mp": 5,
   "stats": {
-    "hp": 33,
-    "max_hp": 33,
-    "mp": 5,
-    "max_mp": 5,
     "STR": 18,
     "DEX": 10,
     "INT": 6,
@@ -25,13 +16,25 @@
   },
   "position": [
     12,
-    11
+    10
   ],
   "status_effects": [],
   "inventory": [
-    "iron_sword",
-    "leather_shield"
+    "철검",
+    "가죽 방패"
   ],
+  "controlled_by": "ai",
+  "agent_id": "agent_a",
+  "race": "인간",
+  "appearance": {
+    "age": "20대 중반",
+    "build": "단단하고 다부진 체형",
+    "skin": "햇볕에 그을린 피부",
+    "hair": "짧게 자른 흑발",
+    "face": "날카로운 눈빛, 과묵한 인상",
+    "outfit": "낡은 쇠사슬 갑옷, 등에 철검, 왼팔에 가죽 방패",
+    "notable": "갑옷 위로 드러난 오래된 흉터"
+  },
   "equipment": {
     "weapon": {
       "name": "iron_sword",
@@ -50,24 +53,6 @@
     "defend",
     "provoke"
   ],
-  "combat_state": {
-    "is_in_combat": false,
-    "defense_bonus": 0,
-    "next_turn_penalty": 0
-  },
-  "history": {
-    "actions_taken": [],
-    "damage_dealt_total": 0,
-    "damage_received_total": 0,
-    "kills": [],
-    "items_used": [],
-    "turns_played": 0
-  },
-  "conditions": {
-    "alive": true,
-    "conscious": true,
-    "death_save_turns": 0
-  },
   "growth": {
     "level": 1,
     "xp": 0,
@@ -76,14 +61,12 @@
     "learned_skills": [],
     "xp_log": []
   },
-  "party_role": "frontline_tank_melee",
-  "appearance": {
-    "age": "mid-20s",
-    "build": "solid and sturdy build",
-    "skin": "sun-tanned skin",
-    "hair": "short-cropped black hair",
-    "face": "sharp gaze, taciturn impression",
-    "outfit": "worn chainmail, iron sword on back, leather shield on left arm",
-    "notable": "old scars visible above the armor"
+  "history": {
+    "actions_taken": [],
+    "damage_dealt_total": 0,
+    "damage_received_total": 0,
+    "kills": [],
+    "items_used": [],
+    "turns_played": 0
   }
 }

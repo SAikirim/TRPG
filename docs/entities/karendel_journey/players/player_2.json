@@ -2,13 +2,20 @@
   "id": 2,
   "name": "lucena",
   "class": "rogue",
-  "level": 3,
-  "xp": 315,
-  "hp": 30,
-  "max_hp": 30,
-  "mp": 14,
-  "max_mp": 14,
+  "background": {
+    "origin": "Saiki's younger sister. While her brother learned magic, she learned survival skills in back alleys. Pickpocketing and lockpicking were her school.",
+    "motivation": "Escape poverty by finding treasure with her brother. 'If brother lights the way, I'll open the path from the shadows.'",
+    "personality": "Rough-spoken with quick hands, but still throws tantrums in front of her brother at fifteen — the most dependable little sister in the world.",
+    "relationships": {
+      "saiki": "Brother. The most precious person in the world",
+      "noel": "Same-age friend. They bicker but understand each other"
+    }
+  },
   "stats": {
+    "hp": 30,
+    "max_hp": 30,
+    "mp": 14,
+    "max_mp": 14,
     "STR": 8,
     "DEX": 20,
     "INT": 10,
@@ -24,8 +31,6 @@
     "thieves_tools",
     "rope"
   ],
-  "controlled_by": "ai",
-  "original_image": "/static/portraits/original/player_2_luchena.png",
   "equipment": {
     "weapon": {
       "name": "dual_daggers",
@@ -41,6 +46,43 @@
     "flee",
     "poison_apply"
   ],
+  "combat_state": {
+    "is_in_combat": false,
+    "defense_bonus": 0,
+    "next_turn_penalty": 0
+  },
+  "history": {
+    "actions_taken": [
+      {
+        "turn": 3,
+        "action": "ambush",
+        "target": "dark orc",
+        "roll": "auto hit (stealth)",
+        "damage": 14,
+        "result": "killed"
+      },
+      {
+        "turn": 7,
+        "action": "trap disarm",
+        "target": "treasure chest poison gas trap",
+        "roll": "success",
+        "damage": 0,
+        "result": "trap disarmed"
+      }
+    ],
+    "damage_dealt_total": 14,
+    "damage_received_total": 0,
+    "kills": [
+      "dark orc"
+    ],
+    "items_used": [],
+    "turns_played": 2
+  },
+  "conditions": {
+    "alive": true,
+    "conscious": true,
+    "death_save_turns": 0
+  },
   "growth": {
     "level": 3,
     "xp": 315,
@@ -76,31 +118,16 @@
       }
     ]
   },
-  "history": {
-    "actions_taken": [
-      {
-        "turn": 3,
-        "action": "ambush",
-        "target": "dark orc",
-        "roll": "auto hit (stealth)",
-        "damage": 14,
-        "result": "killed"
-      },
-      {
-        "turn": 7,
-        "action": "trap disarm",
-        "target": "treasure chest poison gas trap",
-        "roll": "success",
-        "damage": 0,
-        "result": "trap disarmed"
-      }
-    ],
-    "damage_dealt_total": 14,
-    "damage_received_total": 0,
-    "kills": [
-      "dark orc"
-    ],
-    "items_used": [],
-    "turns_played": 2
-  }
+  "party_role": "midline_ambush_util",
+  "controlled_by": "ai",
+  "race": "human",
+  "appearance": {
+    "age": "15",
+    "build": "Quick, agile posture",
+    "hair": "Short messy hair tied back loosely",
+    "face": "Sharp, mischievous eyes with a confident smirk. Tough exterior but youthful softness.",
+    "outfit": "Dark leather street clothes — not proper armor, street urchin's practical outfit with many hidden pockets",
+    "notable": "Dual-wields two small daggers. Lockpicking tools hanging from belt."
+  },
+  "agent_id": "agent_b"
 }

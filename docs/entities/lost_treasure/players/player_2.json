@@ -1,23 +1,14 @@
 {
   "id": 2,
-  "name": "seraphine",
-  "class": "cleric",
-  "controlled_by": "ai",
-  "agent_id": "agent_b",
-  "background": {
-    "origin": "A plague wiped out her village in childhood. After surviving alone, she self-taught healing arts and joined the clergy guild.",
-    "motivation": "Acts before waiting for miracles. Serves the gods with pragmatism over piety.",
-    "personality": "Few words but quick judgment. Appears cold but watches party members' conditions most carefully.",
-    "relationships": {
-      "gaon": "Party tank. If he holds the front, I cover from behind.",
-      "yeoul": "Party rogue. Need to warn him — if he charges in recklessly, healing may come late."
-    }
-  },
+  "name": "세라핀",
+  "class": "성직자",
+  "level": 1,
+  "xp": 0,
+  "hp": 26,
+  "max_hp": 26,
+  "mp": 24,
+  "max_mp": 24,
   "stats": {
-    "hp": 26,
-    "max_hp": 26,
-    "mp": 24,
-    "max_mp": 24,
     "STR": 6,
     "DEX": 10,
     "INT": 18,
@@ -25,13 +16,25 @@
   },
   "position": [
     12,
-    10
+    9
   ],
   "status_effects": [],
   "inventory": [
-    "mace",
-    "holy_amulet"
+    "철퇴",
+    "성스러운 부적"
   ],
+  "controlled_by": "ai",
+  "agent_id": "agent_b",
+  "race": "인간",
+  "appearance": {
+    "age": "20대 초반",
+    "build": "단정하고 슬림한 체형",
+    "skin": "밝은 피부",
+    "hair": "은빛 머리카락을 단정하게 묶음",
+    "face": "날카롭고 차가운 눈빛, 지적인 인상",
+    "outfit": "청백색 사제복, 가벼운 사슬 갑옷",
+    "notable": "은빛 성흔 목걸이, 손에 낡은 성전"
+  },
   "equipment": {
     "weapon": {
       "name": "mace",
@@ -51,24 +54,6 @@
     "blessing",
     "purify"
   ],
-  "combat_state": {
-    "is_in_combat": false,
-    "defense_bonus": 0,
-    "next_turn_penalty": 0
-  },
-  "history": {
-    "actions_taken": [],
-    "damage_dealt_total": 0,
-    "damage_received_total": 0,
-    "kills": [],
-    "items_used": [],
-    "turns_played": 0
-  },
-  "conditions": {
-    "alive": true,
-    "conscious": true,
-    "death_save_turns": 0
-  },
   "growth": {
     "level": 1,
     "xp": 0,
@@ -77,14 +62,12 @@
     "learned_skills": [],
     "xp_log": []
   },
-  "party_role": "backline_healer_support",
-  "appearance": {
-    "age": "early 20s",
-    "build": "neat and slim build",
-    "skin": "fair skin",
-    "hair": "silver hair neatly tied back",
-    "face": "sharp and cold gaze, intellectual impression",
-    "outfit": "pale blue-white priestly robes, light chain armor",
-    "notable": "silver holy symbol necklace, worn scripture in hand"
+  "history": {
+    "actions_taken": [],
+    "damage_dealt_total": 0,
+    "damage_received_total": 0,
+    "kills": [],
+    "items_used": [],
+    "turns_played": 0
   }
 }

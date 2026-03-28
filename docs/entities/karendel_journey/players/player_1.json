@@ -2,13 +2,20 @@
   "id": 1,
   "name": "saiki",
   "class": "mage",
-  "level": 3,
-  "xp": 315,
-  "hp": 21,
-  "max_hp": 21,
-  "mp": 41,
-  "max_mp": 41,
+  "background": {
+    "origin": "From a poor family. A self-taught mage who learned magic from a wandering wizard who visited the village in childhood.",
+    "motivation": "Set out on an adventure to find treasure for the family's livelihood",
+    "personality": "Quiet and cautious, but a responsible brother who risks danger for his family",
+    "relationships": {
+      "lucena": "Younger sister. Siblings who grew up protecting each other",
+      "noel": "Orphan neighbor. A bond from sharing meals"
+    }
+  },
   "stats": {
+    "hp": 21,
+    "max_hp": 21,
+    "mp": 41,
+    "max_mp": 41,
     "STR": 8,
     "DEX": 16,
     "INT": 19,
@@ -35,8 +42,6 @@
     "flint",
     "spice_pouch"
   ],
-  "controlled_by": "user",
-  "original_image": "/static/portraits/original/player_1_saiki.png",
   "equipment": {
     "weapon": {
       "name": "magic_staff",
@@ -53,40 +58,10 @@
     "heal",
     "mana_shield"
   ],
-  "growth": {
-    "level": 3,
-    "xp": 315,
-    "xp_to_next": 600,
-    "stat_points_available": 0,
-    "learned_skills": [
-      "mana_shield"
-    ],
-    "xp_log": [
-      {
-        "source": "orc kill (high)",
-        "amount": 60
-      },
-      {
-        "source": "chapter 1 complete",
-        "amount": 100
-      },
-      {
-        "source": "trap disarm (puzzle)",
-        "amount": 25
-      },
-      {
-        "source": "treasure chest obtained (quest)",
-        "amount": 50
-      },
-      {
-        "source": "exploration/RP (forest, dungeon, inscription)",
-        "amount": 50
-      },
-      {
-        "source": "wolf kill (medium)",
-        "amount": 30
-      }
-    ]
+  "combat_state": {
+    "is_in_combat": false,
+    "defense_bonus": 0,
+    "next_turn_penalty": 0
   },
   "history": {
     "actions_taken": [
@@ -128,5 +103,57 @@
     "kills": [],
     "items_used": [],
     "turns_played": 3
-  }
+  },
+  "conditions": {
+    "alive": true,
+    "conscious": true,
+    "death_save_turns": 0
+  },
+  "growth": {
+    "level": 3,
+    "xp": 315,
+    "xp_to_next": 600,
+    "stat_points_available": 0,
+    "learned_skills": [
+      "mana_shield"
+    ],
+    "xp_log": [
+      {
+        "source": "orc kill (high)",
+        "amount": 60
+      },
+      {
+        "source": "chapter 1 complete",
+        "amount": 100
+      },
+      {
+        "source": "trap disarm (puzzle)",
+        "amount": 25
+      },
+      {
+        "source": "treasure chest obtained (quest)",
+        "amount": 50
+      },
+      {
+        "source": "exploration/RP (forest, dungeon, inscription)",
+        "amount": 50
+      },
+      {
+        "source": "wolf kill (medium)",
+        "amount": 30
+      }
+    ]
+  },
+  "party_role": "backline_ranged_heal",
+  "controlled_by": "user",
+  "race": "human",
+  "appearance": {
+    "age": "18",
+    "build": "Slender and lean",
+    "hair": "Messy dark hair",
+    "face": "Calm, thoughtful deep blue eyes with quiet determination. Gentle but serious expression.",
+    "outfit": "Worn, patched traveler's robe — humble clothing showing poor background",
+    "notable": "Simple wooden staff with faintly glowing crystal at the top"
+  },
+  "agent_id": "agent_a"
 }

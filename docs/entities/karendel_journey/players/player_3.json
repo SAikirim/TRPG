@@ -2,13 +2,20 @@
   "id": 3,
   "name": "noel",
   "class": "warrior",
-  "level": 3,
-  "xp": 315,
-  "hp": 45,
-  "max_hp": 45,
-  "mp": 7,
-  "max_mp": 7,
+  "background": {
+    "origin": "An orphan who lived alone on the village outskirts. Not a formally trained knight, but a street-taught fighter.",
+    "motivation": "Half wanting to repay the kindness of being fed at Saiki's house, half wanting to change his life with treasure. 'This time, I'll stand in front and protect everyone.'",
+    "personality": "Rough on the outside but secretly caring — a tough exterior hiding a soft heart. Recklessly jumps into danger first.",
+    "relationships": {
+      "saiki": "Benefactor from next door whom he calls 'big brother'",
+      "lucena": "Same-age friend. They bicker but understand each other"
+    }
+  },
   "stats": {
+    "hp": 45,
+    "max_hp": 45,
+    "mp": 7,
+    "max_mp": 7,
     "STR": 16,
     "DEX": 12,
     "INT": 8,
@@ -24,8 +31,6 @@
     "orc_axe",
     "wound_treatment_vial"
   ],
-  "controlled_by": "ai",
-  "original_image": "/static/portraits/original/player_3_noeul.png",
   "equipment": {
     "weapon": {
       "name": "orc_axe",
@@ -47,6 +52,33 @@
     "flee",
     "power_strike"
   ],
+  "combat_state": {
+    "is_in_combat": false,
+    "defense_bonus": 0,
+    "next_turn_penalty": 0
+  },
+  "history": {
+    "actions_taken": [
+      {
+        "turn": 3,
+        "action": "attack",
+        "target": "dark orc",
+        "roll": "18+3=21 hit",
+        "damage": 0,
+        "result": "target already dead"
+      }
+    ],
+    "damage_dealt_total": 0,
+    "damage_received_total": 0,
+    "kills": [],
+    "items_used": [],
+    "turns_played": 1
+  },
+  "conditions": {
+    "alive": true,
+    "conscious": true,
+    "death_save_turns": 0
+  },
   "growth": {
     "level": 3,
     "xp": 315,
@@ -82,21 +114,16 @@
       }
     ]
   },
-  "history": {
-    "actions_taken": [
-      {
-        "turn": 3,
-        "action": "attack",
-        "target": "dark orc",
-        "roll": "18+3=21 hit",
-        "damage": 0,
-        "result": "target already dead"
-      }
-    ],
-    "damage_dealt_total": 0,
-    "damage_received_total": 0,
-    "kills": [],
-    "items_used": [],
-    "turns_played": 1
-  }
+  "party_role": "frontline_tank_melee_2",
+  "controlled_by": "ai",
+  "race": "human",
+  "appearance": {
+    "age": "15",
+    "build": "Sturdy, muscular for his age from years of street brawling",
+    "hair": "Wild, unkempt reddish-brown hair",
+    "face": "Scar on cheek. Fierce eyes but warm underneath — acts tough but genuinely cares.",
+    "outfit": "Mismatched scavenged armor — leather shield on one arm, worn iron sword in the other",
+    "notable": "Scar on cheek. Standing protectively in front of others."
+  },
+  "agent_id": "agent_c"
 }
