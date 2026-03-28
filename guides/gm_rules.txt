@@ -215,9 +215,30 @@ The dice_rolls field must always include ruling details when calling gm-update:
 [GM Display Procedure — show_dice_result]
 Check show_dice_result in current_session.json:
 - The show_dice_result check is not automatically performed in phase 1b, so the GM must check before phase 2
-- false: Do not expose values in narration. Convey only as: "Saiki surveyed the surroundings. There was no sign of danger."
-- true: Show all values: "1d20 → [17] + INT(+4) = 21 vs DC 10 → Success!"
-- The ruling result banner is only displayed when show_dice_result is true
+
+[Inline Dice Display in Narration — MANDATORY]
+Every time a ruling occurs, the narration MUST include an inline dice indicator at the moment of the check.
+This applies regardless of show_dice_result setting:
+
+  show_dice_result: false (private mode):
+    🎲 [DEX] 판정 중...
+    (followed by narrative description of the result — no numbers)
+    Example:
+      여울이 석판 이음새에 도구를 집어넣었다.
+      🎲 [DEX] 판정 중...
+      숙련된 손놀림으로 핀을 비틀자 — 딸깍. 금속이 잠기는 소리.
+
+  show_dice_result: true (public mode):
+    🎲 [DEX] 1d20 → [18] + DEX(+4) = 22 vs DC 12 → 성공!
+    (followed by narrative description)
+    Example:
+      여울이 석판 이음새에 도구를 집어넣었다.
+      🎲 [DEX] 1d20 → [18] + DEX(+4) = 22 vs DC 12 → 성공!
+      숙련된 손놀림으로 핀을 비틀자 — 딸깍. 금속이 잠기는 소리.
+
+- The inline dice indicator must appear WITHIN the narration, not separately
+- Without this indicator, the user cannot tell when a check happened
+- Turns with no ruling do not include the indicator
 
 [Private Mode Processing] (show_dice_result: false, default)
 - During phase 1b system processing, the -q (quiet) flag must be used:
