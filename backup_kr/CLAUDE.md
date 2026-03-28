@@ -202,6 +202,11 @@ guides/                   - 상세 규칙 참조 파일
 3. `data/current_session.json` → `data/worldbuilding.json` → `data/game_state.json` 읽기
 4. `guides/gm_rules.txt` 읽기 — 주사위 표시, NPC 등록, 에이전트 규칙 확인
 5. Flask 서버 확인 → 웹 UI 장면 복원 (자동: `restore_scene`)
+6. 현재 세션 설정을 유저에게 표시:
+   - `show_dice_result` (true/false)
+   - `show_system_log` (true/false)
+   - `player_input_mode` (batch/sequential)
+   - `sd_illustration` (true/false)
 
 > 웹 UI가 빈 화면이거나 이전 장면을 보여주는 것은 금지.
 
