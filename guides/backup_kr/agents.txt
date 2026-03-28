@@ -64,6 +64,13 @@ Phase 3: 턴 결과로 SystemRequest 구성
 구성 기준 (GM이 phase 1a에서 결정):
 - Player Agent: 항상 캐릭터별 개별 호출 (각자 고유 페르소나 agents/agent_*.json 보유)
   - 여러 Player Agent를 하나로 합치지 않는다 — 성격 혼합으로 품질 저하
+  - Player Agent는 해당 에이전트 페르소나 파일(agents/agent_*.json)을 반드시 읽고 행동을 생성해야 한다
+  - 매칭: 에이전트의 current_character 필드 → 플레이어 id (예: agent_b.current_character = "player_2" → 루세나)
+  - 페르소나의 personality, play_style, decision_tendency를 행동/대사 생성에 반영해야 한다
+  - controlled_by: "user"인 캐릭터는 AI 에이전트 불필요 — 유저가 직접 조종
+  - 유저가 부재 시 AI가 대신 조종하려면 해당 에이전트의 current_character에 할당
+  - AI 플레이어는 적극적이어야 한다: 행동 제안, NPC에게 먼저 말 걸기, 의견/이견 표현 — 단순 반응만 하지 않는다
+  - 유저가 AI 플레이어에게 직접 말을 걸면 (예: "루세나, 어떻게 생각해?"), 해당 Player Agent를 즉시 호출하여 응답을 생성한다. GM이 AI 플레이어의 대사를 직접 쓰지 않는다.
 - NPC Agent: 주요 NPC (엔티티 파일 + 대화 있는 경우) → 개별 호출. 단역 NPC → 합쳐도 가능
 - 전투/판정/챕터 전환 → 전체 분리 (Player, NPC, Rules, Scenario, Worldbuilding, System Reflection)
 - 평화로운 이동/대화 → Player 개별, NPC 합산 가능, Rules/Scenario 각 분리
@@ -255,9 +262,7 @@ Phase 1b (에이전트 호출 — 방향성 + 맥락 포함):
 - 에이전트는 파일을 읽어 GM의 방향성이 일관성이 있는지 검증하고 구체적인 결과를 반환
 
 Phase 3 (사후 검증):
-- gm-update API 호출 시 자동으로 실행되는 안전망
-- phase 1b 사전 호출 단계에서 놓친 모순을 포착
-- 사후 검증에서 경고가 발생하면 나레이션을 수정하고 데이터를 재반영한 후 재검증
+→ Phase 3 사후 검증: 아래 '에이전트 경고 처리 워크플로우' 섹션 참조
 
 나쁜 예: GM이 NPC 대사를 직접 작성하고 gm-update의 사후 검증에만 의존
 좋은 예: NPC 에이전트가 대사 생성 → GM이 나레이션에 반영 → gm-update 사후 검증으로 추가 확인

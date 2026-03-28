@@ -12,13 +12,7 @@ GM Narration Principles
   - Good example: "Noel hesitated. Lucena said, 'Come with me.'" (Only NPCs are described)
   - Good example (montage): Mira asks a question → scene cuts to next snippet without Saiki's reply (user didn't declare one)
 - For AI characters (controlled_by: "ai"), the Player Agent generates dialogue and actions — the GM does not write them directly
-  - The Player Agent must read the corresponding agent persona file (agents/agent_*.json) before generating actions
-  - Match: agent's current_character field → player id (e.g., agent_b.current_character = "player_2" → Lucena)
-  - The persona's personality, play_style, and decision_tendency must be reflected in action/dialogue generation
-  - Characters with controlled_by: "user" do NOT need an AI agent — the user controls them directly
-  - If the user is absent and wants AI to control their character temporarily, assign an agent via current_character
-  - AI players must be proactive: suggest actions, start NPC conversations, express opinions/disagreements — not just react
-  - When the user speaks directly to an AI player (e.g., "Lucena, what do you think?"), call that Player Agent immediately to generate a response. The GM must NOT write AI player dialogue directly.
+  - Details: See guides/agents.txt "Agent Call Optimization Rules" section
 - Describe only from the character's perspective — convey only what the character sees, hears, and feels
 
 Player Action Summary (mandatory before narration)
@@ -315,16 +309,16 @@ GM Turn Tracker (gm_turn.py) Details
 Only record tasks that were actually executed. Displaying agents/tasks that were not executed is prohibited.
 
 Usage:
-  python gm_turn.py start              # Start GM turn — initialize tracker
+  python core/gm_turn.py start              # Start GM turn — initialize tracker
   # ... Perform actual tasks (game_mechanics.py, gm-update, etc.) ...
   # game_mechanics.py execution -> automatically recorded in tracker
   # gm-update API call -> automatically recorded in tracker
-  python gm_turn.py log npc "Generated Hallan's dialogue"   # Manual record when using Agent
-  python gm_turn.py log narration "Narration output"  # Record after narration
-  python gm_turn.py end                # End GM turn — output omission warnings
+  python core/gm_turn.py log npc "Generated Hallan's dialogue"   # Manual record when using Agent
+  python core/gm_turn.py log narration "Narration output"  # Record after narration
+  python core/gm_turn.py end                # End GM turn — output omission warnings
 
 - Auto-recording: Automatically registered in tracker when game_mechanics.py CLI is executed or gm-update API is called
-- Manual recording: NPC Agent calls, narration output, etc. are recorded via python gm_turn.py log <tag> <msg>
+- Manual recording: NPC Agent calls, narration output, etc. are recorded via python core/gm_turn.py log <tag> <msg>
 - End-of-turn verification: Warns of missing mandatory steps (gm-update, state save, narration) at end
 - Tags: dice, gm-update, state, entity, save, npc, narration
 

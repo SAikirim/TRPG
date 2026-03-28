@@ -26,13 +26,16 @@ Dice Mechanics
 
 [Display Formats]
 - Public Mode (show_dice_result: true):
-  - Show all values: 1d20 -> [15] + INT(+4) = 19 vs DC 16 -> Success!
-  - Damage: 1d8 -> [6] + INT(+4) = 10 damage
-  - Critical: 1d20 -> [20] / Fumble: 1d20 -> [1]
+  - Show all values: 1d20 → [15] + INT(+4) = 19 vs DC 16 → 성공!
+  - Damage: 1d8 → [6] + INT(+4) = 10 damage
+  - Critical: 1d20 → [20] / Fumble: 1d20 → [1]
 - Private Mode (show_dice_result: false):
   - Do not expose numerical values in narration — convey results through description only
   - Only criticals/fumbles are indicated separately
-- Narration order: Situation description -> Dice roll display (if public) -> Continue narration with result
+- Narration order: Situation description → Dice roll display (if public) → Continue narration with result
+
+[Inline Dice Indicator — Mandatory]
+Every check must include an inline indicator in the narration. Details: See guides/gm_rules.txt "Inline Dice Display in Narration" section.
 
 Tactical Cover Rules
 ===

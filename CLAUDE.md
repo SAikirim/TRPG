@@ -67,10 +67,10 @@ By swapping scenarios and rulesets, you can play in various settings including f
 - The user chooses which AI player controls which character — can reassign anytime
 - All 5 AI players (agent_a~e) are equal — none is "the user's avatar"
 
-### Current mappings (karendel_journey):
-- User → Saiki (controlled_by: "user")
-- agent_b (Seoyeon) → Lucena (controlled_by: "ai")
-- agent_c (Minji) → Noel (controlled_by: "ai")
+### Current mappings
+Defined by `current_character` field in each `agents/agent_*.json` file.
+The user sets `controlled_by: "user"` on their chosen character in game_state.
+Check `data/game_state.json` players and `agents/` files for current assignments.
 
 ### GM Detection Rules
 - **IC input**: Character name used, in-game action/dialogue → process as GM turn (narration)
@@ -343,4 +343,5 @@ python core/ascii_map.py    # Check terminal map
 | `guides/process.txt` | Process management, start/stop, duplicate prevention, status checks |
 | `core/schemas/base.py` | Pydantic base: AgentType, RunnerType, AgentConfig, TurnContext, Request/Response |
 | `core/schemas/orchestrator.py` | GM orchestrator: TurnPlan, AgentDispatch, TurnSynthesis |
+| `guides/tile_interaction.txt` | Tile interaction, cover objects, environmental hazards, tactical rules |
 | `data/agent_config.json` | Per-agent runner/model configuration (claude/cloud/local) |

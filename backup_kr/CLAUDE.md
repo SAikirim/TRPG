@@ -131,6 +131,35 @@ Claude Code CLI 터미널에서 Claude가 GM 역할을 하며 진행하는 TRPG 
 
 > **에이전트 호출 공통 규칙**: 에이전트는 매번 새로 생성되어 대화 컨텍스트가 없다. GM이 1b단계에서 반드시 방향 + 맥락 + 구체적 질문을 전달해야 한다. 상세: guides/gm_rules.txt 참조.
 
+### 하이브리드 멀티 에이전트 아키텍처 (Runner 추상화)
+
+하위 에이전트는 서로 다른 백엔드에서 실행 가능하다. GM은 백엔드와 무관하게 동일한 pydantic 스키마 요청을 전송한다.
+
+```
+AgentRequest (pydantic)  →  AgentRegistry (dispatcher)  →  AgentResponse (pydantic)
+                                    │
+                          ┌─────────┼─────────┐
+                     ClaudeRunner  CloudRunner  LocalRunner
+                     (Agent tool)  (Gemini/    (Ollama/
+                                   Groq/       llama.cpp)
+                                   OpenAI)
+```
+
+**설정**: `data/agent_config.json` — 에이전트별 runner/모델 할당.
+
+| Runner | 사용 시점 | 요구 사항 |
+|--------|-----------|-----------|
+| `claude` (기본) | 외부 API 불필요. Claude Code Agent 도구 사용 | 없음 |
+| `cloud` | 외부 LLM에 분산 (Gemini Flash, Llama3, GPT) | 환경 변수에 API 키 |
+| `local` | Ollama를 통한 로컬 모델 | Ollama 실행 중 |
+
+**스키마 파일**: `core/schemas/` — 에이전트별 Request/Response 타입.
+**Runner 파일**: `core/runners/` — 백엔드 구현 + 레지스트리.
+
+> GM은 **오케스트레이터**로 동작한다: 방향 설정 (TurnPlan) → 에이전트 배포 (AgentDispatch) → 결과 종합 (TurnSynthesis) → 나레이션.
+> `claude` runner 사용 시: GM이 `registry.dispatch_claude_prompt(request)`로 프롬프트를 구성하고 Agent 도구에 전달.
+> `cloud`/`local` runner 사용 시: GM이 `registry.dispatch(request)`를 호출하여 프로그래밍 방식으로 실행.
+
 ---
 
 ## 세이브 관리 규칙
