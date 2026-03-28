@@ -66,6 +66,27 @@
     "shield_charge": "방패 돌진",
     "indomitable_will": "불굴의 의지"
   },
+  "skill_desc": {
+    "attack": "근접 무기로 적을 공격. 장비 무기 데미지 적용.",
+    "magic_bolt": "지팡이에서 마나 탄환 발사. 기본 원거리 마법 공격.",
+    "fireball": "화염구 투척. 2타일 범위 마법 데미지.",
+    "heal": "아군 1명의 HP를 회복하는 치유 마법.",
+    "defend": "방패를 올려 방어 자세. 다음 턴까지 방어력 +4.",
+    "ambush": "은밀 접근 후 급소 공격. 기본 공격보다 강력.",
+    "flee": "전투에서 도주. 실패 시 기회 공격.",
+    "mana_shield": "마나 장벽 생성. 3턴간 받는 데미지 절반.",
+    "chain_lightning": "번개가 최대 3명에게 연쇄. 1d8+INT 데미지.",
+    "teleport": "보이는 위치로 즉시 이동.",
+    "meteor": "전체 범위 2d8+INT 데미지. 아군 제외.",
+    "poison_apply": "무기에 독 도포. 3턴간 공격 시 독 데미지 추가.",
+    "shadow_step": "3턴간 은신. 다음 공격 자동 적중+2배 데미지.",
+    "vital_strike": "4d6+DEX 데미지. 은신 중이면 5d6.",
+    "clone": "분신 생성. 2턴간 50% 회피.",
+    "power_strike": "전력 일격. 2d8+STR 데미지. 기절 (CON DC 13).",
+    "war_cry": "전투 함성. 아군 전원 3턴간 공격력 +2.",
+    "shield_charge": "방패 돌진. 1d10+STR 데미지 + 밀어내기 2타일.",
+    "indomitable_will": "HP 25% 이하 시 자동 방어+4, 공격+2."
+  },
   "status_effects": {
     "poison": "중독",
     "defense_up": "방어 강화",

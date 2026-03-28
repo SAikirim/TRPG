@@ -1030,7 +1030,11 @@
                 const effects = p.status_effects.length > 0
                     ? `<div style="font-size:0.75em;color:#ffd700;margin-top:4px">상태: ${p.status_effects.map(e => tStatus(typeof e === 'string' ? e : e.name)).join(', ')}</div>`
                     : '';
-                const invItems = (p.inventory || []).map(item => {
+                const moneyKeys = ['gold', 'silver', 'copper', 'money', 'coin', 'gold_', 'silver_', 'shared_gold'];
+                const moneyItems = (p.inventory || []).filter(item => moneyKeys.some(k => item.includes(k)));
+                const nonMoneyItems = (p.inventory || []).filter(item => !moneyKeys.some(k => item.includes(k)));
+                const moneyDisplay = moneyItems.length ? moneyItems.map(item => tItem(item)).join(', ') : '—';
+                const invItems = nonMoneyItems.map(item => {
                     const info = getItemInfo(item);
                     const rarityClass = info.rarity ? ' rarity-' + info.rarity : '';
                     const displayName = tItem(item);
@@ -1072,6 +1076,7 @@
                         <button class="toggle-all-btn" onclick="toggleAllDetails(${p.id}, this)">전체</button>
                     </div>
                     ${effects}
+                    <div style="font-size:0.8em;color:#ffd700;margin:4px 0;padding:0 4px">💰 ${moneyDisplay}</div>
                     <div class="detail-grid">
                         <div class="detail-col">
                             <button class="detail-col-btn" onclick="toggleDetail(${p.id}, 'equip', this)">장비</button>
@@ -1080,7 +1085,7 @@
                             </div>
                         </div>
                         <div class="detail-col">
-                            <button class="detail-col-btn" onclick="toggleDetail(${p.id}, 'inv', this)">소지품 (${(p.inventory||[]).length})</button>
+                            <button class="detail-col-btn" onclick="toggleDetail(${p.id}, 'inv', this)">소지품 (${nonMoneyItems.length})</button>
                             <div id="detail-inv-${p.id}" class="detail-content">
                                 ${invItems || '<div class="detail-item" style="color:#666">없음</div>'}
                             </div>
@@ -1146,7 +1151,7 @@
                     skillEl.innerHTML = actions.map(name => {
                         const info = skillsData[name] || {};
                         const stat = info.stat || '';
-                        const desc = info.desc || name;
+                        const desc = koData.skill_desc?.[name] || info.desc || name;
                         const lvl = info.level_req ? 'Lv.' + info.level_req : '';
                         const displayName = tSkill(name);
                         return `<div class="detail-item"><span class="item-name">${displayName}</span><span class="item-stat">${stat}</span><div class="tooltip">${desc}${lvl ? ' (' + lvl + ')' : ''}</div></div>`;
