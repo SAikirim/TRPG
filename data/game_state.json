@@ -29,8 +29,8 @@
         "CON": 10
       },
       "position": [
-        13,
-        12
+        12,
+        22
       ],
       "status_effects": [],
       "inventory": [
@@ -68,8 +68,8 @@
         "CON": 15
       },
       "position": [
-        14,
-        12
+        13,
+        22
       ],
       "status_effects": [],
       "inventory": [
@@ -97,8 +97,8 @@
         "CON": 17
       },
       "position": [
-        12,
-        12
+        11,
+        22
       ],
       "status_effects": [],
       "inventory": [
@@ -128,8 +128,8 @@
       "attack": 3,
       "defense": 2,
       "position": [
-        13,
-        13
+        12,
+        23
       ],
       "threat_level": "none",
       "status": "alive",
@@ -153,8 +153,8 @@
       "attack": 2,
       "defense": 2,
       "position": [
-        14,
-        13
+        13,
+        23
       ],
       "threat_level": "none",
       "status": "alive",
@@ -178,8 +178,8 @@
       "mp": 0,
       "max_mp": 0,
       "position": [
-        12,
-        13
+        11,
+        23
       ],
       "status": "alive",
       "location": "trade_road_karendel"
@@ -212,8 +212,8 @@
       "mp": 0,
       "max_mp": 0,
       "position": [
-        15,
-        12
+        14,
+        22
       ],
       "status": "alive",
       "location": "trade_road_karendel",
@@ -229,8 +229,8 @@
       "mp": 0,
       "max_mp": 0,
       "position": [
-        15,
-        13
+        14,
+        23
       ],
       "status": "alive",
       "location": "trade_road_karendel",
@@ -243,42 +243,82 @@
     "tile_size": 40,
     "locations": [
       {
-        "name": "forest_north",
-        "type": "grass",
+        "name": "north_gate",
+        "type": "road",
         "area": {
-          "x1": 0,
+          "x1": 9,
           "y1": 0,
-          "x2": 24,
-          "y2": 7
+          "x2": 14,
+          "y2": 1
         }
       },
       {
-        "name": "trade_road",
-        "type": "road",
+        "name": "mage_guild",
+        "type": "house",
         "area": {
-          "x1": 0,
-          "y1": 8,
+          "x1": 1,
+          "y1": 3,
+          "x2": 6,
+          "y2": 8
+        }
+      },
+      {
+        "name": "adventurer_guild",
+        "type": "house",
+        "area": {
+          "x1": 7,
+          "y1": 3,
+          "x2": 12,
+          "y2": 8
+        }
+      },
+      {
+        "name": "blacksmith",
+        "type": "house",
+        "area": {
+          "x1": 13,
+          "y1": 4,
+          "x2": 17,
+          "y2": 8
+        }
+      },
+      {
+        "name": "red_chimney_inn",
+        "type": "house",
+        "area": {
+          "x1": 18,
+          "y1": 3,
+          "x2": 23,
+          "y2": 8
+        }
+      },
+      {
+        "name": "market_street",
+        "type": "village",
+        "area": {
+          "x1": 4,
+          "y1": 11,
+          "x2": 19,
+          "y2": 17
+        }
+      },
+      {
+        "name": "melos_antique_shop",
+        "type": "house",
+        "area": {
+          "x1": 20,
+          "y1": 12,
           "x2": 24,
           "y2": 16
         }
       },
       {
-        "name": "cart_stop",
-        "type": "village",
+        "name": "south_gate_harun",
+        "type": "road",
         "area": {
-          "x1": 10,
-          "y1": 12,
+          "x1": 9,
+          "y1": 19,
           "x2": 14,
-          "y2": 13
-        }
-      },
-      {
-        "name": "forest_south",
-        "type": "grass",
-        "area": {
-          "x1": 0,
-          "y1": 17,
-          "x2": 24,
           "y2": 24
         }
       }
@@ -286,14 +326,6 @@
   },
   "turn_count": 24,
   "events": [
-    {
-      "turn": 24,
-      "message": "[GM] 미라와 대화",
-      "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
-      "user_input": "",
-      "dialogues": [],
-      "timestamp": "22:53:44"
-    },
     {
       "turn": 24,
       "message": "[GM] 턴 중간 기록 (pending flush)",
@@ -461,10 +493,106 @@
       "user_input": "",
       "dialogues": [],
       "timestamp": "20:42:10"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Turn 27: Travel montage + Karendel arrival",
+      "narrative": "길을 걷는 동안 드문드문 오가는 대화들.\n\n할란이 마차 위에서 다리를 고쳐 앉으며 말했다.\n\n\"카렌델 남문 들어서면 바로 직물 상가 골목이야. 냄새로 알 수 있어 -- 염색약 냄새가 코를 찌르거든. 거기서 오른쪽으로 꺾으면 숙소 밀집지.\"\n\n미라가 고개를 끄덕였다.\n\n\"아버지랑 두 번 갔는데 저는 항상 문 앞에서 기다렸어요.\"\n\n할란이 피식 웃었다.\n\n\"이번엔 직접 들어가 봐라.\"\n\n길 중반. 행상인이 짐 보따리를 고쳐 메며 사이키 옆으로 슬쩍 다가왔다.\n\n\"저기... 카렌델 성문에서 짐 검사 심하게 합니까? 귀중한 건 아닌데, 뭐랄까, 특이한 물건들이라서요.\"\n\n루세나가 뒤에서 끼어들었다.\n\n\"자물쇠가 그 모양인데 귀중한 건 없겠죠.\"\n\n행상인이 움찔하며 보따리를 가슴에 더 꽉 끌어안았다.\n\n루세나가 사이키에게 슬그머니 속삭였다.\n\n\"카렌델 시장에 보석상 골목 있잖아. 거기 눈독 들여놓은 거 있었는데 -- 미라한테 선물하면 좋겠다 싶어서. 오빠를 위해서 봐뒀다고.\"\n\n사이키가 답하기도 전에 루세나가 손가락을 딱 튕기며 씩 웃었다.\n\n오후 초입, 길이 완만한 언덕을 넘을 때. 미라가 걸으며 사이키 쪽을 슬쩍 보았다.\n\n\"마법사분들은 도시마다 마법사 조합 같은 데 들르세요?\"\n\n\"...경우에 따라서.\"\n\n미라가 눈을 약간 빛내며 혼잣말처럼 중얼거렸다.\n\n\"카렌델에도 있다고 들었는데. 탑이 보인다던데.\"\n\n언덕 꼭대기에서 검사가 잠시 멈춰 지평선을 바라보았다. 노엘이 그 옆에 나란히 섰다. 짧은 침묵.\n\n\"...동쪽 길이 더 빨랐을 텐데.\"\n\n노엘이 무표정하게 받았다.\n\n\"그래서 안 갔겠지.\"\n\n검사는 대답 없이 다시 걷기 시작했다.\n\n노엘이 길가 수레바퀴 자국을 내려다보며 짧게 말했다.\n\n\"최근에 마차 통행이 늘었다. 시장이 크게 열리는 모양이군.\"\n\n그리고 오후.\n\n할란이 마차 위에서 몸을 일으켜 먼 곳을 바라보았다.\n\n\"보여. 남문 탑이야.\"\n\n지평선 너머로 회색빛 성벽이 솟아 있었다. 탑 위에 깃발이 펄럭이고, 성문 앞으로 마차와 사람들의 행렬이 길게 이어져 있었다. 말 냄새, 향신료 냄새, 대장간의 연기가 바람에 실려왔다. 가까이 다가갈수록 상인들의 호객 소리와 말발굽 소리가 점점 커졌다.\n\n루세나가 손을 이마에 대고 눈을 가리며 바라보았다.\n\n\"생각보다 크네요.\"\n\n할란이 짧게 웃었다.\n\n\"항상 그래. 볼 때마다.\"\n\n성문 앞. 문지기들이 짐을 대충 확인하고 통행세를 걷고 있었다. 일행의 차례가 왔다. 문지기가 할란의 마차를 훑어보고 고개를 끄덕였다.\n\n카렌델 남문이 열렸다.\n\n직물 상가 골목의 염색약 냄새가 코를 찔렀다. 좁은 골목 양쪽으로 형형색색의 천이 걸려 있고, 사람들이 빼곡히 오가고 있었다. 저 멀리, 마법사 조합의 첨탑이 오후 햇살을 받아 빛나고 있었다.\n\n카렌델. 교역의 도시. 일행은 성문을 넘어 도시 안으로 발을 내디뎠다.",
+      "user_input": "사이키는 동행자들과 약간의 잡담을 하면서, 카렌델로 향합니다.",
+      "dialogues": [
+        {
+          "speaker": "hallan",
+          "line": "카렌델 남문 들어서면 바로 직물 상가 골목이야. 냄새로 알 수 있어 -- 염색약 냄새가 코를 찌르거든.",
+          "tone": "informative"
+        },
+        {
+          "speaker": "mira",
+          "line": "아버지랑 두 번 갔는데 저는 항상 문 앞에서 기다렸어요.",
+          "tone": "nostalgic"
+        },
+        {
+          "speaker": "hallan",
+          "line": "이번엔 직접 들어가 봐라.",
+          "tone": "warm"
+        },
+        {
+          "speaker": "peddler",
+          "line": "저기... 카렌델 성문에서 짐 검사 심하게 합니까?",
+          "tone": "nervous",
+          "target": "saiki"
+        },
+        {
+          "speaker": "lucena",
+          "line": "자물쇠가 그 모양인데 귀중한 건 없겠죠.",
+          "tone": "teasing",
+          "target": "peddler"
+        },
+        {
+          "speaker": "lucena",
+          "line": "미라한테 선물하면 좋겠다 싶어서. 오빠를 위해서 봐뒀다고.",
+          "tone": "playful",
+          "target": "saiki",
+          "type": "whisper"
+        },
+        {
+          "speaker": "mira",
+          "line": "마법사분들은 도시마다 마법사 조합 같은 데 들르세요?",
+          "tone": "curious",
+          "target": "saiki"
+        },
+        {
+          "speaker": "swordsman",
+          "line": "...동쪽 길이 더 빨랐을 텐데.",
+          "tone": "cryptic"
+        },
+        {
+          "speaker": "noel",
+          "line": "그래서 안 갔겠지.",
+          "tone": "dry"
+        },
+        {
+          "speaker": "noel",
+          "line": "최근에 마차 통행이 늘었다. 시장이 크게 열리는 모양이군.",
+          "tone": "observant"
+        },
+        {
+          "speaker": "hallan",
+          "line": "보여. 남문 탑이야.",
+          "tone": "satisfied"
+        },
+        {
+          "speaker": "lucena",
+          "line": "생각보다 크네요.",
+          "tone": "impressed"
+        },
+        {
+          "speaker": "hallan",
+          "line": "항상 그래. 볼 때마다.",
+          "tone": "nostalgic"
+        }
+      ],
+      "timestamp": "20:52:07"
     }
   ],
   "current_scene": {
-    "background": "/static/illustrations/pixel/default.png",
-    "layers": []
+    "background": "/static/illustrations/sd/background_trade_road_afternoon.webp",
+    "layers": [
+      {
+        "type": "portrait",
+        "image": "static/portraits/sd/portrait_mira.webp",
+        "position": "left",
+        "name": "mira",
+        "distance": 1,
+        "size_class": "d1"
+      },
+      {
+        "type": "portrait",
+        "image": "static/portraits/sd/portrait_hallan.webp",
+        "position": "center",
+        "name": "hallan",
+        "distance": 1,
+        "size_class": "d1"
+      }
+    ]
   }
 }

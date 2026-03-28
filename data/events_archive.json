@@ -386,6 +386,15 @@
       ],
       "timestamp": "22:53:42",
       "archived_at": "2026-03-28"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] 미라와 대화",
+      "narrative": "사이키가 미라에게 말을 걸었다. 미라가 수줍게 대답한다.",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:53:44",
+      "archived_at": "2026-03-28"
     }
   ]
 }
