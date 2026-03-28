@@ -1,6 +1,23 @@
 {
   "background": "static/illustrations/pixel/default.png",
-  "layers": [],
+  "layers": [
+    {
+      "type": "portrait",
+      "image": "static/portraits/sd/portrait_mira.webp",
+      "position": "left",
+      "name": "mira",
+      "distance": 1,
+      "size_class": "d1"
+    },
+    {
+      "type": "portrait",
+      "image": "static/portraits/sd/portrait_hallan.webp",
+      "position": "center",
+      "name": "hallan",
+      "distance": 1,
+      "size_class": "d1"
+    }
+  ],
   "generating": {
     "status": "idle",
     "type": null,

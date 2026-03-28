@@ -34,75 +34,7 @@
   "max_mp": 5,
   "relationships": {
     "hallan": "Father. Worried about him but respects him.",
-    "saiki": {
-      "description": "Adventurer who rescued them. Favorable impression.",
-      "affinity": 58,
-      "trust": 55,
-      "history": [
-        {
-          "turn": 26,
-          "change": 3,
-          "reason": "사이키의 친근한 인사"
-        },
-        {
-          "turn": 28,
-          "change": 1,
-          "reason": "환한 미소와 경계에 대한 대화"
-        },
-        {
-          "turn": 29,
-          "change": 2,
-          "reason": "사익이의 웃으며 인사"
-        },
-        {
-          "turn": 31,
-          "change": 2,
-          "reason": "사익이의 웃으며 인사"
-        }
-      ]
-    },
-    "lucena": {
-      "affinity": 58,
-      "trust": 56,
-      "history": [
-        {
-          "turn": 25,
-          "change": 3,
-          "reason": "루세나의 말에 동의하며 친근하게 대화함"
-        },
-        {
-          "turn": 26,
-          "change": 2,
-          "reason": "루세나의 친근한 투덜거림에 대한 상호작용"
-        },
-        {
-          "turn": 28,
-          "change": 1,
-          "reason": "루세나의 마차 탑승과 경계에 대한 대화"
-        },
-        {
-          "turn": 29,
-          "change": 1,
-          "reason": "루세나의 미소 지음"
-        },
-        {
-          "turn": 31,
-          "change": 1,
-          "reason": "루세나의 미소"
-        }
-      ]
-    },
-    "noel": {
-      "affinity": 51,
-      "trust": 51,
-      "history": [
-        {
-          "turn": 31,
-          "change": 1,
-          "reason": "노엘의 인사"
-        }
-      ]
-    }
+    "saiki": "Adventurer who rescued them. Favorable impression."
   },
   "travel": {
     "origin": "Seren Port",

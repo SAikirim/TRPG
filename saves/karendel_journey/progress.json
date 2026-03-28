@@ -1,8 +1,113 @@
 {
   "scenario_id": "karendel_journey",
   "first_played": "2026-03-21 03:50:21",
-  "total_saves": 46,
+  "total_saves": 31,
   "history": [
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-25 22:24:18"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-25 22:29:12"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-25 22:31:39"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "turn28 trade road - mira conversation",
+      "saved_at": "2026-03-26 00:19:24"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-27 22:41:55"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-27 22:52:49"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "미라와 대화 테스트",
+      "saved_at": "2026-03-27 22:52:53"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-27 22:53:44"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "미라와 대화",
+      "saved_at": "2026-03-27 22:53:48"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "미라와 대화",
+      "saved_at": "2026-03-27 22:54:42"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-28 00:10:12"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-28 00:15:38"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-28 00:15:46"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-28 00:18:35"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 24,
+      "description": "자동 저장 (턴 24)",
+      "saved_at": "2026-03-28 00:19:32"
+    },
     {
       "slot": 1,
       "chapter": 2,
@@ -36,115 +141,10 @@
       "chapter": 2,
       "turn": 24,
       "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-28 01:04:34"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 25,
-      "description": "자동 저장 (턴 25)",
-      "saved_at": "2026-03-28 01:05:37"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 25,
-      "description": "자동 저장 (턴 25)",
-      "saved_at": "2026-03-28 01:20:35"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 26,
-      "description": "자동 저장 (턴 26)",
-      "saved_at": "2026-03-28 01:21:10"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 26,
-      "description": "자동 저장 (턴 26)",
-      "saved_at": "2026-03-28 01:21:42"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 27,
-      "description": "자동 저장 (턴 27)",
-      "saved_at": "2026-03-28 01:22:15"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 27,
-      "description": "자동 저장 (턴 27)",
-      "saved_at": "2026-03-28 01:30:41"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 28,
-      "description": "자동 저장 (턴 28)",
-      "saved_at": "2026-03-28 01:30:57"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 28,
-      "description": "자동 저장 (턴 28)",
-      "saved_at": "2026-03-28 01:33:57"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 29,
-      "description": "자동 저장 (턴 29)",
-      "saved_at": "2026-03-28 01:34:14"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 29,
-      "description": "자동 저장 (턴 29)",
-      "saved_at": "2026-03-28 01:34:34"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 30,
-      "description": "자동 저장 (턴 30)",
-      "saved_at": "2026-03-28 01:34:50"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 30,
-      "description": "자동 저장 (턴 30)",
-      "saved_at": "2026-03-28 01:38:03"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 31,
-      "description": "자동 저장 (턴 31)",
-      "saved_at": "2026-03-28 01:38:17"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 32,
-      "description": "자동 저장 (턴 32)",
-      "saved_at": "2026-03-28 01:38:33"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 33,
-      "description": "자동 저장 (턴 33)",
-      "saved_at": "2026-03-28 01:39:02"
+      "saved_at": "2026-03-28 20:42:10"
     }
   ],
-  "last_played": "2026-03-28 01:39:02",
+  "last_played": "2026-03-28 20:42:10",
   "last_chapter": 2,
-  "last_turn": 33
+  "last_turn": 24
 }
