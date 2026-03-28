@@ -966,9 +966,29 @@ class TurnOrchestrator:
         return sd if os.path.isfile(sd) else sys.executable
 
     def _auto_save(self, turn: int, description: str = "") -> None:
-        """매 턴 git commit + push (백그라운드). 세이브 슬롯은 건드리지 않음.
-        [auto] 태그로 수동 save 커밋과 구분."""
+        """매 턴 slot_auto에 저장 + git commit + push (백그라운드).
+        수동 세이브 슬롯(slot_1 등)은 건드리지 않음."""
         try:
+            # slot_auto에 저장
+            session = _load_json(SESSION_PATH)
+            scenario_id = session.get("active_scenario", "")
+            if scenario_id:
+                auto_dir = os.path.join(BASE_DIR, "saves", scenario_id, "slot_auto")
+                os.makedirs(auto_dir, exist_ok=True)
+                game_state = _load_json(GAME_STATE_PATH)
+                auto_save = {
+                    "save_info": {
+                        "type": "auto",
+                        "turn_count": turn,
+                        "description": description,
+                        "saved_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+                    },
+                    "game_state": game_state,
+                }
+                with open(os.path.join(auto_dir, "save.json"), "w", encoding="utf-8") as f:
+                    json.dump(auto_save, f, ensure_ascii=False, indent=2)
+
+            # git commit + push (백그라운드)
             cmd = f'cd "{BASE_DIR}" && git add -A && git commit -m "[auto] turn {turn}: {description}" && git push'
             subprocess.Popen(
                 cmd, shell=True, cwd=BASE_DIR,
