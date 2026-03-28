@@ -196,6 +196,8 @@ GM Auto-Reflection Principles
 Dice Ruling Records and Display
 ===
 
+In-Game Dice Mechanics (DCs, criticals, fumbles, display formats): See guides/game_rules.txt
+
 [Core Principle] Ruling Record ≠ Ruling Display
 - Record: The ruling process (dice value, modifiers, DC, success/failure) is always recorded regardless of show_dice_result
 - Display: The show_dice_result option only affects the narration shown to the user
@@ -210,30 +212,18 @@ The dice_rolls field must always include ruling details when calling gm-update:
 - Rulings executed via mechanics requests are automatically recorded as mechanics_results in events
 - Rulings made directly by the GM (via agents) must also be manually recorded in dice_rolls
 
-[User Display — show_dice_result]
+[GM Display Procedure — show_dice_result]
 Check show_dice_result in current_session.json:
+- The show_dice_result check is not automatically performed in phase 1b, so the GM must check before phase 2
+- false: Do not expose values in narration. Convey only as: "Saiki surveyed the surroundings. There was no sign of danger."
+- true: Show all values: "1d20 → [17] + INT(+4) = 21 vs DC 10 → Success!"
+- The ruling result banner is only displayed when show_dice_result is true
 
-[Public Mode] (show_dice_result: true)
-- Show all ruling values in the narration
-- Example: 1d20 -> [15] + INT(+4) = 19 vs DC 16 -> Success!
-- Example: 1d8 -> [6] + INT(+4) = 10 damage
-- Critical: 1d20 -> [20] / Fumble: 1d20 -> [1]
-
-[Private Mode] (show_dice_result: false, default)
-- Do not expose numerical values in the narration. Only convey results through narration
-- Only display criticals/fumbles separately
+[Private Mode Processing] (show_dice_result: false, default)
 - During phase 1b system processing, the -q (quiet) flag must be used:
   python game_mechanics.py -q check 1 DEX 13
 - Quiet mode: only displays "Ruling complete" in terminal (internal recording proceeds normally)
 - The GM reads .last_result.json for reference when writing narration (do not expose values to the user)
-
-GM narration output ruling display rules:
-- The show_dice_result check is not automatically performed in phase 1b, so the GM must check before phase 2
-- false: Do not expose values in narration. Convey only as: "Saiki surveyed the surroundings. There was no sign of danger."
-- true: Show all values: "1d20 → [17] + INT(+4) = 21 vs DC 10 → Success!"
-- The ruling result banner (🎲 ...) is only displayed when show_dice_result is true
-
-Narration order: Situation description -> Dice roll display -> Continue into narration with the result
 
 Map-Related Rules: See guides/map_rules.txt
 ===
@@ -422,6 +412,7 @@ Must be recorded with the worldbuilding tag in GM turn phase 1b:
 Rule Agent Role
 ===
 When the GM provides action/ruling context in phase 1b, the agent verifies consistency with rules.json.
+Required reading: data/rules.json + guides/game_rules.txt (in-game mechanics: cover, fall damage, hazards, LoS)
 
 Items the rule agent must verify:
 - Was a dice roll made in a situation requiring a ruling? (combat, skill checks, traps, etc.)
@@ -674,14 +665,5 @@ Core principles:
 - Reflection results must be saved to data files — keeping them only in conversation context is not allowed
 - Player communication must be naturally woven into narration — system messages are prohibited
 
-Tactical Cover Rules
+In-Game Rules (Cover, Fall Damage, Hazards, LoS, Encumbrance): See guides/game_rules.txt
 ===
-- When declaring "hide/take cover" on a tile adjacent to an object, a cover bonus is applied
-- Cover bonus applies only to ranged attacks (not melee attacks)
-- Cover is only valid when cover object is between the attacker and defender
-- Use get_cover_at(position, state) to query available cover objects
-- Use apply_cover(attacker_pos, defender_pos, state) to calculate cover bonus
-- Use damage_object(obj_name, damage, state) to destroy objects
-- Flammable objects take extra damage from fire attacks + are destroyed
-- Explosive objects (oil barrels) deal area damage to surroundings when destroyed
-- Agent [Rule Judge] automatically checks cover during combat
