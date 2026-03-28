@@ -22,8 +22,8 @@
     "CON": 10
   },
   "position": [
-    12,
-    22
+    20,
+    6
   ],
   "status_effects": [],
   "inventory": [
@@ -39,7 +39,8 @@
     "travel_money_silver_10",
     "shared_gold_1",
     "rope",
-    "flint"
+    "flint",
+    "spice_pouch"
   ],
   "equipment": {
     "weapon": {
@@ -153,5 +154,6 @@
     "face": "Calm, thoughtful deep blue eyes with quiet determination. Gentle but serious expression.",
     "outfit": "Worn, patched traveler's robe — humble clothing showing poor background",
     "notable": "Simple wooden staff with faintly glowing crystal at the top"
-  }
+  },
+  "agent_id": "agent_a"
 }

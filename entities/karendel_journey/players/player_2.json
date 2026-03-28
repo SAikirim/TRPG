@@ -22,8 +22,8 @@
     "CON": 15
   },
   "position": [
-    13,
-    22
+    21,
+    6
   ],
   "status_effects": [],
   "inventory": [
@@ -128,5 +128,6 @@
     "face": "Sharp, mischievous eyes with a confident smirk. Tough exterior but youthful softness.",
     "outfit": "Dark leather street clothes — not proper armor, street urchin's practical outfit with many hidden pockets",
     "notable": "Dual-wields two small daggers. Lockpicking tools hanging from belt."
-  }
+  },
+  "agent_id": "agent_b"
 }

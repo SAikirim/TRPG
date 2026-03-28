@@ -22,8 +22,8 @@
     "CON": 17
   },
   "position": [
-    11,
-    22
+    19,
+    6
   ],
   "status_effects": [],
   "inventory": [
@@ -124,5 +124,6 @@
     "face": "Scar on cheek. Fierce eyes but warm underneath — acts tough but genuinely cares.",
     "outfit": "Mismatched scavenged armor — leather shield on one arm, worn iron sword in the other",
     "notable": "Scar on cheek. Standing protectively in front of others."
-  }
+  },
+  "agent_id": "agent_c"
 }
