@@ -3,11 +3,11 @@
   "layers": [
     {
       "type": "portrait",
-      "image": "static/portraits/pixel/portrait_volf.png",
+      "image": "static/portraits/sd/portrait_volf.webp",
       "position": "center",
       "name": "volf",
-      "distance": 1,
-      "size_class": "d1"
+      "distance": 0,
+      "size_class": "close"
     }
   ],
   "generating": {

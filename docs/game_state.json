@@ -346,73 +346,6 @@
   "events": [
     {
       "turn": 27,
-      "message": "[GM] Scene fix: Karendel city background (retry)",
-      "narrative": "",
-      "user_input": "",
-      "dialogues": [],
-      "timestamp": "21:04:16"
-    },
-    {
-      "turn": 27,
-      "message": "[GM] Turn 28: Farewell at south gate, party splits",
-      "narrative": "남문 안쪽, 직물 상가 골목. 형형색색의 천이 걸린 좁은 골목에서 일행이 멈춰 섰다.\n\n사이키가 할란과 미라를 바라보며 말했다.\n\n\"여기서 헤어지게 되겠군요. 지금부터 뭘 하실 생각인가요? 저희는 우선 붉은 굴뚝 여관에 머물며 볼일 볼 생각입니다.\"\n\n말하면서, 사이키는 슬쩍 루세나 쪽으로 눈짓을 보냈다. 할란이 빚을 잊지 않는 사람이라는 것 -- 그 부분을 루세나도 알아두라는 신호였다.\n\n루세나가 즉시 알아챘다. 살짝 미소를 지으며 할란에게 눈을 맞추었다.\n\n\"할란 씨, 붉은 굴뚝 여관은 찾기 쉬울 거예요. 저희가 거기 있을 테니까 -- 궁금한 게 생기면 언제든 오세요. 신세는 꼭 갚고 싶을 때 찾아오는 거잖아요, 안 그래요?\"\n\n할란이 다리를 짚으며, 눈을 맞추지 않고 중얼거리듯 말했다.\n\n\"붉은 굴뚝이라... 알았소. 나도 거기서 멀지 않은 쪽에 자리 잡을 거요. 직물 거리 안쪽, 넬빈 포목점 -- 내 오랜 거래처요. 거기 가면 내 이름 대시오, 할란이라고. 시세보다 후하게 쳐줄 거요.\"\n\n잠깐 뜸을 들이더니.\n\n\"그리고... 빚진 건 잊지 않소.\"\n\n루세나 쪽으로 눈이 잠깐 스쳤지만, 아무 말 없이 짐 보따리를 고쳐 잡았다.\n\n미라가 사이키에게 다가섰다.\n\n\"붉은 굴뚝이요? 저도 알아요, 거기 냄새가 좀 고약하지만 이불은 따뜻하거든요!\"\n\n\"저기... 또 만날 수 있죠? 카렌델 크지 않으니까요.\"\n\n조금 망설이다가 작은 천 주머니를 꺼내 사이키 손에 쥐여주었다.\n\n\"향신료요. 여관 음식 맛없을 때 쓰세요. 저희 아버지가 팔다 남긴 거지만... 좋은 거예요.\"\n\n노엘이 짧게 고개를 끄덕였다.\n\n\"잘 가시오. 길 조심하고.\"\n\n행상인이 수레를 끌며 손을 흔들었다.\n\n\"나는 서문 쪽으로. 잘들 가시오.\"\n\n검사가 갑옷 매무새를 고치며 간단히 목례했다.\n\n\"도움이 됐다면 다행이오.\"\n\n검사는 그 말을 끝으로 인파 속으로 사라졌다. 행상인도 서문 방향으로 수레를 끌고 갔다. 할란이 짐마차를 이끌고 직물 거리 안쪽으로 향했다. 미라가 마지막으로 한 번 뒤돌아보며 손을 흔들었다.\n\n이제 셋이 남았다. 염색약 냄새와 호객 소리 사이로, 붉은 굴뚝 여관의 간판이 보일 것이다.",
-      "user_input": "미라와 할란에게 헤어짐 인사. 붉은 굴뚝 여관 언급. 루세나에게 할란 보답 건 눈짓.",
-      "dialogues": [
-        {
-          "speaker": "saiki",
-          "line": "여기서 헤어지게 되겠군요. 지금부터 뭘 하실 생각인가요? 저희는 우선 붉은 굴뚝 여관에 머물며 볼일 볼 생각입니다.",
-          "tone": "calm",
-          "target": "hallan"
-        },
-        {
-          "speaker": "lucena",
-          "line": "할란 씨, 붉은 굴뚝 여관은 찾기 쉬울 거예요. 신세는 꼭 갚고 싶을 때 찾아오는 거잖아요, 안 그래요?",
-          "tone": "playful",
-          "target": "hallan"
-        },
-        {
-          "speaker": "hallan",
-          "line": "직물 거리 안쪽, 넬빈 포목점 -- 내 오랜 거래처요. 거기 가면 내 이름 대시오. 시세보다 후하게 쳐줄 거요.",
-          "tone": "gruff"
-        },
-        {
-          "speaker": "hallan",
-          "line": "그리고... 빚진 건 잊지 않소.",
-          "tone": "serious"
-        },
-        {
-          "speaker": "mira",
-          "line": "또 만날 수 있죠? 카렌델 크지 않으니까요.",
-          "tone": "hopeful",
-          "target": "saiki"
-        },
-        {
-          "speaker": "mira",
-          "line": "향신료요. 여관 음식 맛없을 때 쓰세요.",
-          "tone": "shy",
-          "target": "saiki"
-        },
-        {
-          "speaker": "noel",
-          "line": "잘 가시오. 길 조심하고.",
-          "tone": "respectful",
-          "target": "hallan"
-        },
-        {
-          "speaker": "peddler",
-          "line": "나는 서문 쪽으로. 잘들 가시오.",
-          "tone": "casual"
-        },
-        {
-          "speaker": "swordsman",
-          "line": "도움이 됐다면 다행이오.",
-          "tone": "brief"
-        }
-      ],
-      "timestamp": "21:59:30"
-    },
-    {
-      "turn": 27,
       "message": "[GM] ko sync test",
       "narrative": "",
       "user_input": "",
@@ -506,6 +439,22 @@
       "user_input": "",
       "dialogues": [],
       "timestamp": "22:56:21"
+    },
+    {
+      "turn": 29,
+      "message": "[GM] Generate Volf SD portrait",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "23:17:53"
+    },
+    {
+      "turn": 29,
+      "message": "[GM] Regenerate Volf SD portrait (fix)",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "23:23:11"
     }
   ],
   "current_scene": {
@@ -513,11 +462,11 @@
     "layers": [
       {
         "type": "portrait",
-        "image": "/static/portraits/pixel/portrait_volf.png",
+        "image": "/static/portraits/sd/portrait_volf.webp",
         "position": "center",
         "name": "volf",
-        "distance": 1,
-        "size_class": "d1"
+        "distance": 0,
+        "size_class": "close"
       }
     ]
   }

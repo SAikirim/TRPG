@@ -911,27 +911,28 @@
 
         // 아이템 정보를 items.json에서 조회, 없으면 rules.json 폴백
         function getItemInfo(name) {
-            // items.json 우선 조회
+            // items.json 우선 조회 + ko.json 설명 우선
             if (itemsData[name]) {
                 const info = itemsData[name];
-                return { desc: info.desc || name, stat: info.stat || '', rarity: info.rarity || 'common' };
+                const desc = koData.item_desc?.[name] || info.desc || name;
+                return { desc: desc, stat: info.stat || '', rarity: info.rarity || 'common' };
             }
             // rules.json 무기 테이블 폴백
             if (rulesData?.combat?.weapons?.[name]) {
                 const w = rulesData.combat.weapons[name];
-                return { desc: w.description, stat: 'DMG ' + w.dice, rarity: 'common' };
+                return { desc: koData.item_desc?.[name] || w.description, stat: 'DMG ' + w.dice, rarity: 'common' };
             }
             // rules.json 방어구 테이블 폴백
             if (rulesData?.combat?.armor?.[name]) {
                 const a = rulesData.combat.armor[name];
-                return { desc: a.description || name, stat: a.bonus ? 'DEF +' + a.bonus : '', rarity: 'common' };
+                return { desc: koData.item_desc?.[name] || a.description || name, stat: a.bonus ? 'DEF +' + a.bonus : '', rarity: 'common' };
             }
             // rules.json 소모품 폴백
             if (rulesData?.rest?.use_item?.[name]) {
                 const u = rulesData.rest.use_item[name];
-                return { desc: u.description, stat: u.heal_hp ? 'HP +' + u.heal_hp : u.heal_mp ? 'MP +' + u.heal_mp : '', rarity: 'common' };
+                return { desc: koData.item_desc?.[name] || u.description, stat: u.heal_hp ? 'HP +' + u.heal_hp : u.heal_mp ? 'MP +' + u.heal_mp : '', rarity: 'common' };
             }
-            return { desc: name, stat: '', rarity: 'common' };
+            return { desc: koData.item_desc?.[name] || name, stat: '', rarity: 'common' };
         }
         function statMod(val) {
             const m = Math.floor((val - 10) / 2);
