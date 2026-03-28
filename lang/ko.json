@@ -124,7 +124,8 @@
     "rusty_dagger": "녹슨 단검. 거의 쓸모없음",
     "crossbow_bolt": "석궁 볼트. 10발",
     "old_sword": "산적이 쓰던 낡은 검. 상태 나쁨",
-    "spice_pouch": "미라에게 받은 향신료 주머니. 여관 음식에 사용"
+    "spice_pouch": "미라에게 받은 향신료 주머니. 여관 음식에 사용",
+    "mace": "성직자용 둔기. 1d6+STR 데미지"
   },
   "status_effects": {
     "poison": "중독",
@@ -420,7 +421,8 @@
     "water_barrel": "물통",
     "firewood_pile": "장작더미",
     "oil_barrel": "기름통",
-    "traveler_tent": "여행자 텐트"
+    "traveler_tent": "여행자 텐트",
+    "spring_trap_disarmed": "해제된 스프링 함정"
   },
   "equipment_properties": {
     "attack_bonus": "명중 보너스",
