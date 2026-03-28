@@ -77,12 +77,15 @@ def _add_npc_layers(state):
         for try_name in [npc_name, ko_name]:
             if not try_name:
                 continue
-            for ext in [".webp", ".png"]:
-                for prefix in ["portrait_", ""]:
-                    candidate = os.path.join(BASE_DIR, "static", "portraits", "sd", f"{prefix}{try_name}{ext}")
-                    if os.path.exists(candidate):
-                        portrait_exists = True
-                        portrait_path = candidate
+            for portrait_dir in ["sd", "pixel"]:
+                for ext in [".webp", ".png"]:
+                    for prefix in ["portrait_", ""]:
+                        candidate = os.path.join(BASE_DIR, "static", "portraits", portrait_dir, f"{prefix}{try_name}{ext}")
+                        if os.path.exists(candidate):
+                            portrait_exists = True
+                            portrait_path = candidate
+                            break
+                    if portrait_exists:
                         break
                 if portrait_exists:
                     break

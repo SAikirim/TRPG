@@ -861,7 +861,7 @@
     "karendel": {
       "name": "Karendel",
       "default_bg": {
-        "day": null,
+        "day": "/static/illustrations/sd/background_karendel.webp",
         "night": null
       },
       "world_pos": [

@@ -2,7 +2,7 @@
   "active_scenario": "karendel_journey",
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
-  "turn": 27,
+  "turn": 29,
   "chapter": 2,
   "chapter_name": "red_chimney_inn",
   "party_summary": [
@@ -52,16 +52,16 @@
     }
   ],
   "progress_notes": [
-    "[GM] Turn 26: Combat ability discussion, wolf attack memory",
-    "[GM] Rollback restore - turn 26 trade road scene",
-    "[GM] Turn 27: Travel montage + Karendel arrival",
     "[GM] Scene fix: Karendel city background",
     "[GM] Scene fix: Karendel city background (retry)",
     "[GM] Turn 28: Farewell at south gate, party splits",
     "[GM] ko sync test",
     "[GM] Turn 29: Farewell Mira, arrive Red Chimney Inn, meet Volf",
     "[GM] Fix: remove separated NPCs from map",
-    "[GM] Map refresh after NPC separation"
+    "[GM] Map refresh after NPC separation",
+    "[GM] Fix: set inn interior background",
+    "[GM] Fix: turn count + Volf portrait",
+    "[GM] Generate Volf portrait"
   ],
   "next_objective": "",
   "display_mode": "mobile",

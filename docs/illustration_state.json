@@ -1,6 +1,15 @@
 {
   "background": "static/illustrations/sd/background_karendel.webp",
-  "layers": [],
+  "layers": [
+    {
+      "type": "portrait",
+      "image": "static/portraits/pixel/portrait_volf.png",
+      "position": "center",
+      "name": "volf",
+      "distance": 1,
+      "size_class": "d1"
+    }
+  ],
   "generating": {
     "status": "idle",
     "type": null,
