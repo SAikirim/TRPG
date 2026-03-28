@@ -566,6 +566,11 @@ class SaveManager:
             dst = os.path.join(docs_dir, fname)
             self._copy_if_changed(src, dst)
 
+        # 1b. lang/ 디렉토리 — ko.json 등
+        self._sync_dir_incremental(
+            os.path.join(BASE_DIR, "lang"),
+            os.path.join(docs_dir, "lang"))
+
         # 2. illustration_state.json 생성
         self._build_illustration_state(game_state, docs_dir)
 
