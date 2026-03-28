@@ -978,8 +978,8 @@
     "lost_treasure_dungeon": {
       "name": "Lost Treasure Forest Dungeon",
       "default_bg": {
-        "day": "/static/illustrations/sd/ch2_dungeon.png",
-        "night": "/static/illustrations/sd/ch2_dungeon.png"
+        "day": "/static/illustrations/sd/background_dungeon_corridor.webp",
+        "night": "/static/illustrations/sd/background_dungeon_corridor.webp"
       },
       "type": "dungeon",
       "world_pos": [
@@ -991,6 +991,16 @@
         "ancient_dungeon",
         "treasure_room"
       ],
+      "map": {
+        "width": 25,
+        "height": 25,
+        "areas": [
+          {"name": "dungeon_entrance", "type": "cave", "area": {"x1": 10, "y1": 20, "x2": 14, "y2": 24}},
+          {"name": "corridor_1", "type": "dungeon", "area": {"x1": 10, "y1": 14, "x2": 14, "y2": 19}},
+          {"name": "ancient_dungeon", "type": "dungeon", "area": {"x1": 5, "y1": 6, "x2": 19, "y2": 13}},
+          {"name": "treasure_room", "type": "treasure", "area": {"x1": 9, "y1": 0, "x2": 15, "y2": 5}}
+        ]
+      },
       "connections": {
         "harun_village": {
           "direction": "west",

@@ -3,7 +3,7 @@
   "name": "spring_trap_disarmed",
   "type": "trap",
   "status": "disarmed",
-  "position": [12, 14],
+  "position": [12, 18],
   "size": [1, 1],
   "location": "lost_treasure_dungeon",
   "description": "A spring-loaded trap on the 3rd stone tile. Disarmed by Yeoul. Metal mechanism visible in the gap.",

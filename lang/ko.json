@@ -268,7 +268,10 @@
     "shipyard": "조선소",
     "fish_market": "어시장",
     "sea_temple": "해양 신전",
-    "lighthouse": "등대"
+    "lighthouse": "등대",
+    "corridor_1": "복도 1",
+    "ancient_dungeon": "고대 던전",
+    "treasure_room": "보물실"
   },
   "npcs": {
     "hallan": "할란",

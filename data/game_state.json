@@ -30,7 +30,7 @@
       },
       "position": [
         12,
-        12
+        18
       ],
       "status_effects": [],
       "inventory": [
@@ -68,7 +68,7 @@
       },
       "position": [
         12,
-        11
+        19
       ],
       "status_effects": [],
       "inventory": [
@@ -106,7 +106,7 @@
       },
       "position": [
         12,
-        13
+        17
       ],
       "status_effects": [],
       "inventory": [
@@ -135,43 +135,43 @@
     "tile_size": 40,
     "locations": [
       {
-        "name": "숲길",
-        "type": "grass",
-        "area": {
-          "x1": 0,
-          "y1": 0,
-          "x2": 24,
-          "y2": 10
-        }
-      },
-      {
-        "name": "던전 입구",
+        "name": "dungeon_entrance",
         "type": "cave",
         "area": {
           "x1": 10,
-          "y1": 11,
+          "y1": 20,
           "x2": 14,
-          "y2": 15
-        }
-      },
-      {
-        "name": "숲 (깊은 곳)",
-        "type": "grass",
-        "area": {
-          "x1": 0,
-          "y1": 11,
-          "x2": 9,
           "y2": 24
         }
       },
       {
-        "name": "숲 (깊은 곳)",
-        "type": "grass",
+        "name": "corridor_1",
+        "type": "dungeon",
         "area": {
-          "x1": 15,
-          "y1": 11,
-          "x2": 24,
-          "y2": 24
+          "x1": 10,
+          "y1": 14,
+          "x2": 14,
+          "y2": 19
+        }
+      },
+      {
+        "name": "ancient_dungeon",
+        "type": "dungeon",
+        "area": {
+          "x1": 5,
+          "y1": 6,
+          "x2": 19,
+          "y2": 13
+        }
+      },
+      {
+        "name": "treasure_room",
+        "type": "treasure",
+        "area": {
+          "x1": 9,
+          "y1": 0,
+          "x2": 15,
+          "y2": 5
         }
       }
     ]
@@ -179,48 +179,18 @@
   "turn_count": 1,
   "current_scene": {
     "background": "/static/illustrations/sd/background_dungeon_corridor.webp",
-    "layers": []
+    "layers": [
+      {
+        "type": "object",
+        "image": "/static/illustrations/sd/object_spring_trap_disarmed.webp",
+        "position": "center",
+        "name": "spring_trap_disarmed",
+        "distance": 4,
+        "size_class": "d3"
+      }
+    ]
   },
   "events": [
-    {
-      "turn": 0,
-      "message": "[GM] 오프닝 — 숲 속 던전 입구에 도착한 세 모험가",
-      "narrative": "빽빽한 참나무 가지 사이로 스며드는 아침 햇살이 이끼 낀 돌바닥을 희미하게 비춘다. 숲이 깊어질수록 새소리는 줄고, 축축한 흙 냄새만 짙어진다.\n\n덤불을 헤치자 어둑한 석조 아치가 모습을 드러낸다. 오래된 부조가 새겨진 입구 양 옆에 덩굴이 켜켜이 감겨 있다. 그 너머, 횃불 빛조차 삼키는 어둠이 입을 벌리고 있다.\n\n가온이 아무 말 없이 횃불을 높이 들어 어둠 속을 비추며 한 발 앞으로 나선다. 등 뒤의 두 사람을 잠깐 돌아본 뒤 낮은 목소리로 말한다.\n\n\"내 뒤에 붙어. 간격은 세 걸음.\"\n\n세라핀이 축축한 공기를 느끼며 조용히 성스러운 부적을 쥐었다 놓는다. 가온과 여울의 상태를 훑어보고는 낮은 목소리로 경고한다.\n\n\"들어가기 전에 한 가지 — 여울, 안이 보인다고 혼자 앞서지 마. 치유 사거리를 벗어나면 손 쓸 수가 없어.\"\n\n여울은 횃불 빛에 드러난 돌틈을 손가락으로 훑으며 씩 웃는다.\n\n\"함정 냄새가 벌써 나네 — 좋아, 이런 데가 제일 재밌어.\"\n\n단검 자루를 톡톡 두드리며 망설임 없이 입구 쪽으로 발을 옮긴다.",
-      "dialogues": [
-        {
-          "speaker": "가온",
-          "line": "내 뒤에 붙어. 간격은 세 걸음.",
-          "tone": "낮고 침착한"
-        },
-        {
-          "speaker": "세라핀",
-          "line": "들어가기 전에 한 가지 — 여울, 안이 보인다고 혼자 앞서지 마. 치유 사거리를 벗어나면 손 쓸 수가 없어.",
-          "tone": "냉정한 경고"
-        },
-        {
-          "speaker": "여울",
-          "line": "함정 냄새가 벌써 나네 — 좋아, 이런 데가 제일 재밌어.",
-          "tone": "장난스러운"
-        }
-      ],
-      "timestamp": "18:00:26"
-    },
-    {
-      "turn": 0,
-      "message": "[GM] Generate gaon portrait",
-      "narrative": "",
-      "user_input": "",
-      "dialogues": [],
-      "timestamp": "00:28:04"
-    },
-    {
-      "turn": 0,
-      "message": "[GM] Generate seraphine portrait",
-      "narrative": "",
-      "user_input": "",
-      "dialogues": [],
-      "timestamp": "00:28:09"
-    },
     {
       "turn": 0,
       "message": "[GM] Generate yeoul portrait",
@@ -320,6 +290,30 @@
       "user_input": "",
       "dialogues": [],
       "timestamp": "01:27:07"
+    },
+    {
+      "turn": 1,
+      "message": "[GM] Test object layer",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "01:33:15"
+    },
+    {
+      "turn": 1,
+      "message": "[GM] Fix: load dungeon interior map",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "01:40:00"
+    },
+    {
+      "turn": 1,
+      "message": "[GM] Map refresh — dungeon interior",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "01:41:17"
     }
   ]
 }
