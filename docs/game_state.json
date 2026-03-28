@@ -563,7 +563,7 @@
     }
   ],
   "current_scene": {
-    "background": "/static/illustrations/pixel/default.png",
+    "background": "/static/illustrations/sd/background_karendel.webp",
     "layers": []
   }
 }

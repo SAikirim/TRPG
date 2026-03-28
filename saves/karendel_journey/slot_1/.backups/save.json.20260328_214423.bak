@@ -3,7 +3,7 @@
     "scenario_id": "karendel_journey",
     "slot": 1,
     "description": "자동 저장 (턴 27)",
-    "saved_at": "2026-03-28 21:45:42",
+    "saved_at": "2026-03-28 21:04:16",
     "turn_count": 27,
     "chapter": 2,
     "party_summary": [
@@ -592,25 +592,8 @@
       }
     ],
     "current_scene": {
-      "background": "/static/illustrations/pixel/karendel.png",
-      "layers": [
-        {
-          "type": "portrait",
-          "image": "/static/portraits/sd/portrait_mira.webp",
-          "position": "left",
-          "name": "mira",
-          "distance": 1,
-          "size_class": "d1"
-        },
-        {
-          "type": "portrait",
-          "image": "/static/portraits/sd/portrait_hallan.webp",
-          "position": "center",
-          "name": "hallan",
-          "distance": 1,
-          "size_class": "d1"
-        }
-      ]
+      "background": "/static/illustrations/pixel/default.png",
+      "layers": []
     }
   }
 }
