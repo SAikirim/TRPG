@@ -1289,7 +1289,7 @@
 
         function updateEventsList() {
             const container = document.getElementById('events-list');
-            const events = showFullLog ? [...gameState.events].reverse() : gameState.events.slice(-10).reverse();
+            const events = showFullLog ? [...gameState.events].reverse() : gameState.events.slice(-5).reverse();
             container.innerHTML = events.map(e => {
                 const message = filterNpcNames(e.message || '');
                 const rawNarr = e.narrative ? filterNpcNames(e.narrative) : '';
