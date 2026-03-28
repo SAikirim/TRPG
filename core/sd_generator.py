@@ -185,12 +185,15 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
             img = Image.open(io.BytesIO(img_data)).convert("RGB")
 
             if illustration_type in ("portrait", "object"):
-                # Save original (before background removal) to portraits/original/
-                original_dir = os.path.join(BASE_DIR, "static", "portraits", "original")
+                # Save original (before background removal)
+                if illustration_type == "portrait":
+                    original_dir = os.path.join(BASE_DIR, "static", "portraits", "original")
+                else:  # object
+                    original_dir = os.path.join(BASE_DIR, "static", "illustrations", "original")
                 os.makedirs(original_dir, exist_ok=True)
                 original_path = os.path.join(original_dir, f"{safe_name}.webp")
                 img.save(original_path, "WEBP", quality=95)
-                logger.info(f"Original portrait saved: {original_path}")
+                logger.info(f"Original {illustration_type} saved: {original_path}")
 
                 # Remove background for compositing on any scene
                 try:

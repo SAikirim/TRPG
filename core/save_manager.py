@@ -578,6 +578,7 @@ class SaveManager:
         image_dirs = [
             "static/illustrations/sd",
             "static/illustrations/pixel",
+            "static/illustrations/original",
             "static/portraits/pixel",
             "static/portraits/sd",
             "static/portraits/original",
