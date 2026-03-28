@@ -649,6 +649,12 @@ def gm_update():
     except Exception:
         pass  # Don't block gm-update on overlap check failure
 
+    # ─── NPC 근접성 자동 관리 (separated ↔ alive) ───
+    try:
+        _auto_npc_proximity(state)
+    except Exception:
+        pass
+
     # scene_state를 game_state에 저장
     _save_scene_to_state(state)
 
@@ -858,6 +864,54 @@ def get_worldbuilding():
         return jsonify({"error": "파일 없음"}), 404
     except json.JSONDecodeError:
         return jsonify({"error": "JSON 파싱 실패"}), 500
+
+
+def _auto_npc_proximity(state):
+    """NPC 근접성 자동 관리.
+    - friendly NPC가 파티에서 멀어지면 자동 separated
+    - separated NPC가 파티 근처에 돌아오면 자동 alive 복원
+    - hostile/neutral/dead/fled/gone NPC는 대상 외
+    """
+    PROXIMITY_THRESHOLD = 5  # 타일 거리 기준
+
+    # 파티 평균 위치 계산
+    player_positions = [p.get("position", [0, 0]) for p in state.get("players", [])]
+    if not player_positions:
+        return
+    avg_x = sum(p[0] for p in player_positions) / len(player_positions)
+    avg_y = sum(p[1] for p in player_positions) / len(player_positions)
+
+    current_loc = state.get("current_location", "")
+
+    for npc in state.get("npcs", []):
+        status = npc.get("status", "")
+        npc_type = npc.get("type", "")
+        npc_loc = npc.get("location", "")
+
+        # dead/fled/gone은 건드리지 않음
+        if status in ("dead", "fled", "gone"):
+            continue
+
+        # hostile NPC는 근접성 관리 대상 아님 (전투 로직이 관리)
+        if npc_type == "hostile":
+            continue
+
+        npc_pos = npc.get("position", [0, 0])
+        dist = abs(npc_pos[0] - avg_x) + abs(npc_pos[1] - avg_y)  # 맨해튼 거리
+
+        # 같은 location이 아닌 NPC → separated
+        if npc_loc and current_loc and npc_loc != current_loc:
+            if status == "alive":
+                npc["status"] = "separated"
+            continue
+
+        # 같은 location이지만 거리가 먼 friendly NPC → separated
+        if status == "alive" and npc_type == "friendly" and dist > PROXIMITY_THRESHOLD:
+            npc["status"] = "separated"
+
+        # separated NPC가 파티 근처로 돌아오면 → alive 복원
+        elif status == "separated" and dist <= PROXIMITY_THRESHOLD:
+            npc["status"] = "alive"
 
 
 def _auto_update_ko(state):

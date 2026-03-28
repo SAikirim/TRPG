@@ -26,7 +26,7 @@ stats, hp, max_hp, mp, max_mp are required fields. Refer to rules.json's npc_sta
   "name": "Harlan",
   "type": "friendly",        // friendly | monster | neutral
   "known": false,             // Required — whether name is revealed to players. If false, displayed as "???"
-  "status": "alive",          // alive | dead | fled | unconscious | looted
+  "status": "alive",          // alive | dead | fled | unconscious | looted | gone | separated
   "location": "Trade Route",
   "stats": {                  // Required -- same 4 stats as players
     "STR": 10,
