@@ -12,6 +12,11 @@ GM 나레이션 원칙
   - 좋은 예: "노엘이 머뭇거렸다. 루세나가 '같이 가'라고 말했다." (NPC만 묘사)
   - 좋은 예 (몬타주): 미라가 질문 → 사이키의 답 없이 다음 장면으로 넘어감 (유저가 선언하지 않았으므로)
 - AI 캐릭터(controlled_by: "ai")는 Player Agent가 대사와 행동을 생성한다 — GM이 직접 쓰지 않는다
+  - Player Agent는 해당 에이전트 페르소나 파일(agents/agent_*.json)을 반드시 읽고 행동을 생성해야 한다
+  - 매칭: 에이전트의 current_character 필드 → 플레이어 id (예: agent_b.current_character = "player_2" → 루세나)
+  - 페르소나의 personality, play_style, decision_tendency를 행동/대사 생성에 반영해야 한다
+  - controlled_by: "user"인 캐릭터는 AI 에이전트 불필요 — 유저가 직접 조종
+  - 유저가 부재 시 AI가 대신 조종하려면 해당 에이전트의 current_character에 할당
 - 캐릭터 시점으로만 묘사 -- 캐릭터가 보고, 듣고, 느끼는 것만 전달
 
 플레이어 행동 요약 (나레이션 전 필수 출력)
