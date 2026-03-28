@@ -299,8 +299,8 @@ class MapGenerator:
         # NPC 아이콘 그리기 + 위치 수집
         r = 12
         for npc in state["npcs"]:
-            if npc.get("status") == "fled":
-                continue  # 도주한 NPC만 제외, 시체는 표시
+            if npc.get("status") in ("fled", "gone", "separated"):
+                continue  # 도주/퇴장/헤어진 NPC는 맵에서 제외
             px, py = npc["position"]
             if px < 0 or py < 0 or px >= map_w or py >= map_h:
                 continue
@@ -447,7 +447,7 @@ class MapGenerator:
 
         # 현재 맵에 존재하는 NPC
         for npc in state["npcs"]:
-            if npc.get("status") == "fled":
+            if npc.get("status") in ("fled", "gone", "separated"):
                 continue
             npc_loc = npc.get("location", "")
             if current_loc and npc_loc and npc_loc != current_loc:

@@ -1,0 +1,27 @@
+{
+  "id": 306,
+  "name": "volf",
+  "type": "friendly",
+  "status": "alive",
+  "location": "karendel",
+  "personality": {
+    "temperament": "neutral",
+    "intelligence": "medium",
+    "behavior_pattern": "",
+    "speech_style": "",
+    "motivation": ""
+  },
+  "relationships": {},
+  "memory": {
+    "dialogue_history": [],
+    "key_events": []
+  },
+  "description": "Owner of Red Chimney Inn. Old friend of Ernes. Bad knees.",
+  "known": true,
+  "hp": 15,
+  "max_hp": 15,
+  "position": [
+    20,
+    5
+  ]
+}

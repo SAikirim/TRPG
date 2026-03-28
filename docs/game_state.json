@@ -29,8 +29,8 @@
         "CON": 10
       },
       "position": [
-        12,
-        22
+        20,
+        6
       ],
       "status_effects": [],
       "inventory": [
@@ -69,8 +69,8 @@
         "CON": 15
       },
       "position": [
-        13,
-        22
+        21,
+        6
       ],
       "status_effects": [],
       "inventory": [
@@ -98,8 +98,8 @@
         "CON": 17
       },
       "position": [
-        11,
-        22
+        19,
+        6
       ],
       "status_effects": [],
       "inventory": [
@@ -133,7 +133,7 @@
         23
       ],
       "threat_level": "none",
-      "status": "alive",
+      "status": "separated",
       "location": "karendel",
       "known": true
     },
@@ -158,7 +158,7 @@
         23
       ],
       "threat_level": "none",
-      "status": "alive",
+      "status": "separated",
       "location": "karendel",
       "known": true
     },
@@ -182,7 +182,7 @@
         11,
         23
       ],
-      "status": "alive",
+      "status": "separated",
       "location": "karendel"
     },
     {
@@ -236,6 +236,23 @@
       "status": "gone",
       "location": "karendel",
       "description": "A swordsman sipping from a cup while never letting go of his sword. He noticed Lucena's scouting."
+    },
+    {
+      "id": 306,
+      "name": "volf",
+      "type": "friendly",
+      "known": true,
+      "hp": 15,
+      "max_hp": 15,
+      "mp": 0,
+      "max_mp": 0,
+      "position": [
+        20,
+        5
+      ],
+      "status": "alive",
+      "location": "karendel",
+      "description": "Owner of Red Chimney Inn. Old friend of Ernes. Bad knees."
     }
   ],
   "map": {
@@ -327,72 +344,6 @@
   },
   "turn_count": 27,
   "events": [
-    {
-      "turn": 24,
-      "message": "[GM] Restore correct background",
-      "narrative": "",
-      "user_input": "",
-      "dialogues": [],
-      "timestamp": "00:19:32"
-    },
-    {
-      "turn": 24,
-      "message": "[GM] Sync scene to game_state",
-      "narrative": "",
-      "user_input": "",
-      "dialogues": [],
-      "timestamp": "00:22:11"
-    },
-    {
-      "turn": 24,
-      "message": "[GM] Turn 25: Saiki flirts with Mira on the trade road",
-      "narrative": "마차가 교역로를 따라 덜컹거리며 나아간다. 아침 안개가 걷히고, 길 양쪽으로 드넓은 초원이 펼쳐진다.\n\n사이키가 마차 옆을 걸으며 미라에게 다가갔다.\n\n\"미라양, 혹시 나이가 어떻게 되시나요? 좋아하는 건요? 남자친구 있으세요?\"\n\n미라가 눈을 동그랗게 떴다. 손에 들고 있던 보따리를 떨어뜨릴 뻔하며, 볼이 빠르게 붉어진다. 포니테일 끝을 만지작거리며 아버지 쪽을 힐끗 확인했다.\n\n\"어, 어머 -- 갑자기 그런 걸 다 물어보시네요?!\"\n\n잠깐 당황하더니, 나이만큼은 솔직하게 대답했다.\n\n\"저... 스물둘이에요.\"\n\n목소리가 약간 올라갔다. 이어서 화제를 자기가 자신 있는 쪽으로 돌렸다.\n\n\"좋아하는 건... 여러 곳 돌아다니면서 처음 보는 물건 구경하는 거요. 상인 딸이라서 그런가봐요, 헤헤.\"\n\n살짝 들뜬 말투. 하지만 마지막 질문에 이르자 미라의 목소리가 확 작아졌다.\n\n\"남-- 남자친구 같은 건... 아버지한테 들리면 어떡해요!\"\n\n소곤거리듯 속삭이며 민망함 반, 웃음 반으로 손을 내저었다.\n\n그 때, 마차 위에서 할란의 헛기침 소리가 들렸다. 고삐를 잡은 채 뒤를 힐끗 돌아보더니, 눈썹 하나를 치켜올리고 사이키를 천천히 훑어본다. 그리고 소리 없이 시선을 앞으로 되돌렸다.\n\n\"...마차 길이 험하니까, 딴 데 신경 쓰다 혀 깨물지 말고.\"\n\n사이키에게 하는 말인지 혼잣말인지 모를 온도. 적대적이진 않지만, 분명히 들으라고 한 말이었다.\n\n뒤에서 루세나가 입을 틀어막았다. 어깨가 들썩이며 웃음을 참는 게 역력하더니, 사이키에게 속삭이듯 -- 하지만 충분히 들리게 말했다.\n\n\"오빠, 한 번에 세 개? 효율적이다~ 근데 그 순서는 좀 바꿔야 하지 않아?\"\n\n노엘은 정면을 보고 걷다가 딱 한 박자 멈추었다. 사이키 쪽으로 시선을 주지도 않고, 묵묵히 걸음을 재개했다. 표정 변화 없음. 다만 귀가 약간 붉었다.\n\n\"...용감하네.\"\n\n극도로 건조한 한마디였다.",
-      "user_input": "미라양, 혹시 나이가 어떻게 되시나요? 좋아하는 건요? 남자친구 있으세요?",
-      "dialogues": [
-        {
-          "speaker": "saiki",
-          "line": "미라양, 혹시 나이가 어떻게 되시나요? 좋아하는 건요? 남자친구 있으세요?",
-          "tone": "flirty",
-          "target": "mira"
-        },
-        {
-          "speaker": "mira",
-          "line": "어, 어머 -- 갑자기 그런 걸 다 물어보시네요?! 저... 스물둘이에요.",
-          "tone": "flustered",
-          "target": "saiki"
-        },
-        {
-          "speaker": "mira",
-          "line": "좋아하는 건... 여러 곳 돌아다니면서 처음 보는 물건 구경하는 거요. 상인 딸이라서 그런가봐요, 헤헤.",
-          "tone": "cheerful",
-          "target": "saiki"
-        },
-        {
-          "speaker": "mira",
-          "line": "남-- 남자친구 같은 건... 아버지한테 들리면 어떡해요!",
-          "tone": "whisper",
-          "target": "saiki",
-          "type": "whisper"
-        },
-        {
-          "speaker": "hallan",
-          "line": "...마차 길이 험하니까, 딴 데 신경 쓰다 혀 깨물지 말고.",
-          "tone": "gruff"
-        },
-        {
-          "speaker": "lucena",
-          "line": "오빠, 한 번에 세 개? 효율적이다~ 근데 그 순서는 좀 바꿔야 하지 않아?",
-          "tone": "teasing",
-          "target": "saiki"
-        },
-        {
-          "speaker": "noel",
-          "line": "...용감하네.",
-          "tone": "dry"
-        }
-      ],
-      "timestamp": "00:27:15"
-    },
     {
       "turn": 24,
       "message": "[GM] Turn 26: Combat ability discussion, wolf attack memory",
@@ -612,27 +563,66 @@
       "user_input": "",
       "dialogues": [],
       "timestamp": "22:15:00"
+    },
+    {
+      "turn": 27,
+      "message": "[GM] Turn 29: Farewell Mira, arrive Red Chimney Inn, meet Volf",
+      "narrative": "\"기회가 된다면 다음에 또 봅시다.\"\n\n사이키가 미라에게 말했다. 미라가 고개를 끄덕이며 한 번 더 손을 흔들었다. 할란이 짐마차를 이끌고 직물 거리 안쪽으로 사라졌다. 미라의 갈색 포니테일이 인파 속으로 멀어졌다.\n\n셋은 직물 거리를 지나 북쪽으로 걸었다. 좁은 골목이 넓어지고, 숙소 밀집지의 간판들이 보이기 시작했다. 그리고 이내 -- 붉은 벽돌로 쌓은 굴뚝이 오후의 연기를 옅게 내뿜고 있는 2층짜리 석조 건물이 눈에 들어왔다.\n\n붉은 굴뚝 여관.\n\n문을 열자 구운 보리빵 냄새와 나무가 타는 향이 먼저 맞이했다. 홀은 좁지 않지만 붐비지도 않았다 -- 낮 시간이라 손님은 구석에 혼자 앉아 맥주를 홀짝이는 노인 하나뿐. 테이블은 닳았지만 깨끗하고, 바닥에는 지푸라기 대신 마른 허브가 뿌려져 있었다.\n\n루세나가 홀 입구에서 카운터 위 먼지를 손가락으로 툭 닦으며 말했다.\n\n\"음... 냄새는 그럭저럭이네. 외양간 냄새보다는 낫잖아.\"\n\n노엘은 등의 짐을 고쳐 메며 눈으로 창문과 출구 위치를 훑었다.\n\n\"앉을 자리부터.\"\n\n카운터 뒤에서 커다란 남자가 행주로 잔을 닦고 있었다. 오십대 초반, 키가 크고 어깨가 넓지만 배가 나왔다. 소금후추색 머리를 짧게 친 얼굴에 사흘치 수염. 왼쪽 무릎을 약간 감싸며 서 있는 걸 눈치 빠른 사람이라면 알아챌 수 있었다.\n\n세 사람이 들어서자 시선이 올라왔다. 오래 이 일을 해온 사람의, 평가하는 눈빛.\n\n\"어서 오시오.\"\n\n잔을 내려놓으며 말했다. 목소리는 낮고 무뚝뚝하지만 거칠지는 않았다.\n\n\"방 찾으시오, 식사 찾으시오? 방은 1인실이 동쪽으로 둘 남았고, 3인 합실은 하나 있소. 저녁은 해 질 무렵부터요.\"\n\n잠깐 멈추더니 일행을 한 번 훑었다 -- 여행 먼지, 짐의 무게, 지친 기색.\n\n\"멀리서 오셨소?\"",
+      "user_input": "기회가 된다면 다음에 또 봅시다. 여관으로 간다.",
+      "dialogues": [
+        {
+          "speaker": "saiki",
+          "line": "기회가 된다면 다음에 또 봅시다.",
+          "tone": "calm",
+          "target": "mira"
+        },
+        {
+          "speaker": "lucena",
+          "line": "음... 냄새는 그럭저럭이네. 외양간 냄새보다는 낫잖아.",
+          "tone": "casual"
+        },
+        {
+          "speaker": "noel",
+          "line": "앉을 자리부터.",
+          "tone": "dry"
+        },
+        {
+          "speaker": "volf",
+          "line": "어서 오시오.",
+          "tone": "businesslike"
+        },
+        {
+          "speaker": "volf",
+          "line": "방 찾으시오, 식사 찾으시오? 방은 1인실이 동쪽으로 둘 남았고, 3인 합실은 하나 있소.",
+          "tone": "businesslike"
+        },
+        {
+          "speaker": "volf",
+          "line": "멀리서 오셨소?",
+          "tone": "neutral"
+        }
+      ],
+      "timestamp": "22:25:27"
+    },
+    {
+      "turn": 27,
+      "message": "[GM] Fix: remove separated NPCs from map",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:43:06"
+    },
+    {
+      "turn": 27,
+      "message": "[GM] Map refresh after NPC separation",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:44:00"
     }
   ],
   "current_scene": {
     "background": "/static/illustrations/sd/background_karendel.webp",
-    "layers": [
-      {
-        "type": "portrait",
-        "image": "static/portraits/sd/portrait_mira.webp",
-        "position": "left",
-        "name": "mira",
-        "distance": 1,
-        "size_class": "d1"
-      },
-      {
-        "type": "portrait",
-        "image": "static/portraits/sd/portrait_hallan.webp",
-        "position": "center",
-        "name": "hallan",
-        "distance": 1,
-        "size_class": "d1"
-      }
-    ]
+    "layers": []
   }
 }

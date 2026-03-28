@@ -637,7 +637,7 @@ def gm_update():
                 all_positions[pos_key] = p.get("name", f"player_{p['id']}")
 
         for n in state.get("npcs", []):
-            if n.get("status") in ("dead", "fled", "gone"):
+            if n.get("status") in ("dead", "fled", "gone", "separated"):
                 continue
             pos_key = tuple(n.get("position", [0, 0]))
             if pos_key in all_positions:
