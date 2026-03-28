@@ -2,9 +2,9 @@
   "active_scenario": "lost_treasure",
   "active_save_slot": 2,
   "ruleset": "fantasy_basic",
-  "turn": 0,
+  "turn": 1,
   "chapter": 1,
-  "chapter_name": "숲길",
+  "chapter_name": "corridor_1",
   "party_summary": [
     {
       "name": "가온",
@@ -39,7 +39,16 @@
     }
   ],
   "progress_notes": [
-    "[GM] 오프닝 — 숲 속 던전 입구에 도착한 세 모험가"
+    "[GM] Generate yeoul portrait",
+    "[GM] Regenerate gaon portrait (female)",
+    "[GM] Regenerate yeoul portrait (female)",
+    "[GM] Turn 1: Dungeon entry, trap found and disarmed by Yeoul",
+    "[GM] Fix: dungeon entry scene + location update",
+    "[GM] Fix: dungeon entry positions + trap object + skill correction",
+    "[GM] Map refresh with objects + position fix",
+    "[GM] Test object layer",
+    "[GM] Fix: load dungeon interior map",
+    "[GM] Map refresh — dungeon interior"
   ],
   "next_objective": "",
   "display_mode": "mobile",

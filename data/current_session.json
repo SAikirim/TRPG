@@ -1,71 +1,58 @@
 {
-  "active_scenario": "karendel_journey",
-  "active_save_slot": 1,
+  "active_scenario": "lost_treasure",
+  "active_save_slot": 2,
   "ruleset": "fantasy_basic",
-  "turn": 29,
-  "chapter": 2,
-  "chapter_name": "red_chimney_inn",
+  "turn": 1,
+  "chapter": 1,
+  "chapter_name": "corridor_1",
   "party_summary": [
     {
-      "name": "saiki",
-      "class": "mage",
-      "hp": "21/21",
-      "mp": "41/41",
+      "name": "가온",
+      "class": "전사",
+      "hp": "33/33",
+      "mp": "5/5",
       "key_items": [
-        "magic_staff",
-        "mana_potion",
-        "mana_crystal",
-        "slime_jelly",
-        "herb",
-        "ancient_key",
-        "legendary_treasure",
-        "ernes_letter",
-        "herb_bundle_for_volf",
-        "travel_money_silver_10",
-        "shared_gold_1",
-        "rope",
-        "flint",
-        "spice_pouch"
+        "철검",
+        "가죽 방패"
       ]
     },
     {
-      "name": "lucena",
-      "class": "rogue",
-      "hp": "30/30",
-      "mp": "14/14",
+      "name": "세라핀",
+      "class": "성직자",
+      "hp": "26/26",
+      "mp": "24/24",
       "key_items": [
-        "dual_daggers",
-        "thieves_tools",
-        "rope"
+        "철퇴",
+        "성스러운 부적"
       ]
     },
     {
-      "name": "noel",
-      "class": "warrior",
-      "hp": "45/45",
-      "mp": "7/7",
+      "name": "여울",
+      "class": "도적",
+      "hp": "20/20",
+      "mp": "12/12",
       "key_items": [
-        "leather_shield",
-        "orc_axe",
-        "wound_treatment_vial"
+        "단검 x2",
+        "도둑 도구",
+        "밧줄"
       ]
     }
   ],
   "progress_notes": [
-    "[GM] ko sync test",
-    "[GM] Turn 29: Farewell Mira, arrive Red Chimney Inn, meet Volf",
-    "[GM] Fix: remove separated NPCs from map",
-    "[GM] Map refresh after NPC separation",
-    "[GM] Fix: set inn interior background",
-    "[GM] Fix: turn count + Volf portrait",
-    "[GM] Generate Volf portrait",
-    "[GM] Fix: inn interior background",
-    "[GM] Generate Volf SD portrait",
-    "[GM] Regenerate Volf SD portrait (fix)"
+    "[GM] Generate yeoul portrait",
+    "[GM] Regenerate gaon portrait (female)",
+    "[GM] Regenerate yeoul portrait (female)",
+    "[GM] Turn 1: Dungeon entry, trap found and disarmed by Yeoul",
+    "[GM] Fix: dungeon entry scene + location update",
+    "[GM] Fix: dungeon entry positions + trap object + skill correction",
+    "[GM] Map refresh with objects + position fix",
+    "[GM] Test object layer",
+    "[GM] Fix: load dungeon interior map",
+    "[GM] Map refresh — dungeon interior"
   ],
   "next_objective": "",
   "display_mode": "mobile",
-  "show_dice_result": false,
+  "show_dice_result": true,
   "show_system_log": false,
   "sd_illustration": true,
   "last_updated": "2026-03-29"

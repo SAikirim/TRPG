@@ -1,7 +1,7 @@
 {
   "scenario_id": "lost_treasure",
   "first_played": "2026-03-20 00:02:05",
-  "total_saves": 10,
+  "total_saves": 11,
   "history": [
     {
       "slot": 1,
@@ -72,9 +72,16 @@
       "turn": 0,
       "description": "턴0 오프닝 — 던전 입구 도착 (재저장)",
       "saved_at": "2026-03-24 00:01:10"
+    },
+    {
+      "slot": 2,
+      "chapter": 2,
+      "turn": 1,
+      "description": "Turn 1: Dungeon entry, trap disarmed",
+      "saved_at": "2026-03-29 01:47:31"
     }
   ],
-  "last_played": "2026-03-24 00:01:10",
+  "last_played": "2026-03-29 01:47:31",
   "last_chapter": 2,
-  "last_turn": 0
+  "last_turn": 1
 }
