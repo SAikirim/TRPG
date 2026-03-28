@@ -1226,7 +1226,9 @@
                     if (actions.length) {
                         skillEl.innerHTML = actions.map(name => {
                             const info = skillsData[name] || {};
-                            return `<div class="detail-item"><span class="item-name">${name}</span><span class="item-stat">${info.stat || ''}</span><div class="tooltip">${info.desc || name}</div></div>`;
+                            const displayName = tSkill(name);
+                            const desc = koData.skill_desc?.[name] || info.desc || name;
+                            return `<div class="detail-item"><span class="item-name">${displayName}</span><span class="item-stat">${info.stat || ''}</span><div class="tooltip">${desc}</div></div>`;
                         }).join('');
                     } else {
                         skillEl.innerHTML = '<div class="detail-item" style="color:#666">없음</div>';

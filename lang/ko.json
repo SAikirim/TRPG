@@ -141,7 +141,8 @@
     "magic_stone": "마법석",
     "coin_pouch": "동전 주머니",
     "crossbow_bolt": "석궁 볼트",
-    "free_stay_1night": "무료 숙박 1박"
+    "free_stay_1night": "무료 숙박 1박",
+    "spice_pouch": "향신료 주머니"
   },
   "creatures": {
     "slime": "슬라임",
@@ -242,7 +243,9 @@
     "seraphine": "세라핀",
     "yeoul": "여울",
     "hooded_figure": "후드 인물",
-    "swordsman": "검객"
+    "swordsman": "검객",
+    "pack_horse": "짐말",
+    "peddler": "행상인"
   },
   "agent_names": {
     "junhyeok": "준혁",

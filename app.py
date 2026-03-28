@@ -657,6 +657,12 @@ def gm_update():
     gm._log_to_tracker("state", "game_state 저장 + 엔티티 동기화")
     update_map_image()
 
+    # ko.json 자동 업데이트 (신규 NPC/아이템/위치 감지)
+    try:
+        _auto_update_ko(state)
+    except Exception:
+        pass
+
     # docs/ 동기화 (GitHub Pages용)
     try:
         save_manager._sync_docs(state)
@@ -852,6 +858,56 @@ def get_worldbuilding():
         return jsonify({"error": "파일 없음"}), 404
     except json.JSONDecodeError:
         return jsonify({"error": "JSON 파싱 실패"}), 500
+
+
+def _auto_update_ko(state):
+    """game_state의 NPC/아이템/위치 등 새 키가 ko.json에 없으면 자동 추가."""
+    ko_path = os.path.join(BASE_DIR, "lang", "ko.json")
+    try:
+        with open(ko_path, "r", encoding="utf-8") as f:
+            ko = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return
+
+    changed = False
+
+    # NPC 이름
+    for npc in state.get("npcs", []):
+        name = npc.get("name", "")
+        if name and name not in ko.get("npcs", {}):
+            ko.setdefault("npcs", {})[name] = name
+            changed = True
+
+    # 플레이어 이름
+    for p in state.get("players", []):
+        name = p.get("name", "")
+        if name and name not in ko.get("npcs", {}):
+            ko.setdefault("npcs", {})[name] = name
+            changed = True
+
+    # 아이템 (전체 인벤토리 스캔)
+    for p in state.get("players", []):
+        for item in p.get("inventory", []):
+            if item and item not in ko.get("items", {}) and item not in ko.get("weapons", {}) and item not in ko.get("armor", {}):
+                ko.setdefault("items", {})[item] = item
+                changed = True
+
+    # 위치
+    loc = state.get("current_location", "")
+    if loc and loc not in ko.get("locations", {}):
+        ko.setdefault("locations", {})[loc] = loc
+        changed = True
+
+    # 맵 area 이름
+    for area in state.get("map", {}).get("locations", []):
+        area_name = area.get("name", "")
+        if area_name and area_name not in ko.get("area_names", {}):
+            ko.setdefault("area_names", {})[area_name] = area_name
+            changed = True
+
+    if changed:
+        with open(ko_path, "w", encoding="utf-8") as f:
+            json.dump(ko, f, ensure_ascii=False, indent=2)
 
 
 @app.route("/api/ko", methods=["GET"])

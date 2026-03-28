@@ -24,7 +24,8 @@
         "travel_money_silver_10",
         "shared_gold_1",
         "rope",
-        "flint"
+        "flint",
+        "spice_pouch"
       ]
     },
     {
@@ -51,8 +52,6 @@
     }
   ],
   "progress_notes": [
-    "[GM] Restore character layers",
-    "[GM] Scene restore - trade road background",
     "[GM] Restore correct background",
     "[GM] Sync scene to game_state",
     "[GM] Turn 25: Saiki flirts with Mira on the trade road",
@@ -60,7 +59,9 @@
     "[GM] Rollback restore - turn 26 trade road scene",
     "[GM] Turn 27: Travel montage + Karendel arrival",
     "[GM] Scene fix: Karendel city background",
-    "[GM] Scene fix: Karendel city background (retry)"
+    "[GM] Scene fix: Karendel city background (retry)",
+    "[GM] Turn 28: Farewell at south gate, party splits",
+    "[GM] ko sync test"
   ],
   "next_objective": "",
   "display_mode": "mobile",

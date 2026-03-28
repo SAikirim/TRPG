@@ -32,7 +32,8 @@
     "travel_money_silver_10",
     "shared_gold_1",
     "rope",
-    "flint"
+    "flint",
+    "spice_pouch"
   ],
   "controlled_by": "user",
   "original_image": "/static/portraits/original/player_1_saiki.png",
