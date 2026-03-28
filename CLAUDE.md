@@ -242,6 +242,11 @@ guides/                   - Detailed rule reference files
 3. Read `data/current_session.json` → `data/worldbuilding.json` → `data/game_state.json`
 4. Read `guides/gm_rules.txt` — verify dice display, NPC registration, agent rules
 5. Check Flask server → restore web UI scene (automatic: `restore_scene`)
+6. Display current session settings to the user:
+   - `show_dice_result` (true/false)
+   - `show_system_log` (true/false)
+   - `player_input_mode` (batch/sequential)
+   - `sd_illustration` (true/false)
 
 > Showing a blank screen or a previous scene in the web UI is prohibited.
 
