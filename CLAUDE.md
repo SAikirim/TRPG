@@ -51,6 +51,28 @@ By swapping scenarios and rulesets, you can play in various settings including f
 - ❗ If incorrect information is found in event logs, correct it immediately
 ---
 
+## Player vs Character (IC/OOC Distinction)
+
+> This system has two layers: **Players** (real people / AI personas) and **Characters** (in-game entities).
+
+| Layer | Identity | Examples | Speech Mode |
+|-------|----------|----------|-------------|
+| **Player (OOC)** | The person controlling the character | Junhyeok, Seoyeon, Minji | Out-of-character: strategy, opinions, meta-discussion |
+| **Character (IC)** | The in-game persona | Saiki, Lucena, Noel | In-character: dialogue, actions, roleplay |
+
+### Mapping
+- `agents/agent_a.json` (Junhyeok) → controls `player_1` (Saiki) — **user-controlled**
+- `agents/agent_b.json` (Seoyeon) → controls `player_2` (Lucena) — **AI Player Agent**
+- `agents/agent_c.json` (Minji) → controls `player_3` (Noel) — **AI Player Agent**
+
+### GM Detection Rules
+- **IC input**: Character name used, in-game action/dialogue → process as GM turn (narration)
+- **OOC input**: Player name used (민지, 서연), meta-discussion (strategy, rules, character sheet) → call Player Agent in OOC mode, respond as player persona (not character)
+- OOC responses are NOT included in narration or event logs
+- Players may discuss strategy OOC, then switch to IC for the actual turn
+
+---
+
 ## GM Turn Processing Order (Strict Compliance)
 
 > GM = director (knows the overall flow and sets direction), agents = specialists (verify direction consistency + generate specific results)
