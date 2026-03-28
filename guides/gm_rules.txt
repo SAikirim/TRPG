@@ -32,6 +32,35 @@ Rules:
 - AI player entries are 1-line summaries from the Player Agent results
 - This summary is always displayed regardless of show_system_log setting
 - If a player had no notable action this turn, write "—" or omit
+
+Player Input Mode (player_input_mode)
+===
+Setting in current_session.json that controls how the GM collects actions from multiple user-controlled characters.
+
+[batch] (default)
+- The user inputs all character actions in one message
+- Example: "사이키는 미라에게 말을 건다. 루세나는 주변 경계. 노엘은 할란을 돕는다."
+- Faster, fewer turns, lower token usage
+
+[sequential]
+- The GM asks each user character for their action one by one
+- Flow:
+  1. GM: "사이키의 행동?" → User responds
+  2. GM: "루세나의 행동?" → User responds
+  3. GM: "노엘의 행동?" → User responds
+  4. GM processes turn with all collected actions
+- Higher immersion, individual character focus
+- Only applies when multiple characters have controlled_by: "user"
+
+How to switch:
+- User types ":inputmode batch" or ":inputmode sequential"
+- GM changes player_input_mode in current_session.json
+
+Notes:
+- When only 1 character is controlled_by: "user", this setting has no effect
+- AI characters (controlled_by: "ai") are always handled by Player Agent regardless of this setting
+- In sequential mode, the GM must NOT process the turn until all user characters have declared actions
+
 - No advance spoilers — do not reveal DC, rewards, or trap presence before an action is declared
   - Bad example: "Investigate inscription (INT DC 14 — obtain ancient key on success)"
   - Good example: "Something is densely carved on the wall. Ancient letters faintly glimmer in the torchlight."

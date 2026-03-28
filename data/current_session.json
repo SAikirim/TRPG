@@ -66,6 +66,7 @@
   "display_mode": "mobile",
   "show_dice_result": false,
   "show_system_log": false,
+  "player_input_mode": "batch",
   "sd_illustration": true,
   "last_updated": "2026-03-28"
 }
