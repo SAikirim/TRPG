@@ -99,6 +99,64 @@ def check_and_warn(game_state=None, mechanics_results=None):
         if not in_area and areas:
             warnings.append(f"⚖️ {name} 위치 {pos}가 어떤 맵 영역에도 속하지 않음")
 
+    # 5. 스킬 사용 검증: 대화에서 언급된 스킬이 해당 캐릭터의 available_actions에 있는지
+    events = game_state.get("events", [])
+    if events:
+        latest_event = events[-1]
+        dialogues = latest_event.get("dialogues", [])
+        if dialogues:
+            # skills.json에서 스킬 이름 목록 로드
+            skills_data = _load_json(SKILLS_PATH)
+            skill_names = []
+            if skills_data and "skills" in skills_data:
+                skill_names = list(skills_data["skills"].keys())
+
+            if skill_names:
+                # 플레이어 이름→엔티티 매핑 (available_actions 조회용)
+                scenario_id = game_state.get("game_info", {}).get("scenario_id", "")
+                player_map = {}  # name -> available_actions
+                for p in game_state.get("players", []):
+                    ent_path = os.path.join(
+                        BASE_DIR, "entities", scenario_id, "players",
+                        f"player_{p['id']}.json")
+                    entity = _load_json(ent_path)
+                    if entity:
+                        pname = entity.get("name", p.get("name", ""))
+                        player_map[pname.lower()] = [
+                            a.lower() for a in entity.get("available_actions", [])]
+
+                for dlg in dialogues:
+                    speaker = dlg.get("speaker", "").lower()
+                    line = dlg.get("line", "").lower()
+                    # 플레이어 캐릭터만 검사 (NPC 제외)
+                    if speaker in player_map:
+                        actions = player_map[speaker]
+                        for skill in skill_names:
+                            if skill.lower() in line and skill.lower() not in actions:
+                                warnings.append(
+                                    f"⚖️ {speaker}의 대사에 '{skill}' 언급 — "
+                                    f"available_actions에 없는 스킬")
+
+    # 6. 이동 묘사 vs current_location 변경 감지
+    if events:
+        latest_event = events[-1]
+        narr = latest_event.get("narrative", "")
+        move_keywords = ["들어갔다", "입장", "도착", "entered", "arrived", "moved to", "이동"]
+        has_move_narr = any(kw in narr for kw in move_keywords)
+        if has_move_narr:
+            # 이전 이벤트의 current_location과 비교
+            current_loc = game_state.get("current_location", "")
+            prev_loc = ""
+            if len(events) >= 2:
+                # 이전 이벤트 시점의 location 추정: game_state에 기록된 값이
+                # 변경되지 않았으면 이동이 반영되지 않은 것
+                prev_event = events[-2]
+                # 이전 이벤트에도 이동 키워드가 없었다면 그때의 location이 기준
+                prev_loc = current_loc  # 변경 안 됐으면 동일
+            if current_loc and prev_loc and current_loc == prev_loc and len(events) >= 2:
+                warnings.append(
+                    "⚖️ 나레이션에 이동 묘사가 있으나 current_location 미변경")
+
     return warnings
 
 

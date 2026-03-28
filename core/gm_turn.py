@@ -274,6 +274,31 @@ def end_turn():
         if any(kw in all_details for kw in move_keywords):
             warnings.append("  ⚠️  위치 변경 누락 가능: 나레이션에 이동 키워드 감지됨 → gm-update에 location 필드 추가 필요")
 
+    # GM 행동 강화 검증: narration + 플레이어 행동 요약
+    if "narration" in done_tags:
+        has_player_action = any(
+            s["tag"] == "narration" and ("플레이어 행동" in s.get("message", "")
+                                         or "Player Actions" in s.get("message", ""))
+            for s in tracker["steps"]
+        )
+        # 다른 로그에서도 플레이어 행동 기록 확인
+        if not has_player_action:
+            has_player_action = any(
+                "플레이어 행동" in s.get("message", "") or "Player Actions" in s.get("message", "")
+                for s in tracker["steps"]
+            )
+        if not has_player_action:
+            warnings.append("  ⚠️ 플레이어 행동 요약 미출력")
+
+    # GM 행동 강화 검증: dice 판정 시 나레이션에 🎲 인라인 표시
+    if "dice" in done_tags:
+        narration_msgs = [
+            s.get("message", "") for s in tracker["steps"] if s["tag"] == "narration"
+        ]
+        has_dice_emoji = any("🎲" in msg for msg in narration_msgs)
+        if not has_dice_emoji:
+            warnings.append("  ⚠️ 나레이션에 🎲 인라인 판정 표시 누락")
+
     tracker["completed"] = True
     tracker["ended_at"] = datetime.now().isoformat()
     _save_tracker(tracker)

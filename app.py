@@ -541,10 +541,12 @@ def gm_update():
         state["npcs"].append(new_npc)
         gm.create_npc_entity(new_npc, state)
 
-    # turn_count 증가는 GM이 직접 관리 — API에서 자동 증가하지 않음
-    # 단, turn이 명시적으로 제공된 경우 해당 값으로 설정
+    # turn_count 자동 증가: narrative가 있고 turn이 명시되지 않으면 +1
+    # turn이 명시적으로 제공된 경우 해당 값으로 설정
     if "turn" in data:
         state["turn_count"] = data["turn"]
+    elif narrative:
+        state["turn_count"] = state.get("turn_count", 0) + 1
 
     # 이벤트는 description 또는 narrative가 있을 때만 추가
     event = None
