@@ -56,8 +56,10 @@ def set_scene_state(background=None, layers=None):
         _scene_state["generating"]["status"] = "idle"
 
 
+_game_state_lock = threading.Lock()
+
 def _sync_scene_to_game_state():
-    """_scene_state를 game_state.json의 current_scene에 동기화"""
+    """_scene_state를 game_state.json의 current_scene에 동기화 (atomic write)"""
     try:
         with _lock:
             scene_snapshot = {
@@ -65,11 +67,14 @@ def _sync_scene_to_game_state():
                 "layers": list(_scene_state.get("layers", [])),
             }
         gs_path = os.path.join(BASE_DIR, "data", "game_state.json")
-        with open(gs_path, "r", encoding="utf-8") as f:
-            state = json.load(f)
-        state["current_scene"] = scene_snapshot
-        with open(gs_path, "w", encoding="utf-8") as f:
-            json.dump(state, f, ensure_ascii=False, indent=2)
+        with _game_state_lock:
+            with open(gs_path, "r", encoding="utf-8") as f:
+                state = json.load(f)
+            state["current_scene"] = scene_snapshot
+            tmp_path = gs_path + ".tmp"
+            with open(tmp_path, "w", encoding="utf-8") as f:
+                json.dump(state, f, ensure_ascii=False, indent=2)
+            os.replace(tmp_path, gs_path)
     except Exception as e:
         logger.warning(f"Failed to sync scene to game_state: {e}")
 
@@ -199,7 +204,7 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
             with _lock:
                 if illustration_type == "background":
                     _scene_state["background"] = image_url
-                    _scene_state["layers"] = []  # clear layers on new background
+                    # 레이어는 유지 — 배경 교체(SD 완료)로 NPC 레이어가 사라지면 안 됨
                 else:
                     # Remove existing layer with same name if any
                     _scene_state["layers"] = [l for l in _scene_state["layers"] if l.get("name") != name]
