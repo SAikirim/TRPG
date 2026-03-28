@@ -896,9 +896,10 @@
             return STATIC_PREFIX + 'portraits/sd/portrait_' + name + '.webp';
         }
         function getPlayerPortraitFull(p) {
-            if (p.original_image) return staticPath(p.original_image);
+            // 줌: original(배경 있음) > sd(배경 제거) > pixel
             const name = _resolvePortraitName(p.name);
-            return STATIC_PREFIX + 'portraits/sd/portrait_' + name + '.webp';
+            if (p.original_image) return staticPath(p.original_image);
+            return STATIC_PREFIX + 'portraits/original/' + name + '.webp';
         }
         function buildOriginalImageMap() {
             if (!gameState) return;
