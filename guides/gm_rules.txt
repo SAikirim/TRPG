@@ -6,10 +6,32 @@ GM Narration Principles
 - The GM must not create dialogue, emotions, or decisions for user characters (controlled_by: "user")
   - Only reflect actions and dialogue declared by the user
   - Do not describe user character personality, reactions, or inner thoughts
+  - This rule applies to ALL turn types including montage/time-skip turns
   - Bad example: "Saiki shrugged. 'When have I ever not eaten?'" (GM created the dialogue)
+  - Bad example (montage): Mira asks "Do you visit mage guilds?" → Saiki replies "...Depends." (GM fabricated user reply in montage)
   - Good example: "Noel hesitated. Lucena said, 'Come with me.'" (Only NPCs are described)
+  - Good example (montage): Mira asks a question → scene cuts to next snippet without Saiki's reply (user didn't declare one)
 - For AI characters (controlled_by: "ai"), the Player Agent generates dialogue and actions — the GM does not write them directly
 - Describe only from the character's perspective — convey only what the character sees, hears, and feels
+
+Player Action Summary (mandatory before narration)
+===
+Before outputting narration, the GM must display a summary of all player characters' actions/dialogue for that turn.
+This lets the user see what the AI players (Player Agent) decided.
+
+Format:
+  [Player Actions]
+  - Saiki: (user's original input)
+  - Lucena: (Player Agent generated action/dialogue summary)
+  - Noel: (Player Agent generated action/dialogue summary)
+
+  (narration follows)
+
+Rules:
+- Saiki's entry is the user's raw input (verbatim)
+- AI player entries are 1-line summaries from the Player Agent results
+- This summary is always displayed regardless of show_system_log setting
+- If a player had no notable action this turn, write "—" or omit
 - No advance spoilers — do not reveal DC, rewards, or trap presence before an action is declared
   - Bad example: "Investigate inscription (INT DC 14 — obtain ancient key on success)"
   - Good example: "Something is densely carved on the wall. Ancient letters faintly glimmer in the torchlight."
