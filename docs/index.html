@@ -880,18 +880,24 @@
 
         // 플레이어 원본 이미지 매핑 (엔티티 original_image 필드 또는 폴백)
         const playerOriginalImages = {};
+        function _resolvePortraitName(name) {
+            // ko.json npcs에서 역방향 검색: 한국어 이름 → 영어 키
+            const lower = name.toLowerCase().replace(/\s+/g, '_');
+            if (koData.npcs) {
+                for (const [eng, kor] of Object.entries(koData.npcs)) {
+                    if (kor === name || eng === lower) return eng.toLowerCase();
+                }
+            }
+            return lower;
+        }
         function getPlayerPortrait(p) {
-            // SD portrait > original_image > pixel fallback
-            const name = p.name.toLowerCase().replace(/\s+/g, '_');
-            const sdPath = STATIC_PREFIX + 'portraits/sd/portrait_' + name + '.webp';
-            const sdPng = STATIC_PREFIX + 'portraits/sd/portrait_' + name + '.png';
-            // Try SD webp first (most common), fall back to pixel
-            return p.original_image ? staticPath(p.original_image) : sdPath;
+            if (p.original_image) return staticPath(p.original_image);
+            const name = _resolvePortraitName(p.name);
+            return STATIC_PREFIX + 'portraits/sd/portrait_' + name + '.webp';
         }
         function getPlayerPortraitFull(p) {
-            // For zoom: SD portrait > original_image > pixel
-            const name = p.name.toLowerCase().replace(/\s+/g, '_');
             if (p.original_image) return staticPath(p.original_image);
+            const name = _resolvePortraitName(p.name);
             return STATIC_PREFIX + 'portraits/sd/portrait_' + name + '.webp';
         }
         function buildOriginalImageMap() {
