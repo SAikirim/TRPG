@@ -1,0 +1,29 @@
+{
+  "id": "obj_001",
+  "name": "hallan_cart",
+  "type": "vehicle",
+  "status": "parked",
+  "position": [
+    12,
+    13
+  ],
+  "size": [
+    2,
+    1
+  ],
+  "location": "trade_road_karendel",
+  "description": "Hallan and Mira's trade cart. Loaded with textiles and dried fish. Pulled by a packhorse.",
+  "interactable": true,
+  "interaction": "Investigate to check the trade goods.",
+  "icon": "🛒",
+  "tactical": {
+    "cover": "full",
+    "defense_bonus": 5,
+    "blocks_ranged": true,
+    "destructible": true,
+    "hp": 30,
+    "flammable": true,
+    "climbable": true,
+    "description": "Hiding behind the cart fully blocks ranged attacks. Flammable."
+  }
+}

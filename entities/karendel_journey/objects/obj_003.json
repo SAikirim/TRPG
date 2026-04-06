@@ -1,0 +1,24 @@
+{
+  "id": "obj_003",
+  "name": "firewood_pile",
+  "type": "resource",
+  "status": "available",
+  "position": [
+    13,
+    13
+  ],
+  "location": "crossroads_rest",
+  "description": "An armful of firewood gathered by Noel. Stacked next to the campfire.",
+  "interactable": true,
+  "interaction": "Can add firewood to the campfire.",
+  "icon": "🔶",
+  "tactical": {
+    "cover": "half",
+    "defense_bonus": 2,
+    "blocks_ranged": false,
+    "destructible": true,
+    "hp": 8,
+    "flammable": true,
+    "description": "Half cover behind the firewood pile. Flammable — causes burn damage to surroundings if ignited."
+  }
+}

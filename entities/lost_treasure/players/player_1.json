@@ -1,59 +1,54 @@
 {
   "id": 1,
-  "name": "사이키",
-  "class": "마법사",
+  "name": "gaon",
+  "class": "warrior",
+  "controlled_by": "ai",
+  "agent_id": "agent_a",
   "background": {
-    "origin": "가난한 집안 출신. 어린 시절 마을에 찾아온 떠돌이 마법사에게 마법을 배운 독학 마법사.",
-    "motivation": "가족의 생계를 위해 보물을 찾으러 모험을 떠남",
-    "personality": "조용하고 신중하지만, 가족을 위해서라면 위험도 감수하는 책임감 강한 오빠",
+    "origin": "Former mercenary. Worked alone after losing multiple parties, but has formed a team again.",
+    "motivation": "Learned through experience that protecting allies is the best strategy. This time, he won't lose anyone.",
+    "personality": "The quiet type who acts first. Plans strategy only in his head and shows it through action.",
     "relationships": {
-      "루체나": "여동생. 서로를 지키며 자란 남매",
-      "노을": "마을 이웃의 고아. 밥을 나눠주던 인연"
+      "seraphine": "Party healer. Someone he can trust to cover the rear.",
+      "yeoul": "Party rogue. Someone he needs to shield from the front."
     }
   },
   "stats": {
-    "hp": 21,
-    "max_hp": 21,
-    "mp": 37,
-    "max_mp": 41,
-    "STR": 8,
-    "DEX": 16,
-    "INT": 19,
-    "CON": 10
+    "hp": 33,
+    "max_hp": 33,
+    "mp": 5,
+    "max_mp": 5,
+    "STR": 18,
+    "DEX": 10,
+    "INT": 6,
+    "CON": 16
   },
   "position": [
-    3,
-    7
+    12,
+    18
   ],
   "status_effects": [],
   "inventory": [
-    "마법 지팡이",
-    "마나 포션",
-    "마나 결정",
-    "슬라임 젤리",
-    "약초",
-    "고대 열쇠",
-    "전설의 보물",
-    "에르네스의 소개장",
-    "약초 봉투 (볼프에게 전달)",
-    "노잣돈 (은화 10닢)",
-    "금화 1닢 (공용, 카렌델 환전 후 3등분)"
+    "철검",
+    "가죽 방패"
   ],
   "equipment": {
     "weapon": {
-      "name": "마법 지팡이",
+      "name": "iron_sword",
       "rarity": "common",
       "properties": {}
     },
-    "armor": null,
+    "armor": {
+      "name": "chainmail",
+      "rarity": "common",
+      "properties": {}
+    },
     "accessory": null
   },
   "available_actions": [
-    "공격",
-    "마법탄",
-    "파이어볼",
-    "힐",
-    "마나 쉴드"
+    "attack",
+    "defend",
+    "provoke"
   ],
   "combat_state": {
     "is_in_combat": false,
@@ -61,45 +56,12 @@
     "next_turn_penalty": 0
   },
   "history": {
-    "actions_taken": [
-      {
-        "turn": 3,
-        "action": "파이어볼",
-        "target": "어두운 오크",
-        "roll": "nat20 크리티컬",
-        "damage": 14,
-        "result": "명중"
-      },
-      {
-        "turn": 6,
-        "action": "고대 열쇠 사용",
-        "target": "철문",
-        "roll": "자동 성공",
-        "damage": 0,
-        "result": "챕터3 진입"
-      },
-      {
-        "turn": 7,
-        "action": "마력 분석",
-        "target": "수호 마법",
-        "roll": "실패",
-        "damage": 0,
-        "result": "해체 실패, 열쇠 반응 발견"
-      },
-      {
-        "turn": 7,
-        "action": "고대 열쇠 사용",
-        "target": "보물 상자",
-        "roll": "자동 성공",
-        "damage": 0,
-        "result": "보물 획득"
-      }
-    ],
-    "damage_dealt_total": 14,
+    "actions_taken": [],
+    "damage_dealt_total": 0,
     "damage_received_total": 0,
     "kills": [],
     "items_used": [],
-    "turns_played": 3
+    "turns_played": 0
   },
   "conditions": {
     "alive": true,
@@ -107,40 +69,22 @@
     "death_save_turns": 0
   },
   "growth": {
-    "level": 3,
-    "xp": 315,
-    "xp_to_next": 600,
+    "level": 1,
+    "xp": 0,
+    "xp_to_next": 100,
     "stat_points_available": 0,
-    "learned_skills": [
-      "마나 쉴드"
-    ],
-    "xp_log": [
-      {
-        "source": "오크 처치 (high)",
-        "amount": 60
-      },
-      {
-        "source": "챕터1 완료",
-        "amount": 100
-      },
-      {
-        "source": "함정 해제 (퍼즐)",
-        "amount": 25
-      },
-      {
-        "source": "보물 상자 획득 (퀘스트)",
-        "amount": 50
-      },
-      {
-        "source": "탐색/RP (숲, 던전, 비문)",
-        "amount": 50
-      },
-      {
-        "source": "늑대 처치 (medium)",
-        "amount": 30
-      }
-    ]
+    "learned_skills": [],
+    "xp_log": []
   },
-  "party_role": "후열 (원거리 딜/힐)",
-  "controlled_by": "user"
+  "party_role": "frontline_tank_melee",
+  "appearance": {
+    "age": "mid-20s",
+    "build": "solid and sturdy build",
+    "skin": "sun-tanned skin",
+    "hair": "short-cropped black hair",
+    "face": "sharp gaze, taciturn impression",
+    "outfit": "worn chainmail, iron sword on back, leather shield on left arm",
+    "notable": "old scars visible above the armor",
+    "gender": "female"
+  }
 }

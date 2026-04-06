@@ -1,26 +1,26 @@
 {
   "game_info": {
-    "title": "카렌델로 가는 길",
+    "title": "The Road to Karendel",
     "scenario_id": "karendel_journey",
-    "scenario": "전설의 보물을 감정하기 위해 교역도시 카렌델로 향하는 중",
+    "scenario": "Heading to the trade city Karendel to appraise the legendary treasure",
     "ruleset": "fantasy_basic",
     "difficulty": "normal",
     "stat_pool": 50,
     "status": "in_progress",
     "ending": null,
-    "current_chapter": 1
+    "current_chapter": 2
   },
-  "current_location": "trade_road_karendel",
+  "current_location": "red_chimney_inn_1f",
   "players": [
     {
       "id": 1,
-      "name": "사이키",
-      "class": "마법사",
+      "name": "saiki",
+      "class": "mage",
       "level": 3,
       "xp": 315,
       "hp": 21,
       "max_hp": 21,
-      "mp": 37,
+      "mp": 41,
       "max_mp": 41,
       "stats": {
         "STR": 8,
@@ -29,37 +29,39 @@
         "CON": 10
       },
       "position": [
-        13,
-        12
+        7,
+        5
       ],
       "status_effects": [],
       "inventory": [
-        "마법 지팡이",
-        "마나 포션",
-        "마나 결정",
-        "슬라임 젤리",
-        "약초",
-        "고대 열쇠",
-        "전설의 보물",
-        "에르네스의 소개장",
-        "약초 봉투 (볼프에게 전달)",
-        "노잣돈 (은화 10닢)",
-        "금화 1닢 (공용, 카렌델 환전 후 3등분)",
-        "밧줄",
-        "부싯돌"
+        "magic_staff",
+        "mana_potion",
+        "mana_crystal",
+        "slime_jelly",
+        "herb",
+        "ancient_key",
+        "legendary_treasure",
+        "ernes_letter",
+        "herb_bundle_for_volf",
+        "travel_money_silver_10",
+        "shared_gold_1",
+        "rope",
+        "flint",
+        "spice_pouch",
+        "free_stay_1night"
       ],
       "controlled_by": "user",
       "original_image": "/static/portraits/original/player_1_saiki.png"
     },
     {
       "id": 2,
-      "name": "루체나",
-      "class": "도적",
+      "name": "lucena",
+      "class": "rogue",
       "level": 3,
       "xp": 315,
       "hp": 30,
       "max_hp": 30,
-      "mp": 12,
+      "mp": 14,
       "max_mp": 14,
       "stats": {
         "STR": 8,
@@ -68,22 +70,22 @@
         "CON": 15
       },
       "position": [
-        14,
-        12
+        8,
+        5
       ],
       "status_effects": [],
       "inventory": [
-        "단검 x2",
-        "도둑 도구",
-        "밧줄"
+        "dual_daggers",
+        "thieves_tools",
+        "rope"
       ],
-      "controlled_by": "agent",
+      "controlled_by": "ai",
       "original_image": "/static/portraits/original/player_2_luchena.png"
     },
     {
       "id": 3,
-      "name": "노을",
-      "class": "전사",
+      "name": "noel",
+      "class": "warrior",
       "level": 3,
       "xp": 315,
       "hp": 45,
@@ -97,23 +99,23 @@
         "CON": 17
       },
       "position": [
-        12,
-        12
+        6,
+        5
       ],
       "status_effects": [],
       "inventory": [
-        "가죽 방패",
-        "오크의 도끼",
-        "상처 치료 약병"
+        "leather_shield",
+        "orc_axe",
+        "wound_treatment_vial"
       ],
-      "controlled_by": "agent",
+      "controlled_by": "ai",
       "original_image": "/static/portraits/original/player_3_noeul.png"
     }
   ],
   "npcs": [
     {
       "id": 300,
-      "name": "할란",
+      "name": "hallan",
       "type": "friendly",
       "stats": {
         "STR": 10,
@@ -128,17 +130,17 @@
       "attack": 3,
       "defense": 2,
       "position": [
-        13,
-        13
+        12,
+        23
       ],
       "threat_level": "none",
-      "status": "alive",
-      "location": "trade_road_karendel",
+      "status": "separated",
+      "location": "karendel",
       "known": true
     },
     {
       "id": 301,
-      "name": "미라",
+      "name": "mira",
       "type": "friendly",
       "stats": {
         "STR": 8,
@@ -153,19 +155,19 @@
       "attack": 2,
       "defense": 2,
       "position": [
-        14,
-        13
+        13,
+        23
       ],
       "threat_level": "none",
-      "status": "alive",
-      "location": "trade_road_karendel",
+      "status": "separated",
+      "location": "karendel",
       "known": true
     },
     {
       "id": 302,
-      "name": "짐말",
+      "name": "pack_horse",
       "type": "friendly",
-      "race": "말",
+      "race": "horse",
       "known": true,
       "stats": {
         "STR": 16,
@@ -178,11 +180,81 @@
       "mp": 0,
       "max_mp": 0,
       "position": [
-        12,
-        13
+        11,
+        23
+      ],
+      "status": "separated",
+      "location": "karendel"
+    },
+    {
+      "id": 303,
+      "name": "hooded_figure",
+      "type": "neutral",
+      "known": false,
+      "hp": 15,
+      "max_hp": 15,
+      "mp": 0,
+      "max_mp": 0,
+      "position": [
+        16,
+        11
+      ],
+      "status": "fled",
+      "location": "trade_road_karendel",
+      "description": "A suspicious hooded figure with no luggage at all. Sitting still beyond the campfire.",
+      "note": "Left the rest stop at dawn"
+    },
+    {
+      "id": 304,
+      "name": "peddler",
+      "type": "neutral",
+      "known": true,
+      "hp": 10,
+      "max_hp": 10,
+      "mp": 0,
+      "max_mp": 0,
+      "position": [
+        14,
+        22
+      ],
+      "status": "gone",
+      "location": "karendel",
+      "description": "A peddler carrying a bundle on their back. The lock is flimsy."
+    },
+    {
+      "id": 305,
+      "name": "swordsman",
+      "type": "neutral",
+      "known": true,
+      "hp": 25,
+      "max_hp": 25,
+      "mp": 0,
+      "max_mp": 0,
+      "position": [
+        14,
+        23
+      ],
+      "status": "gone",
+      "location": "karendel",
+      "description": "A swordsman sipping from a cup while never letting go of his sword. He noticed Lucena's scouting."
+    },
+    {
+      "id": 306,
+      "name": "volf",
+      "display_name": "innkeeper",
+      "type": "friendly",
+      "known": true,
+      "hp": 15,
+      "max_hp": 15,
+      "mp": 0,
+      "max_mp": 0,
+      "position": [
+        17,
+        5
       ],
       "status": "alive",
-      "location": "trade_road_karendel"
+      "location": "red_chimney_inn_1f",
+      "description": "Owner of Red Chimney Inn. Old friend of Ernes. Bad knees."
     }
   ],
   "map": {
@@ -191,149 +263,249 @@
     "tile_size": 40,
     "locations": [
       {
-        "name": "숲 (북쪽)",
-        "type": "grass",
+        "name": "common_room",
+        "type": "floor_wood",
         "area": {
-          "x1": 0,
-          "y1": 0,
-          "x2": 24,
-          "y2": 7
+          "x1": 1,
+          "y1": 1,
+          "x2": 15,
+          "y2": 11
         }
       },
       {
-        "name": "교역로",
-        "type": "road",
+        "name": "counter",
+        "type": "counter",
         "area": {
-          "x1": 0,
-          "y1": 8,
-          "x2": 24,
-          "y2": 16
+          "x1": 16,
+          "y1": 2,
+          "x2": 17,
+          "y2": 8
         }
       },
       {
-        "name": "수레 정차 지점",
-        "type": "village",
+        "name": "work_area",
+        "type": "floor_stone",
         "area": {
-          "x1": 10,
+          "x1": 18,
+          "y1": 1,
+          "x2": 21,
+          "y2": 8
+        }
+      },
+      {
+        "name": "kitchen",
+        "type": "kitchen",
+        "area": {
+          "x1": 18,
+          "y1": 9,
+          "x2": 21,
+          "y2": 11
+        }
+      },
+      {
+        "name": "fireplace",
+        "type": "fireplace",
+        "area": {
+          "x1": 1,
           "y1": 12,
-          "x2": 14,
-          "y2": 13
+          "x2": 2,
+          "y2": 14
         }
       },
       {
-        "name": "숲 (남쪽)",
-        "type": "grass",
+        "name": "south_seating",
+        "type": "floor_wood",
         "area": {
-          "x1": 0,
-          "y1": 17,
-          "x2": 24,
-          "y2": 24
+          "x1": 1,
+          "y1": 12,
+          "x2": 15,
+          "y2": 18
+        }
+      },
+      {
+        "name": "storage",
+        "type": "floor_stone",
+        "area": {
+          "x1": 16,
+          "y1": 9,
+          "x2": 23,
+          "y2": 18
+        }
+      },
+      {
+        "name": "stairway",
+        "type": "stairs",
+        "area": {
+          "x1": 22,
+          "y1": 1,
+          "x2": 23,
+          "y2": 3
+        }
+      },
+      {
+        "name": "hallway_south",
+        "type": "floor_wood",
+        "area": {
+          "x1": 1,
+          "y1": 19,
+          "x2": 23,
+          "y2": 23
+        }
+      },
+      {
+        "name": "main_entrance",
+        "type": "door",
+        "area": {
+          "x1": 11,
+          "y1": 23,
+          "x2": 13,
+          "y2": 23
         }
       }
     ]
   },
-  "turn_count": 17,
+  "turn_count": 30,
   "events": [
     {
-      "turn": 0,
-      "message": "새 시나리오: 카렌델로 가는 길. 교역로에서 상인 할란, 미라와 동행 중.",
-      "timestamp": "시나리오 시작"
-    },
-    {
-      "turn": 2,
-      "message": "[GM] [로드] 카렌델로 가는 길 — 챕터 1: 교역로. 상인 할란, 미라와 동행 중.",
+      "turn": 27,
+      "message": "[GM] Map refresh after NPC separation",
       "narrative": "",
-      "timestamp": "19:07:38"
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:44:00"
     },
     {
-      "turn": 3,
-      "message": "[GM] [로드] 카렌델로 가는 길 — 교역로, 상인 할란/미라와 동행 중.",
+      "turn": 27,
+      "message": "[GM] Fix: set inn interior background",
       "narrative": "",
-      "timestamp": "21:31:11"
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:47:40"
     },
     {
-      "turn": 4,
-      "message": "[GM] [로드] 카렌델로 가는 길 — 교역로, 상인 할란/미라와 동행 중.",
+      "turn": 27,
+      "message": "[GM] Fix: turn count + Volf portrait",
       "narrative": "",
-      "timestamp": "21:54:38"
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:52:04"
     },
     {
-      "turn": 5,
-      "message": "[GM] 출발 준비 완료. 수레 수리됨. 할란의 다리 부상으로 이동 속도 느림.",
-      "narrative": "수레 바퀴 수리가 끝났다. 할란이 다리를 절며 수레에 올라탔다. 미라가 짐을 정리하며 파티를 돌아보았다. \"이제 출발할 수 있어요. 카렌델까지 이틀 정도... 아버지 다리 때문에 좀 느릴 거예요.\" 교역로 동쪽으로 길이 이어진다. 해가 아직 높다.",
-      "timestamp": "22:26:04"
-    },
-    {
-      "turn": 6,
-      "message": "[GM] 출발 준비. 사이키가 노을에게 땅에 떨어진 물건을 챙기자고 한다. 할란과 미라가 반응한다.",
-      "narrative": "할란이 수레에서 고개를 돌렸다. \"그거? 늑대가 짓밟은 거라 상품 가치는 없어. 챙길 거면 챙겨.\" 잠시 뜸을 들이더니 덧붙였다. \"...진짜 쓸만한 건 이미 수레에 실었으니까. 도와줘서 고맙다.\" 미라가 가방을 뒤지더니 작은 약병 하나를 꺼내 노을에게 건넸다. \"이건 아버지 치료하려고 가져온 건데, 하나 남았어요. 도와줘서 감사한 마음이에요.\" 노을이 약병을 받으며 고개를 끄덕였다. 땅에 흩어진 물건들 — 찢어진 천 조각, 깨진 도자기 파편, 으깨진 건과일 몇 줌. 쓸만한 것은 거의 없었지만, 노을이 꼼꼼히 뒤지자 밧줄 한 타래와 부싯돌 하나가 나왔다.",
-      "timestamp": "22:36:53"
-    },
-    {
-      "turn": 7,
-      "message": "[GM] [테스트] 짐말 초상화 재생성",
+      "turn": 27,
+      "message": "[GM] Generate Volf portrait",
       "narrative": "",
-      "timestamp": "23:52:13"
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:52:24"
     },
     {
-      "turn": 8,
-      "message": "[GM] [재생성] 짐말 초상화",
+      "turn": 27,
+      "message": "[GM] Fix: inn interior background",
       "narrative": "",
-      "timestamp": "23:55:19"
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:56:21"
     },
     {
-      "turn": 9,
-      "message": "[GM] [재생성] 짐말 초상화 (배경 제거 테스트)",
+      "turn": 27,
+      "message": "[GM] Generate Volf SD portrait",
       "narrative": "",
-      "timestamp": "00:00:42"
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "23:17:53"
     },
     {
-      "turn": 10,
-      "message": "[GM] [재생성] 짐말 초상화 (배경 제거 테스트)",
+      "turn": 27,
+      "message": "[GM] Regenerate Volf SD portrait (fix)",
       "narrative": "",
-      "timestamp": "00:02:09"
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "23:23:11"
     },
     {
-      "turn": 11,
-      "message": "[GM] [재생성] 짐말 초상화 (배경 제거 테스트)",
-      "narrative": "",
-      "timestamp": "00:03:56"
+      "turn": 28,
+      "message": "",
+      "narrative": "사이키가 카운터 앞으로 걸어갔다.\n\n\"안녕하세요. 여기 볼프씨 있으신가요, 여기 에르네스의 소개장과 약초 봉투가 있다고 알려주세요.\"\n\n카운터 뒤의 남자가 행주를 닦던 손을 멈췄다. 눈썹이 올라갔다. 천천히 행주를 내려놓으며 몸을 앞으로 기댔다.\n\n\"...내가 볼프요.\"\n\n잠깐의 침묵. 그의 시선이 사이키의 얼굴에서 짐으로, 다시 뒤의 두 동료에게로 옮겨갔다.\n\n\"에르네스가 보냈다고? 소개장이랑 약초 봉투, 여기 놓으시오.\"\n\n사이키가 가방에서 에르네스의 소개장과 약초 묶음을 꺼내 카운터 위에 올렸다. 볼프가 소개장을 펼쳐 읽기 시작했다. 약초 봉투를 한 번 만져보더니 입꼬리가 아주 미세하게 올라갔다.\n\n\"그 녀석, 잊지 않았군.\"\n\n낮은 목소리에 뭔가 말랑한 것이 스쳤다. 하지만 곧 원래의 무뚝뚝한 표정으로 돌아왔다.\n\n\"아, 그리고 우리들을 위한 음식과 음료를 주세요. 이 둘은 애들이라 시원한 우유로 주시고요.\"\n\n루체나가 카운터에 팔짱을 끼고 기대며 사이키를 쏘아봤다.\n\n\"야, 잠깐만요. 저 애 아니고요, 우유도 됐어요. 저한테는 에일이나 한 잔 주세요, 아저씨. 아, 그리고 사이키 오빠 -- 애들이라고 하면 다음엔 소개장 잃어버릴 수도 있으니까 참고해요.\"\n\n눈은 사이키를 째려보면서도, 그 시선은 이미 홀 안을 훑고 있었다.\n\n노엘은 입구 쪽 벽에 등을 대고 앉을 수 있는 자리를 골라 짐을 내렸다. 문과 양쪽 창문이 한눈에 보이는 위치. 오크 도끼를 벽에 기대고, 무심한 눈으로 사이키를 보며 한마디 했다.\n\n\"...애라고 했나.\"\n\n볼프가 세 사람을 한 번 훑어보더니, 허탈한 듯 코를 한 번 훌쩍였다.\n\n\"꼬맹이들 우유는 알았소. 음식은 지금 낸다. 뭘 드실 거요?\"",
+      "user_input": "Saiki presents letter and herbs, orders food/milk",
+      "dialogues": [],
+      "timestamp": "01:13:08"
     },
     {
-      "turn": 12,
-      "message": "[GM] [재생성] 짐말 초상화 (배경 제거 테스트)",
-      "narrative": "",
-      "timestamp": "00:07:37"
+      "turn": 29,
+      "message": "",
+      "narrative": "사이키가 루체나 근처 자리에 앉으며 볼프를 올려다봤다.\n\n\"여기서 추천하는 음식이 뭐에요? 4인분 같은 3인분 주세요. 한창 먹고 클 나이라.\"\n\n루체나와 노엘을 보며 살짝 미소지었다.\n\n루체나가 이마에 핏줄이 서는 것을 꾹 참으며 대답했다.\n\n\"지금 세 시 반쯤 됐어. ...그리고 클 나이가 두 번째야, 사이키. 한 번 더 하면 나중에 네 지갑에서 실수로 동전 몇 개 빠진다.\"\n\n노엘은 자리에서 식기를 정리하며 무심하게 한마디 보탰다.\n\n\"...한 번 더 하면 몫 뺏는다.\"\n\n볼프가 카운터 아래에서 분필판 메뉴를 꺼내며 말했다.\n\n\"오늘은 양고기 스튜에 흑빵, 구운 닭 반 마리씩 나온다.\"\n\n\"스튜는 아침부터 끓인 거라 지금이 제일 맛있을 때고.\"\n\n잠깐 일행을 훑어보더니,\n\n\"4인분을 3명이 먹겠다고? ...뭐, 크는 애들한테 그게 맞는 양이지.\"\n\n루체나가 볼프까지 가세했다는 듯 눈을 치켜떴지만, 볼프는 아랑곳하지 않고 소개장을 다시 한 번 들어 보였다.\n\n\"에르네스 영감 소개장에 하룻밤 무료라고 적혀 있으니, 방은 2층 제일 안쪽으로 잡아뒀다.\"\n\n행주를 어깨에 걸치며 주방 쪽으로 몸을 돌렸다.\n\n\"짐 풀고 내려와라. 스튜 식기 전에.\"",
+      "user_input": "적당한 자리에 앉아 추천 음식 4인분급 3인분 주문, 클 나이 드립, 루체나에게 시간 물음",
+      "dialogues": [],
+      "timestamp": "01:20:55"
     },
     {
-      "turn": 13,
-      "message": "[GM] 일행이 마차에 올라타 교역로를 따라 카렌델로 출발한다.",
-      "narrative": "할란이 고삐를 잡고 마차에 올랐다. 다친 왼쪽 다리를 조심스럽게 접으며 자리를 잡더니, 짐말의 등을 한 번 툭 쳤다. 짐말이 콧바람을 불며 느릿느릿 걷기 시작했다.\n\n미라가 마차 뒤쪽에서 짐을 정리하며 밝은 목소리로 말했다.\n\"카렌델까지 하루 반 정도 걸릴 거예요. 오늘은 해가 지기 전에 갈림길 근처 쉼터에서 야영하는 게 좋을 것 같아요.\"\n\n할란이 짧게 끄덕였다.\n\"...순풍이면 내일 오후엔 닿는다.\"\n\n교역로 양쪽으로 참나무 숲이 이어졌다. 바람이 나뭇잎을 흔들고, 새소리가 들렸다. 수레바퀴가 흙길 위에서 덜컹거리며 앞으로 나아갔다. 평화로운 오후였다.",
-      "timestamp": "00:28:51"
-    },
-    {
-      "turn": 14,
-      "message": "[GM] 늑대 시체 해체. 고기와 가죽을 할란에게 전달.",
-      "narrative": "노을이 능숙하게 늑대 시체를 해체했다. 가죽 한 장과 고기 몇 점이 나왔다. 할란이 고개를 끄덕이며 받아들었다. \"고맙다. 카렌델에서 팔면 몇 닢은 되겠군.\" 미라가 고기를 천으로 감싸 수레에 실었다. \"오늘 저녁은 고기 구이네요!\"",
-      "timestamp": "00:35:11"
-    },
-    {
-      "turn": 15,
-      "message": "[GM] 사이키가 루체나와 자리를 바꾼다.",
-      "narrative": "루체나가 자리를 옮기며 씩 웃었다. \"뭐야, 갑자기? 경치가 더 좋은 쪽이 있어?\"",
-      "timestamp": "00:46:59"
-    },
-    {
-      "turn": 16,
-      "message": "[GM] 사이키가 \"실험할게 있어\"라며 루체나와 다시 자리를 바꾼다.",
-      "narrative": "사이키가 루체나에게 말했다. \"실험할게 있어.\" 루체나가 눈을 깜빡이더니 자리를 비켜주었다. \"또? 뭔데, 말해봐.\"\n\n수레 위에서 자리를 바꾸자, 미라 옆자리에 사이키가 앉게 되었다. 미라가 고개를 갸웃하며 물었다. \"실험이요? 뭔가 마법 관련인가요?\"\n\n할란이 고삐를 잡은 채 뒤를 흘끗 봤다. \"...수레 위에서 터뜨리는 건 아니겠지.\"",
-      "timestamp": "02:15:36"
-    },
-    {
-      "turn": 17,
-      "message": "[GM] 사이키가 카렌델까지의 거리를 물었다. 할란이 지형을 보며 설명한다.",
-      "narrative": "사이키가 주위를 둘러보았다. 교역로 양쪽으로 참나무 숲이 여전히 이어지고 있었다.\n\n할란이 고삐를 잡은 채 길 옆의 이정표를 턱으로 가리켰다.\n\"...저기 보이는 갈림길이 중간 지점이다. 거기서 남쪽으로 빠지면 항구로, 동쪽으로 계속 가면 카렌델이야.\"\n\n미라가 하늘을 올려다보며 말했다.\n\"해가 좀 더 기울면 갈림길 쉼터에 도착할 거예요. 거기서 하룻밤 자고, 내일 오후면 카렌델 성문이 보일 거예요.\"\n\n할란이 짧게 덧붙였다.\n\"...도적이나 짐승만 안 만나면.\"",
-      "timestamp": "02:20:52"
+      "turn": 30,
+      "message": "",
+      "narrative": "\"알겠어, 장난이야. 짐 내려두고 밥 먹고 감정받으러 가자. 위치는 알고 있어?\"\n\n사이키가 짐을 들고 계단 쪽으로 걸었다.\n\n\"장난치다 혼나기 전에 얼른 올라가.\" 루체나가 자기 짐을 낚아채며 뒤를 따랐다. \"멜로스 골동품 상회라고, 카렌델 구시가지 쪽에 있다고 들었어. 에르네스 편지에도 나왔잖아, 안 읽었어?\"\n\n노엘이 벽에 기댄 오크 도끼와 방패를 집어 들며 짧게 말했다.\n\n\"짐 먼저 풀고.\"\n\n나무 계단이 세 사람의 무게에 삐걱거렸다. 2층 복도는 좁고 어두웠다 -- 작은 창 하나에서 오후의 빛이 비스듬히 들어왔다. 제일 안쪽 문을 열자 3인 합실이 나왔다. 넓지는 않지만 깨끗했다. 침대 셋, 작은 탁자 하나, 벽에 걸린 옷걸이. 창문 너머로 카렌델의 지붕들이 보였다.\n\n노엘이 도끼를 침대 옆에 세우고 방패를 벽에 기댔다. 루체나는 짐을 침대 위에 던지고 창문 잠금 장치를 한 번 확인했다 -- 도적의 습관.\n\n사이키도 짐을 내려놓았다. 아래에서 양고기 스튜 냄새가 올라오고 있었다.\n\n셋은 다시 1층으로 내려갔다. 카운터 앞 테이블에 김이 모락모락 나는 양고기 스튜 세 그릇, 흑빵, 구운 닭 반 마리씩, 그리고 보리 에일 한 잔과 -- 우유 두 잔이 놓여 있었다.\n\n루체나가 우유 잔을 보고 사이키를 째려봤지만, 볼프는 이미 다른 손님에게 가 있었다.",
+      "user_input": "짐 내려두고 밥 먹고 감정받으러 가자, 위치 알아? 2층으로 올라감",
+      "dialogues": [],
+      "timestamp": "01:34:05"
     }
-  ]
+  ],
+  "current_scene": {
+    "background": "/static/illustrations/sd/background_red_chimney_inn.webp",
+    "layers": [
+      {
+        "type": "object",
+        "image": "static/illustrations/sd/object_stairway.webp",
+        "position": "center",
+        "name": "stairway",
+        "distance": 5,
+        "size_class": "d3"
+      },
+      {
+        "type": "portrait",
+        "image": "static/portraits/sd/portrait_volf.webp",
+        "position": "far-left",
+        "name": "volf",
+        "distance": 2,
+        "size_class": "d2"
+      },
+      {
+        "type": "object",
+        "image": "static/illustrations/sd/object_round_table_2.webp",
+        "position": "center",
+        "name": "round_table_2",
+        "distance": 5,
+        "size_class": "d3"
+      },
+      {
+        "type": "object",
+        "image": "static/illustrations/sd/object_bar_counter.webp",
+        "position": "center",
+        "name": "bar_counter",
+        "distance": 2,
+        "size_class": "d2"
+      },
+      {
+        "type": "object",
+        "image": "static/illustrations/sd/object_chair.webp",
+        "position": "center",
+        "name": "chair",
+        "distance": 3,
+        "size_class": "d3"
+      },
+      {
+        "type": "object",
+        "image": "static/illustrations/sd/object_kitchen_table.webp",
+        "position": "center",
+        "name": "kitchen_table",
+        "distance": 5,
+        "size_class": "d3"
+      },
+      {
+        "type": "object",
+        "image": "static/illustrations/sd/object_barrel_stack.webp",
+        "position": "center",
+        "name": "barrel_stack",
+        "distance": 6,
+        "size_class": "d3"
+      }
+    ]
+  }
 }

@@ -13,6 +13,7 @@ TRPG 세션 검증 자동화
 import json
 import os
 import sys
+sys.stdout.reconfigure(encoding='utf-8')
 import urllib.request
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -235,16 +236,28 @@ def check_scenario_files(state):
         else:
             log("error", f"data/{fname} 파일 없음")
 
-    # scenario.json 타이틀이 현재 game_state의 시나리오와 일치하는지 검증
+    # scenario.json이 현재 game_state의 시나리오와 일치하는지 검증 (scenario_id 기준)
     scenario_data = load_json_safe("data/scenario.json")
     if scenario_data and state:
         gs_scenario_id = state.get("game_info", {}).get("scenario_id", "")
-        sc_title = scenario_data.get("scenario_info", {}).get("title", "")
-        gs_title = state.get("game_info", {}).get("title", "")
-        if sc_title != gs_title:
-            log("error", f"scenario.json 타이틀 불일치: scenario.json='{sc_title}' vs game_state='{gs_title}'")
-            if "--fix" in sys.argv or "--fix" not in sys.argv:  # auto-fix by default
-                # Try to find and copy correct scenario file
+        # scenario.json에서 scenario_id 추출 (scenario_info.id 또는 타이틀 기반 매칭)
+        sc_info = scenario_data.get("scenario_info", {})
+        sc_id = sc_info.get("id", "")
+        sc_title = sc_info.get("title", "")
+
+        # scenario_id가 직접 있으면 그걸로, 없으면 index.json에서 타이틀로 매칭
+        if not sc_id and gs_scenario_id:
+            idx = load_json_safe("scenarios/index.json")
+            if idx:
+                for s in idx.get("scenarios", []):
+                    if s["id"] == gs_scenario_id:
+                        sc_id = s["id"]
+                        break
+
+        # scenario_id로 비교 (title은 에필로그 등에서 변경될 수 있으므로 비교하지 않음)
+        if gs_scenario_id and sc_id and gs_scenario_id != sc_id:
+            log("error", f"scenario.json 불일치: scenario_id='{sc_id}' vs game_state='{gs_scenario_id}'")
+            if FIX_MODE:
                 idx = load_json_safe("scenarios/index.json")
                 if idx:
                     for s in idx.get("scenarios", []):
@@ -253,15 +266,41 @@ def check_scenario_files(state):
                             if os.path.exists(src):
                                 import shutil
                                 shutil.copy2(src, os.path.join(BASE_DIR, "data", "scenario.json"))
-                                log("fix", f"scenario.json을 '{gs_title}'로 교체")
+                                log("warn", f"scenario.json을 '{gs_scenario_id}'로 교체", auto_fixed=True)
                             break
         else:
-            log("ok", f"scenario.json 타이틀 일치: '{sc_title}'")
+            log("ok", f"scenario.json 일치: {gs_scenario_id} ('{sc_title}')")
 
-    # scenarios/index.json
+    # scenarios/index.json + 개별 시나리오 파일 존재 검증
     idx = load_json_safe("scenarios/index.json")
     if idx:
-        log("ok", f"scenarios/index.json 존재 ({len(idx.get('scenarios',[]))}개 시나리오)")
+        scenarios = idx.get("scenarios", [])
+        log("ok", f"scenarios/index.json 존재 ({len(scenarios)}개 시나리오)")
+
+        # 등록된 모든 시나리오의 파일 존재 확인
+        for s in scenarios:
+            sid = s["id"]
+            sf = s.get("scenario_file", f"{sid}.json")
+            # scenarios/ 접두사 붙여서 경로 탐색
+            sf_path = os.path.join(BASE_DIR, "scenarios", sf) if not sf.startswith("scenarios/") else os.path.join(BASE_DIR, sf)
+            if not os.path.exists(sf_path):
+                # scenarios/ 없이도 시도
+                alt_path = os.path.join(BASE_DIR, sf)
+                if os.path.exists(alt_path):
+                    sf_path = alt_path
+            if os.path.exists(sf_path):
+                log("ok", f"시나리오 파일 존재: {sid} -> {sf}")
+            else:
+                log("error", f"시나리오 파일 누락: {sid} -> {sf} (index.json에 등록되어 있지만 파일 없음)")
+
+            # initial_state 파일 확인
+            isf = s.get("initial_state", "")
+            if isf:
+                isf_path = os.path.join(BASE_DIR, isf)
+                if os.path.exists(isf_path):
+                    log("ok", f"초기 상태 파일 존재: {sid} -> {isf}")
+                else:
+                    log("error", f"초기 상태 파일 누락: {sid} -> {isf}")
     else:
         log("error", "scenarios/index.json 없음 또는 파싱 실패")
 
@@ -356,31 +395,138 @@ def check_worldbuilding(state):
         save_json("data/worldbuilding.json", wb)
 
 
+def _find_processes_on_port(port):
+    """특정 포트를 점유하는 프로세스 PID 목록 반환."""
+    import subprocess
+    pids = []
+    try:
+        # Linux: lsof
+        result = subprocess.run(
+            ["lsof", "-ti", f":{port}"], capture_output=True, text=True, timeout=5
+        )
+        if result.returncode == 0:
+            for line in result.stdout.strip().split("\n"):
+                if line.strip():
+                    pids.append(int(line.strip()))
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        try:
+            # Linux fallback: /proc 기반
+            import glob
+            for fd_dir in glob.glob("/proc/[0-9]*/fd/*"):
+                try:
+                    link = os.readlink(fd_dir)
+                    if f"socket:" in link:
+                        pid = int(fd_dir.split("/")[2])
+                        if pid not in pids:
+                            pids.append(pid)
+                except (OSError, ValueError):
+                    pass
+        except Exception:
+            pass
+    try:
+        # Windows fallback: netstat
+        result = subprocess.run(
+            ["netstat", "-ano"], capture_output=True, text=True, timeout=5
+        )
+        if result.returncode == 0:
+            for line in result.stdout.split("\n"):
+                if f":{port} " in line and "LISTEN" in line:
+                    parts = line.strip().split()
+                    if parts:
+                        try:
+                            pid = int(parts[-1])
+                            if pid not in pids:
+                                pids.append(pid)
+                        except ValueError:
+                            pass
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        pass
+    return pids
+
+
+def _find_python_processes(keyword):
+    """특정 키워드를 포함하는 Python 프로세스 목록 반환. [(pid, cmdline), ...]"""
+    import subprocess
+    procs = []
+    try:
+        result = subprocess.run(
+            ["ps", "aux"], capture_output=True, text=True, timeout=5
+        )
+        if result.returncode == 0:
+            for line in result.stdout.split("\n"):
+                if keyword in line and "grep" not in line:
+                    parts = line.split()
+                    if len(parts) >= 2:
+                        try:
+                            pid = int(parts[1])
+                            cmdline = " ".join(parts[10:])
+                            procs.append((pid, cmdline))
+                        except (ValueError, IndexError):
+                            pass
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        pass
+    return procs
+
+
+def _is_service_alive(url, timeout=3):
+    """URL에 GET 요청을 보내 응답 코드를 반환. 실패 시 None."""
+    try:
+        req = urllib.request.Request(url, method="GET")
+        resp = urllib.request.urlopen(req, timeout=timeout)
+        return resp.status
+    except Exception:
+        return None
+
+
 def check_services():
-    """Flask 서버 및 SD WebUI 접속 확인 (선택적)."""
+    """Flask 서버 및 SD WebUI 접속 확인 + 중복 프로세스 감지."""
+    import subprocess
     print("\n[7] 서비스 접속 확인")
 
-    # Flask
-    try:
-        req = urllib.request.Request("http://localhost:5000/api/game-state", method="GET")
-        resp = urllib.request.urlopen(req, timeout=3)
-        if resp.status == 200:
-            log("ok", "Flask 서버 (localhost:5000) 정상")
-        else:
-            log("warn", f"Flask 서버 응답 코드: {resp.status}")
-    except Exception:
-        log("warn", "Flask 서버 (localhost:5000) 접속 불가 — 미실행 상태")
+    # --- Flask ---
+    flask_status = _is_service_alive("http://localhost:5000/api/game-state")
+    flask_procs = _find_python_processes("app.py")
 
-    # SD WebUI
-    try:
-        req = urllib.request.Request("http://localhost:7860/sdapi/v1/options", method="GET")
-        resp = urllib.request.urlopen(req, timeout=3)
-        if resp.status == 200:
-            log("ok", "SD WebUI (localhost:7860) 정상")
-        else:
-            log("warn", f"SD WebUI 응답 코드: {resp.status}")
-    except Exception:
-        log("warn", "SD WebUI (localhost:7860) 접속 불가 — 미실행 또는 Cairo 폴백 사용")
+    if flask_status == 200:
+        log("ok", f"Flask 서버 (localhost:5000) 정상 (프로세스 {len(flask_procs)}개)")
+        # debug 모드는 부모+자식 2개가 정상. 3개 이상이면 중복
+        if len(flask_procs) > 2:
+            log("warn", f"Flask 프로세스 {len(flask_procs)}개 감지 — 중복 가능성")
+            for pid, cmd in flask_procs:
+                log("warn", f"  PID {pid}: {cmd}")
+            if FIX_MODE:
+                # 가장 최근(PID가 큰) 부모+자식만 남기고 나머지 종료
+                sorted_procs = sorted(flask_procs, key=lambda x: x[0], reverse=True)
+                keep_pids = {sorted_procs[0][0], sorted_procs[1][0]} if len(sorted_procs) >= 2 else {sorted_procs[0][0]}
+                for pid, cmd in flask_procs:
+                    if pid not in keep_pids:
+                        try:
+                            os.kill(pid, 9)
+                            log("warn", f"  PID {pid} 종료됨", auto_fixed=True)
+                        except OSError:
+                            log("warn", f"  PID {pid} 종료 실패")
+    elif flask_status is not None:
+        log("warn", f"Flask 서버 응답 코드: {flask_status}")
+    else:
+        log("warn", "Flask 서버 (localhost:5000) 접속 불가 — 미실행 상태")
+        if flask_procs:
+            log("warn", f"  그러나 app.py 프로세스 {len(flask_procs)}개 존재 — 좀비 가능성")
+            for pid, cmd in flask_procs:
+                log("warn", f"  PID {pid}: {cmd}")
+        # 자동 시작은 하지 않음 — 환경(venv 등)이 다를 수 있으므로 안내만
+        log("warn", "  → Flask 서버를 수동으로 시작하세요: python app.py")
+
+    # --- SD WebUI ---
+    session = load_json_safe("data/current_session.json") or {}
+    sd_enabled = session.get("sd_illustration", False)
+
+    sd_status = _is_service_alive("http://localhost:7860/sdapi/v1/options", timeout=5)
+    if sd_status == 200:
+        log("ok", "SD WebUI (localhost:7860) 정상")
+    elif sd_enabled:
+        log("warn", "SD WebUI (localhost:7860) 접속 불가 — sd_illustration=true인데 미실행. Skia 폴백 사용")
+    else:
+        log("ok", "SD WebUI 미실행 (sd_illustration=false, Skia 폴백 사용)")
 
 
 def check_illustrations(state):
@@ -463,14 +609,104 @@ def check_orphan_npcs(state):
     # 엔티티 있지만 game_state에 없는 NPC
     orphan_entities = entity_npc_ids - state_npc_ids
     if orphan_entities:
-        log("warn", f"엔티티 파일은 있지만 game_state에 없는 NPC: {orphan_entities}")
+        turn = state.get("turn_count", 0)
+        if turn == 0 and FIX_MODE:
+            # 새 게임 상태(턴 0)에서 고아 엔티티 → monster만 정리, 세계관 NPC 보존
+            removed = 0
+            preserved = []
+            for oid in orphan_entities:
+                orphan_path = os.path.join(npc_dir, f"npc_{oid}.json")
+                if os.path.exists(orphan_path):
+                    try:
+                        npc_data = load_json_safe(orphan_path)
+                        if npc_data and npc_data.get("type") == "monster":
+                            os.remove(orphan_path)
+                            removed += 1
+                        else:
+                            preserved.append(npc_data.get("name", str(oid)) if npc_data else str(oid))
+                    except Exception:
+                        preserved.append(str(oid))
+            if removed:
+                log("warn", f"이전 플레이 잔존 monster 엔티티 {removed}개 자동 정리 (턴 0)", auto_fixed=True)
+            if preserved:
+                log("ok", f"세계관 NPC 보존: {', '.join(preserved)}")
+        else:
+            log("warn", f"엔티티 파일은 있지만 game_state에 없는 NPC: {orphan_entities}")
     else:
         log("ok", "고아 NPC 엔티티 없음")
 
 
+def check_npc_temporal_consistency(state):
+    """연계 시나리오 간 NPC 시간 정합성 검증.
+    이전 시나리오에서 죽은 NPC가 현재 시나리오에서 살아있으면 경고."""
+    print("\n[11] NPC 시간 정합성 검증")
+    if state is None:
+        return
+
+    scenario_id = state.get("game_info", {}).get("scenario_id", "")
+    if not scenario_id:
+        return
+
+    # 현재 시나리오의 선행 시나리오 확인
+    idx = load_json_safe("scenarios/index.json")
+    if not idx:
+        log("ok", "scenarios/index.json 없음 — 시간 검증 스킵")
+        return
+
+    entry = next((s for s in idx.get("scenarios", []) if s["id"] == scenario_id), None)
+    if not entry or not entry.get("prerequisite"):
+        log("ok", "선행 시나리오 없음 — 시간 검증 불필요")
+        return
+
+    prev_scenario = entry["prerequisite"]
+
+    # 이전 시나리오의 최신 세이브에서 NPC 상태 확인
+    prev_save_path = None
+    saves_dir = os.path.join(BASE_DIR, "saves")
+    for slot_name in ["slot_complete", "slot_1"]:
+        candidate = os.path.join(saves_dir, prev_scenario, slot_name, "save.json")
+        if os.path.exists(candidate):
+            prev_save_path = candidate
+            break
+
+    if not prev_save_path:
+        log("ok", f"이전 시나리오 '{prev_scenario}' 세이브 없음 — 시간 검증 스킵")
+        return
+
+    prev_save = load_json_safe(prev_save_path)
+    if not prev_save:
+        return
+
+    prev_npcs = prev_save.get("game_state", {}).get("npcs", [])
+    # 이전에서 dead인 세계관 NPC 목록
+    prev_dead = {n["name"] for n in prev_npcs
+                 if n.get("status") in ("dead", "removed") and n.get("type") != "monster"}
+
+    if not prev_dead:
+        log("ok", f"이전 시나리오 '{prev_scenario}'에서 사망한 세계관 NPC 없음")
+        return
+
+    # 현재 시나리오에서 alive인 NPC와 대조
+    current_npcs = state.get("npcs", [])
+    violations = []
+    for npc in current_npcs:
+        if npc.get("name") in prev_dead and npc.get("status") in ("alive", "active", "idle"):
+            violations.append(npc["name"])
+
+    if violations:
+        log("error", f"시간 모순: 이전 시나리오({prev_scenario})에서 사망했지만 현재 alive인 NPC: {', '.join(violations)}")
+        if FIX_MODE:
+            for npc in current_npcs:
+                if npc.get("name") in violations:
+                    npc["status"] = "dead"
+            log("warn", f"사망 NPC {len(violations)}명 status를 dead로 수정", auto_fixed=True)
+    else:
+        log("ok", f"NPC 시간 정합성 통과 (이전 사망: {', '.join(prev_dead)})")
+
+
 def check_rules_consistency(state):
     """룰 기반 데이터 일관성 검증."""
-    print("\n[11] 룰 일관성 검증")
+    print("\n[12] 룰 일관성 검증")
     if state is None:
         return
 
@@ -528,9 +764,98 @@ def check_rules_consistency(state):
     log("ok", "룰 일관성 검증 완료")
 
 
+def check_save_integrity(state):
+    """세이브 파일 정합성 검증 (2중 안전망)."""
+    print("\n[13] 세이브 파일 정합성 검증")
+    saves_dir = os.path.join(BASE_DIR, "saves")
+    if not os.path.exists(saves_dir):
+        log("ok", "세이브 디렉토리 없음 (새 게임)")
+        return
+
+    save_count = 0
+    for sid in sorted(os.listdir(saves_dir)):
+        sid_path = os.path.join(saves_dir, sid)
+        if not os.path.isdir(sid_path):
+            continue
+        for slot_dir in sorted(os.listdir(sid_path)):
+            if not slot_dir.startswith("slot_"):
+                continue
+            save_file = os.path.join(sid_path, slot_dir, "save.json")
+            if not os.path.exists(save_file):
+                continue
+            save_count += 1
+
+            save_data = load_json_safe(save_file)
+            if save_data is None:
+                log("error", f"{sid}/{slot_dir}: 세이브 파일 파싱 실패")
+                continue
+
+            info = save_data.get("save_info", {})
+            gs = save_data.get("game_state", {})
+            gi = gs.get("game_info", {})
+
+            # 1. scenario_id 일치 (폴더 vs save_info vs game_state)
+            info_sid = info.get("scenario_id", "")
+            gs_sid = gi.get("scenario_id", "")
+            if info_sid and info_sid != sid:
+                log("error", f"{sid}/{slot_dir}: save_info.scenario_id='{info_sid}' ≠ 폴더='{sid}'")
+                if FIX_MODE:
+                    info["scenario_id"] = sid
+                    save_json(save_file, save_data)
+                    log("warn", f"{sid}/{slot_dir}: save_info.scenario_id를 '{sid}'로 수정", auto_fixed=True)
+            elif info_sid:
+                log("ok", f"{sid}/{slot_dir}: scenario_id 일치 ({info_sid})")
+
+            if gs_sid and gs_sid != sid:
+                log("error", f"{sid}/{slot_dir}: game_state.scenario_id='{gs_sid}' ≠ 폴더='{sid}'")
+                if FIX_MODE:
+                    gi["scenario_id"] = sid
+                    save_json(save_file, save_data)
+                    log("warn", f"{sid}/{slot_dir}: game_state.scenario_id를 '{sid}'로 수정", auto_fixed=True)
+
+            # 2. current_location 존재
+            loc = gs.get("current_location")
+            if not loc:
+                log("warn", f"{sid}/{slot_dir}: current_location 비어있음")
+
+            # 3. 필수 키 존재
+            for key in ["players", "npcs", "events"]:
+                if key not in gs:
+                    log("error", f"{sid}/{slot_dir}: game_state.{key} 누락")
+
+            # 4. 시나리오 파일과 NPC 대조 (타 시나리오 NPC 오염 감지)
+            scenario_path = os.path.join(BASE_DIR, "scenarios", f"{sid}.json")
+            if os.path.exists(scenario_path):
+                sc = load_json_safe(scenario_path)
+                if sc:
+                    valid_npc_names = {n.get("name") for n in sc.get("default_npcs", [])}
+                    # 몬스터/임시 NPC는 제외, friendly/quest NPC만 체크
+                    for npc in gs.get("npcs", []):
+                        if npc.get("type") in ("monster",):
+                            continue
+                        if npc.get("status") in ("dead", "removed", "fled"):
+                            continue
+                        npc_name = npc.get("name", "")
+                        if npc_name and valid_npc_names and npc_name not in valid_npc_names:
+                            log("warn", f"{sid}/{slot_dir}: NPC '{npc_name}'이 시나리오 default_npcs에 없음 (타 시나리오 오염?)")
+
+            # 5. 플레이어 HP/MP 범위
+            for p in gs.get("players", []):
+                pname = p.get("name", "?")
+                if p.get("hp", 0) > p.get("max_hp", 999):
+                    log("warn", f"{sid}/{slot_dir}: {pname} HP({p['hp']}) > max_hp({p['max_hp']})")
+                if p.get("mp", 0) > p.get("max_mp", 999):
+                    log("warn", f"{sid}/{slot_dir}: {pname} MP({p['mp']}) > max_mp({p['max_mp']})")
+
+    if save_count == 0:
+        log("ok", "세이브 파일 없음 (새 게임)")
+    else:
+        log("ok", f"세이브 파일 {save_count}개 검증 완료")
+
+
 def check_quest_consistency(state):
     """퀘스트 상태 일관성 검증."""
-    print("\n[12] 퀘스트 상태 검증")
+    print("\n[14] 퀘스트 상태 검증")
     quests = load_json_safe("data/quests.json")
     if quests is None:
         log("ok", "quests.json 없음 (퀘스트 미사용)")
@@ -577,7 +902,7 @@ def _create_player_entity(scenario_id, player):
             "kills": [], "items_used": [], "turns_played": 0
         },
         "conditions": {"alive": True, "conscious": True, "death_save_turns": 0},
-        "controlled_by": player.get("controlled_by", "agent"),
+        "controlled_by": player.get("controlled_by", "ai"),
     }
     save_json(os.path.join(ent_dir, f"player_{player['id']}.json"), entity)
 
@@ -635,9 +960,11 @@ def main():
     check_worldbuilding(state)
     check_entity_directory_structure(state)
     check_orphan_npcs(state)
+    check_npc_temporal_consistency(state)
     check_services()
     check_illustrations(state)
     check_rules_consistency(state)
+    check_save_integrity(state)
     check_quest_consistency(state)
 
     # 자동 수정된 game_state 저장

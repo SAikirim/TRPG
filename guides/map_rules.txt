@@ -1,0 +1,75 @@
+Map Rules (Detailed)
+===
+This file covers map display strategy, map system, entity display, minimap cropping, and coordinate-based distance system.
+Only map/location-related agents need to read this file.
+For core rules on GM narration, web rendering, dice, events, etc., refer to guides/gm_rules.txt.
+
+Map Display Strategy
+===
+- Map is required when providing location information -- always display a map when conveying character positions, movement, combat placement, etc.
+- Display modes (check display_mode in current_session.json):
+  - "terminal": run python ascii_map.py (ANSI colors + emoji, for native terminal)
+  - "mobile": GM writes emoji text map directly in the response (no Bash code blocks, to prevent ANSI code corruption)
+
+Block Map (Terminal Block Map)
+---
+Only run `python core/ascii_map.py` when the user specifically requests "block map" or "show block map".
+- Used for the user to check the map via terminal when the web UI is unavailable
+- Not automatically displayed every turn -- only executed on user request
+- Separate from the PIL image map on web UI -- terminal-only text map
+- show_all(): outputs map + party status + event log all at once
+- show_emoji_map(): outputs map only
+
+Mobile mode map format example:
+  **Chapter N -- Area Name (Turn T)**
+      14 15 16 17 18 19
+  10  .. .. .. .. .. ..
+  11  R  G  .. .. .. ..
+  12  B  .. X  .. .. ..
+  B Psyche [14,12] / G Lucena [15,11] / R Noel [14,11]
+  X Treasure Chest [16,12]
+
+- Display only the currently relevant area, not the entire map (to save tokens)
+- Legend should be concise, on a single line below the map
+- Cannot be auto-detected -- confirm with the user at session start or use the display_mode value from current_session.json
+- Web UI (http://localhost:5000): PIL image auto-refreshes (display only)
+- Custom images: place files in the static/custom/ folder to use instead of PIL-generated images
+
+Map System
+===
+- Map templates per location stored in worldbuilding.json (25x25 tiles, tile 40px)
+- Automatic map switching based on current_location, reused on revisit
+- Full map (map.png): displays all tiles, for click-to-zoom (~1000x1000px)
+- Minimap (map_mini.png): player-centered crop, for sidebar display (~412px width)
+- Map refresh: update_map_image() is automatically called on gm-update or position change
+
+Entity Display
+===
+- Players: emoji icon (⚔️warrior, 🔮mage, 🗡️rogue, 🏹archer, ✝️cleric) + class color background
+- NPCs: emoji icon (😊friendly, 👹monster, 👤neutral)
+- Label collision avoidance: automatically adjust position when location labels/character names overlap with icons
+  - Location labels: default at top of area, move upward on collision, semi-transparent background box
+  - Character names: default below icon, float upward then sideways on collision
+- Only fled NPCs are removed from the map. Dead NPCs (corpses) are displayed on the map with a 💀 icon
+- Corpses can be interacted with (looting/dismantling/burial). They remain on the map until explicitly removed
+- Corpse states: dead → looted → removal only on location change or burial
+- NPCs from other locations are not displayed
+
+Minimap Cropping
+===
+- Crop 7 tiles horizontally and 5 tiles vertically from the player's center coordinates
+- LANCZOS resize to fit sidebar width (412px)
+- Coordinate display: 14px Bold, centered on tile
+- Display at original aspect ratio on web sidebar (no object-fit)
+- Click to show full map overlay (95vw/95vh)
+
+Coordinate-Based Distance System
+===
+- Distance = Manhattan distance (|x1-x2| + |y1-y2|)
+- Melee attack: within 1 tile
+- Ranged attack: 10 tiles (hit penalty -2 beyond 6 tiles)
+- Magic attack: 8 tiles
+- Area attack (fireball): all targets within 2-tile radius
+- Movement: 3 tiles per turn, dash 6 tiles
+- Visual perception: 8 tiles, stealth DC -1 per 2 tiles of distance
+- Successful flee requires 3+ tiles of separation from enemy

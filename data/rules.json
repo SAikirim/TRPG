@@ -1,163 +1,110 @@
 {
   "game_rules": {
     "version": "1.0",
-    "description": "판타지 TRPG 기본 룰셋"
+    "description": "Fantasy TRPG basic ruleset"
   },
   "dice": {
     "default": "1d20",
     "damage": "1d6",
     "heal": "1d8",
-    "description": "판정은 1d20, 피해는 1d6, 회복은 1d8 기본"
+    "description": "Checks use 1d20, damage uses 1d6, healing uses 1d8 by default"
   },
   "turn_order": {
     "method": "dex_based",
-    "description": "DEX가 높은 순서대로 행동. 동률이면 플레이어 우선.",
-    "surprise_round": "습격 성공 시 선제 행동 1회 추가"
+    "description": "Actions proceed in descending DEX order. Ties go to players first.",
+    "surprise_round": "On successful ambush, gain 1 additional preemptive action"
   },
   "combat": {
     "attack_roll": {
       "formula": "1d20 + STR_modifier",
-      "description": "공격 판정 = 1d20 + 능력치 보정값. 상대 방어력 이상이면 명중.",
+      "description": "Attack roll = 1d20 + stat modifier. Hit if roll meets or exceeds target's defense.",
       "critical": {
         "threshold": 20,
-        "effect": "데미지 2배"
+        "effect": "Double damage"
       },
       "fumble": {
         "threshold": 1,
-        "effect": "자동 실패 + 다음 턴 불이익 (-2 판정)"
+        "effect": "Automatic failure + next turn penalty (-2 to rolls)"
       }
     },
     "damage": {
-      "description": "무기/스킬별 데미지. 기본 공격은 장비 기반, 스킬은 스킬 정의 참조.",
-      "melee": "무기 다이스 + STR_modifier",
-      "magic": "무기 다이스 + INT_modifier",
-      "ranged": "무기 다이스 + DEX_modifier"
+      "description": "Damage per weapon/skill. Basic attacks are equipment-based, skills reference skill definitions.",
+      "melee": "weapon_dice + STR_modifier",
+      "magic": "weapon_dice + INT_modifier",
+      "ranged": "weapon_dice + DEX_modifier"
     },
     "weapons": {
-      "맨손": {"dice": "1d2", "type": "melee", "stat": "STR", "description": "주먹과 발. 무기 없이 싸울 때 사용."},
-      "마법 지팡이": {"dice": "1d4", "type": "melee", "stat": "STR", "description": "근접 타격용"},
-      "단검": {"dice": "1d6", "type": "melee", "stat": "DEX", "description": "가볍고 빠른 단검"},
-      "단검 x2": {"dice": "2d6", "type": "melee", "stat": "DEX", "description": "쌍단검 이도류"},
-      "오크의 도끼": {"dice": "1d8", "type": "melee", "stat": "STR", "description": "무겁고 강력한 전투 도끼"},
-      "장검": {"dice": "1d8", "type": "melee", "stat": "STR", "description": "표준 한손검"},
-      "대검": {"dice": "1d10", "type": "melee", "stat": "STR", "description": "양손 대검"},
-      "활": {"dice": "1d6", "type": "ranged", "stat": "DEX", "description": "표준 단궁"}
+      "bare_hands": {"dice": "1d2", "type": "melee", "stat": "STR", "description": "Fists and feet. Used when fighting unarmed."},
+      "magic_staff": {"dice": "1d4", "type": "melee", "stat": "STR", "description": "For melee strikes"},
+      "dagger": {"dice": "1d6", "type": "melee", "stat": "DEX", "description": "Light and fast dagger"},
+      "dual_daggers": {"dice": "2d6", "type": "melee", "stat": "DEX", "description": "Dual-wielded daggers"},
+      "orc_axe": {"dice": "1d8", "type": "melee", "stat": "STR", "description": "Heavy and powerful battle axe"},
+      "longsword": {"dice": "1d8", "type": "melee", "stat": "STR", "description": "Standard one-handed sword"},
+      "greatsword": {"dice": "1d10", "type": "melee", "stat": "STR", "description": "Two-handed greatsword"},
+      "bow": {"dice": "1d6", "type": "ranged", "stat": "DEX", "description": "Standard shortbow"}
     },
     "equipment_properties": {
-      "_설명": "장비에 부여 가능한 마법 효과. 여러 속성 중첩 가능.",
-      "attack_bonus": {"description": "+N 명중 보너스", "example": 1},
-      "damage_bonus": {"description": "+N 데미지 보너스", "example": 2},
-      "defense_bonus": {"description": "+N 방어력(AC) 보너스", "example": 2},
+      "_note": "Magical effects that can be applied to equipment. Multiple properties can stack.",
+      "attack_bonus": {"description": "+N attack bonus", "example": 1},
+      "damage_bonus": {"description": "+N damage bonus", "example": 2},
+      "defense_bonus": {"description": "+N defense (AC) bonus", "example": 2},
       "element": {
-        "description": "원소 속성 부여. 공격 시 추가 원소 데미지.",
+        "description": "Grants elemental attribute. Adds extra elemental damage on attack.",
         "types": {
-          "fire": {"bonus_dice": "1d4", "description": "화염 — 추가 1d4 화상"},
-          "ice": {"bonus_dice": "1d4", "description": "냉기 — 추가 1d4 동상, 10% 감속"},
-          "lightning": {"bonus_dice": "1d6", "description": "전기 — 추가 1d6, 금속 갑옷 착용 시 +2"},
-          "holy": {"bonus_dice": "1d6", "description": "신성 — 추가 1d6, 언데드에게 2배"},
-          "dark": {"bonus_dice": "1d4", "description": "암흑 — 추가 1d4, 적중 시 HP 흡수"}
+          "fire": {"bonus_dice": "1d4", "description": "Fire — extra 1d4 burn damage"},
+          "ice": {"bonus_dice": "1d4", "description": "Ice — extra 1d4 frostbite, 10% slow"},
+          "lightning": {"bonus_dice": "1d6", "description": "Lightning — extra 1d6, +2 against metal armor"},
+          "holy": {"bonus_dice": "1d6", "description": "Holy — extra 1d6, double against undead"},
+          "dark": {"bonus_dice": "1d4", "description": "Dark — extra 1d4, HP drain on hit"}
         }
       },
       "on_hit": {
-        "description": "적중 시 확률 발동 효과",
+        "description": "Chance-based effects triggered on hit",
         "types": {
-          "poison": {"chance": 0.25, "effect": "중독 (턴당 2 데미지, 3턴)"},
-          "stun": {"chance": 0.15, "effect": "기절 (1턴 행동불가)"},
-          "bleed": {"chance": 0.2, "effect": "출혈 (턴당 1 데미지, 5턴)"},
-          "lifesteal": {"chance": 1.0, "effect": "데미지의 25% HP 회복"}
+          "poison": {"chance": 0.25, "effect": "Poison (2 damage per turn, 3 turns)"},
+          "stun": {"chance": 0.15, "effect": "Stun (unable to act for 1 turn)"},
+          "bleed": {"chance": 0.2, "effect": "Bleed (1 damage per turn, 5 turns)"},
+          "lifesteal": {"chance": 1.0, "effect": "Recover 25% of damage dealt as HP"}
         }
       },
       "passive": {
-        "description": "장착 중 상시 적용 효과",
+        "description": "Persistent effects while equipped",
         "types": {
-          "hp_regen": {"description": "턴마다 HP N 회복"},
-          "mp_regen": {"description": "턴마다 MP N 회복"},
-          "stat_boost": {"description": "특정 능력치 +N"},
-          "resistance": {"description": "특정 원소 데미지 절반"},
-          "initiative_bonus": {"description": "이니셔티브 +N"}
+          "hp_regen": {"description": "Recover N HP per turn"},
+          "mp_regen": {"description": "Recover N MP per turn"},
+          "stat_boost": {"description": "Specific stat +N"},
+          "resistance": {"description": "Halve specific elemental damage"},
+          "initiative_bonus": {"description": "Initiative +N"}
         }
       },
       "rarity": {
-        "common": {"color": "⬜", "max_properties": 0, "description": "일반 — 마법 효과 없음"},
-        "uncommon": {"color": "🟩", "max_properties": 1, "description": "비범 — 마법 효과 1개"},
-        "rare": {"color": "🟦", "max_properties": 2, "description": "희귀 — 마법 효과 2개"},
-        "epic": {"color": "🟪", "max_properties": 3, "description": "영웅 — 마법 효과 3개"},
-        "legendary": {"color": "🟧", "max_properties": 4, "description": "전설 — 고유 효과 + 마법 3개"}
+        "common": {"color": "⬜", "max_properties": 0, "description": "Common — no magical effects"},
+        "uncommon": {"color": "🟩", "max_properties": 1, "description": "Uncommon — 1 magical effect"},
+        "rare": {"color": "🟦", "max_properties": 2, "description": "Rare — 2 magical effects"},
+        "epic": {"color": "🟪", "max_properties": 3, "description": "Epic — 3 magical effects"},
+        "legendary": {"color": "🟧", "max_properties": 4, "description": "Legendary — unique effect + 3 magical effects"}
       }
     },
     "armor": {
-      "없음": {"bonus": 0},
-      "천 옷": {"bonus": 0, "description": "방어력 추가 없음"},
-      "가죽 갑옷": {"bonus": 1, "description": "경장갑, 은신 패널티 없음"},
-      "가죽 방패": {"bonus": 2, "description": "방패, 한 손 사용"},
-      "사슬 갑옷": {"bonus": 3, "description": "중장갑, 은신 -2"},
-      "판금 갑옷": {"bonus": 4, "description": "최중장, 은신 -4, DEX 보정 최대 +2"},
-      "철 방패": {"bonus": 3, "description": "무거운 방패, 한 손 사용"}
+      "none": {"bonus": 0},
+      "cloth": {"bonus": 0, "description": "No defense bonus"},
+      "leather_armor": {"bonus": 1, "description": "Light armor, no stealth penalty"},
+      "leather_shield": {"bonus": 2, "description": "Shield, uses one hand"},
+      "chain_armor": {"bonus": 3, "description": "Heavy armor, stealth -2"},
+      "plate_armor": {"bonus": 4, "description": "Heaviest armor, stealth -4, DEX modifier cap +2"},
+      "iron_shield": {"bonus": 3, "description": "Heavy shield, uses one hand"}
     },
     "defense": {
       "formula": "10 + DEX_modifier + armor_bonus + equipment_defense_bonus",
-      "description": "방어력 = 기본 10 + DEX 보정 + 방어구 보너스 + 장비 마법 보너스"
+      "description": "Defense = base 10 + DEX modifier + armor bonus + equipment magic bonus"
     },
     "flee": {
       "formula": "1d20 + DEX_modifier >= flee_dc",
-      "description": "도주 판정. 실패 시 도주 불가 + 적에게 기회 공격 허용."
-    }
-  },
-  "distance": {
-    "description": "좌표 기반 거리 계산. 맨하탄 거리(|x1-x2| + |y1-y2|) 사용.",
-    "unit": "칸 (1칸 = 약 1.5m)",
-    "melee_range": 1,
-    "short_range": 3,
-    "medium_range": 6,
-    "long_range": 10,
-    "rules": {
-      "melee_attack": {
-        "max_range": 1,
-        "description": "근접 공격은 인접 1칸 이내만 가능"
-      },
-      "ranged_attack": {
-        "max_range": 10,
-        "penalty_beyond": 6,
-        "penalty_value": -2,
-        "description": "원거리 공격 최대 10칸. 6칸 초과 시 명중 -2"
-      },
-      "magic_attack": {
-        "max_range": 8,
-        "description": "마법 공격 최대 8칸"
-      },
-      "aoe_radius": {
-        "fireball": 2,
-        "heal": 1,
-        "description": "범위 공격은 지정 좌표 기준 반경 내 모든 대상 적중"
-      },
-      "movement": {
-        "per_turn": 3,
-        "dash": 6,
-        "description": "턴당 기본 이동 3칸. 대시(행동 소모) 시 6칸",
-        "terrain_cost": {
-          "road": 1,
-          "grass": 1,
-          "village": 1,
-          "house": 1,
-          "dungeon": 1,
-          "treasure": 1,
-          "water": 2,
-          "mountain": 3
-        }
-      },
-      "detection": {
-        "visual_range": 8,
-        "stealth_modifier": "-1 per 2 distance",
-        "description": "시각 인식 범위 8칸. 은신 판정 시 거리 2칸당 DC -1"
-      },
-      "flee": {
-        "min_distance": 3,
-        "description": "도주 성공 시 적에게서 3칸 이상 떨어져야 완전 이탈"
-      }
+      "description": "Flee check. On failure, cannot flee + enemy gets an opportunity attack."
     }
   },
   "stat_modifiers": {
-    "description": "능력치 보정값 = (능력치 - 10) / 2 (내림)",
+    "description": "Stat modifier = (stat - 10) / 2 (rounded down)",
     "table": {
       "6": -2,
       "8": -1,
@@ -171,111 +118,111 @@
     }
   },
   "actions": {
-    "_설명": "기본 공격은 장비 무기 다이스 사용, 스킬은 고유 다이스. 모든 클래스는 기본 공격(0 MP) 가능.",
+    "_note": "Basic attacks use equipped weapon dice, skills use their own dice. All classes can perform basic attacks (0 MP).",
 
-    "공격": {
+    "attack": {
       "type": "combat",
       "class": "all",
-      "description": "장비 무기로 기본 공격. 데미지는 무기 다이스 + 능력치 보정.",
+      "description": "Basic attack with equipped weapon. Damage is weapon dice + stat modifier.",
       "roll": "1d20 + weapon_stat_modifier",
       "damage": "weapon_dice + weapon_stat_modifier",
       "cost": {"mp": 0},
-      "note": "무기별 다이스: 오크의 도끼(1d8+STR), 단검x2(2d6+DEX), 마법지팡이(1d4+STR)"
+      "note": "Weapon dice: orc_axe(1d8+STR), dual_daggers(2d6+DEX), magic_staff(1d4+STR)"
     },
-    "마법탄": {
+    "magic_bolt": {
       "type": "magic_attack",
-      "class": "마법사",
-      "description": "지팡이에서 마력 탄환을 발사한다. 기본 원거리 마법 공격.",
+      "class": "mage",
+      "description": "Fire a mana projectile from the staff. Basic ranged magic attack.",
       "roll": "1d20 + INT_modifier",
       "damage": "1d6 + INT_modifier",
       "cost": {"mp": 0},
       "range": 6
     },
-    "파이어볼": {
+    "fireball": {
       "type": "magic_attack",
-      "class": "마법사",
-      "description": "화염 구체를 날려 범위 내 적에게 마법 피해를 입힌다.",
+      "class": "mage",
+      "description": "Hurl a fireball dealing magic damage to enemies in an area.",
       "roll": "1d20 + INT_modifier",
       "damage": "1d8 + INT_modifier",
       "cost": {"mp": 4},
-      "special": "범위 공격 — 인접한 적 전체에 동일 데미지"
+      "special": "Area attack — same damage to all adjacent enemies"
     },
-    "힐": {
+    "heal": {
       "type": "heal",
-      "class": "마법사",
-      "description": "치유 마법으로 아군 한 명의 HP를 회복한다.",
+      "class": "mage",
+      "description": "Restore HP of one ally with healing magic.",
       "roll": "1d8 + INT_modifier",
       "target": "ally",
       "cost": {"mp": 3}
     },
-    "방어": {
+    "defend": {
       "type": "defense",
-      "class": "전사",
-      "description": "방패를 들어 방어 태세. 다음 턴까지 방어력 +4.",
+      "class": "warrior",
+      "description": "Raise shield in defensive stance. Defense +4 until next turn.",
       "effect": {"defense_bonus": 4, "duration": 1},
       "cost": {"mp": 0}
     },
-    "습격": {
+    "ambush": {
       "type": "combat",
-      "class": "도적",
-      "description": "은밀하게 접근하여 급소를 노린다. 기본 공격보다 강력.",
+      "class": "rogue",
+      "description": "Approach stealthily and strike a vital point. Stronger than basic attack.",
       "roll": "1d20 + DEX_modifier",
       "damage": "3d6 + DEX_modifier",
       "cost": {"mp": 2},
-      "check": {"stat": "DEX", "dc": 13, "fail": "발각되어 기본 공격으로 전환 (2d6+DEX)"}
+      "check": {"stat": "DEX", "dc": 13, "fail": "Detected — reverts to basic attack (2d6+DEX)"}
     },
-    "도주": {
+    "flee": {
       "type": "utility",
       "class": "all",
-      "description": "전투에서 도주를 시도한다. 파티 전체가 후퇴.",
+      "description": "Attempt to flee from combat. Entire party retreats.",
       "roll": "1d20 + DEX_modifier",
       "cost": {"mp": 0},
-      "fail_penalty": "적의 기회 공격 (무기 데미지 1회)"
+      "fail_penalty": "Enemy opportunity attack (weapon damage x1)"
     }
   },
   "status_effects": {
-    "중독": {
-      "description": "턴마다 2 피해. 3턴 지속.",
+    "poison": {
+      "description": "2 damage per turn. Lasts 3 turns.",
       "damage_per_turn": 2,
       "duration": 3
     },
-    "방어 강화": {
-      "description": "방어력 +4. 1턴 지속.",
+    "defense_up": {
+      "description": "Defense +4. Lasts 1 turn.",
       "defense_bonus": 4,
       "duration": 1
     },
-    "기절": {
-      "description": "행동 불가. 1턴 지속.",
+    "stun": {
+      "description": "Unable to act. Lasts 1 turn.",
       "skip_turn": true,
       "duration": 1
     },
-    "은신": {
-      "description": "다음 공격 시 자동 명중 + 추가 피해. 공격하면 해제.",
+    "stealth": {
+      "description": "Next attack auto-hits + bonus damage. Removed on attack.",
       "next_attack_auto_hit": true,
       "bonus_damage": 4
     }
   },
   "rest": {
     "short_rest": {
-      "description": "안전 지역에서 짧은 휴식. HP 5, MP 3 회복.",
+      "description": "Short rest in a safe area. Recover 5 HP and 3 MP.",
       "heal_hp": 5,
       "heal_mp": 3,
       "turns_required": 1
     },
     "long_rest": {
-      "description": "안전한 장소에서 하룻밤 수면. HP/MP 전부 회복.",
+      "description": "Full night's sleep in a safe place. Fully recover HP/MP.",
       "heal_hp": "full",
       "heal_mp": "full",
-      "condition": "안전한 장소 (마을, 여관, 야영지 등)"
+      "condition": "Safe location (town, inn, campsite, etc.)"
     },
     "use_item": {
-      "치유 약초": {"heal_hp": 5, "description": "HP 5 회복"},
-      "마나 포션": {"heal_mp": 8, "description": "MP 8 회복"}
+      "healing_herb": {"heal_hp": 5, "description": "Recover 5 HP"},
+      "mana_potion": {"heal_mp": 8, "description": "Recover 8 MP"}
     }
   },
   "level_up": {
     "enabled": true,
-    "description": "경험치(XP) 획득 → 레벨업 → 능력치/HP/MP 성장 + 신규 스킬 해금",
+    "description": "Gain XP → level up → stat/HP/MP growth + unlock new skills",
     "xp_table": {
       "1": 0,
       "2": 100,
@@ -299,66 +246,50 @@
     "per_level": {
       "stat_points": 1,
       "stat_cap": 20,
-      "description": "레벨업마다 능력치 포인트 1점 자유 배분. 개별 능력치 상한 20."
+      "description": "1 free stat point per level up. Individual stat cap is 20."
     },
     "class_growth": {
-      "마법사": {
+      "mage": {
         "hp_per_level": 3,
         "mp_per_level": 5,
         "skills": {
-          "3": {"name": "마나 쉴드", "type": "defense", "description": "마나로 보호막 생성. 3턴간 받는 데미지 절반.", "cost": {"mp": 5}, "effect": {"damage_reduction": 0.5, "duration": 3}},
-          "5": {"name": "체인 라이트닝", "type": "magic_attack", "description": "전기 사슬이 적 3체까지 연쇄. 각각 1d8+INT 피해.", "roll": "1d8 + INT_modifier", "cost": {"mp": 7}, "targets": 3},
-          "7": {"name": "텔레포트", "type": "utility", "description": "시야 내 원하는 위치로 순간이동.", "cost": {"mp": 4}},
-          "9": {"name": "메테오", "type": "magic_attack", "description": "전체 범위 2d8+INT 피해. 아군 제외.", "roll": "2d8 + INT_modifier", "cost": {"mp": 12}}
+          "3": {"name": "Mana Shield", "type": "defense", "description": "Create a mana barrier. Halve incoming damage for 3 turns.", "cost": {"mp": 5}, "effect": {"damage_reduction": 0.5, "duration": 3}},
+          "5": {"name": "Chain Lightning", "type": "magic_attack", "description": "Lightning chains to up to 3 enemies. 1d8+INT damage each.", "roll": "1d8 + INT_modifier", "cost": {"mp": 7}, "targets": 3},
+          "7": {"name": "Teleport", "type": "utility", "description": "Instantly teleport to any visible location.", "cost": {"mp": 4}},
+          "9": {"name": "Meteor", "type": "magic_attack", "description": "Full area 2d8+INT damage. Excludes allies.", "roll": "2d8 + INT_modifier", "cost": {"mp": 12}}
         }
       },
-      "도적": {
+      "rogue": {
         "hp_per_level": 4,
         "mp_per_level": 2,
         "skills": {
-          "3": {"name": "독 바르기", "type": "buff", "description": "무기에 독을 발라 3턴간 공격 시 추가 독 데미지 2.", "cost": {"mp": 2}, "effect": {"poison_damage": 2, "duration": 3}},
-          "5": {"name": "그림자 걸음", "type": "utility", "description": "3턴간 은신. 다음 공격 시 자동 명중 + 데미지 2배.", "cost": {"mp": 4}, "effect": {"stealth": true, "duration": 3, "next_attack_bonus": "double"}},
-          "7": {"name": "급소 찌르기", "type": "combat", "description": "4d6+DEX 피해. 은신 상태면 5d6.", "roll": "4d6 + DEX_modifier", "cost": {"mp": 3}},
-          "9": {"name": "분신", "type": "defense", "description": "분신 생성. 2턴간 공격 50% 회피.", "cost": {"mp": 6}, "effect": {"evasion": 0.5, "duration": 2}}
+          "3": {"name": "Poison Apply", "type": "buff", "description": "Apply poison to weapon. Extra 2 poison damage on attacks for 3 turns.", "cost": {"mp": 2}, "effect": {"poison_damage": 2, "duration": 3}},
+          "5": {"name": "Shadow Step", "type": "utility", "description": "Enter stealth for 3 turns. Next attack auto-hits + double damage.", "cost": {"mp": 4}, "effect": {"stealth": true, "duration": 3, "next_attack_bonus": "double"}},
+          "7": {"name": "Vital Strike", "type": "combat", "description": "4d6+DEX damage. 5d6 if in stealth.", "roll": "4d6 + DEX_modifier", "cost": {"mp": 3}},
+          "9": {"name": "Clone", "type": "defense", "description": "Create a clone. 50% evasion for 2 turns.", "cost": {"mp": 6}, "effect": {"evasion": 0.5, "duration": 2}}
         }
       },
-      "전사": {
+      "warrior": {
         "hp_per_level": 6,
         "mp_per_level": 1,
         "skills": {
-          "3": {"name": "강타", "type": "combat", "description": "전력을 다한 일격. 2d8+STR 피해. 대상 기절 1턴 (CON DC 13).", "roll": "2d8 + STR_modifier", "cost": {"mp": 2}, "effect": {"stun_dc": 13}},
-          "5": {"name": "전투 함성", "type": "buff", "description": "아군 전체 공격력 +2, 3턴 지속.", "cost": {"mp": 3}, "effect": {"attack_bonus": 2, "duration": 3, "target": "all_allies"}},
-          "7": {"name": "방패 돌진", "type": "combat", "description": "방패로 돌진. 1d10+STR 피해 + 밀어내기 2칸.", "roll": "1d10 + STR_modifier", "cost": {"mp": 2}, "effect": {"knockback": 2}},
-          "9": {"name": "불굴의 의지", "type": "passive", "description": "HP가 25% 이하일 때 방어력 +4, 공격력 +2 자동 적용."}
+          "3": {"name": "Power Strike", "type": "combat", "description": "A full-power strike. 2d8+STR damage. Stun target for 1 turn (CON DC 13).", "roll": "2d8 + STR_modifier", "cost": {"mp": 2}, "effect": {"stun_dc": 13}},
+          "5": {"name": "War Cry", "type": "buff", "description": "All allies gain +2 attack for 3 turns.", "cost": {"mp": 3}, "effect": {"attack_bonus": 2, "duration": 3, "target": "all_allies"}},
+          "7": {"name": "Shield Charge", "type": "combat", "description": "Charge with shield. 1d10+STR damage + knockback 2 tiles.", "roll": "1d10 + STR_modifier", "cost": {"mp": 2}, "effect": {"knockback": 2}},
+          "9": {"name": "Indomitable Will", "type": "passive", "description": "When HP is below 25%, automatically gain defense +4 and attack +2."}
         }
       }
     }
   },
-  "npc_stats": {
-    "description": "모든 NPC(몬스터 포함)는 플레이어와 동일한 4능력치 시스템을 사용한다.",
-    "guidelines": {
-      "weak_monster": {"STR": "8-12", "DEX": "8-12", "INT": "4-8", "CON": "8-10", "HP": "8-15"},
-      "strong_monster": {"STR": "14-18", "DEX": "8-14", "INT": "6-12", "CON": "12-16", "HP": "20-40"},
-      "boss_monster": {"STR": "18-20", "DEX": "10-14", "INT": "10-16", "CON": "16-20", "HP": "35-60"},
-      "civilian": {"STR": "6-10", "DEX": "8-12", "INT": "10-14", "CON": "8-10", "HP": "6-12"},
-      "guard": {"STR": "12-14", "DEX": "10-12", "INT": "8-10", "CON": "12-14", "HP": "15-25"},
-      "merchant": {"STR": "8-10", "DEX": "10-12", "INT": "12-16", "CON": "8-12", "HP": "8-15"},
-      "animal_horse": {"STR": "14-18", "DEX": "12-14", "INT": "2-4", "CON": "12-16", "HP": "15-25"},
-      "animal_wolf": {"STR": "12-14", "DEX": "14-16", "INT": "4-6", "CON": "10-12", "HP": "10-18"}
-    },
-    "hp_formula": "base + floor(CON * 0.5)",
-    "mp_formula": "base + floor(INT * 0.3)",
-    "defense_formula": "10 + DEX_modifier + armor_bonus"
-  },
   "death_rules": {
-    "player_death": "HP가 0이 되면 기절. 다음 턴에 힐을 받지 못하면 사망.",
-    "monster_death": "HP가 0이 되면 즉시 사망.",
-    "revival": "현재 시나리오에서 부활 수단 없음."
+    "player_death": "When HP reaches 0, the character falls unconscious. If not healed by next turn, the character dies.",
+    "monster_death": "When HP reaches 0, the monster dies immediately.",
+    "revival": "No revival means available in current scenario."
   },
   "gm_guidelines": {
-    "role": "GM(Claude)은 공정한 판정과 몰입감 있는 나레이션을 제공한다.",
-    "dice_rolling": "GM이 주사위를 대신 굴리고 결과를 서술한다.",
-    "flexibility": "룰에 명시되지 않은 상황은 GM이 판단하여 적절한 DC와 효과를 결정한다.",
-    "narrative_style": "한국어로 서술. 분위기 있는 묘사와 대화를 포함한다."
+    "role": "The GM (Claude) provides fair rulings and immersive narration.",
+    "dice_rolling": "The GM rolls dice on behalf of players and narrates the results.",
+    "flexibility": "For situations not covered by rules, the GM determines appropriate DCs and effects.",
+    "narrative_style": "Narrate in Korean. Include atmospheric descriptions and dialogue."
   }
 }

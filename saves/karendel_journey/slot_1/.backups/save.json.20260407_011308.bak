@@ -1,0 +1,556 @@
+{
+  "save_info": {
+    "scenario_id": "karendel_journey",
+    "slot": 1,
+    "description": "자동 저장 (턴 27)",
+    "saved_at": "2026-04-07 01:02:18",
+    "turn_count": 27,
+    "chapter": 2,
+    "party_summary": [
+      {
+        "name": "saiki",
+        "class": "mage",
+        "level": 3,
+        "controlled_by": "user"
+      },
+      {
+        "name": "lucena",
+        "class": "rogue",
+        "level": 3,
+        "controlled_by": "ai"
+      },
+      {
+        "name": "noel",
+        "class": "warrior",
+        "level": 3,
+        "controlled_by": "ai"
+      }
+    ]
+  },
+  "game_state": {
+    "game_info": {
+      "title": "The Road to Karendel",
+      "scenario_id": "karendel_journey",
+      "scenario": "Heading to the trade city Karendel to appraise the legendary treasure",
+      "ruleset": "fantasy_basic",
+      "difficulty": "normal",
+      "stat_pool": 50,
+      "status": "in_progress",
+      "ending": null,
+      "current_chapter": 2
+    },
+    "current_location": "red_chimney_inn_1f",
+    "players": [
+      {
+        "id": 1,
+        "name": "saiki",
+        "class": "mage",
+        "level": 3,
+        "xp": 315,
+        "hp": 21,
+        "max_hp": 21,
+        "mp": 41,
+        "max_mp": 41,
+        "stats": {
+          "STR": 8,
+          "DEX": 16,
+          "INT": 19,
+          "CON": 10
+        },
+        "position": [
+          11,
+          22
+        ],
+        "status_effects": [],
+        "inventory": [
+          "magic_staff",
+          "mana_potion",
+          "mana_crystal",
+          "slime_jelly",
+          "herb",
+          "ancient_key",
+          "legendary_treasure",
+          "ernes_letter",
+          "herb_bundle_for_volf",
+          "travel_money_silver_10",
+          "shared_gold_1",
+          "rope",
+          "flint",
+          "spice_pouch"
+        ],
+        "controlled_by": "user",
+        "original_image": "/static/portraits/original/player_1_saiki.png"
+      },
+      {
+        "id": 2,
+        "name": "lucena",
+        "class": "rogue",
+        "level": 3,
+        "xp": 315,
+        "hp": 30,
+        "max_hp": 30,
+        "mp": 14,
+        "max_mp": 14,
+        "stats": {
+          "STR": 8,
+          "DEX": 20,
+          "INT": 10,
+          "CON": 15
+        },
+        "position": [
+          12,
+          22
+        ],
+        "status_effects": [],
+        "inventory": [
+          "dual_daggers",
+          "thieves_tools",
+          "rope"
+        ],
+        "controlled_by": "ai",
+        "original_image": "/static/portraits/original/player_2_luchena.png"
+      },
+      {
+        "id": 3,
+        "name": "noel",
+        "class": "warrior",
+        "level": 3,
+        "xp": 315,
+        "hp": 45,
+        "max_hp": 45,
+        "mp": 7,
+        "max_mp": 7,
+        "stats": {
+          "STR": 16,
+          "DEX": 12,
+          "INT": 8,
+          "CON": 17
+        },
+        "position": [
+          13,
+          22
+        ],
+        "status_effects": [],
+        "inventory": [
+          "leather_shield",
+          "orc_axe",
+          "wound_treatment_vial"
+        ],
+        "controlled_by": "ai",
+        "original_image": "/static/portraits/original/player_3_noeul.png"
+      }
+    ],
+    "npcs": [
+      {
+        "id": 300,
+        "name": "hallan",
+        "type": "friendly",
+        "stats": {
+          "STR": 10,
+          "DEX": 8,
+          "INT": 14,
+          "CON": 10
+        },
+        "hp": 10,
+        "max_hp": 12,
+        "mp": 3,
+        "max_mp": 3,
+        "attack": 3,
+        "defense": 2,
+        "position": [
+          12,
+          23
+        ],
+        "threat_level": "none",
+        "status": "separated",
+        "location": "karendel",
+        "known": true
+      },
+      {
+        "id": 301,
+        "name": "mira",
+        "type": "friendly",
+        "stats": {
+          "STR": 8,
+          "DEX": 12,
+          "INT": 12,
+          "CON": 10
+        },
+        "hp": 14,
+        "max_hp": 14,
+        "mp": 5,
+        "max_mp": 5,
+        "attack": 2,
+        "defense": 2,
+        "position": [
+          13,
+          23
+        ],
+        "threat_level": "none",
+        "status": "separated",
+        "location": "karendel",
+        "known": true
+      },
+      {
+        "id": 302,
+        "name": "pack_horse",
+        "type": "friendly",
+        "race": "horse",
+        "known": true,
+        "stats": {
+          "STR": 16,
+          "DEX": 12,
+          "INT": 2,
+          "CON": 14
+        },
+        "hp": 20,
+        "max_hp": 20,
+        "mp": 0,
+        "max_mp": 0,
+        "position": [
+          11,
+          23
+        ],
+        "status": "separated",
+        "location": "karendel"
+      },
+      {
+        "id": 303,
+        "name": "hooded_figure",
+        "type": "neutral",
+        "known": false,
+        "hp": 15,
+        "max_hp": 15,
+        "mp": 0,
+        "max_mp": 0,
+        "position": [
+          16,
+          11
+        ],
+        "status": "fled",
+        "location": "trade_road_karendel",
+        "description": "A suspicious hooded figure with no luggage at all. Sitting still beyond the campfire.",
+        "note": "Left the rest stop at dawn"
+      },
+      {
+        "id": 304,
+        "name": "peddler",
+        "type": "neutral",
+        "known": true,
+        "hp": 10,
+        "max_hp": 10,
+        "mp": 0,
+        "max_mp": 0,
+        "position": [
+          14,
+          22
+        ],
+        "status": "gone",
+        "location": "karendel",
+        "description": "A peddler carrying a bundle on their back. The lock is flimsy."
+      },
+      {
+        "id": 305,
+        "name": "swordsman",
+        "type": "neutral",
+        "known": true,
+        "hp": 25,
+        "max_hp": 25,
+        "mp": 0,
+        "max_mp": 0,
+        "position": [
+          14,
+          23
+        ],
+        "status": "gone",
+        "location": "karendel",
+        "description": "A swordsman sipping from a cup while never letting go of his sword. He noticed Lucena's scouting."
+      },
+      {
+        "id": 306,
+        "name": "volf",
+        "display_name": "innkeeper",
+        "type": "friendly",
+        "known": false,
+        "hp": 15,
+        "max_hp": 15,
+        "mp": 0,
+        "max_mp": 0,
+        "position": [
+          17,
+          5
+        ],
+        "status": "alive",
+        "location": "red_chimney_inn_1f",
+        "description": "Owner of Red Chimney Inn. Old friend of Ernes. Bad knees."
+      }
+    ],
+    "map": {
+      "width": 25,
+      "height": 25,
+      "tile_size": 40,
+      "locations": [
+        {
+          "name": "common_room",
+          "type": "floor_wood",
+          "area": {
+            "x1": 1,
+            "y1": 1,
+            "x2": 15,
+            "y2": 11
+          }
+        },
+        {
+          "name": "counter",
+          "type": "counter",
+          "area": {
+            "x1": 16,
+            "y1": 2,
+            "x2": 17,
+            "y2": 8
+          }
+        },
+        {
+          "name": "work_area",
+          "type": "floor_stone",
+          "area": {
+            "x1": 18,
+            "y1": 1,
+            "x2": 21,
+            "y2": 8
+          }
+        },
+        {
+          "name": "kitchen",
+          "type": "kitchen",
+          "area": {
+            "x1": 18,
+            "y1": 9,
+            "x2": 21,
+            "y2": 11
+          }
+        },
+        {
+          "name": "fireplace",
+          "type": "fireplace",
+          "area": {
+            "x1": 1,
+            "y1": 12,
+            "x2": 2,
+            "y2": 14
+          }
+        },
+        {
+          "name": "south_seating",
+          "type": "floor_wood",
+          "area": {
+            "x1": 1,
+            "y1": 12,
+            "x2": 15,
+            "y2": 18
+          }
+        },
+        {
+          "name": "storage",
+          "type": "floor_stone",
+          "area": {
+            "x1": 16,
+            "y1": 9,
+            "x2": 23,
+            "y2": 18
+          }
+        },
+        {
+          "name": "stairway",
+          "type": "stairs",
+          "area": {
+            "x1": 22,
+            "y1": 1,
+            "x2": 23,
+            "y2": 3
+          }
+        },
+        {
+          "name": "hallway_south",
+          "type": "floor_wood",
+          "area": {
+            "x1": 1,
+            "y1": 19,
+            "x2": 23,
+            "y2": 23
+          }
+        },
+        {
+          "name": "main_entrance",
+          "type": "door",
+          "area": {
+            "x1": 11,
+            "y1": 23,
+            "x2": 13,
+            "y2": 23
+          }
+        }
+      ]
+    },
+    "turn_count": 27,
+    "events": [
+      {
+        "turn": 27,
+        "message": "[GM] ko sync test",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "22:15:00"
+      },
+      {
+        "turn": 27,
+        "message": "[GM] Turn 29: Farewell Mira, arrive Red Chimney Inn, meet Volf",
+        "narrative": "\"기회가 된다면 다음에 또 봅시다.\"\n\n사이키가 미라에게 말했다. 미라가 고개를 끄덕이며 한 번 더 손을 흔들었다. 할란이 짐마차를 이끌고 직물 거리 안쪽으로 사라졌다. 미라의 갈색 포니테일이 인파 속으로 멀어졌다.\n\n셋은 직물 거리를 지나 북쪽으로 걸었다. 좁은 골목이 넓어지고, 숙소 밀집지의 간판들이 보이기 시작했다. 그리고 이내 -- 붉은 벽돌로 쌓은 굴뚝이 오후의 연기를 옅게 내뿜고 있는 2층짜리 석조 건물이 눈에 들어왔다.\n\n붉은 굴뚝 여관.\n\n문을 열자 구운 보리빵 냄새와 나무가 타는 향이 먼저 맞이했다. 홀은 좁지 않지만 붐비지도 않았다 -- 낮 시간이라 손님은 구석에 혼자 앉아 맥주를 홀짝이는 노인 하나뿐. 테이블은 닳았지만 깨끗하고, 바닥에는 지푸라기 대신 마른 허브가 뿌려져 있었다.\n\n루세나가 홀 입구에서 카운터 위 먼지를 손가락으로 툭 닦으며 말했다.\n\n\"음... 냄새는 그럭저럭이네. 외양간 냄새보다는 낫잖아.\"\n\n노엘은 등의 짐을 고쳐 메며 눈으로 창문과 출구 위치를 훑었다.\n\n\"앉을 자리부터.\"\n\n카운터 뒤에서 커다란 남자가 행주로 잔을 닦고 있었다. 오십대 초반, 키가 크고 어깨가 넓지만 배가 나왔다. 소금후추색 머리를 짧게 친 얼굴에 사흘치 수염. 왼쪽 무릎을 약간 감싸며 서 있는 걸 눈치 빠른 사람이라면 알아챌 수 있었다.\n\n세 사람이 들어서자 시선이 올라왔다. 오래 이 일을 해온 사람의, 평가하는 눈빛.\n\n\"어서 오시오.\"\n\n잔을 내려놓으며 말했다. 목소리는 낮고 무뚝뚝하지만 거칠지는 않았다.\n\n\"방 찾으시오, 식사 찾으시오? 방은 1인실이 동쪽으로 둘 남았고, 3인 합실은 하나 있소. 저녁은 해 질 무렵부터요.\"\n\n잠깐 멈추더니 일행을 한 번 훑었다 -- 여행 먼지, 짐의 무게, 지친 기색.\n\n\"멀리서 오셨소?\"",
+        "user_input": "기회가 된다면 다음에 또 봅시다. 여관으로 간다.",
+        "dialogues": [
+          {
+            "speaker": "saiki",
+            "line": "기회가 된다면 다음에 또 봅시다.",
+            "tone": "calm",
+            "target": "mira"
+          },
+          {
+            "speaker": "lucena",
+            "line": "음... 냄새는 그럭저럭이네. 외양간 냄새보다는 낫잖아.",
+            "tone": "casual"
+          },
+          {
+            "speaker": "noel",
+            "line": "앉을 자리부터.",
+            "tone": "dry"
+          },
+          {
+            "speaker": "volf",
+            "line": "어서 오시오.",
+            "tone": "businesslike"
+          },
+          {
+            "speaker": "volf",
+            "line": "방 찾으시오, 식사 찾으시오? 방은 1인실이 동쪽으로 둘 남았고, 3인 합실은 하나 있소.",
+            "tone": "businesslike"
+          },
+          {
+            "speaker": "volf",
+            "line": "멀리서 오셨소?",
+            "tone": "neutral"
+          }
+        ],
+        "timestamp": "22:25:27"
+      },
+      {
+        "turn": 27,
+        "message": "[GM] Fix: remove separated NPCs from map",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "22:43:06"
+      },
+      {
+        "turn": 27,
+        "message": "[GM] Map refresh after NPC separation",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "22:44:00"
+      },
+      {
+        "turn": 27,
+        "message": "[GM] Fix: set inn interior background",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "22:47:40"
+      },
+      {
+        "turn": 27,
+        "message": "[GM] Fix: turn count + Volf portrait",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "22:52:04"
+      },
+      {
+        "turn": 27,
+        "message": "[GM] Generate Volf portrait",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "22:52:24"
+      },
+      {
+        "turn": 27,
+        "message": "[GM] Fix: inn interior background",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "22:56:21"
+      },
+      {
+        "turn": 27,
+        "message": "[GM] Generate Volf SD portrait",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "23:17:53"
+      },
+      {
+        "turn": 27,
+        "message": "[GM] Regenerate Volf SD portrait (fix)",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "23:23:11"
+      }
+    ],
+    "current_scene": {
+      "background": "/static/illustrations/sd/background_red_chimney_inn.webp",
+      "layers": [
+        {
+          "type": "object",
+          "image": "static/illustrations/sd/object_stairway.webp",
+          "position": "center",
+          "name": "stairway",
+          "distance": 5,
+          "size_class": "d3"
+        },
+        {
+          "type": "object",
+          "image": "static/illustrations/sd/object_barrel_stack.webp",
+          "position": "center",
+          "name": "barrel_stack",
+          "distance": 4,
+          "size_class": "d3"
+        },
+        {
+          "type": "object",
+          "image": "static/illustrations/sd/object_bar_counter.webp",
+          "position": "center",
+          "name": "bar_counter",
+          "distance": 4,
+          "size_class": "d3"
+        },
+        {
+          "type": "object",
+          "image": "static/illustrations/sd/object_kitchen_table.webp",
+          "position": "center",
+          "name": "kitchen_table",
+          "distance": 4,
+          "size_class": "d3"
+        },
+        {
+          "type": "portrait",
+          "image": "static/portraits/sd/portrait_volf.webp",
+          "position": "far-left",
+          "name": "volf",
+          "distance": 17,
+          "size_class": "d4"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,190 @@
+{
+  "world_info": {
+    "name": "Ersia",
+    "name_origin": "Means 'vast land' in the ancient tongue. The name scholars use to refer to the continent.",
+    "description": "A medieval fantasy world where sword and magic coexist",
+    "grid": {
+      "description": "World map coordinate grid. Current data covers only the Karendel region (eastern continent) in detail.",
+      "known_range": {"x_min": 0, "x_max": 150, "y_min": 0, "y_max": 120},
+      "scale_note": "As a fantasy map, strict scale is not applied. For distances between coordinates, refer to distance_km in connections. The map is schematic; visual distance between coordinates may differ from actual distance_km.",
+      "world_map_scale": {
+        "coord_per_km": "approx 1.5 (1 coord ≈ 600m)",
+        "description": "World map coordinates. Range 0-150 after 10x expansion."
+      },
+      "default_terrain": "grassland",
+      "north": "upward (y decreasing direction)"
+    },
+    "tech_level": "Medieval (iron age, magic coexistence)",
+    "magic_system": "Mana-based. Uses mediums such as staffs and amulets. The Mage Guild manages magic."
+  },
+  "currency": {
+    "system": "Copper/silver/gold 3-tier system",
+    "exchange_rate": {
+      "100_copper_coins": "1 silver coin",
+      "100_silver_coins": "1 gold coin"
+    },
+    "value_table": {
+      "5_copper_coins": "a loaf of bread",
+      "20-50_copper_coins": "one meal at a village restaurant",
+      "1-2_silver_coins": "one day lodging + meals",
+      "10-20_silver_coins": "one basic weapon/armor",
+      "30_silver_coins": "one month living expenses (frugal)",
+      "50_silver_coins": "one month living expenses (moderate)",
+      "1_gold_coin": "a small house / half-year living expenses",
+      "3_gold_coins": "high-grade weapon or magic equipment",
+      "5+_gold_coins": "magic items, luxury mansions",
+      "10+_gold_coins": "castles, estates"
+    },
+    "notes": "Everyday transactions use copper/silver coins. Gold coins are only used for high-value transactions. Pulling out gold coins in a rural village draws attention."
+  },
+  "terrain": {
+    "description": "World map terrain. Based on world_pos coordinates. Types: forest, mountain, river, sea, plains, swamp",
+    "features": [
+      {"type": "forest", "description": "A vast forest surrounding Harun Village. Dominated by oak and maple trees, with an ancient dungeon hidden deep within. Wolves and slimes inhabit the area.", "name": "Harun Forest", "coords": [[20,55],[30,55],[40,55],[50,55],[20,60],[30,60],[40,60],[50,60],[60,60],[20,70],[30,70],[40,70],[50,70],[60,70],[70,70],[20,80],[30,80],[40,80],[50,80],[60,80],[30,90],[40,90],[50,90],[60,90],[70,90],[40,100],[50,100]]},
+      {"type": "mountain", "description": "A rugged mountain range spanning the northern part of the continent. Peaks covered in permanent snow, and the source of the Karen River. Beyond the mountains lies unknown territory.", "name": "Northern Wall Mountains", "coords": [[10,5],[20,5],[30,5],[40,5],[50,5],[10,10],[20,10],[30,10],[40,10],[50,10],[10,15],[20,15],[30,15],[40,15],[20,20],[30,20]]},
+      {"type": "sea", "description": "The vast sea to the east of the continent. Ships can sail along the coast from Seren Port to western cities. Fishermen make their living here.", "name": "Eastern Sea", "coords": [[95,20],[100,20],[110,20],[95,30],[100,30],[110,30],[90,40],[100,40],[110,40],[90,50],[100,50],[110,50],[90,60],[100,60],[110,60],[90,70],[100,70],[110,70],[95,80],[100,80],[110,80],[100,90],[110,90]]},
+      {"type": "river", "description": "A river originating from the Northern Wall Mountains, flowing through the Karendel Plains and into the Eastern Sea. The trade city of Karendel takes its name from this river.", "name": "Karen River", "path": [[45,15],[50,20],[55,25],[60,30],[65,35],[70,40],[75,50],[80,55],[85,60],[84,65],[82,70],[79,75]]},
+      {"type": "plains", "description": "Fertile plains surrounding the trade city of Karendel. Wheat fields and pastures stretch across the land, with trade roads crossing the plains.", "name": "Karendel Plains", "coords": [[50,20],[55,20],[60,20],[40,25],[50,25],[60,25],[70,25],[80,25],[40,30],[50,30],[60,30],[70,30],[80,30],[50,35],[60,35],[70,35],[80,35],[50,40],[60,40],[70,40],[80,40],[50,45],[55,45],[60,45]]},
+      {"type": "coastline", "name": "Eastern Coastline", "description": "The eastern coast of the continent. Extends north and south from the Karen River estuary.", "path": [[95,10],[90,15],[88,20],[87,25],[90,30],[92,35],[90,40],[88,45],[85,50],[82,55],[80,60],[80,65],[79,70],[77,75],[76,80],[80,85],[87,90],[95,95],[100,100],[105,110]]},
+      {"type": "border", "name": "Known World Border", "description": "The boundary of the currently explored/recorded world. Beyond lies the unknown.", "edges": {"north": "Beyond the Northern Wall Mountains — unknown lands. Only tales from occasional travelers who crossed the mountains are passed down.", "east": "Eastern Sea — rumors of a continent beyond the horizon exist, but none confirmed.", "south": "Wide grasslands extend south of Harun Forest, and southern cities are said to lie several days' journey away.", "west": "Other kingdoms lie several days' journey to the west. They can be reached by ship from Seren Port."}}
+    ]
+  },
+  "locations": {
+    "harun_village": {
+      "name": "Harun Village",
+      "world_pos": [40, 80],
+      "type": "village",
+      "description": "A small farming village near the forest. Population approximately 200.",
+      "features": ["chief_house", "guard_post", "general_store", "inn_small", "church"],
+      "map": {
+        "width": 25,
+        "height": 25,
+        "areas": [
+          {"name": "village_entrance", "type": "road", "area": {"x1": 0, "y1": 8, "x2": 7, "y2": 13}},
+          {"name": "village_square", "type": "village", "area": {"x1": 8, "y1": 4, "x2": 18, "y2": 17}},
+          {"name": "saiki_house", "type": "house", "area": {"x1": 12, "y1": 6, "x2": 16, "y2": 10}},
+          {"name": "chief_house", "type": "house", "area": {"x1": 8, "y1": 6, "x2": 10, "y2": 10}},
+          {"name": "forest_path_karendel", "type": "grass", "area": {"x1": 20, "y1": 0, "x2": 24, "y2": 8}}
+        ]
+      },
+      "notable_npcs": {
+        "ernes": {
+          "role": "Village chief",
+          "appearance": "A white-haired elder. Walks with a cane.",
+          "personality": "Generous and taciturn. The type to bestow kindness without ever mentioning it.",
+          "relationship_to_party": "A silent benefactor. Has been quietly watching over the three since they were young.",
+          "hidden_actions": [
+            "He is the one who introduced the wandering mage who taught Saiki magic (Saiki does not know)",
+            "He secretly paid for the bread Lucena stole from the general store (Lucena does not know)",
+            "He leaves firewood and grain at Noel's hut every winter (Noel does not know who)"
+          ],
+          "karendel_connections": {
+            "melos_antique_shop": "A picky but honest appraiser",
+            "red_chimney_inn": "Near the north gate. Run by Volf. A letter of introduction grants one free night's stay."
+          }
+        },
+        "hunt": "An old guard. Stationed at the village entrance."
+      },
+      "connections": {
+        "trade_road_karendel": {"direction": "north", "distance_km": 16},
+        "lost_treasure_dungeon": {"direction": "east", "distance_km": 16}
+      }
+    },
+    "trade_road_karendel": {
+      "name": "Trade Road (toward Karendel)",
+      "world_pos": [40, 50],
+      "type": "road",
+      "description": "The trade road connecting Harun Village to Karendel",
+      "map": {
+        "width": 25,
+        "height": 25,
+        "areas": [
+          {"name": "forest_north", "type": "grass", "area": {"x1": 0, "y1": 0, "x2": 24, "y2": 7}},
+          {"name": "trade_road", "type": "road", "area": {"x1": 0, "y1": 8, "x2": 24, "y2": 16}},
+          {"name": "cart_stop", "type": "village", "area": {"x1": 10, "y1": 12, "x2": 14, "y2": 13}},
+          {"name": "forest_south", "type": "grass", "area": {"x1": 0, "y1": 17, "x2": 24, "y2": 24}}
+        ]
+      },
+      "connections": {
+        "harun_village": {"direction": "south", "distance_km": 16},
+        "crossroads_rest": {"direction": "east", "distance_km": 15}
+      }
+    },
+    "karendel": {
+      "name": "Karendel",
+      "world_pos": [55, 20],
+      "type": "trade_city",
+      "description": "A trade city in the north. A gathering place for various races and merchants.",
+      "features": ["mage_guild", "adventurer_guild", "appraiser", "blacksmith", "market", "inn_street"],
+      "map": {
+        "width": 25,
+        "height": 25,
+        "areas": [
+          {"name": "north_gate", "type": "road", "area": {"x1": 9, "y1": 0, "x2": 14, "y2": 1}},
+          {"name": "mage_guild", "type": "house", "area": {"x1": 1, "y1": 3, "x2": 6, "y2": 8}},
+          {"name": "adventurer_guild", "type": "house", "area": {"x1": 7, "y1": 3, "x2": 12, "y2": 8}},
+          {"name": "blacksmith", "type": "house", "area": {"x1": 13, "y1": 4, "x2": 17, "y2": 8}},
+          {"name": "red_chimney_inn", "type": "house", "area": {"x1": 18, "y1": 3, "x2": 23, "y2": 8}},
+          {"name": "market_street", "type": "village", "area": {"x1": 4, "y1": 11, "x2": 19, "y2": 17}},
+          {"name": "melos_antique_shop", "type": "house", "area": {"x1": 20, "y1": 12, "x2": 24, "y2": 16}},
+          {"name": "south_gate_harun", "type": "road", "area": {"x1": 9, "y1": 19, "x2": 14, "y2": 24}}
+        ]
+      },
+      "notable_npcs": {
+        "melos": "Antique shop owner. Picky but with a sharp eye, and never overcharges. An acquaintance of Ernes.",
+        "volf": "Owner of the Red Chimney Inn. An old friend of Ernes. One free night's stay with a letter of introduction. Has bad knees, so Ernes sends mountain herbs for him."
+      },
+      "connections": {
+        "crossroads_rest": {"direction": "south", "distance_km": 25}
+      }
+    },
+    "lost_treasure_dungeon": {
+      "name": "Lost Treasure Forest Dungeon",
+      "type": "dungeon",
+      "world_pos": [60, 80],
+      "description": "An ancient dungeon deep in the forest east of Harun Village.",
+      "sub_areas": ["ancient_dungeon", "treasure_room"],
+      "connections": {
+        "harun_village": {"direction": "west", "distance_km": 16}
+      }
+    },
+    "crossroads_rest": {
+      "name": "Crossroads Rest",
+      "world_pos": [55, 45],
+      "type": "rest_area",
+      "description": "The point where the trade road splits north (toward Karendel) and south (toward Seren Port). Situated in the middle of the plains with open views in all directions. A rest stop where travelers camp.",
+      "connections": {
+        "karendel": {"direction": "north", "distance_km": 25},
+        "seren_port": {"direction": "southeast", "distance_km": 30},
+        "trade_road_karendel": {"direction": "west", "distance_km": 15}
+      }
+    },
+    "seren_port": {
+      "name": "Seren Port",
+      "world_pos": [76, 80],
+      "type": "port_village",
+      "description": "A small fishing port at the Karen River estuary. Ships travel along the coast to western cities. A small-scale trading hub handling both inland waterway and maritime transport.",
+      "connections": {
+        "crossroads_rest": {"direction": "northwest", "distance_km": 30}
+      }
+    }
+  },
+  "factions": {
+    "mage_guild": {
+      "description": "An organization that researches and manages magic. Headquartered in Karendel.",
+      "services": ["magic_item_appraisal", "magic_education", "quest_board"]
+    },
+    "adventurer_guild": {
+      "description": "An organization that brokers quests and provides support for adventurers.",
+      "services": ["quest_brokerage", "equipment_rental", "info_service"]
+    }
+  },
+  "races": ["human", "elf", "dwarf", "orc", "beastkin"],
+  "common_monsters": {
+    "slime": "The weakest monster. Inhabits dungeon entrances.",
+    "orc": "An aggressive species. Inhabits forests and dungeons.",
+    "golem": "Guardian of ancient ruins. A stone construct created by magic.",
+    "goblin": "Lives in small groups. Weak but cunning.",
+    "wolf": "Inhabits forests. Pack attacks are dangerous."
+  }
+}

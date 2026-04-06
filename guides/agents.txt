@@ -1,0 +1,314 @@
+Agent Roles and Call Rules
+===
+
+For GM turn processing and narration rules, see guides/gm_rules.txt
+For in-game mechanics (dice, cover, hazards), see guides/game_rules.txt
+
+Agent Call Common Rules
+===
+All agents are freshly created each time and have no conversation context.
+Therefore, when the GM calls agents in phase 1b, the following must be provided:
+- The direction for this turn (determined by the GM in phase 1a)
+- The user's original action declaration
+- Relevant situational context (current location, accompanying NPCs, active quests, etc.)
+- Specific questions for the agent
+
+The agent verifies/generates based on the provided context + mandatory reading files and returns results to the GM.
+The GM receives agent results, modifies the direction if there are issues, and proceeds to phase 2 (narration) with the corrected results.
+
+Schema-Based Agent Calls (Hybrid Architecture)
+===
+Agents use pydantic schemas for structured input/output (core/schemas/).
+The GM orchestrator uses TurnPlan → AgentDispatch → TurnSynthesis flow.
+
+Phase 1a: Build TurnPlan
+  - Set turn_number, user_action, gm_direction, mood, agents_needed
+  - Determine which agents are required this turn
+
+Phase 1b: Build AgentDispatch with AgentCall list
+  - Each AgentCall specifies: agent_type, priority, depends_on, payload, required_files
+  - AgentDispatch.parallel_groups() returns batches that can run concurrently
+  - For each call, the GM builds AgentRequest with:
+    - TurnContext (turn_number, location, chapter, time, player/npc summaries, recent events, gm_direction)
+    - Agent-specific payload (e.g., RuleRequest for rule_arbiter, NPCRequest for npc)
+    - Required files the agent must read
+
+Runner dispatch (data/agent_config.json determines which runner per agent):
+  - claude runner: registry.dispatch_claude_prompt(request) → prompt string → pass to Agent tool
+  - cloud/local runner: registry.dispatch(request) → AgentResponse directly
+
+Phase 2: Build TurnSynthesis
+  - Collect all AgentResponses into agent_results dict
+  - merge_warnings() to aggregate warnings/errors from all agents
+  - If has_errors(): address before proceeding
+  - Write narration based on synthesized results
+
+Phase 3: Build SystemRequest from turn results
+  - Include narration, dice_rolls, npc_actions, player_actions, state_changes
+  - System agent assembles GMUpdatePayload → calls /api/gm-update
+
+Example AgentDispatch for a combat turn:
+  calls:
+    - agent_type: rule_arbiter, priority: 1, payload: {checks: [...], combat_actions: [...]}
+    - agent_type: player, priority: 1, payload: {player_ids: [2,3], situation: "...", is_combat: true}
+    - agent_type: npc, priority: 1, payload: {npc_ids: [300], party_actions: "..."}
+    - agent_type: scenario, priority: 1, payload: {events_this_turn: ["combat_started"]}
+    - agent_type: system, priority: 2, depends_on: [rule_arbiter, player, npc, scenario]
+
+Groups: [[rule_arbiter, player, npc, scenario], [system]] → first group runs in parallel, system waits.
+
+Agent Call Optimization Rules
+===
+Each agent incurs a fixed overhead (~8K tokens). Compose flexibly based on the turn situation.
+
+Composition criteria (GM determines in phase 1a):
+- Player Agents: ALWAYS call individually per character (each has unique persona from agents/agent_*.json)
+  - Never combine multiple Player Agents into one call — persona/personality mixing degrades quality
+  - The Player Agent must read the corresponding agent persona file (agents/agent_*.json) before generating actions
+  - Match: agent's current_character field → player id (e.g., agent_b.current_character = "player_2" → Lucena)
+  - The persona's personality, play_style, and decision_tendency must be reflected in action/dialogue generation
+  - Characters with controlled_by: "user" do NOT need an AI agent — the user controls them directly
+  - If the user is absent and wants AI to control their character temporarily, assign an agent via current_character
+  - AI players must be proactive: suggest actions, start NPC conversations, express opinions/disagreements — not just react
+  - When the user speaks directly to an AI player (e.g., "Lucena, what do you think?"), call that Player Agent immediately to generate a response. The GM must NOT write AI player dialogue directly.
+- NPC Agents: Major NPCs (with entity file + active dialogue) → individual call. Minor NPCs → may combine
+- Combat/ruling/chapter transition → Separate all (Player, NPC, Rules, Scenario, Worldbuilding, System Reflection)
+- Peaceful movement/dialogue → Players individual, NPCs may combine, separate Rules/Scenario each
+- Simple response (single NPC line, etc.) → Minimal composition (2-3), but Players still individual
+
+File content volume criteria:
+- If total files an agent must read are 5,000 tokens or less → Can be combined
+- 5,000-10,000 tokens → Judge based on situation
+- Over 10,000 tokens → Must separate (to prevent accuracy degradation)
+- Example: If rules.json grows large, run the rule agent independently; if scenario.json grows large, run the scenario agent independently
+
+Parallel execution principle:
+- Independent agents must be called in parallel (execution time = based on the slowest agent)
+- Sequential if there are dependencies (e.g., rule ruling result → narration)
+
+Worldbuilding Agent Role
+===
+When the GM provides worldbuilding-related context in phase 1b, the agent verifies against worldbuilding.json.
+
+Items the worldbuilding agent must verify:
+- A new region is mentioned in narration → Is it registered in worldbuilding.json?
+- New geography (sea, river, mountain range, etc.) mentioned → Is it consistent with existing worldbuilding?
+- Direction/distance mentioned → Does it match existing data in connections?
+- New faction/organization mentioned → Is it registered in factions?
+- An NPC mentions regional information → Is that information accurate, or is the NPC's misinformation an intentional setting?
+
+Handling unregistered elements:
+1. Warn the GM: "This region/faction is not registered in worldbuilding.json"
+2. If it is an intentional new element → Register immediately in worldbuilding.json including world_pos
+3. If it is an NPC's inaccurate information → Record "incorrect information" in the NPC entity's memory
+4. If it is a GM mistake → Correct the narration or adjust to match the worldbuilding
+
+Must be recorded with the worldbuilding tag in GM turn phase 1b:
+- "No new elements" — Proceeding within existing worldbuilding
+- "Crossroads rest stop registered" — New region added to worldbuilding.json
+- "Port mentioned — unregistered, needs specification in next turn" — Pending item recorded
+
+Rule Agent Role
+===
+When the GM provides action/ruling context in phase 1b, the agent verifies consistency with rules.json.
+Required reading: data/rules.json + guides/game_rules.txt (in-game mechanics: cover, fall damage, hazards, LoS)
+
+Items the rule agent must verify:
+- Was a dice roll made in a situation requiring a ruling? (combat, skill checks, traps, etc.)
+- Does the MP cost for magic/skill usage match skills.json?
+- Does the attack comply with range rules? (melee = 1 tile, ranged = within range)
+- Does the damage/healing amount match the formulas in rules.json?
+- Are status effect effects applied according to status_effects.json?
+- Has a status effect duration expired but not been removed?
+- Is equipment being used without meeting requirements (level, stats)?
+- Is the character acting with HP/MP at 0 or below?
+- Is the combat initiative order being followed?
+
+Handling violations:
+1. Warn the GM: "This action violates the rules — [specific rule]"
+2. Correct immediately if possible (e.g., missed HP/MP deduction)
+3. Request ruling re-execution if the violation affects narration
+4. If it is an intentional rule variation (GM discretion), record the reason
+
+Must be recorded with the rules tag in GM turn phase 1b:
+- "No ruling — dialogue/movement only" — Turn that requires no ruling
+- "Fireball MP 8 deduction confirmed" — Cost verification complete
+- "Wolf attack ruling d20+3=15 vs AC 12 — hit confirmed" — Combat ruling verified
+- "Status effect 'poison' 3 turns elapsed — auto-removed" — Status effect expiry handled
+
+Scenario Agent Role
+===
+When the GM provides progression context in phase 1b, the agent verifies consistency with the scenario structure (scenario.json).
+
+Items the scenario agent must verify:
+- Does the current location match the expected area for the scenario chapter?
+- Has a chapter transition condition been met but the chapter not changed?
+- Has a quest completion condition been met but the status remains active?
+- Has a key scenario NPC died/departed, and is story progression still possible?
+- Has a required item been lost/used, and does it affect the main quest?
+- Is an ending branch condition approaching? (Whether the player needs a hint)
+- Has an unexpected situation occurred outside the scenario? (Ad-lib event tracking)
+
+Handling scenario deviation:
+1. Minor deviation → Guide back to the main line through natural narration
+2. Intentional deviation → Expand the scenario with a new branch (update scenario.json)
+3. Irrecoverable deviation → Create an alternative path or change the ending branch
+
+Must be recorded with the scenario tag in GM turn phase 1b:
+- "Chapter 1 in progress — objective: reach Karendel" — Normal progression
+- "Approaching quest 'herb delivery' target NPC" — Quest progress detected
+- "Deviated from main route — entered side path, return possible" — Deviation tracked
+- "Ending condition approaching: chapter 2 transition upon treasure appraisal completion" — Branch point alert
+
+World Map Agent Role
+===
+Verifies the geographical rationality of the world map. Automatic checks from geography, cartography, and ecology perspectives.
+
+Auto-call conditions (must call world map agent in these situations):
+- When creating a new worldbuilding → Full verification
+- When registering a new location in worldbuilding.json → Coordinate/terrain verification
+- When changing terrain → Map update
+- When a new region is discovered/mentioned during gameplay → Placement rationality verification
+
+Verification items:
+- Is the port on a coastline (adjacent to sea)?
+- Is the town/city not placed on the sea?
+- Does the river flow from mountains toward the sea?
+- Are road connections rational? (Direct vs. detour contradictions)
+- Are travel_hours and coordinate distances consistent?
+- Does the new region not conflict with existing region coordinates?
+- Is the city at a transportation hub (riverside, intersection, coast)?
+
+Must be recorded with the worldmap tag in GM turn phase 1b:
+- "No new regions" — No world map changes
+- "Seren port coordinate verification — coastline confirmed OK" — Verification passed
+- "New region 'Abandoned Mine' registered — coordinates [6,9] inside forest, geographically rational" — New registration
+
+System Reflection Agent Role
+===
+After the GM finalizes the narration, the system reflection agent handles the following automatically when it is delegated.
+The main GM does not need to manage individual items directly.
+
+Items the system reflection agent handles:
+1. game_state.json update (turn_count, events, player/NPC states)
+2. entities/ file synchronization
+3. gm-update API call:
+   - Deliver narration text
+   - Include ruling details in the dice_rolls field if there were rulings (always record)
+   - Include the mechanics field if there were mechanics requests (results are auto-recorded in events)
+   - player_updates/npc_updates on location change (position, location)
+   - Background illustration replacement (detect location/time-of-day changes)
+   - new_npcs or npc_updates on NPC appearance
+4. current_location update (on location change)
+5. Background illustration:
+   - Location change → Request new background generation (illustration field)
+   - Time-of-day change → Time-of-day reflecting prompt (night, dawn, etc.)
+   - Prioritize reusing existing images (_find_existing_image)
+6. NPC registration check:
+   - Whether NPCs individually described in narration exist in game_state
+   - If not, return a warning to the GM
+7. show_dice_result check:
+   - Warn if values are included in narration when set to false
+8. gm_turn.py log recording (gm-update, state, entity tags)
+9. git commit (every turn) — Details: guides/save_rules.txt
+10. git push (every 3 turns or when user specifies, in background) — Details: guides/save_rules.txt
+
+Information the GM must provide to the system reflection agent:
+- Narration text
+- Whether location changed + new location
+- Whether time-of-day changed (day/night/dawn)
+- NPC state changes (HP, position, status, etc.)
+- Player state changes (HP, MP, position, inventory, etc.)
+
+This agent is called using the Agent tool (run_in_background=true).
+
+Agent Review Mandatory Rules
+===
+When review is needed regarding worldbuilding, geography, NPCs, rules, or scenarios, the GM must not judge directly but must call the relevant agent for review.
+
+| Review Content | Agent to Call |
+| Place names, regions, factions, geographical information | Agent [Worldbuilding] (worldbuilding_agent) |
+| Coordinates, coastlines, road connections, terrain placement | Agent [World Map] (worldmap_agent) |
+| Rulings, skills, HP/MP, combat rules | Agent [Rule Judge] (rules_agent) |
+| Chapter transitions, quests, story branches | Agent [Scenario] (scenario_agent) |
+| AI player actions/dialogue/decisions | Agent [Player:{name}] (player_agent) |
+| NPC states, dialogue, actions, proactive decisions | Agent [NPC:{name}] (npc_agent) |
+
+The GM directly reading JSON and making judgments is prohibited. Judgments must be based on results verified by agents.
+- Bad example: GM reads worldbuilding.json directly and decides "Seren port is here, so..."
+- Good example: Request to Agent [Worldbuilding]: "Check if the southern coastal village Hallan mentioned is registered"
+
+This rule applies to all cases: verifying settings that come up in gameplay dialogue, answering user questions, and registering new regions/NPCs.
+
+GM Direction Setting → Agent Call Principles
+===
+Agents are freshly created each time and have no conversation context. Only the GM knows the overall flow.
+Therefore, the GM must set the direction first and convey that direction to the agents.
+
+- GM = Director: Knows the overall flow and sets the direction for "what will happen this turn"
+- Agent = Specialist: Verifies whether the GM's direction is consistent and generates specific results (dialogue, ruling values, etc.)
+
+Phase 1a (GM Direction Setting):
+- The GM determines the direction for this turn based on conversation context + scenario flow
+- Decides which agents are needed and what to ask them
+- Bad example: Asking Agent [Scenario] "Does forest exploration fit the scenario?" (thrown without context)
+- Good example: Asking Agent [Scenario] "Late chapter 1, check if trap event trigger conditions have been met"
+
+Phase 1b (Agent Calls — Including Direction + Context):
+- Call agents in parallel with the GM's direction + specific context included
+- NPC dialogue must be generated by the NPC Agent — the GM does not write it directly
+- Rulings must be handled by the Rule Agent — the GM does not roll dice directly
+- New regions/settings are included in narration only after confirmation from Worldbuilding/World Map Agents
+- Agents read files to verify that the GM's direction is consistent and return specific results
+
+Phase 3 (Post-verification):
+→ Phase 3 post-verification: See 'Agent Warning Handling Workflow' section below
+
+Bad example: GM writes NPC dialogue directly and relies only on gm-update's post-verification
+Good example: NPC Agent generates dialogue → GM reflects it in narration → gm-update post-verification provides additional confirmation
+
+Agent Warning Handling Workflow
+===
+Processing flow when an agent detects a problem.
+Warnings can occur at two points: phase 1b (pre-verification) and phase 3 (post-verification).
+
+[Phase 1b Warning — Pre-verification]
+
+  The agent finds a problem with the GM's direction and reports:
+  - 🌍 Worldbuilding: "A port was mentioned but there is no water body setting"
+  - ⚖️ Rules: "Fireball MP 8 cost was not deducted"
+  - 📜 Scenario: "Passing by without meeting Volf, the quest 'herb delivery' target"
+
+  → The GM receives the report and decides:
+  - 🌍: ① Add a river to the south ② Hallan's misunderstanding ③ Coastal trading port
+  - ⚖️: ① Deduct MP immediately ② Allow free use at GM discretion (record reason)
+  - 📜: ① Remind quest through NPC dialogue ② Respect player choice, mark quest as failed
+
+  → The GM reflects the decision in data files:
+  - 🌍 → worldbuilding.json (add/modify regions/factions/geography)
+  - ⚖️ → game_state.json (modify HP/MP/stats/status effects)
+  - 📜 → scenario.json / quests.json (quest status/chapter transitions)
+
+  → Proceed to phase 2 (narration writing) with the corrected direction.
+
+[Phase 3 Warning — Post-verification (Safety Net)]
+
+  A safety net that automatically runs when the gm-update API is called.
+  Catches contradictions missed in phase 1b.
+  - Post-verification warning raised → GM revises narration + re-reflects data + re-calls gm-update
+
+[Player Communication of Warning Results]
+
+  - Communicate naturally through narration when necessary
+  - Direct communication: Weave into NPC dialogue, environmental descriptions, events
+  - Indirect communication: Ruling result display, state change notifications
+  - No communication needed: Internal system corrections (data consistency fixes, etc.)
+
+  Bad example: "Due to a system error, MP was not deducted and has been corrected" (meta-commentary)
+  Good example: Saiki felt the fatigue of expending magical energy. (MP 37 → 29)
+
+Core principles:
+- Agent warnings are not directly visible to the player — handled internally by the GM
+- The GM may ignore agent warnings, but must record the reason for ignoring
+- Reflection results must be saved to data files — keeping them only in conversation context is not allowed
+- Player communication must be naturally woven into narration — system messages are prohibited

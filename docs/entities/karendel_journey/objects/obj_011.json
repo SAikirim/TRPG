@@ -1,0 +1,21 @@
+{
+  "id": "obj_011",
+  "name": "round_table_2",
+  "type": "table",
+  "status": "placed",
+  "position": [10, 4],
+  "size": [2, 2],
+  "location": "red_chimney_inn_1f",
+  "description": "A sturdy oak table with years of scratches. Seats four.",
+  "interactable": true,
+  "interaction": "Sit down at the table.",
+  "icon": "🍽️",
+  "tactical": {
+    "cover": "half",
+    "defense_bonus": 2,
+    "blocks_ranged": false,
+    "destructible": true,
+    "hp": 15,
+    "flammable": true
+  }
+}

@@ -1,60 +1,116 @@
 {
-  "description": "상점 데이터베이스. 각 상점의 위치, 판매 품목, 매입 가격을 정의.",
+  "description": "Shop database. Defines location, inventory, and buy prices for each shop.",
   "shops": {
-    "하룬_잡화점": {
-      "name": "하룬 마을 잡화점",
+    "harun_general_store": {
+      "name": "Harun Village General Store",
       "location": "harun_village",
       "type": "general",
-      "owner": "없음 (무명 상인)",
+      "owner": "None (unnamed merchant)",
       "inventory": {
-        "치유 약초": {"price": 5, "stock": 10},
-        "마나 포션": {"price": 15, "stock": 3},
-        "밧줄": {"price": 3, "stock": 5},
-        "부싯돌": {"price": 1, "stock": 10},
-        "횃불": {"price": 1, "stock": 20}
+        "healing_herb": {
+          "price": 5,
+          "stock": 10
+        },
+        "mana_potion": {
+          "price": 15,
+          "stock": 3
+        },
+        "rope": {
+          "price": 3,
+          "stock": 5
+        },
+        "flint": {
+          "price": 1,
+          "stock": 10
+        },
+        "torch": {
+          "price": 1,
+          "stock": 20
+        }
       },
       "buy_rate": 0.5
     },
-    "카렌델_대장간": {
-      "name": "카렌델 대장간",
+    "karendel_blacksmith": {
+      "name": "Karendel Blacksmith",
       "location": "karendel",
       "type": "weapon_armor",
-      "owner": "미정",
+      "owner": "TBD",
       "inventory": {
-        "철검": {"price": 20, "stock": 5},
-        "장검": {"price": 50, "stock": 2},
-        "가죽 방패": {"price": 15, "stock": 5},
-        "체인메일": {"price": 80, "stock": 1},
-        "단검 x2": {"price": 25, "stock": 3}
+        "iron_sword": {
+          "price": 20,
+          "stock": 5
+        },
+        "longsword": {
+          "price": 50,
+          "stock": 2
+        },
+        "leather_shield": {
+          "price": 15,
+          "stock": 5
+        },
+        "chain_mail_item": {
+          "price": 80,
+          "stock": 1
+        },
+        "dual_daggers": {
+          "price": 25,
+          "stock": 3
+        }
       },
       "buy_rate": 0.4
     },
-    "카렌델_약초상": {
-      "name": "카렌델 약초상",
+    "karendel_herbalist": {
+      "name": "Karendel Herbalist",
       "location": "karendel",
       "type": "consumable",
-      "owner": "미정",
+      "owner": "TBD",
       "inventory": {
-        "치유 약초": {"price": 5, "stock": 20},
-        "마나 포션": {"price": 15, "stock": 10},
-        "해독제": {"price": 10, "stock": 5},
-        "상처 치료 약병": {"price": 20, "stock": 5},
-        "마나 결정": {"price": 25, "stock": 3}
+        "healing_herb": {
+          "price": 5,
+          "stock": 20
+        },
+        "mana_potion": {
+          "price": 15,
+          "stock": 10
+        },
+        "antidote": {
+          "price": 10,
+          "stock": 5
+        },
+        "wound_treatment_vial": {
+          "price": 20,
+          "stock": 5
+        },
+        "mana_crystal": {
+          "price": 25,
+          "stock": 3
+        }
       },
       "buy_rate": 0.5
     },
-    "멜로스_골동품점": {
-      "name": "멜로스 골동품점",
+    "melos_antique_shop": {
+      "name": "Melos Antique Shop",
       "location": "karendel",
       "type": "appraisal_antique",
-      "owner": "멜로스",
+      "owner": "Melos",
       "services": {
-        "감정": {"price": 10, "desc": "아이템 감정. 희귀 아이템은 추가 비용."},
-        "매입": {"desc": "고대 유물, 마법 아이템 고가 매입"}
+        "appraisal": {
+          "price": 10,
+          "desc": "Item appraisal. Rare items cost extra."
+        },
+        "purchase": {
+          "desc": "Purchases ancient relics and magic items at high prices"
+        }
       },
       "inventory": {
-        "마법 반지 (INT+1)": {"price": 200, "stock": 1},
-        "보호의 부적": {"price": 150, "stock": 1}
+        "magic_ring_int1": {
+          "price": 200,
+          "stock": 1
+        },
+        "protection_amulet": {
+          "price": 150,
+          "stock": 1
+        }
       },
       "buy_rate": 0.6
     }

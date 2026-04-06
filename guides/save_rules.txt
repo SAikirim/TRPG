@@ -1,0 +1,30 @@
+Save Rules Detail
+===
+This file covers git commit/push rules.
+Only the System Reflection agent needs to read this file.
+For core rules on GM narration/web reflection/dice/events, refer to guides/gm_rules.txt.
+
+Save Rules
+===
+Separate commit and push. Commit is local and fast; push involves network I/O and is slow.
+
+- Commit message format: save: turnN content -- result summary
+- Branch: claude/clarify-task-xApb3
+
+commit (every turn):
+- Run git commit when phase 3 (system reflection) is complete each turn (including docs/ sync)
+- Must commit immediately in the following situations:
+| Situation                          | Files to save                                                     |
+| End of combat                      | game_state.json, current_session.json, entities/{id}/npcs/        |
+| Item acquisition/distribution/use  | game_state.json, current_session.json, entities/{id}/players/     |
+| Trap/object interaction            | game_state.json, current_session.json, entities/{id}/objects/     |
+| Chapter transition                 | game_state.json, current_session.json (all)                       |
+| Character HP/MP change             | game_state.json, current_session.json, entities/{id}/players/     |
+| Puzzle/event resolution            | game_state.json, current_session.json, entities/{id}/objects/     |
+
+push (every 3 turns or on user request):
+- Auto push every 3 turns (check with python gm_turn.py should_push)
+- Push immediately when user explicitly says "save"
+- Push immediately on major events such as chapter transitions or end of combat
+- Push must always run in background (Agent run_in_background=true) — do not block narration
+- If push fails, retry at the next push point (do not interrupt game progress)

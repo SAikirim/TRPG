@@ -1,0 +1,12 @@
+{
+  "description": "Worldbuilding catalog. Referenced by scenarios via the worldbuilding field.",
+  "worldbuildings": [
+    {
+      "id": "karendel_world",
+      "name": "Karendel World",
+      "description": "A medieval fantasy world where sword and magic coexist. Includes Harun Village, Karendel trade city, etc.",
+      "file": "worldbuildings/karendel_world.json",
+      "genre": "fantasy"
+    }
+  ]
+}

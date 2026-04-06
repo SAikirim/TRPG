@@ -1,0 +1,31 @@
+{
+  "id": "obj_004",
+  "name": "oil_barrel",
+  "type": "container",
+  "status": "sealed",
+  "position": [
+    9,
+    14
+  ],
+  "location": "crossroads_rest",
+  "description": "A small oil barrel placed at one side of the shelter. Appears to belong to another traveler. Contains lamp oil.",
+  "interactable": true,
+  "interaction": "Can extract oil. Taking it without the owner's permission is theft.",
+  "hazard": {
+    "near_fire": "Fire hazard if the oil barrel breaks near the campfire",
+    "effect": "burn"
+  },
+  "icon": "🛢️",
+  "tactical": {
+    "cover": "none",
+    "defense_bonus": 0,
+    "blocks_ranged": false,
+    "destructible": true,
+    "hp": 5,
+    "flammable": true,
+    "explosive": true,
+    "explosion_damage": 8,
+    "explosion_radius": 2,
+    "description": "No cover. Explodes from fire attacks — 8 damage in 2-tile radius."
+  }
+}

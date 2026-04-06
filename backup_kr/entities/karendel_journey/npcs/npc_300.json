@@ -1,0 +1,61 @@
+{
+  "id": 300,
+  "name": "할란",
+  "type": "friendly",
+  "race": "인간",
+  "known": true,
+  "status": "alive",
+  "location": "교역로 (수레 파손 현장)",
+  "appearance": {
+    "age": "50대",
+    "build": "다부진 중년 남성",
+    "skin": "햇볕에 그을린 갈색 피부",
+    "hair": "짧게 깎은 회색 섞인 갈색 머리",
+    "face": "깊은 주름, 날카로운 눈, 짧고 거친 턱수염. 무뚝뚝하지만 신뢰감 있는 인상",
+    "outfit": "낡은 가죽 조끼, 두꺼운 천 바지, 허리에 돈주머니와 작은 단검",
+    "notable": "왼쪽 종아리에 붕대. 절뚝거림"
+  },
+  "personality": {
+    "temperament": "gruff",
+    "intelligence": "high",
+    "behavior_pattern": "노련한 무역상. 무뚝뚝하지만 은혜를 잊지 않는다. 거래에 능숙.",
+    "speech_style": "짧고 직설적. 쓸데없는 말 안 함. 가끔 한숨.",
+    "motivation": "카렌델까지 무사히 짐을 운반해서 장사하는 것. 딸 미라 보호."
+  },
+  "relationships": {
+    "미라": "딸. 장사를 가르치는 중. 걱정이 많다.",
+    "사이키": "늑대에서 구해준 젊은 모험가. 고마움."
+  },
+  "stats": {
+    "STR": 10,
+    "DEX": 10,
+    "INT": 14,
+    "CON": 10
+  },
+  "hp": 10,
+  "max_hp": 12,
+  "mp": 3,
+  "max_mp": 3,
+  "conditions": {
+    "wounded": "왼쪽 종아리 늑대 물림"
+  },
+  "possessions": {
+    "마차": "말(짐말)이 끄는 상인용 마차. 수레 바퀴 수리 완료.",
+    "상품": "카렌델에서 팔 약초, 직물, 잡화 등. 일부 늑대에 의해 파손."
+  },
+  "travel": {
+    "origin": "세렌 항구",
+    "destination": "카렌델",
+    "route": ["교역로 (카렌델 방면)", "갈림길 쉼터", "카렌델"],
+    "current_segment": "교역로 (카렌델 방면)",
+    "met_party_at": "교역로 (카렌델 방면)",
+    "travel_mode": "cart",
+    "origin_note": "에르시아 남동쪽의 작은 어항. 직물과 건어물을 싣고 교역로를 따라 카렌델로 북상 중."
+  },
+  "memory": {
+    "dialogue_history": [],
+    "key_events": [
+      "파티에게 늑대에서 구출됨. 수레 수리 도움 요청."
+    ]
+  }
+}

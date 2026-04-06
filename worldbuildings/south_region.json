@@ -1,0 +1,118 @@
+{
+  "world_info": {
+    "name": "Arentiya",
+    "name_origin": "Means 'hot land' in the ancient tongue. Derived from its wide grasslands and warm climate.",
+    "description": "The grassland region south of Ersia. A warm land where trade and agriculture flourish.",
+    "grid": {
+      "description": "Arentiya region world map coordinates.",
+      "known_range": {"x_min": 0, "x_max": 150, "y_min": 0, "y_max": 120},
+      "scale_note": "As a fantasy map, strict scale is not applied.",
+      "local_map_scale": {
+        "tile_meters": 2,
+        "description": "Local map 1 tile = approx 2m."
+      },
+      "world_map_scale": {
+        "coord_per_km": "approx 1.5",
+        "description": "World map coordinates. 1 coord ≈ 600m."
+      },
+      "default_terrain": "grassland",
+      "north": "upward (y decreasing direction)"
+    },
+    "tech_level": "Medieval (iron age, magic coexistence, agriculture/pastoralism more developed than Ersia)",
+    "magic_system": "Mana-based. Same system as Ersia, but spirit magic is more common in the south.",
+    "neighbors": {
+      "north": {"name": "Ersia", "border_terrain": "forest", "note": "Connected to Harun Forest"},
+      "east": {"feature": "sea", "name": "Southeastern Sea", "note": "Extension of Ersia's Eastern Sea"},
+      "south": {"feature": "swamp", "name": "Southern Arid Zone", "note": "Savanna and desert borderlands"},
+      "west": {"feature": "mountain", "name": "Western Hills", "note": "Gentle hill terrain"}
+    }
+  },
+  "currency": {
+    "system": "Ersia copper/silver/gold coins accepted + Arentiya's own 'sun coin'",
+    "exchange_rate": {
+      "1_ersia_silver_coin": "1.2 sun coins (slight discount)"
+    },
+    "notes": "Ersia currency is widely accepted. Sun coins are used only in southern markets."
+  },
+  "terrain": {
+    "description": "Arentiya terrain. Based on world_pos coordinates.",
+    "features": [
+      {"type": "plains", "name": "Aren Prairie", "description": "The vast grassland at the center of Arentiya. Tall grasses and wildflowers stretch across the land. Nomads and farmers coexist.", "coords": [[30,25],[40,25],[50,25],[60,25],[70,25],[80,25],[30,35],[40,35],[50,35],[60,35],[70,35],[80,35],[30,45],[40,45],[50,45],[60,45],[70,45],[80,45],[40,55],[50,55],[60,55],[70,55]]},
+      {"type": "mountain", "name": "Western Hills", "description": "Gentle hill terrain to the west. The water source for Karla agricultural city.", "coords": [[10,30],[20,30],[10,40],[20,40],[10,50],[20,50],[10,60],[20,60]]},
+      {"type": "sea", "name": "Southeastern Sea", "description": "The southern extension of Ersia's Eastern Sea. Surha Port faces this sea.", "coords": [[100,30],[110,30],[100,40],[110,40],[100,50],[110,50],[100,60],[110,60],[100,70],[110,70],[100,80],[110,80],[110,90],[110,100]]},
+      {"type": "forest", "name": "Border Forest", "description": "A small forest extending from Ersia's Harun Forest. Gradually transitions to grassland further south.", "coords": [[40,5],[50,5],[60,5],[40,10],[50,10],[60,10],[50,15]]},
+      {"type": "swamp", "name": "Southern Arid Zone", "description": "Dry savanna at the southern edge of the Aren Prairie. Thorny bushes and dried grasses spread across the area.", "coords": [[30,90],[40,90],[50,90],[60,90],[70,90],[80,90],[30,100],[40,100],[50,100],[60,100],[70,100],[80,100]]},
+      {"type": "river", "name": "Aren River", "description": "A river originating from the Western Hills, crossing the prairie and flowing into the Southeastern Sea. The lifeline of Karla agricultural city.", "path": [[20,40],[30,42],[40,45],[50,50],[60,55],[70,55],[80,55],[90,58],[95,60]]},
+      {"type": "coastline", "name": "Southeastern Coastline", "description": "The Southeastern Sea coast. Where Surha Port is located.", "path": [[95,0],[100,10],[100,20],[95,30],[90,40],[90,50],[90,55],[92,60],[95,70],[100,80],[105,90],[110,100],[110,110]]}
+    ]
+  },
+  "locations": {
+    "baran_fortress": {
+      "name": "Baran Fortress",
+      "world_pos": [50, 10],
+      "type": "fortress",
+      "description": "A gateway fortress on the Ersia border. The starting point of the north-south trade road and garrison for the border guard.",
+      "features": ["gatehouse", "barracks", "trade_checkpoint", "inn"],
+      "connections": {
+        "talis": {"direction": "south", "distance_km": 24},
+        "ersia_harun_village": {"direction": "north", "distance_km": 40, "note": "Ersia region"}
+      }
+    },
+    "talis": {
+      "name": "Talis",
+      "world_pos": [60, 40],
+      "type": "trade_city",
+      "description": "A trade city in the middle of the Aren Prairie. A strategic point where north-south and east-west trade routes intersect. Famous for its tent market.",
+      "features": ["large_tent_market", "caravan_lodge", "mercenary_guild", "spirit_mage_tower", "racecourse"],
+      "connections": {
+        "baran_fortress": {"direction": "north", "distance_km": 24},
+        "karla": {"direction": "southwest", "distance_km": 20},
+        "surha": {"direction": "east", "distance_km": 30}
+      }
+    },
+    "karla": {
+      "name": "Karla",
+      "world_pos": [40, 55],
+      "type": "village",
+      "description": "An agricultural city on the banks of the Aren River. The breadbasket of the prairie. Characterized by white plastered buildings and terracotta roofs.",
+      "features": ["granary", "watermill", "riverside_market", "brewery"],
+      "connections": {
+        "talis": {"direction": "northeast", "distance_km": 20},
+        "surha": {"direction": "east", "distance_km": 40}
+      }
+    },
+    "surha": {
+      "name": "Surha",
+      "world_pos": [92, 58],
+      "type": "port",
+      "description": "A port city on the Southeastern Sea coast. A hub for maritime trade. Connected by sea route to Seren Port in Ersia.",
+      "features": ["harbor", "shipyard", "fish_market", "sea_temple", "lighthouse"],
+      "connections": {
+        "talis": {"direction": "west", "distance_km": 30},
+        "ersia_seren_port": {"direction": "north (sea route)", "distance_km": 60, "note": "sea route"}
+      }
+    }
+  },
+  "factions": {
+    "grassland_nomad_alliance": {
+      "description": "A loose alliance of nomadic tribes that roam the Aren Prairie.",
+      "services": ["guide_service", "horse_trade", "prairie_info"]
+    },
+    "spirit_mage_tower": {
+      "description": "A spirit magic research organization based in Talis. Exchanges with the Ersia Mage Guild.",
+      "services": ["spirit_contract", "nature_magic_education", "weather_forecast"]
+    },
+    "southern_merchant_guild": {
+      "description": "A maritime trade guild based in Surha Port.",
+      "services": ["sea_transport", "foreign_goods", "ship_rental"]
+    }
+  },
+  "races": ["human", "elf", "beastkin", "dwarf"],
+  "common_monsters": {
+    "prairie_wolf": "Travels in packs across the wide prairie. Threatens livestock but sometimes coexists with nomads.",
+    "desert_scorpion": "Inhabits the Southern Arid Zone. Has powerful venom.",
+    "prairie_goblin": "Nests in prairie hills and raids caravans. More skilled at mounted combat than Ersia goblins.",
+    "spirit_tree": "An ancient tree imbued with spirit power. Usually docile, but becomes aggressive when the forest is threatened.",
+    "sand_golem": "A golem made of sand that guards ancient ruins in the Southern Arid Zone."
+  }
+}

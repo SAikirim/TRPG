@@ -1,0 +1,375 @@
+일러스트 시스템 상세
+===
+
+이미지 생성 방식 (Skia 즉시 + SD 교체)
+===
+모든 이미지 생성은 2단계로 동작한다:
+
+  [1단계] Skia 즉시 생성 (0.1초 이내)
+    - 요청 즉시 Skia가 플레이스홀더 이미지를 생성하여 웹에 표시
+    - 빈 화면 없이 즉시 시각적 피드백 제공
+
+  [2단계] SD 백그라운드 생성 (10~30초)
+    - SD WebUI가 고품질 이미지를 백그라운드에서 생성
+    - 완료 시 Skia 이미지를 SD 이미지로 자동 교체
+    - 웹 UI의 2초 폴링이 자동으로 새 이미지를 감지
+    - SD OFF 또는 SD 실패 시 Skia 이미지가 최종본으로 유지
+
+적용 대상:
+| 대상 | Skia 플레이스홀더 | SD 최종 |
+| 씬 배경 | 벡터 배경 (숲/던전/마을 등) | SD 고품질 배경 |
+| NPC/PC 초상화 | 실루엣 + 색상 | SD 초상화 |
+| 세계 지도 배경 | 지형색 맵 | SD 판타지 텍스처 |
+| 오브젝트 아이콘 | 벡터 아이콘 | Skia 유지 (SD 불필요) |
+
+SD가 꺼져 있으면 Skia가 최종 이미지 역할을 한다.
+
+SD 동작 확인:
+- current_session.json의 sd_illustration 값으로 ON/OFF 제어
+- sd_generator.py의 is_sd_enabled()로 확인
+- SD WebUI 미응답 시 Skia 이미지가 최종본으로 유지
+
+Skia 사용 원칙:
+- 직선보다 곡선(베지어) 우선 사용 — 판타지 느낌
+- 안티앨리어싱 항상 활성화
+- 벡터 기반이므로 해상도 자유롭게 설정 가능
+- 그라디언트, 투명도, 그림자 적극 활용
+
+SD 시작/종료:
+- 게임 세션 시작 시 SD WebUI 자동 확인 (guides/process.txt 참조)
+- sd_illustration이 true이면 SD가 동작 중이어야 한다
+- SD 미실행 시 Skia 플레이스홀더가 최종 이미지로 유지 — 게임 진행에 영향 없음
+
+SD 일러스트 연동 시스템 (sd_generator.py)
+===
+
+SD ON/OFF 토글:
+- current_session.json의 sd_illustration 값으로 제어
+- 웹 UI의 토글 버튼 또는 /api/illustration/toggle API로 전환 가능
+
+sd_generator.py 동작:
+- 비동기 스레드로 SD WebUI API 호출 (request_illustration)
+- 모델 자동 확인: dreamshaper_8이 아니면 자동 전환
+- 생성 중 상태 추적: _scene_state["generating"]["status"] (idle/generating/error)
+- 스레드 안전: threading.Lock으로 scene_state 보호
+
+레이어 시스템
+===
+비주얼노벨 스타일 레이어 구조:
+  [배경 이미지 - 전체]
+    +-- [캐릭터 portrait - left/center/right]
+    +-- [오브젝트 - 위치 지정]
+
+- 배경 생성 시 기존 레이어 자동 클리어
+- remove_layer("이름")으로 특정 레이어 제거
+- clear_scene으로 전체 초기화
+
+생성 사이즈:
+| 타입                       | 사이즈   |
+| 배경 (background/scene)    | 768x512  |
+| 초상화 (portrait)          | 384x512  |
+| 오브젝트 (object)          | 256x256  |
+
+SD 파라미터
+===
+- 모델: dreamshaper_8.safetensors
+- 샘플러: DPM++ 2M Karras
+- 스텝: 20, CFG Scale: 7
+- 네거티브: lowres, bad anatomy, bad hands, text, watermark, worst quality, low quality
+
+gm-update 일러스트 payload
+===
+
+배경 생성:
+  {"illustration": {"type": "background", "prompt": "..."}}
+
+캐릭터 초상화 배치:
+  {"illustration": {"type": "portrait", "prompt": "...", "position": "left", "name": "사이키"}}
+
+오브젝트 배치:
+  {"illustration": {"type": "object", "prompt": "...", "position": "center-bottom", "name": "보물상자"}}
+
+특정 레이어 제거:
+  {"remove_layer": "오크"}
+
+전체 장면 초기화:
+  {"clear_scene": true}
+
+Skia 플레이스홀더 (SD OFF 시)
+===
+- map_generator.py 기반 Skia/Pillow 코드 생성
+- 그라디언트, 베지어, 안티앨리어싱
+- 배경: static/illustrations/pixel/ (forest.png, dungeon.png, treasure.png)
+- 초상화: static/portraits/pixel/ (player_1.png ~ player_3.png)
+
+세계 지도 생성 규칙
+===
+
+배경 이미지 생성:
+  자연 데이터(terrain)를 기반으로 항상 두 가지 배경을 생성한다:
+  1. Skia 백지도 (즉시) → background_skia.webp
+  2. 색 블롭 가이드 → SD img2img → background_sd.webp (백그라운드)
+
+배경 표시 우선순위:
+  1순위: custom/background.webp — 사용자가 첨부한 백지도 (있으면 무조건 사용)
+  2순위: background_sd.webp — SD 보정 배경 (sd_illustration=true일 때)
+  3순위: background_skia.webp — Skia 폴백 (sd_illustration=false이거나 SD 미생성 시)
+
+자연 데이터 생성:
+  [사용자 이미지 제공 시]
+    사용자 백지도 → terrain_extractor가 자동 추출 → worldbuilding.json terrain 반영
+  [사용자 이미지 없음 — 새 시나리오/세계관]
+    세계관 에이전트: 지형 설계 (대륙 형태, 기후, 식생 컨셉)
+    세계 지도 에이전트: 좌표 배치 + 지리 검증 (해안선, 산맥, 강 흐름)
+    → worldbuilding.json terrain 섹션에 저장
+  [권역 추가 시]
+    기존 세계 지도 참고 (인접 권역 경계, 해안선 연속)
+    neighbors 정보로 일관성 보장
+
+문명 배치 (자연 데이터 확정 후):
+  세계관 에이전트 + 세계 지도 에이전트가 지형에 맞춰 위치 배치:
+    만/하구 → 항구, 강 합류점 → 교역도시, 산맥 고개 → 요새, 비옥한 평야 → 농촌
+
+최종 지도 합성:
+  배경(위 우선순위) + 마커 오버레이(장소, 도로, 라벨, 현재 위치, 나침반, 제목, 범례)
+  → world_map.png
+
+폴더 구조 (static/maps/world/{세계관}/):
+  custom/background.webp  — 사용자 첨부 원본 (선택)
+  background_sd.webp      — SD img2img 보정 배경
+  background_skia.webp    — Skia 폴백 백지도
+  color_guide.png         — 색 블롭 가이드 (SD 입력용)
+  world_map.png           — 최종 완성 지도 (배경 + 마커)
+
+자동 생성 조건:
+  - 새 시나리오/세계관 생성 시 (전체 파이프라인)
+  - 활동 지역이 다른 나라/권역으로 변경될 때
+  - Flask 서버 시작 시 (마커만 재합성, 배경 캐시 재사용)
+  - gm-update 호출 시 (마커만 재합성)
+  - /api/world-map/regenerate (전체 강제 재실행)
+
+캐시 정책:
+  - 사용자 이미지, SD 배경, Skia 배경은 캐시 보존
+  - terrain 변경 시에만 색 가이드 + Skia 재생성
+  - 마커 변경 시에만 world_map.png 재합성
+  - 세계관 전환 시 기존 캐시 보존 (폴더가 다름)
+
+세계 지도 후처리 (SD 기준 지형 보정)
+===
+
+세계 지도 전체 워크플로우:
+  [1] 지형 데이터(worldbuilding.json terrain.features) 작성 또는 수정
+  [2] SD 백지도 생성 (generate_world_map 또는 SD WebUI)
+  [3] SD 기준 지형 보정 (SD 결과물 육안 확인 → 지형 좌표 미세 조정)
+  [4] 오버레이 맵(world_map.png) 재생성
+  [5] 최종 검토 — 세계관 + 세계지도 에이전트 병렬 검토
+  [6] GM 통합 판단 + 수정
+  [7] 데이터 검증 (모순 확인)
+  [8] 최종 확정 + docs/ 동기화
+
+왜 필요한가:
+  - SD는 프롬프트와 지형 데이터를 기반으로 배경을 생성하지만, 좌표를 정확히 반영하지 못한다
+  - 생성된 SD 이미지가 "실제 지도"이고, 지형 데이터는 이에 맞춰 보정해야 한다
+  - 보정하지 않으면 world_map.png 오버레이(장소 마커, 지형 색상)와 SD 배경이 어긋난다
+
+보정 대상:
+  - 산맥(mountain) 좌표 범위
+  - 숲(forest) 좌표 범위
+  - 평원(plains) 좌표 범위
+  - 강(river) 경로
+  - 해안선(coastline) 경로
+  - 바다(sea) 좌표 범위
+
+보정 방법:
+  - background_sd.webp를 Read 툴로 열어 시각적으로 확인한다
+  - SD 이미지의 색상 영역(갈색=산, 녹색=숲, 밝은색=평원, 파란색=바다)과 현재 좌표를 대조한다
+  - 좌표를 SD 이미지에 맞게 조정한다
+  - 장소(locations) 데이터는 변경하지 않는다 -- 지형만 보정
+  - 보정 후 world_map.png를 재생성하여 오버레이가 배경과 일치하는지 확인한다
+
+자동 트리거 조건:
+  - SD 백지도를 새로 생성했을 때
+  - 세계관의 지형 데이터를 대폭 수정했을 때
+  - 세션 시작 시 world_map.png 오버레이와 background_sd.webp가 어긋나 보일 때
+
+주의사항:
+  - background_sd.webp가 없거나 Skia 폴백인 경우 이 단계를 건너뛴다
+  - 보정은 지형 좌표(terrain.features)만 대상으로 한다
+  - 장소 좌표(locations.*.world_pos)는 별도 판단으로만 변경한다
+  - 두 파일(data/worldbuilding.json, worldbuildings/*.json)을 항상 동일하게 유지한다
+
+세계 지도 최종 검토 (에이전트 검증)
+===
+세계 지도를 생성하거나 수정한 후, 반드시 세계관 에이전트와 세계지도 에이전트가 최종 검토한다.
+GM이 검토 결과를 통합 판단하여 수정 여부를 결정한다.
+
+트리거 조건:
+- 세계 지도를 새로 생성했을 때
+- 장소 좌표(world_pos)를 변경했을 때
+- 연결(connections) 거리/방향을 변경했을 때
+- 지형 데이터(terrain.features)를 대폭 수정했을 때
+- SD 기준 지형 보정을 수행한 후
+
+검토 프로세스:
+  [1] Agent [세계관] 검토 (병렬)
+    - 장소 배치의 지리적 합리성 (도시는 평원, 마을은 숲, 항구는 해안)
+    - 연결/경로의 논리성 (우회로 이유, 교역로 이름과 실제 경로 일치)
+    - 거리의 합리성 (좌표 직선거리보다 짧은 경로거리는 물리적 불가)
+    - 지형과 설정의 모순 여부
+    - 전체 지리가 서사적으로 일관된지
+
+  [2] Agent [세계 지도] 검토 (병렬)
+    - 좌표와 지형 타입 일치 (항구가 바다 위가 아닌 해안 위인지)
+    - 지형 오버레이와 SD 배경의 정합성
+    - 강 흐름 방향 (고지대→바다)
+    - 해안선 경로와 SD 이미지 일치
+    - 연결 방향 라벨과 실제 좌표 방향 일치
+    - 거리와 좌표 간 스케일 일관성
+    - 라벨 가독성
+
+  [3] GM 통합 판단
+    - 두 에이전트의 검토 결과를 수집한다
+    - 게임 진행 상황, 기존 나레이션, 시나리오 흐름을 고려한다
+    - 각 이슈에 대해 수정/보류/무시를 결정한다
+    - 수정이 기존 이벤트 로그와 모순되면 로그도 함께 수정한다
+    - 최종 수정 후 world_map.png를 재생성하여 결과를 확인한다
+
+  [4] 수정 적용 후 데이터 검증 (모순 확인)
+    GM이 수정을 적용한 후, 자동/수동 검증으로 새로운 모순이 없는지 확인한다.
+    - session_validator.py 실행 — 게임 상태, NPC, 세이브 정합성 자동 검증
+    - 좌표 데이터와 최종 렌더링 이미지(world_map.png)를 시각적으로 대조
+      - 마커가 올바른 지형 위에 있는지 (항구가 바다 위가 아닌 해안 위)
+      - 강이 산에서 바다까지 끊김 없이 연결되는지
+      - 지형 오버레이 색상이 SD 배경과 어긋나지 않는지
+    - 수정으로 영향받은 연결(connections) 거리/방향 재확인
+    - 이벤트 로그에 수정 전 데이터와 모순되는 내용이 없는지 확인
+    - 문제 발견 시 → [3]으로 돌아가 재수정
+    - 문제 없으면 → [5]로 진행
+
+  [5] 최종 확정
+    - world_map.png 재생성 + docs/ 동기화
+    - git commit
+    - 검증 완료 기록
+
+검토 출력 형식:
+  각 에이전트는 이슈를 심각도(HIGH/MEDIUM/LOW)로 분류하여 보고한다.
+  - HIGH: 물리적 불가능 또는 명백한 모순 — 반드시 수정
+  - MEDIUM: 정합성 부족 또는 설정 보강 필요 — GM 판단으로 수정 권장
+  - LOW: 미세 조정 또는 시각적 개선 — 후순위
+
+주의사항:
+- 에이전트 검토 결과를 그대로 적용하지 않는다 — GM이 전체 맥락에서 통합 판단한다
+- 검토 없이 월드맵을 확정하지 않는다
+- 검토 결과 수정이 발생하면 맵 재생성 + docs 동기화까지 완료해야 한다
+
+AnimateDiff
+===
+- 모션 모듈: extensions/sd-webui-animatediff/model/mm_sd_v15_v2.ckpt (1.7GB)
+- WebP 직접 출력 지원: format: ["WEBP"]
+- 8GB VRAM에서 8~12프레임 생성 가능
+
+시나리오 사전 생성 이미지
+===
+시나리오 Agent가 시나리오를 생성하면, 전체 스토리를 기반으로 필요한 모든 이미지를 사전 생성한다.
+게임 중 실시간 생성 대기 없이 즉시 표시 가능. 포맷은 WebP.
+
+사전 생성 대상:
+| 분류              | 파일명 규칙                    | 크기    | 배경 |
+| 챕터 배경         | background_{name}.webp         | 896x512 | 있음 |
+| 장소/이벤트 배경  | background_{name}.webp         | 896x512 | 있음 |
+| NPC/몬스터        | portrait_{name}.webp           | 384x512 | 투명 |
+| 플레이어 캐릭터   | portrait_{name}.webp           | 384x512 | 투명 |
+| 오브젝트          | object_{name}.webp             | 256x256 | 투명 |
+
+인물/오브젝트 투명 배경 규칙:
+- 인물과 오브젝트는 배경 없이(투명) 생성한다 -> 어떤 배경 위에든 합성 가능
+- SD 생성 후 transparent-background 라이브러리로 자동 배경 제거
+- negative prompt에 자동으로 "detailed background, scenery, landscape" 추가됨
+- 프롬프트에 "simple background, solid color background" 포함 권장
+
+시나리오 이미지 생성 절차:
+1. 시나리오 Agent가 scenario.json 생성 시 전체 스토리 파악
+2. 필요한 이미지 목록 추출: 모든 챕터 배경, 등장 NPC, 주요 오브젝트, 주요 장소
+3. 각 항목에 대한 영문 프롬프트 작성
+4. SD API로 순차 생성 (VRAM 제약으로 동시 생성 금지)
+5. 품질 확인 -> 문제 시 프롬프트 개선 후 재생성
+6. static/illustrations/sd/ 및 static/portraits/sd/에 저장
+7. git commit + push (docs/ 자동 동기화)
+
+기본 배경 자동 표시:
+- 웹 UI는 현재 챕터에 맞는 배경을 자동 표시한다
+- 우선순위: GM 요청 장면 > SD 사전 생성 배경 > Skia 폴백 배경
+- SD OFF 시에도 Skia 배경이 항상 표시된다 (빈 화면 없음)
+- app.py의 /api/illustration 엔드포인트가 default_bg (sd/pixel 경로)를 제공
+
+일러스트 생성 기준
+===
+- 비중 없는 NPC/생물체(짐말, 배경 동물 등)는 일러스트를 생성하지 않는다
+- 유저가 명시적으로 요청한 경우에만 생성
+- 일러스트 이미지는 원본 크기를 사용한다 — 미리 축소하지 않음
+- 웹에서 CSS로 적절히 표시 (max-width/max-height로 제어)
+
+NPC 초상화 생성 시 필수 사항
+===
+- SD로 NPC 초상화 생성 시 반드시 entities/{scenario_id}/npcs/npc_{id}.json의 appearance 필드를 참조
+- appearance의 age, build, skin, hair, face, outfit, notable을 영문 프롬프트에 반영
+- race 필드도 반드시 반영 (인간/엘프/오크 등)
+- 세계관 설정(중세 판타지)에 맞는 의상/소품 사용 — 현대풍 금지
+- 생성 후 외형이 엔티티 설정과 일치하는지 확인 필수
+
+초상화/오브젝트 자동 프롬프트 생성
+===
+- request_illustration(type="portrait", prompt="", name="이름") 호출 시 prompt가 비어 있으면 자동 생성
+- 오브젝트(type="object")도 동일하게 적용
+- 동작 방식:
+  1. entities/{scenario_id}/npcs/ 및 players/ 디렉토리에서 name이 일치하는 엔티티 JSON 검색
+  2. 찾으면 race + appearance 필드를 영문 SD 프롬프트로 변환 (_appearance_to_prompt)
+  3. race는 한국어→영어 매핑 테이블 사용 (인간→human, 엘프→elf, 말→horse 등)
+  4. appearance의 age, build, skin, hair, face, outfit, notable을 순서대로 프롬프트에 추가
+  5. 스타일 키워드 자동 추가: fantasy, semi-realistic, upper body portrait, simple background, masterpiece, best quality
+  6. 엔티티를 찾지 못하면 "fantasy character portrait, {name}, simple background, masterpiece"로 폴백
+- prompt가 명시적으로 제공된 경우 자동 생성을 건너뛰고 제공된 prompt를 그대로 사용
+- 이 기능으로 빈 프롬프트로 초상화 요청 시에도 캐릭터 설정에 맞는 이미지가 생성된다
+
+캐릭터 외형 일관성 규칙
+===
+- 동일 인물은 항상 같은 외형(얼굴, 체형, 의상, 머리색)을 유지해야 한다
+- 캐릭터별 기준 이미지(reference)를 static/portraits/sd/ 또는 static/portraits/pixel/에 저장
+- 새 장면에서 같은 캐릭터가 등장할 때 기존 이미지를 재활용한다
+- 외형이 변경되는 경우(장비 변경, 부상 등)에만 새 이미지를 생성
+- 동작/포즈만 바꿔야 할 경우: img2img로 기존 이미지를 기반으로 변형
+- 레이어 초상화는 반드시 투명 배경 -- 배경이 있는 초상화는 메인 배경을 가림
+- SD 생성 시 transparent-background 라이브러리로 자동 배경 제거
+- 배경 제거 실패 시 로그 경고 + 그대로 저장 (수동 확인 필요)
+
+캐릭터 이미지 파일 규칙:
+| 용도              | 경로             | 이름 규칙                          | 배경      |
+| 기준 이미지(정면) | portraits/sd/    | portrait_{name}.webp               | 투명      |
+| 동작 변형         | portraits/sd/    | portrait_{name}_{action}.webp      | 투명      |
+| 프로필 카드용     | portraits/pixel/ | player_{id}.png                    | 원형 마스크|
+
+예시:
+- portrait_할란.webp (기본 -- 정면)
+- portrait_할란_injured.webp (부상 상태)
+- portrait_미라.webp (기본)
+- portrait_미라_angry.webp (화난 표정)
+
+이모지 렌더링 규칙
+===
+- 맵 PNG 이미지에서 사용하는 이모지는 Windows seguiemj.ttf 호환이어야 한다
+- map_generator.py의 safe_emoji() 함수가 자동으로 미지원 이모지를 폴백 처리
+- 미지원 판정 기준: 30x30px 렌더링 시 alpha 채널 픽셀 < 150개 (컬러 글리프 없음)
+- 새 이모지 추가 시 반드시 safe_emoji()를 거쳐야 한다
+- 폴백 매핑: EMOJI_FALLBACK 딕셔너리에 등록
+- HTML 웹 UI에서는 브라우저가 렌더링하므로 이 제한 없음 (PNG 맵 전용)
+- 오브젝트 엔티티 JSON의 icon 필드는 원본 이모지 유지 가능 — 렌더링 시 safe_emoji가 처리
+
+이미지 품질 관리
+===
+- 생성 후 품질 확인 필수: 흐릿함(blurry), 초점 이탈(out of focus), 왜곡(deformed) 체크
+- 문제 있는 이미지는 프롬프트 개선 후 재생성
+- 프롬프트 개선 팁:
+  - 흐릿한 결과: negative에 "blurry, out of focus, bokeh, depth of field" 추가
+  - 손/신체 왜곡: negative에 "bad hands, bad anatomy, deformed, extra fingers" 추가
+  - 초점 안 맞음: prompt에 "sharp focus, 4k" 추가
+  - 배경에 인물 포함됨: negative에 "people, characters, person" 추가

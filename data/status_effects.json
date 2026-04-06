@@ -1,82 +1,277 @@
 {
-  "description": "상태이상 데이터베이스. 전투/탐험 중 적용되는 모든 상태 효과 정의.",
+  "description": "Status effects database. Combat and environmental effects.",
   "effects": {
-    "중독": {
+    "poison": {
       "type": "debuff",
       "damage_per_turn": 2,
       "duration": 3,
-      "cure": ["해독제", "힐"],
-      "desc": "턴마다 2 피해. 3턴 지속. 힐 또는 해독제로 치료.",
+      "cure": [
+        "antidote",
+        "heal"
+      ],
+      "desc": "2 damage per turn. Lasts 3 turns. Cured by Heal or Antidote.",
       "icon": "🟢"
     },
-    "방어 강화": {
+    "defense_up": {
       "type": "buff",
       "defense_bonus": 4,
       "duration": 1,
-      "desc": "방어력 +4. 1턴 지속.",
+      "desc": "DEF +4. Lasts 1 turn.",
       "icon": "🛡️"
     },
-    "기절": {
+    "stun": {
       "type": "debuff",
       "skip_turn": true,
       "duration": 1,
-      "desc": "행동 불가. 1턴 지속.",
+      "desc": "Cannot act. Lasts 1 turn.",
       "icon": "💫"
     },
-    "은신": {
+    "stealth": {
       "type": "buff",
       "next_attack_auto_hit": true,
       "bonus_damage": 4,
       "duration": -1,
       "end_on": "attack",
-      "desc": "다음 공격 시 자동 명중 + 추가 피해 4. 공격하면 해제.",
+      "desc": "Auto-hit on next attack + 4 bonus damage. Removed on attack.",
       "icon": "👤"
     },
-    "출혈": {
+    "bleed": {
       "type": "debuff",
       "damage_per_turn": 3,
       "duration": 2,
-      "cure": ["붕대", "힐"],
-      "desc": "턴마다 3 피해. 2턴 지속.",
+      "cure": [
+        "bandage",
+        "heal"
+      ],
+      "desc": "3 damage per turn. Lasts 2 turns.",
       "icon": "🩸"
     },
-    "화상": {
+    "burn": {
       "type": "debuff",
       "damage_per_turn": 2,
       "duration": 2,
       "defense_penalty": -2,
-      "desc": "턴마다 2 피해 + 방어력 -2. 2턴 지속.",
+      "desc": "2 damage per turn + DEF -2. Lasts 2 turns.",
       "icon": "🔥"
     },
-    "독 무기": {
+    "poison_weapon": {
       "type": "buff",
       "bonus_poison_damage": 2,
       "duration": 3,
       "target": "self_weapon",
-      "desc": "3턴간 공격 시 추가 독 피해 2. 독 바르기 스킬로 적용.",
+      "desc": "+2 poison damage on attacks for 3 turns. Applied via Poison Apply skill.",
       "icon": "🗡️"
     },
-    "마나 쉴드": {
+    "mana_shield": {
       "type": "buff",
       "absorb_damage": "INT_modifier * 2",
       "duration": 3,
-      "desc": "3턴간 피해를 INT보정*2만큼 흡수.",
+      "desc": "Absorbs damage equal to INT modifier*2 for 3 turns.",
       "icon": "🔮"
     },
-    "공포": {
+    "fear": {
       "type": "debuff",
       "attack_penalty": -2,
       "flee_bonus": 2,
       "duration": 2,
-      "desc": "공격 판정 -2, 도주 판정 +2. 2턴 지속.",
+      "desc": "Attack check -2, Flee check +2. Lasts 2 turns.",
       "icon": "😱"
     },
-    "축복": {
+    "blessing": {
       "type": "buff",
       "all_bonus": 1,
       "duration": 3,
-      "desc": "모든 판정 +1. 3턴 지속.",
+      "desc": "+1 to all checks. Lasts 3 turns.",
       "icon": "✨"
+    },
+    "wet": {
+      "type": "env_debuff",
+      "duration": 3,
+      "vulnerability": {
+        "electric": 1.5,
+        "cold": 1.5
+      },
+      "resistance": {
+        "fire": 0.5
+      },
+      "cure": [
+        "fire_exposure",
+        "natural_dry"
+      ],
+      "desc": "Wet. Electric/Cold damage +50%, Fire damage -50%. 3 turns or fire exposure.",
+      "icon": "💧"
+    },
+    "burning": {
+      "type": "env_debuff",
+      "damage_per_turn": "1d4",
+      "damage_element": "fire",
+      "duration": 3,
+      "cure": [
+        "water",
+        "wet",
+        "roll_ground_DEX_10"
+      ],
+      "removes": [
+        "wet",
+        "oiled"
+      ],
+      "desc": "Burning. 1d4 fire damage per turn. Removed by water or rolling (DEX DC 10).",
+      "icon": "🔥"
+    },
+    "oiled": {
+      "type": "env_debuff",
+      "duration": -1,
+      "vulnerability": {
+        "fire": 2.0
+      },
+      "on_fire_hit": "burning",
+      "cure": [
+        "water",
+        "washing"
+      ],
+      "desc": "Oiled. Fire damage +100%. Ignites on fire hit.",
+      "icon": "🛢️"
+    },
+    "frozen": {
+      "type": "env_debuff",
+      "duration": 2,
+      "immobilize": true,
+      "vulnerability": {
+        "fire": 1.5
+      },
+      "melee_bonus_against": 2,
+      "cure": [
+        "fire_exposure"
+      ],
+      "desc": "Frozen. Cannot move. Fire damage +50%. Melee attacks against: +2 hit.",
+      "icon": "🧊"
+    },
+    "prone": {
+      "type": "env_debuff",
+      "duration": 1,
+      "melee_bonus_against": 2,
+      "ranged_penalty_against": -2,
+      "stand_cost": "half_movement",
+      "desc": "Prone. Melee attacks against: +2. Ranged: -2. Stand up costs half movement.",
+      "icon": "⬇️"
+    },
+    "electrified": {
+      "type": "env_debuff",
+      "duration": 1,
+      "damage": "1d6",
+      "damage_element": "electric",
+      "wet_multiplier": 2,
+      "stun_check": {
+        "stat": "CON",
+        "dc": 13
+      },
+      "desc": "Electrified. 1d6 electric damage. Double if wet. CON DC 13 or stunned.",
+      "icon": "⚡"
+    },
+    "poisoned": {
+      "type": "env_debuff",
+      "damage_per_turn": "1d4",
+      "damage_element": "poison",
+      "duration": 3,
+      "all_penalty": -2,
+      "cure": [
+        "antidote",
+        "cure_spell"
+      ],
+      "disperse": [
+        "fire"
+      ],
+      "dilute": [
+        "water"
+      ],
+      "desc": "Poisoned. 1d4 poison damage per turn. -2 to all checks. Dispersed by fire, diluted by water.",
+      "icon": "☠️"
+    },
+    "infected": {
+      "type": "env_debuff",
+      "duration": 3,
+      "evolves_to": "diseased",
+      "cure": [
+        "disinfect",
+        "alcohol",
+        "herb_treatment",
+        "cure_spell"
+      ],
+      "desc": "Infected. No direct damage. Evolves to diseased after 3 turns if untreated.",
+      "icon": "🦠"
+    },
+    "diseased": {
+      "type": "env_debuff",
+      "damage_per_turn": 1,
+      "duration": 10,
+      "all_penalty": -1,
+      "cure": [
+        "cure_spell",
+        "herb_treatment",
+        "temple"
+      ],
+      "desc": "Diseased. 1 damage per turn. -1 to all stats. 10 turns. Cure: magic, herbs, temple.",
+      "icon": "🤒"
+    },
+    "cursed": {
+      "type": "env_debuff",
+      "duration": -1,
+      "all_penalty": -2,
+      "luck_disadvantage": true,
+      "cure": [
+        "dispel_curse",
+        "temple",
+        "special_item"
+      ],
+      "desc": "Cursed. -2 to all stats. Luck checks at disadvantage. Lasts until dispelled.",
+      "icon": "💀"
+    },
+    "madness": {
+      "type": "env_debuff",
+      "duration": 3,
+      "random_action": true,
+      "can_attack_ally": true,
+      "ai_override": true,
+      "cure": [
+        "sedative",
+        "sleep",
+        "cure_spell"
+      ],
+      "desc": "Madness. Random actions each turn (may attack allies). AI takes control. 3 turns.",
+      "icon": "🌀"
+    },
+    "blinded": {
+      "type": "env_debuff",
+      "duration": 3,
+      "attack_penalty": -5,
+      "dodge_penalty": -3,
+      "move_check": {
+        "stat": "DEX",
+        "dc": 10,
+        "fail": "prone"
+      },
+      "cure": [
+        "cure_spell",
+        "natural_recovery_3"
+      ],
+      "desc": "Blinded. Attack -5, Dodge -3. DEX DC 10 to move or fall prone. 3 turns or cure.",
+      "icon": "🕶️"
+    },
+    "petrified": {
+      "type": "env_debuff",
+      "duration": -1,
+      "immobilize": true,
+      "skip_turn": true,
+      "defense_bonus": 10,
+      "vulnerability": {
+        "physical_shatter": true
+      },
+      "cure": [
+        "depetrify_spell",
+        "special_potion"
+      ],
+      "desc": "Petrified. Cannot act. Defense +10. Risk of shattering from physical damage. Lasts until cured.",
+      "icon": "🗿"
     }
   }
 }

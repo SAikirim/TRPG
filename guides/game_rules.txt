@@ -1,0 +1,148 @@
+Game Rules Detail (In-Game Mechanics)
+===
+
+For GM operational rules (narration, agents, turn processing), see guides/gm_rules.txt
+
+Dice Mechanics
+===
+
+[Dice Types and Usage]
+- Ability checks: 1d20 + modifier vs DC
+- Damage rolls: Weapon/spell specific (e.g., 1d8 + STR for longsword)
+- Saving throws: 1d20 + stat modifier vs DC
+
+[Difficulty Class (DC) Guidelines]
+- DC 5: Trivial (almost anyone can do it)
+- DC 10: Easy (slight challenge)
+- DC 13: Moderate (average difficulty)
+- DC 15: Hard (requires skill)
+- DC 18: Very Hard (expert level)
+- DC 20: Near Impossible (legendary feat)
+- Detailed values: see data/rules.json
+
+[Critical and Fumble]
+- Critical (Natural 20): Automatic success. Double damage dice on attacks.
+- Fumble (Natural 1): Automatic failure. May trigger negative side effects (weapon drop, self-injury, spell backfire — GM discretion).
+
+[Display Formats]
+- Public Mode (show_dice_result: true):
+  - Show all values: 1d20 → [15] + INT(+4) = 19 vs DC 16 → 성공!
+  - Damage: 1d8 → [6] + INT(+4) = 10 damage
+  - Critical: 1d20 → [20] / Fumble: 1d20 → [1]
+- Private Mode (show_dice_result: false):
+  - Do not expose numerical values in narration — convey results through description only
+  - Only criticals/fumbles are indicated separately
+- Narration order: Situation description → Dice roll display (if public) → Continue narration with result
+
+[Inline Dice Indicator — Mandatory]
+Every check must include an inline indicator in the narration. Details: See guides/gm_rules.txt "Inline Dice Display in Narration" section.
+
+Tactical Cover Rules
+===
+- When declaring "hide/take cover" on a tile adjacent to an object, a cover bonus is applied
+- Cover bonus applies only to ranged attacks (not melee attacks)
+- Cover is only valid when cover object is between the attacker and defender
+- Use get_cover_at(position, state) to query available cover objects
+- Use apply_cover(attacker_pos, defender_pos, state) to calculate cover bonus
+- Use damage_object(obj_name, damage, state) to destroy objects
+- Flammable objects take extra damage from fire attacks + are destroyed
+- Explosive objects (oil barrels) deal area damage to surroundings when destroyed
+- Agent [Rule Judge] automatically checks cover during combat
+
+Fall Damage Rules
+===
+- Falling from height: 1d6 bludgeoning damage per 3 meters fallen
+- Maximum: 20d6 (60m fall cap)
+- DEX saving throw may halve damage (DC = 10 + 1 per 3m fallen)
+- Landing on soft surfaces (water, hay, snow) reduces damage by half
+- Feather Fall or similar effects negate fall damage entirely
+- Detailed values: see data/rules.json
+
+Object Stacking Rules
+===
+- Entities (players, NPCs, monsters) cannot stack on the same tile
+- Movement into an occupied tile is blocked — the entity must choose an adjacent tile
+- Exception: Allied entities may pass through (but not end turn on) an occupied tile
+- Objects (items, furniture, terrain features) can coexist on the same tile as entities
+- Large creatures (2x2 or larger) occupy multiple tiles — all occupied tiles are blocked
+
+Environmental Hazard Rules
+===
+Tiles may have environmental effects that trigger when an entity enters or starts their turn on them.
+
+[Fire Tiles]
+- 1d6 fire damage per turn while on the tile
+- Flammable equipment/items may catch fire (DEX save DC 12 to avoid)
+- Fire spreads to adjacent flammable tiles at end of round
+- Extinguished by water, ice magic, or smothering actions
+
+[Poison Gas]
+- 1d4 poison damage per turn while in the area
+- CON saving throw DC 13 at start of each turn to halve damage
+- May inflict "Poisoned" status on failed save (disadvantage on attacks/checks)
+- Dissipates after 1d4+1 rounds unless source is continuous
+- Wind or air magic can clear gas immediately
+
+[Slippery/Ice Tiles]
+- DEX saving throw DC 12 when entering or moving through
+- Failure: fall prone (lose remaining movement, attacks against have advantage)
+- Movement cost doubled on ice tiles
+
+[Darkness/Magical Darkness]
+- Blocks normal vision — attacks have disadvantage, perception checks at -5
+- Darkvision reduces penalty (treat as dim light)
+- Magical darkness: even darkvision fails, only truesight or dispel works
+
+[Difficult Terrain]
+- Movement cost doubled (1 tile costs 2 tiles of movement)
+- Examples: rubble, thick vegetation, shallow water, steep slopes
+- Detailed values: see data/rules.json
+
+Line of Sight Rules
+===
+Line of sight (LoS) determines whether a character can see or target another entity.
+
+[Basic Principle]
+- Draw a straight line from attacker center to target center
+- If the line passes through a solid obstacle (wall, large object), LoS is blocked
+- Partial obstruction (half-wall, narrow pillar) grants cover but does not block LoS
+
+[Ranged Attack Requirements]
+- Ranged attacks require clear LoS to the target
+- Melee attacks do not require LoS (adjacent tile only)
+- Spells with "target you can see" require LoS
+
+[Elevation]
+- Higher ground grants LoS advantage (can see over low obstacles)
+- Lower ground may have LoS blocked by terrain features
+- Elevation difference of 3m+ grants +2 bonus to ranged attacks (high ground advantage)
+
+[Darkness and Visibility]
+- Dim light: LoS intact but perception checks at disadvantage
+- Darkness: LoS blocked for creatures without darkvision
+- Fog/smoke: LoS blocked beyond 2 tiles (heavy) or grants concealment (light)
+
+Carry Weight / Encumbrance (Optional)
+===
+Lightweight reference system. Only enforced when the GM enables encumbrance tracking.
+
+[Weight Capacity]
+- Base carry capacity: STR x 5 kg
+- Encumbered (over 60% capacity): Movement speed -1 tile
+- Heavily encumbered (over 80% capacity): Movement speed -2 tiles, disadvantage on DEX checks
+- Over capacity (100%+): Cannot move, disadvantage on all physical checks
+
+[Common Item Weights]
+- Light weapon (dagger, wand): ~0.5 kg
+- Medium weapon (longsword, staff): ~1.5 kg
+- Heavy weapon (greatsword, halberd): ~3 kg
+- Light armor: ~5 kg
+- Medium armor: ~10 kg
+- Heavy armor: ~20 kg
+- Potion/scroll: ~0.2 kg
+- Coins (100): ~1 kg
+
+[Simplification]
+- By default, encumbrance is not tracked unless the scenario calls for it
+- GM may enable encumbrance for survival/exploration-heavy scenarios
+- Detailed values: see data/rules.json

@@ -1,137 +1,148 @@
-시나리오/룰셋 상세
+Scenario/Ruleset Details
 ===
 
-새 시나리오 추가
+Adding a New Scenario
 ===
-1. scenarios/ 에 {scenario_id}.json 파일 생성
-2. scenarios/index.json 에 메타데이터 등록
-3. entities/{scenario_id}/ 디렉토리 생성 후 npcs/players/objects/ 파일 작성
-4. 게임 시작 시 game_state.json 에 scenario_id 지정
+1. World Design (World Map First):
+   - Create a worldbuilding file in worldbuildings/ (terrain + locations + world_pos)
+   - Generate a world map (conditions/methods → see guides/illustration.txt "World Map Generation Rules")
+   - Finalize region/terrain placement before starting scenario work
+2. Create a {scenario_id}.json file in scenarios/
+3. Register metadata in scenarios/index.json (include worldbuilding and ruleset fields)
+4. Create entities/{scenario_id}/ directory and write npcs/players/objects/ files
+5. Specify scenario_id in game_state.json when starting the game
 
-새 룰셋 추가
+Adding a New Ruleset
 ===
-1. rulesets/ 에 {ruleset_id}.json 파일 생성 (fantasy_basic.json 참고)
-2. rulesets/index.json 에 등록
-3. scenario.json 의 ruleset 필드에서 참조
+1. Create a {ruleset_id}.json file in rulesets/ (refer to fantasy_basic.json)
+2. Register it in rulesets/index.json
+3. Reference it from the ruleset field in scenario.json
 
-시나리오 구성 요소
+Scenario Components
 ===
 {
   "scenario_info": {
-    "title": "시나리오 제목",
-    "description": "시나리오 한줄 설명",
+    "title": "Scenario Title",
+    "description": "One-line scenario description",
     "difficulty": "normal",
     "recommended_level": 1,
-    "prerequisite": "이전_시나리오_id 또는 null",
+    "party_size": {"min": 3, "max": 3, "recommended": 3},
+    "prerequisite": "previous_scenario_id or null",
     "prerequisite_required": false,
-    "backstory": "시나리오 배경 설명 (새 게임 시작 시 표시)"
+    "backstory": "Scenario background description (displayed when starting a new game)"
   },
   "opening": {
-    "continue": "이어하기 시 표시할 설명 (선행 시나리오가 있는 경우에만)",
-    "new_game": "새 게임 시작 시 표시할 설명",
-    "narrative": "오프닝 나레이션"
+    "continue": "Description displayed when continuing (only if a prerequisite scenario exists)",
+    "new_game": "Description displayed when starting a new game",
+    "narrative": "Opening narration"
   },
   "default_party": {
-    "description": "기본 파티 설명",
+    "description": "Default party description",
     "players": [...]
   },
   "default_npcs": [...],
   "chapters": [...],
   "chapter_themes": {
-    "1": {"name": "숲", "bg_type": "forest"},
-    "2": {"name": "던전", "bg_type": "dungeon"},
-    "3": {"name": "보물실", "bg_type": "treasure"}
+    "1": {"name": "Forest", "bg_type": "forest"},
+    "2": {"name": "Dungeon", "bg_type": "dungeon"},
+    "3": {"name": "Treasure Room", "bg_type": "treasure"}
   },
   "endings": [...]
 }
 
-- chapter_themes.bg_type 값으로 배경 이미지 자동 생성 (map_generator.py 참고)
+- chapter_themes.bg_type values are used to auto-generate background images (see map_generator.py)
 
-시나리오 시작 모드
+Scenario Start Modes
 ===
-시나리오는 두 가지 모드로 시작할 수 있다.
+A scenario can be started in two modes.
 
-1. 새 게임 (new_game)
-   - default_party의 캐릭터로 시작한다.
-   - 이름이 비어있는 캐릭터는 캐릭터 메이킹 단계에서 유저가 지정한다.
-   - initial_state 파일(시나리오별 game_state 초기값)을 로드한다.
-   - opening.new_game 설명과 opening.narrative 나레이션을 표시한다.
+1. New Game (new_game)
+   - Starts with the characters from default_party.
+   - Characters with empty names are named by the user during the character creation phase.
+   - Loads the initial_state file (scenario-specific game_state initial values).
+   - Displays the opening.new_game description and opening.narrative narration.
 
-2. 이어하기 (continue)
-   - 선행 시나리오의 세이브 데이터에서 캐릭터, 인벤토리, 레벨을 그대로 가져온다.
-   - opening.continue 설명과 opening.narrative 나레이션을 표시한다.
-   - 선행 시나리오가 없는 경우 이 모드는 사용할 수 없다.
+2. Continue (continue)
+   - Carries over characters, inventory, and levels from the prerequisite scenario's save data.
+   - Displays the opening.continue description and opening.narrative narration.
+   - This mode is unavailable if there is no prerequisite scenario.
 
-prerequisite_required 필드
+prerequisite_required Field
 ===
-- false: 선행 시나리오 클리어 없이도 새 게임으로 플레이 가능하다.
-  유저에게 "새 게임" / "이어하기" 선택지를 제공한다.
-- true: 반드시 선행 시나리오를 클리어해야 플레이할 수 있다.
-  세이브 데이터에서 선행 시나리오 클리어 여부를 확인한다.
-- null 또는 prerequisite 자체가 null: 선행 시나리오가 없다. 새 게임만 가능하다.
+- false: Playable as a new game without clearing the prerequisite scenario.
+  Presents the user with "New Game" / "Continue" options.
+- true: The prerequisite scenario must be cleared before playing.
+  Checks the save data for prerequisite scenario completion.
+- null or prerequisite itself is null: No prerequisite scenario exists. Only new game is available.
 
-default_party 구조
+default_party Structure
 ===
-시나리오별 기본 파티를 정의한다. 새 게임 시작 시 사용한다.
+Defines the default party for each scenario. Used when starting a new game.
 
-각 플레이어 항목:
+Each player entry:
 {
   "id": 1,
   "name": "",
-  "class": "전사",
+  "class": "Warrior",
   "level": 1,
   "xp": 0,
   "stats": {"STR": 18, "DEX": 10, "INT": 8, "CON": 14},
   "hp_base": 25,
   "mp_base": 5,
-  "starting_inventory": ["철검", "가죽 방패"],
+  "starting_inventory": ["Iron Sword", "Leather Shield"],
   "controlled_by": "user"
 }
 
-- name이 빈 문자열이면 캐릭터 메이킹 단계에서 유저에게 이름 입력을 요청한다.
-- controlled_by: "user"인 캐릭터는 유저가 직접 조종한다. "agent"는 GM이 조종한다.
-- hp/mp 실제 값은 hp_formula / mp_formula로 계산한다 (character_classes.json 참조).
-- starting_inventory: 시나리오 시작 시 보유할 아이템 목록.
-- level/xp: 해당 시나리오의 권장 레벨에 맞춰 설정한다.
+- If name is an empty string, the user is prompted to enter a name during the character creation phase.
+- controlled_by: Characters set to "user" are controlled directly by the user. "ai" characters are controlled by the Player Agent.
+- Actual hp/mp values are calculated using hp_formula / mp_formula (see character_classes.json).
+- starting_inventory: List of items the character starts with at the beginning of the scenario.
+- level/xp: Set to match the scenario's recommended level.
 
-시나리오 인덱스 (scenarios/index.json)
+Scenario Index (scenarios/index.json)
 ===
-각 시나리오 등록 시 포함해야 하는 필드:
+Fields required when registering each scenario:
 {
   "id": "scenario_id",
-  "title": "시나리오 제목",
-  "description": "한줄 설명",
-  "genre": "판타지",
+  "title": "Scenario Title",
+  "description": "One-line description",
+  "genre": "Fantasy",
   "difficulty": "normal",
   "recommended_level": 1,
   "recommended_players": 3,
   "ruleset": "fantasy_basic",
+  "worldbuilding": "karendel_world",
   "scenario_file": "scenario.json",
   "initial_state": "game_state_initial.json",
-  "available_classes": ["전사", "마법사", "도적", "성직자", "궁수"],
-  "setting": "중세 판타지 숲 던전",
+  "available_classes": ["Warrior", "Mage", "Rogue", "Cleric", "Archer"],
+  "setting": "Medieval Fantasy Forest Dungeon",
   "estimated_turns": "20~40",
-  "tags": ["던전 탐험"],
+  "tags": ["Dungeon Exploration"],
   "standalone": true,
-  "prerequisite": "이전_시나리오_id 또는 없음",
+  "prerequisite": "previous_scenario_id or none",
   "prerequisite_required": false
 }
 
-- standalone: true이면 새 게임으로 단독 플레이 가능하다.
-- initial_state: 새 게임 시작 시 로드할 game_state 초기 파일 경로.
-- prerequisite / prerequisite_required: 시나리오 시작 모드 섹션 참조.
+- standalone: If true, the scenario can be played independently as a new game.
+- initial_state: Path to the initial game_state file loaded when starting a new game.
+- prerequisite / prerequisite_required: See the Scenario Start Modes section.
 
-게임 시작 플로우 (신규 게임)
+Game Start Flow (New Game)
 ===
-1. scenarios/index.json 에서 시나리오 선택
-2. 연결된 룰셋 (rulesets/) 확인
-3. 시작 모드 결정:
-   - prerequisite가 없으면 → 새 게임
-   - prerequisite가 있고 prerequisite_required가 false이면 → "새 게임" / "이어하기" 선택
-   - prerequisite가 있고 prerequisite_required가 true이면 → 이어하기만 가능
-4. 캐릭터 메이킹 (templates/character_classes.json 참고)
-   - 새 게임: default_party 기반. 유저가 이름, 클래스, 능력치 커스텀 가능.
-   - 이어하기: 이전 세이브에서 캐릭터 로드. 추가 설정 없음.
-5. initial_state 파일로 game_state.json 초기화
-6. entities/{scenario_id}/ 엔티티 파일 생성
-7. opening.narrative 표시 + 챕터 1 맵 표시
+1. Select a scenario from scenarios/index.json
+2. Select a ruleset:
+   - Display the ruleset list from rulesets/index.json
+   - The scenario's ruleset field is the recommended ruleset (default)
+   - If the user does not select one, the recommended ruleset is applied automatically
+   - If there is only one ruleset, it is selected automatically
+3. Determine the start mode:
+   - If no prerequisite exists → New Game
+   - If prerequisite exists and prerequisite_required is false → "New Game" / "Continue" selection
+   - If prerequisite exists and prerequisite_required is true → Continue only
+4. Character Creation (see templates/character_classes.json)
+   - New Game: Based on default_party. The user can customize names, classes, and stats.
+   - Continue: Characters loaded from the previous save. No additional setup required.
+5. Initialize game_state.json with the initial_state file
+6. Create entity files in entities/{scenario_id}/
+7. Copy active files: scenarios/ → data/scenario.json, rulesets/ → data/rules.json
+8. Display opening.narrative + show Chapter 1 map

@@ -1,0 +1,21 @@
+{
+  "id": "obj_019",
+  "name": "kitchen_table",
+  "type": "table",
+  "status": "placed",
+  "position": [19, 10],
+  "size": [2, 1],
+  "location": "red_chimney_inn_1f",
+  "description": "A kitchen worktable. Flour and utensils are scattered across the surface.",
+  "interactable": true,
+  "interaction": "Examine the kitchen table.",
+  "icon": "🍽️",
+  "tactical": {
+    "cover": "half",
+    "defense_bonus": 2,
+    "blocks_ranged": false,
+    "destructible": true,
+    "hp": 15,
+    "flammable": true
+  }
+}

@@ -1,0 +1,108 @@
+Process Management Rules
+===
+
+Required Process List
+===
+Only 2 processes are needed for game operation. Each must have only 1 instance running.
+
+| Process | Port | Run Command | Purpose |
+| Flask Server (app.py) | :5000 | SD venv Python app.py | Web UI, gm-update API |
+| SD WebUI (launch.py) | :7860 | SD venv launch.py (with options) | Image generation API |
+
+- Flask Server: Always running during gameplay (Web UI + API)
+- SD WebUI: Only run when image generation is needed. Not required as Skia fallback operates when SD is OFF
+
+Execution Paths and Commands
+===
+SD venv Python: C:\git\WebUI\stable-diffusion-webui\venv\Scripts\Python.exe
+
+Flask Server Start:
+  cd C:\git\trpg
+  C:\git\WebUI\stable-diffusion-webui\venv\Scripts\Python.exe app.py
+
+SD WebUI Start:
+  cd C:\git\WebUI\stable-diffusion-webui
+  ./venv/Scripts/Python.exe launch.py --theme dark --xformers --xformers-flash-attention --deepdanbooru --no-half-vae --api --cors-allow-origins="http://127.0.0.1:7860" --listen --enable-insecure-extension-access
+
+Convenience Script: start_server.bat (Windows)
+
+Duplicate Execution Prevention
+===
+If the same process runs more than once, port conflicts, memory waste, and state inconsistencies will occur.
+
+Pre-start verification steps:
+1. Check port occupancy with netstat -ano | grep -E ":5000 |:7860 " | grep LISTEN
+2. If already running, do not start a new instance
+3. If a restart is needed, terminate the existing process first before starting
+
+Termination method:
+  taskkill //PID <pid> //F
+
+Handling duplicate detection:
+1. Check all Python processes with wmic process where "name='python.exe'" get ProcessId,CommandLine
+2. Identify the PID occupying the actual port with netstat -ano | grep ":port " | grep LISTEN
+3. Terminate duplicate processes that are not occupying the port
+4. Keep only 1 process that occupies the port
+
+Process Status Check
+===
+| Check Target | Command |
+| Flask operation check | curl -s http://localhost:5000/api/game-state --max-time 3 |
+| SD WebUI operation check | curl -s http://127.0.0.1:7860/sdapi/v1/options --max-time 5 |
+| Port occupancy check | netstat -ano | grep -E ":5000 |:7860 " | grep LISTEN |
+| Python process list | wmic process where "name='python.exe'" get ProcessId,CommandLine |
+
+Session Start Process Check
+===
+The following must be verified when starting a game session (after running session_validator.py):
+
+1. Check Flask server operation — start if not running
+2. Check SD WebUI operation — verify if sd_illustration is true in current_session.json
+3. Check for duplicate processes — clean up if found
+
+Flask Restart Procedure
+===
+When a Flask server restart is needed after code modification:
+
+1. Check current PID with netstat -ano | grep ":5000 " | grep LISTEN
+2. Terminate with taskkill //PID <pid> //F
+3. Verify port release (netstat)
+4. Restart with SD venv Python app.py
+5. Verify operation with curl
+
+Note: In Flask's debug=True mode, a child process is spawned. Terminating the parent may also terminate the child, or conversely, the child may remain. Always verify port release before restarting.
+
+Flask Auto-Start
+===
+When game_start.py (new/continue/load) is executed and the Flask server is not running, it automatically starts in the background.
+- _start_flask_server() checks port 5000 occupancy → starts via subprocess.Popen if not running
+- Executes SD venv Python (C:\git\WebUI\...\Python.exe) + app.py as DETACHED_PROCESS
+- Waits up to 10 seconds then verifies server readiness
+- On successful start, _try_restore_scene() automatically performs scene restoration
+
+Idle Auto-Shutdown
+===
+If no game_state changes occur for 3 minutes after saving, Flask + SD WebUI are automatically shut down.
+
+How it works:
+1. Timer starts (180 seconds) when save_game_state() is called
+2. Timer resets on gm-update API calls
+3. If no state changes for 180 seconds:
+   - SD WebUI (port 7860) process is terminated
+   - Flask server shuts itself down
+4. Manual disarm: POST /api/idle-shutdown/disarm
+
+Notes:
+- The timer only activates after save_game_state() is called (does not operate before saving)
+- During gameplay (when gm-update is called), the timer resets so shutdown does not occur during play
+
+Unnecessary Processes
+===
+The following processes run only temporarily and terminate automatically after completion:
+- python session_validator.py (session validation)
+- python game_start.py (game start)
+- python build_static.py (docs sync)
+- python game_mechanics.py (resolution execution)
+- python gm_turn.py (turn tracking)
+
+If these remain as zombie processes, they must be terminated.

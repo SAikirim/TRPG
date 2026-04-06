@@ -1,0 +1,470 @@
+{
+  "scenario_id": "karendel_journey",
+  "archived_events": [
+    {
+      "turn": 0,
+      "message": "New scenario: The Road to Karendel. Traveling with merchant Hallan and Mira on the trade road.",
+      "timestamp": "scenario start",
+      "archived_at": "2026-03-25",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 2,
+      "message": "[GM] [Load] The Road to Karendel — Chapter 1: Trade Road. Traveling with merchant Hallan and Mira.",
+      "narrative": "",
+      "timestamp": "19:07:38",
+      "archived_at": "2026-03-25",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 3,
+      "message": "[GM] [Load] The Road to Karendel — Trade road, traveling with merchant Hallan/Mira.",
+      "narrative": "",
+      "timestamp": "21:31:11",
+      "archived_at": "2026-03-25",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 4,
+      "message": "[GM] [Load] The Road to Karendel — Trade road, traveling with merchant Hallan/Mira.",
+      "narrative": "",
+      "timestamp": "21:54:38",
+      "archived_at": "2026-03-25",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 5,
+      "message": "[GM] Departure preparations complete. Cart repaired. Hallan's leg injury slows travel speed.",
+      "narrative": "The cart wheel repair was finished. Hallan limped onto the cart. Mira organized the luggage and looked at the party. \"We can leave now. About a day to Karendel... it'll be a bit slow because of father's leg.\" The road continues east along the trade route. The sun is still high.",
+      "timestamp": "22:26:04",
+      "archived_at": "2026-03-25",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 6,
+      "message": "[GM] Departure preparation. Saiki suggests to Noel to pick up items dropped on the ground. Hallan and Mira react.",
+      "narrative": "Hallan turned from the cart. \"That stuff? Got trampled by wolves, so it's worthless as merchandise. Take it if you want.\" He paused, then added, \"...The actually useful stuff is already on the cart. Thanks for the help.\" Mira rummaged through her bag and pulled out a small vial, handing it to Noel. \"I brought this to treat father, but there's one left. It's a thank-you for your help.\" Noel nodded as he took the vial. Scattered on the ground were torn cloth scraps, broken pottery shards, and a few handfuls of crushed dried fruit. Hardly anything useful, but as Noel searched thoroughly, he found a coil of rope and a flint.",
+      "timestamp": "22:36:53",
+      "archived_at": "2026-03-25",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 13,
+      "message": "[GM] The party boards the cart and departs along the trade road toward Karendel.",
+      "narrative": "Hallan took the reins and climbed onto the cart. He carefully folded his injured left leg and settled in, then patted the pack horse's back once. The horse snorted and began plodding forward.\n\nMira organized the luggage from the back of the cart and said cheerfully,\n\"If we stay the night at the crossroads rest stop, we'll arrive at Karendel by tomorrow afternoon. I think it's best to camp at the rest stop before sunset.\"\n\nHallan nodded briefly.\n\"...With good winds, we'll get there by tomorrow afternoon.\"\n\nOak forests stretched along both sides of the trade road. Wind rustled the leaves, and birdsong could be heard. The cart wheels rattled along the dirt path, moving forward. It was a peaceful afternoon.",
+      "timestamp": "00:28:51",
+      "archived_at": "2026-03-25",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 14,
+      "message": "[GM] Wolf carcass butchered. Meat and hide given to Hallan.",
+      "narrative": "Noel skillfully butchered the wolf carcass. A hide and some cuts of meat were produced. Hallan nodded and accepted them. \"Thanks. Should fetch a few coins at Karendel.\" Mira wrapped the meat in cloth and loaded it onto the cart. \"Grilled meat for dinner tonight!\"",
+      "timestamp": "00:35:11",
+      "archived_at": "2026-03-25",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 16,
+      "message": "[GM] Saiki says \"I have something to experiment with\" and switches seats with Lucena again.",
+      "narrative": "Saiki spoke to Lucena. \"I have something to experiment with.\" Lucena blinked and moved aside. \"Again? What is it, tell me.\"\n\nAfter switching seats on the cart, Saiki ended up sitting next to Mira. Mira tilted her head curiously. \"An experiment? Something magic-related?\"\n\nHallan glanced back while holding the reins. \"...You're not going to blow something up on the cart, are you?\"",
+      "timestamp": "02:15:36",
+      "archived_at": "2026-03-27",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 17,
+      "message": "[GM] Saiki asked about the distance to Karendel. Hallan explains the terrain.",
+      "narrative": "Saiki looked around. Oak forests still stretched along both sides of the trade road.\n\nHallan gestured with his chin toward a signpost by the road while holding the reins.\n\"...See that fork up ahead? That's the halfway point. Head south from there and you reach the port; keep going east and it's Karendel.\"\n\nMira looked up at the sky and said,\n\"Once the sun drops a bit more, we'll arrive at the crossroads rest stop. We'll stay the night there, and by tomorrow afternoon, we'll see Karendel's gates.\"\n\nHallan added briefly,\n\"...As long as we don't run into bandits or beasts.\"",
+      "timestamp": "02:20:52",
+      "archived_at": "2026-03-27",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 18,
+      "message": "[GM] Saiki asked about directions. Hallan explains the crossroads geography in detail.",
+      "narrative": "Hallan nodded while gripping the reins.\n\"That's roughly right. This trade road goes straight east and then turns at the crossroads. From there, go left — that is, north — and you reach Karendel.\"\n\nMira chimed in.\n\"The south road goes down toward the coast. There's a port town there... what was its name again.\"\n\nHallan answered briefly.\n\"...Seren. A small fishing harbor. You can take a ship from there along the coast to western cities, but we have no business there.\"\n\nThe cart rattled forward. Ahead on the trade road, the point where the path splits into two was faintly coming into view.",
+      "timestamp": "15:43:08",
+      "archived_at": "2026-03-27",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 19,
+      "message": "[GM] Saiki takes a short rest on the cart. MP 37→40 recovered.",
+      "narrative": "Saiki pulled his robe tighter and leaned against one side of the cart. Closing his eyes and steadying his breath, the faintly scattered mana began to slowly gather back into his body.\n\nMira glanced sideways at him briefly, then turned her gaze forward.\n\nLucena sat on the edge of the cart with her legs dangling, chewing on a fruit.\n\"Don't fall off while you sleep. Old man Hallan won't stop for you.\"\n\nHallan snorted without looking back.\n\"...If you fall, you'll wake up.\"\n\nThe cart slowly continued east along the trade road. Wind rustled the leaves, and the afternoon sun was warm.",
+      "timestamp": "15:49:39",
+      "archived_at": "2026-03-27",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 20,
+      "message": "[GM] Saiki asked about stopping at the crossroads rest stop. Hallan explains practical reasons.",
+      "narrative": "Hallan thought for a moment while gripping the reins, then spoke.\n\"...I understand the hurry, but there are reasons.\"\n\nHallan counted on his fingers.\n\"First, the pack horse is tired. We came all the way from Harun without stopping. If the horse collapses, the cart stops too.\"\n\"Second, the road from the crossroads to Karendel has mountain paths mixed in. If a wheel gets stuck in the dark, we're done for.\"\n\"Third...\" Hallan lowered his voice. \"Merchants always gather at the crossroads rest stop. If there's a group heading to Karendel together, it's safer.\"\n\nMira chimed in.\n\"And the rest stop has a well. We need to refill the water barrel too.\"\n\nHallan added briefly.\n\"...Of course, it's your call. If you want to travel through the night, I won't stop you, but I wouldn't recommend it.\"",
+      "timestamp": "18:24:35",
+      "archived_at": "2026-03-27",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 21,
+      "message": "[GM] Crossroads rest stop camp (night). Lucena returns from scouting. Noel stands guard.",
+      "narrative": "Lucena slipped away from the campfire and melted into the darkness. She circled the rest stop, checking the travelers' belongings, but could only make out silhouettes in the dark. When she passed near the peddler's bundle, she felt a gaze from the swordsman's direction. She paused for a moment, then casually turned back.\n\nReturning to the campfire, Lucena scooted up next to Saiki and whispered softly.\n\"I checked everything out~ The peddler's lock is toy-level, and the sword guy is the type who won't let go of his blade even in his sleep. But that hooded person over there... has zero luggage. Isn't that suspicious?\"\n\nNoel silently added a log to the fire. The flames leapt up and brightened the surroundings. With his axe resting on his knees, he'd been scanning the darkness, then placed a blanket on Saiki.\n\"...Cover up.\"\n\nBeyond the campfire, the hooded figure's shadow sat motionless. The swordsman was still in the same posture, sipping from his cup. The night was deepening.",
+      "user_input": "",
+      "dialogues": [
+        {
+          "speaker": "lucena",
+          "target": "saiki",
+          "line": "I checked everything out~ The peddler's lock is toy-level, and the sword guy is the type who won't let go of his blade even in his sleep. But that hooded person over there... has zero luggage. Isn't that suspicious?",
+          "tone": "playful+whisper",
+          "type": "whisper"
+        },
+        {
+          "speaker": "noel",
+          "target": "saiki",
+          "line": "...Cover up.",
+          "tone": "calm",
+          "action": "placing a blanket",
+          "type": "dialogue"
+        }
+      ],
+      "timestamp": "21:16:53",
+      "dice_rolls": [
+        {
+          "character": "lucena",
+          "type": "DEX",
+          "dc": 12,
+          "roll": 6,
+          "modifier": 5,
+          "total": 11,
+          "result": "fail",
+          "margin": -1,
+          "context": "Stealth scouting - slightly noticed by the swordsman"
+        },
+        {
+          "character": "lucena",
+          "type": "INT",
+          "dc": 11,
+          "roll": 8,
+          "modifier": 0,
+          "total": 8,
+          "result": "fail",
+          "margin": -3,
+          "context": "Cargo appraisal - failed to assess value in the dark"
+        }
+      ],
+      "archived_at": "2026-03-28",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 22,
+      "message": "[GM] Mana wire cast + night watch rotation set (1st shift Lucena, 2nd shift Noel). Camp for the night.",
+      "narrative": "Saiki draped the blanket over his shoulders and said,\n\"If we want to wake up early tomorrow, we should sleep early.\"\n\nHallan cut in briefly.\n\"...We need to set a watch. There are strangers mixed in here.\"\n\nSaiki nodded, then pulled out his staff and slowly traced a circle on the ground around the camp. A thin thread of mana unwound from the tip of the staff and seeped between the blades of grass. An invisible detection line settled into place around the campsite.\n\nLucena's eyes sparkled as she asked.\n\"Oh, what's that? A trap?\"\n\n\"Mana wire. If someone crosses it, I'll sense it.\"\n\nLucena nodded, then twirled a dagger between her fingers and settled by the campfire.\n\"Alright, but we still need a watch. That hooded person earlier was really suspicious. I'm not sleepy yet, so I'll take the first shift.\"\n\nNoel replied briefly.\n\"...Second shift.\"\n\nHe glanced at Saiki and nodded once — meaning, get some good sleep.\n\nSaiki pulled the blanket over himself and lay down by the campfire. He could faintly sense the mana threads surrounding the area. Lucena added another log to the fire. Flames rose and warmed the night air.\n\nDeep in the night. An owl's cry echoed from the forest.",
+      "user_input": "Cast mana wire and sleep",
+      "dialogues": [
+        {
+          "speaker": "saiki",
+          "line": "If we want to wake up early tomorrow, we should sleep early.",
+          "tone": "calm",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "hallan",
+          "line": "...We need to set a watch. There are strangers mixed in here.",
+          "tone": "wary",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "lucena",
+          "line": "Oh, what's that? A trap?",
+          "tone": "curious",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "saiki",
+          "line": "Mana wire. If someone crosses it, I'll sense it.",
+          "tone": "calm",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "lucena",
+          "line": "Alright, but we still need a watch. That hooded person earlier was really suspicious. I'm not sleepy yet, so I'll take the first shift.",
+          "tone": "confident",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "noel",
+          "line": "...Second shift.",
+          "tone": "calm",
+          "action": "nodding while looking at Saiki",
+          "type": "dialogue"
+        }
+      ],
+      "timestamp": "09:28:53",
+      "dice_rolls": [],
+      "archived_at": "2026-03-28",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 23,
+      "message": "[GM] Uneventful night. Morning wake-up. Long rest: all members HP/MP full.",
+      "narrative": "The night was quiet.\n\nThe mana wire vibrated faintly a couple of times, but it was only small wild animals passing through. The campfire gradually died down, and stars filled the sky.\n\nAt shift change, Lucena approached Noel and whispered softly.\n\"That hooded one was only pretending to sleep. Tell Saiki too.\"\nNoel nodded and gripped his axe. Lucena clutched her daggers to her chest and fell into a light sleep.\n\nAt dawn. Noel detected movement in the darkness. The hooded figure quietly rose and slipped out of the rest stop, returning shortly after. When they returned, he could see them wiping their hands on their clothes.\n\nBefore long, dawn broke.\n\nWith birdsong and morning sunlight illuminating the rest stop, Saiki opened his eyes. The mana wire's sensation had faded — its effect had expired. His body felt light. A full night's sleep had completely restored his mana.\n\nNoel looked toward Saiki and said briefly.\n\"...The hooded one went out once at dawn.\"\n\nLooking around, the hooded figure's spot was empty. No one knew when they had left. The swordsman was still leaning against the wall with his sword in his arms, and the peddler was packing up and preparing to depart.\n\nHallan said while watering the pack horse.\n\"...We can leave in about an hour. We'll reach Karendel today.\"",
+      "user_input": "",
+      "dialogues": [
+        {
+          "speaker": "lucena",
+          "target": "noel",
+          "line": "That hooded one was only pretending to sleep. Tell Saiki too.",
+          "tone": "whisper",
+          "type": "whisper"
+        },
+        {
+          "speaker": "noel",
+          "target": "saiki",
+          "line": "...The hooded one went out once at dawn.",
+          "tone": "calm",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "hallan",
+          "line": "...We can leave in about an hour. We'll reach Karendel today.",
+          "tone": "calm",
+          "type": "dialogue"
+        }
+      ],
+      "timestamp": "09:43:13",
+      "archived_at": "2026-03-28",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Peddler/swordsman join as travel companions. Departure toward Karendel.",
+      "narrative": "Saiki approached the peddler packing his things and the swordsman leaning against the wall.\n\n\"We're heading to Karendel. If you're going the same way, would you like to travel together?\"\n\nThe peddler frantically gathered his bundle and nodded repeatedly.\n\"Oh my, I was just worried about going alone! If you'd join me, nothing could be more welcome...\"\n\nThe swordsman, still in his position leaning against the wall with his hand on his sword, regarded Saiki for a moment.\n\"...Karendel.\"\nAfter a brief silence, he slowly stood up.\n\"I happen to have business that way. We merely share the same road, so don't mind me.\"\n\nHe glanced at the empty spot where the hooded figure had been, but said nothing.\n\nHallan said while hitching the pack horse.\n\"...No reason to object. The more of us there are, the less beasts will bother us.\"\n\nLucena sidled up to Saiki and whispered.\n\"The peddler is whatever, but that swordsman... he was really good at muffling his footsteps while pretending to sleep. He might not be a thief, but he's not ordinary either.\"\n\nNoel chimed in while slinging his axe over his shoulder.\n\"Having one more guy who can use a blade makes things a bit easier for me.\"\n\nThe party had grown. Hallan patted the pack horse's back, and the cart began to move slowly. Morning mist lay thin over the trade road. Half a day or so until Karendel.",
+      "user_input": "Suggest traveling together to the peddler and swordsman",
+      "dialogues": [
+        {
+          "speaker": "saiki",
+          "line": "We're heading to Karendel. If you're going the same way, would you like to travel together?",
+          "tone": "polite",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "peddler",
+          "line": "Oh my, I was just worried about going alone! If you'd join me, nothing could be more welcome...",
+          "tone": "relieved",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "swordsman",
+          "line": "I happen to have business that way. We merely share the same road, so don't mind me.",
+          "tone": "indifferent",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "hallan",
+          "line": "...No reason to object. The more of us there are, the less beasts will bother us.",
+          "tone": "calm",
+          "type": "dialogue"
+        },
+        {
+          "speaker": "lucena",
+          "target": "saiki",
+          "line": "The peddler is whatever, but that swordsman... he was really good at muffling his footsteps while pretending to sleep. He might not be a thief, but he's not ordinary either.",
+          "tone": "whisper",
+          "type": "whisper"
+        },
+        {
+          "speaker": "noel",
+          "line": "Having one more guy who can use a blade makes things a bit easier for me.",
+          "tone": "casual",
+          "type": "dialogue"
+        }
+      ],
+      "timestamp": "09:55:00",
+      "dice_rolls": [],
+      "archived_at": "2026-03-28",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Session restore - trade road scene",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:15:38",
+      "archived_at": "2026-03-28",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Scene restore - trade road background",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "00:18:35",
+      "archived_at": "2026-03-28",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Turn 25: Saiki flirts with Mira on the trade road",
+      "narrative": "마차가 교역로를 따라 덜컹거리며 나아간다. 아침 안개가 걷히고, 길 양쪽으로 드넓은 초원이 펼쳐진다.\n\n사이키가 마차 옆을 걸으며 미라에게 다가갔다.\n\n\"미라양, 혹시 나이가 어떻게 되시나요? 좋아하는 건요? 남자친구 있으세요?\"\n\n미라가 눈을 동그랗게 떴다. 손에 들고 있던 보따리를 떨어뜨릴 뻔하며, 볼이 빠르게 붉어진다. 포니테일 끝을 만지작거리며 아버지 쪽을 힐끗 확인했다.\n\n\"어, 어머 -- 갑자기 그런 걸 다 물어보시네요?!\"\n\n잠깐 당황하더니, 나이만큼은 솔직하게 대답했다.\n\n\"저... 스물둘이에요.\"\n\n목소리가 약간 올라갔다. 이어서 화제를 자기가 자신 있는 쪽으로 돌렸다.\n\n\"좋아하는 건... 여러 곳 돌아다니면서 처음 보는 물건 구경하는 거요. 상인 딸이라서 그런가봐요, 헤헤.\"\n\n살짝 들뜬 말투. 하지만 마지막 질문에 이르자 미라의 목소리가 확 작아졌다.\n\n\"남-- 남자친구 같은 건... 아버지한테 들리면 어떡해요!\"\n\n소곤거리듯 속삭이며 민망함 반, 웃음 반으로 손을 내저었다.\n\n그 때, 마차 위에서 할란의 헛기침 소리가 들렸다. 고삐를 잡은 채 뒤를 힐끗 돌아보더니, 눈썹 하나를 치켜올리고 사이키를 천천히 훑어본다. 그리고 소리 없이 시선을 앞으로 되돌렸다.\n\n\"...마차 길이 험하니까, 딴 데 신경 쓰다 혀 깨물지 말고.\"\n\n사이키에게 하는 말인지 혼잣말인지 모를 온도. 적대적이진 않지만, 분명히 들으라고 한 말이었다.\n\n뒤에서 루세나가 입을 틀어막았다. 어깨가 들썩이며 웃음을 참는 게 역력하더니, 사이키에게 속삭이듯 -- 하지만 충분히 들리게 말했다.\n\n\"오빠, 한 번에 세 개? 효율적이다~ 근데 그 순서는 좀 바꿔야 하지 않아?\"\n\n노엘은 정면을 보고 걷다가 딱 한 박자 멈추었다. 사이키 쪽으로 시선을 주지도 않고, 묵묵히 걸음을 재개했다. 표정 변화 없음. 다만 귀가 약간 붉었다.\n\n\"...용감하네.\"\n\n극도로 건조한 한마디였다.",
+      "user_input": "미라양, 혹시 나이가 어떻게 되시나요? 좋아하는 건요? 남자친구 있으세요?",
+      "dialogues": [
+        {
+          "speaker": "saiki",
+          "line": "미라양, 혹시 나이가 어떻게 되시나요? 좋아하는 건요? 남자친구 있으세요?",
+          "tone": "flirty",
+          "target": "mira"
+        },
+        {
+          "speaker": "mira",
+          "line": "어, 어머 -- 갑자기 그런 걸 다 물어보시네요?! 저... 스물둘이에요.",
+          "tone": "flustered",
+          "target": "saiki"
+        },
+        {
+          "speaker": "mira",
+          "line": "좋아하는 건... 여러 곳 돌아다니면서 처음 보는 물건 구경하는 거요. 상인 딸이라서 그런가봐요, 헤헤.",
+          "tone": "cheerful",
+          "target": "saiki"
+        },
+        {
+          "speaker": "mira",
+          "line": "남-- 남자친구 같은 건... 아버지한테 들리면 어떡해요!",
+          "tone": "whisper",
+          "target": "saiki",
+          "type": "whisper"
+        },
+        {
+          "speaker": "hallan",
+          "line": "...마차 길이 험하니까, 딴 데 신경 쓰다 혀 깨물지 말고.",
+          "tone": "gruff"
+        },
+        {
+          "speaker": "lucena",
+          "line": "오빠, 한 번에 세 개? 효율적이다~ 근데 그 순서는 좀 바꿔야 하지 않아?",
+          "tone": "teasing",
+          "target": "saiki"
+        },
+        {
+          "speaker": "noel",
+          "line": "...용감하네.",
+          "tone": "dry"
+        }
+      ],
+      "timestamp": "00:27:15",
+      "archived_at": "2026-03-28",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Rollback restore - turn 26 trade road scene",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "20:42:10",
+      "archived_at": "2026-03-28",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 24,
+      "message": "[GM] Turn 27: Travel montage + Karendel arrival",
+      "narrative": "길을 걷는 동안 드문드문 오가는 대화들.\n\n할란이 마차 위에서 다리를 고쳐 앉으며 말했다.\n\n\"카렌델 남문 들어서면 바로 직물 상가 골목이야. 냄새로 알 수 있어 -- 염색약 냄새가 코를 찌르거든. 거기서 오른쪽으로 꺾으면 숙소 밀집지.\"\n\n미라가 고개를 끄덕였다.\n\n\"아버지랑 두 번 갔는데 저는 항상 문 앞에서 기다렸어요.\"\n\n할란이 피식 웃었다.\n\n\"이번엔 직접 들어가 봐라.\"\n\n길 중반. 행상인이 짐 보따리를 고쳐 메며 사이키 옆으로 슬쩍 다가왔다.\n\n\"저기... 카렌델 성문에서 짐 검사 심하게 합니까? 귀중한 건 아닌데, 뭐랄까, 특이한 물건들이라서요.\"\n\n루세나가 뒤에서 끼어들었다.\n\n\"자물쇠가 그 모양인데 귀중한 건 없겠죠.\"\n\n행상인이 움찔하며 보따리를 가슴에 더 꽉 끌어안았다.\n\n루세나가 사이키에게 슬그머니 속삭였다.\n\n\"카렌델 시장에 보석상 골목 있잖아. 거기 눈독 들여놓은 거 있었는데 -- 미라한테 선물하면 좋겠다 싶어서. 오빠를 위해서 봐뒀다고.\"\n\n사이키가 답하기도 전에 루세나가 손가락을 딱 튕기며 씩 웃었다.\n\n오후 초입, 길이 완만한 언덕을 넘을 때. 미라가 걸으며 사이키 쪽을 슬쩍 보았다.\n\n\"마법사분들은 도시마다 마법사 조합 같은 데 들르세요?\"\n\n\"...경우에 따라서.\"\n\n미라가 눈을 약간 빛내며 혼잣말처럼 중얼거렸다.\n\n\"카렌델에도 있다고 들었는데. 탑이 보인다던데.\"\n\n언덕 꼭대기에서 검사가 잠시 멈춰 지평선을 바라보았다. 노엘이 그 옆에 나란히 섰다. 짧은 침묵.\n\n\"...동쪽 길이 더 빨랐을 텐데.\"\n\n노엘이 무표정하게 받았다.\n\n\"그래서 안 갔겠지.\"\n\n검사는 대답 없이 다시 걷기 시작했다.\n\n노엘이 길가 수레바퀴 자국을 내려다보며 짧게 말했다.\n\n\"최근에 마차 통행이 늘었다. 시장이 크게 열리는 모양이군.\"\n\n그리고 오후.\n\n할란이 마차 위에서 몸을 일으켜 먼 곳을 바라보았다.\n\n\"보여. 남문 탑이야.\"\n\n지평선 너머로 회색빛 성벽이 솟아 있었다. 탑 위에 깃발이 펄럭이고, 성문 앞으로 마차와 사람들의 행렬이 길게 이어져 있었다. 말 냄새, 향신료 냄새, 대장간의 연기가 바람에 실려왔다. 가까이 다가갈수록 상인들의 호객 소리와 말발굽 소리가 점점 커졌다.\n\n루세나가 손을 이마에 대고 눈을 가리며 바라보았다.\n\n\"생각보다 크네요.\"\n\n할란이 짧게 웃었다.\n\n\"항상 그래. 볼 때마다.\"\n\n성문 앞. 문지기들이 짐을 대충 확인하고 통행세를 걷고 있었다. 일행의 차례가 왔다. 문지기가 할란의 마차를 훑어보고 고개를 끄덕였다.\n\n카렌델 남문이 열렸다.\n\n직물 상가 골목의 염색약 냄새가 코를 찔렀다. 좁은 골목 양쪽으로 형형색색의 천이 걸려 있고, 사람들이 빼곡히 오가고 있었다. 저 멀리, 마법사 조합의 첨탑이 오후 햇살을 받아 빛나고 있었다.\n\n카렌델. 교역의 도시. 일행은 성문을 넘어 도시 안으로 발을 내디뎠다.",
+      "user_input": "사이키는 동행자들과 약간의 잡담을 하면서, 카렌델로 향합니다.",
+      "dialogues": [
+        {
+          "speaker": "hallan",
+          "line": "카렌델 남문 들어서면 바로 직물 상가 골목이야. 냄새로 알 수 있어 -- 염색약 냄새가 코를 찌르거든.",
+          "tone": "informative"
+        },
+        {
+          "speaker": "mira",
+          "line": "아버지랑 두 번 갔는데 저는 항상 문 앞에서 기다렸어요.",
+          "tone": "nostalgic"
+        },
+        {
+          "speaker": "hallan",
+          "line": "이번엔 직접 들어가 봐라.",
+          "tone": "warm"
+        },
+        {
+          "speaker": "peddler",
+          "line": "저기... 카렌델 성문에서 짐 검사 심하게 합니까?",
+          "tone": "nervous",
+          "target": "saiki"
+        },
+        {
+          "speaker": "lucena",
+          "line": "자물쇠가 그 모양인데 귀중한 건 없겠죠.",
+          "tone": "teasing",
+          "target": "peddler"
+        },
+        {
+          "speaker": "lucena",
+          "line": "미라한테 선물하면 좋겠다 싶어서. 오빠를 위해서 봐뒀다고.",
+          "tone": "playful",
+          "target": "saiki",
+          "type": "whisper"
+        },
+        {
+          "speaker": "mira",
+          "line": "마법사분들은 도시마다 마법사 조합 같은 데 들르세요?",
+          "tone": "curious",
+          "target": "saiki"
+        },
+        {
+          "speaker": "swordsman",
+          "line": "...동쪽 길이 더 빨랐을 텐데.",
+          "tone": "cryptic"
+        },
+        {
+          "speaker": "noel",
+          "line": "그래서 안 갔겠지.",
+          "tone": "dry"
+        },
+        {
+          "speaker": "noel",
+          "line": "최근에 마차 통행이 늘었다. 시장이 크게 열리는 모양이군.",
+          "tone": "observant"
+        },
+        {
+          "speaker": "hallan",
+          "line": "보여. 남문 탑이야.",
+          "tone": "satisfied"
+        },
+        {
+          "speaker": "lucena",
+          "line": "생각보다 크네요.",
+          "tone": "impressed"
+        },
+        {
+          "speaker": "hallan",
+          "line": "항상 그래. 볼 때마다.",
+          "tone": "nostalgic"
+        }
+      ],
+      "timestamp": "20:52:07",
+      "archived_at": "2026-03-28",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 27,
+      "message": "[GM] Scene fix: Karendel city background",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "21:00:32",
+      "archived_at": "2026-03-28",
+      "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 27,
+      "message": "[GM] Scene fix: Karendel city background (retry)",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "21:04:16",
+      "archived_at": "2026-03-28",
+      "scenario_id": "karendel_journey"
+    }
+  ]
+}

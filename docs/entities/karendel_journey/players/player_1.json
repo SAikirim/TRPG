@@ -1,49 +1,46 @@
 {
   "id": 1,
-  "name": "사이키",
-  "class": "마법사",
-  "background": {
-    "origin": "가난한 집안 출신. 어린 시절 마을에 찾아온 떠돌이 마법사에게 마법을 배운 독학 마법사.",
-    "motivation": "가족의 생계를 위해 보물을 찾으러 모험을 떠남",
-    "personality": "조용하고 신중하지만, 가족을 위해서라면 위험도 감수하는 책임감 강한 오빠",
-    "relationships": {
-      "루체나": "여동생. 서로를 지키며 자란 남매",
-      "노을": "마을 이웃의 고아. 밥을 나눠주던 인연"
-    }
-  },
+  "name": "saiki",
+  "class": "mage",
+  "level": 3,
+  "xp": 315,
+  "hp": 21,
+  "max_hp": 21,
+  "mp": 41,
+  "max_mp": 41,
   "stats": {
-    "hp": 21,
-    "max_hp": 21,
-    "mp": 37,
-    "max_mp": 41,
     "STR": 8,
     "DEX": 16,
     "INT": 19,
     "CON": 10
   },
   "position": [
-    13,
-    12
+    7,
+    5
   ],
   "status_effects": [],
   "inventory": [
-    "마법 지팡이",
-    "마나 포션",
-    "마나 결정",
-    "슬라임 젤리",
-    "약초",
-    "고대 열쇠",
-    "전설의 보물",
-    "에르네스의 소개장",
-    "약초 봉투 (볼프에게 전달)",
-    "노잣돈 (은화 10닢)",
-    "금화 1닢 (공용, 카렌델 환전 후 3등분)",
-    "밧줄",
-    "부싯돌"
+    "magic_staff",
+    "mana_potion",
+    "mana_crystal",
+    "slime_jelly",
+    "herb",
+    "ancient_key",
+    "legendary_treasure",
+    "ernes_letter",
+    "herb_bundle_for_volf",
+    "travel_money_silver_10",
+    "shared_gold_1",
+    "rope",
+    "flint",
+    "spice_pouch",
+    "free_stay_1night"
   ],
+  "controlled_by": "user",
+  "original_image": "/static/portraits/original/player_1_saiki.png",
   "equipment": {
     "weapon": {
-      "name": "마법 지팡이",
+      "name": "magic_staff",
       "rarity": "common",
       "properties": {}
     },
@@ -51,50 +48,80 @@
     "accessory": null
   },
   "available_actions": [
-    "공격",
-    "마법탄",
-    "파이어볼",
-    "힐",
-    "마나 쉴드"
+    "attack",
+    "magic_bolt",
+    "fireball",
+    "heal",
+    "mana_shield"
   ],
-  "combat_state": {
-    "is_in_combat": false,
-    "defense_bonus": 0,
-    "next_turn_penalty": 0
+  "growth": {
+    "level": 3,
+    "xp": 315,
+    "xp_to_next": 600,
+    "stat_points_available": 0,
+    "learned_skills": [
+      "mana_shield"
+    ],
+    "xp_log": [
+      {
+        "source": "orc kill (high)",
+        "amount": 60
+      },
+      {
+        "source": "chapter 1 complete",
+        "amount": 100
+      },
+      {
+        "source": "trap disarm (puzzle)",
+        "amount": 25
+      },
+      {
+        "source": "treasure chest obtained (quest)",
+        "amount": 50
+      },
+      {
+        "source": "exploration/RP (forest, dungeon, inscription)",
+        "amount": 50
+      },
+      {
+        "source": "wolf kill (medium)",
+        "amount": 30
+      }
+    ]
   },
   "history": {
     "actions_taken": [
       {
         "turn": 3,
-        "action": "파이어볼",
-        "target": "어두운 오크",
-        "roll": "nat20 크리티컬",
+        "action": "fireball",
+        "target": "dark orc",
+        "roll": "nat20 critical",
         "damage": 14,
-        "result": "명중"
+        "result": "hit"
       },
       {
         "turn": 6,
-        "action": "고대 열쇠 사용",
-        "target": "철문",
-        "roll": "자동 성공",
+        "action": "use ancient key",
+        "target": "iron door",
+        "roll": "auto success",
         "damage": 0,
-        "result": "챕터3 진입"
+        "result": "entered chapter 3"
       },
       {
         "turn": 7,
-        "action": "마력 분석",
-        "target": "수호 마법",
-        "roll": "실패",
+        "action": "mana analysis",
+        "target": "guardian magic",
+        "roll": "failure",
         "damage": 0,
-        "result": "해체 실패, 열쇠 반응 발견"
+        "result": "disassembly failed, key reaction discovered"
       },
       {
         "turn": 7,
-        "action": "고대 열쇠 사용",
-        "target": "보물 상자",
-        "roll": "자동 성공",
+        "action": "use ancient key",
+        "target": "treasure chest",
+        "roll": "auto success",
         "damage": 0,
-        "result": "보물 획득"
+        "result": "treasure obtained"
       }
     ],
     "damage_dealt_total": 14,
@@ -102,47 +129,5 @@
     "kills": [],
     "items_used": [],
     "turns_played": 3
-  },
-  "conditions": {
-    "alive": true,
-    "conscious": true,
-    "death_save_turns": 0
-  },
-  "growth": {
-    "level": 3,
-    "xp": 315,
-    "xp_to_next": 600,
-    "stat_points_available": 0,
-    "learned_skills": [
-      "마나 쉴드"
-    ],
-    "xp_log": [
-      {
-        "source": "오크 처치 (high)",
-        "amount": 60
-      },
-      {
-        "source": "챕터1 완료",
-        "amount": 100
-      },
-      {
-        "source": "함정 해제 (퍼즐)",
-        "amount": 25
-      },
-      {
-        "source": "보물 상자 획득 (퀘스트)",
-        "amount": 50
-      },
-      {
-        "source": "탐색/RP (숲, 던전, 비문)",
-        "amount": 50
-      },
-      {
-        "source": "늑대 처치 (medium)",
-        "amount": 30
-      }
-    ]
-  },
-  "party_role": "후열 (원거리 딜/힐)",
-  "controlled_by": "user"
+  }
 }

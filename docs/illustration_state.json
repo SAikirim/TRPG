@@ -1,21 +1,61 @@
 {
-  "background": "static/illustrations/sd/background_village_night.webp",
+  "background": "static/illustrations/sd/background_red_chimney_inn.webp",
   "layers": [
     {
-      "type": "portrait",
-      "image": "static/portraits/sd/portrait_미라.webp",
-      "position": "left",
-      "name": "미라",
-      "distance": 1,
-      "size_class": "d1"
+      "type": "object",
+      "image": "static/illustrations/sd/object_stairway.webp",
+      "position": "center",
+      "name": "stairway",
+      "distance": 5,
+      "size_class": "d3"
     },
     {
       "type": "portrait",
-      "image": "static/portraits/sd/portrait_할란.webp",
+      "image": "static/portraits/sd/portrait_volf.webp",
+      "position": "far-left",
+      "name": "volf",
+      "distance": 2,
+      "size_class": "d2"
+    },
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_round_table_2.webp",
       "position": "center",
-      "name": "할란",
-      "distance": 1,
-      "size_class": "d1"
+      "name": "round_table_2",
+      "distance": 5,
+      "size_class": "d3"
+    },
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_bar_counter.webp",
+      "position": "center",
+      "name": "bar_counter",
+      "distance": 2,
+      "size_class": "d2"
+    },
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_chair.webp",
+      "position": "center",
+      "name": "chair",
+      "distance": 3,
+      "size_class": "d3"
+    },
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_kitchen_table.webp",
+      "position": "center",
+      "name": "kitchen_table",
+      "distance": 5,
+      "size_class": "d3"
+    },
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_barrel_stack.webp",
+      "position": "center",
+      "name": "barrel_stack",
+      "distance": 6,
+      "size_class": "d3"
     }
   ],
   "generating": {
@@ -27,8 +67,8 @@
   },
   "enabled": false,
   "default_bg": {
-    "sd": "static/illustrations/sd/ch1_forest.png",
-    "pixel": "static/illustrations/pixel/forest.png"
+    "sd": "static/illustrations/sd/ch2_dungeon.png",
+    "pixel": "static/illustrations/pixel/dungeon.png"
   },
-  "current_chapter": 1
+  "current_chapter": 2
 }

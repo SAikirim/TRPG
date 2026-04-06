@@ -1,50 +1,55 @@
 {
   "id": 2,
-  "name": "루체나",
-  "class": "도적",
+  "name": "seraphine",
+  "class": "cleric",
+  "controlled_by": "ai",
+  "agent_id": "agent_b",
   "background": {
-    "origin": "사이키의 여동생. 오빠가 마법을 배우는 동안 뒷골목에서 생존술을 익힘. 소매치기, 자물쇠 따기가 그녀의 학교였다.",
-    "motivation": "오빠와 함께 보물을 찾아 가난에서 벗어나기. '오빠가 길을 밝히면, 내가 그림자에서 길을 열게.'",
-    "personality": "입은 거칠고 손은 빠르지만, 오빠 앞에서만은 아직도 투정부리는 열다섯 살 — 세상에서 가장 믿음직한 여동생.",
+    "origin": "A plague wiped out her village in childhood. After surviving alone, she self-taught healing arts and joined the clergy guild.",
+    "motivation": "Acts before waiting for miracles. Serves the gods with pragmatism over piety.",
+    "personality": "Few words but quick judgment. Appears cold but watches party members' conditions most carefully.",
     "relationships": {
-      "사이키": "오빠. 세상에서 가장 소중한 사람",
-      "노을": "동갑내기 친구. 서로 티격태격하지만 통하는 사이"
+      "gaon": "Party tank. If he holds the front, I cover from behind.",
+      "yeoul": "Party rogue. Need to warn him — if he charges in recklessly, healing may come late."
     }
   },
   "stats": {
-    "hp": 30,
-    "max_hp": 30,
-    "mp": 12,
-    "max_mp": 14,
-    "STR": 8,
-    "DEX": 20,
-    "INT": 10,
-    "CON": 15
+    "hp": 26,
+    "max_hp": 26,
+    "mp": 24,
+    "max_mp": 24,
+    "STR": 6,
+    "DEX": 10,
+    "INT": 18,
+    "CON": 16
   },
   "position": [
-    4,
-    7
+    12,
+    19
   ],
   "status_effects": [],
   "inventory": [
-    "단검 x2",
-    "도둑 도구",
-    "밧줄"
+    "철퇴",
+    "성스러운 부적"
   ],
   "equipment": {
     "weapon": {
-      "name": "단검 x2",
+      "name": "mace",
       "rarity": "common",
       "properties": {}
     },
     "armor": null,
-    "accessory": null
+    "accessory": {
+      "name": "holy_amulet",
+      "rarity": "common",
+      "properties": {}
+    }
   },
   "available_actions": [
-    "공격",
-    "습격",
-    "도주",
-    "독 바르기"
+    "attack",
+    "healing",
+    "blessing",
+    "purify"
   ],
   "combat_state": {
     "is_in_combat": false,
@@ -52,31 +57,12 @@
     "next_turn_penalty": 0
   },
   "history": {
-    "actions_taken": [
-      {
-        "turn": 3,
-        "action": "습격",
-        "target": "어두운 오크",
-        "roll": "자동명중(은신)",
-        "damage": 14,
-        "result": "처치"
-      },
-      {
-        "turn": 7,
-        "action": "함정 해제",
-        "target": "보물 상자 독 가스 함정",
-        "roll": "성공",
-        "damage": 0,
-        "result": "함정 해제 완료"
-      }
-    ],
-    "damage_dealt_total": 14,
+    "actions_taken": [],
+    "damage_dealt_total": 0,
     "damage_received_total": 0,
-    "kills": [
-      "어두운 오크"
-    ],
+    "kills": [],
     "items_used": [],
-    "turns_played": 2
+    "turns_played": 0
   },
   "conditions": {
     "alive": true,
@@ -84,40 +70,22 @@
     "death_save_turns": 0
   },
   "growth": {
-    "level": 3,
-    "xp": 315,
-    "xp_to_next": 600,
+    "level": 1,
+    "xp": 0,
+    "xp_to_next": 100,
     "stat_points_available": 0,
-    "learned_skills": [
-      "독 바르기"
-    ],
-    "xp_log": [
-      {
-        "source": "오크 처치 (high)",
-        "amount": 60
-      },
-      {
-        "source": "챕터1 완료",
-        "amount": 100
-      },
-      {
-        "source": "함정 해제 (퍼즐)",
-        "amount": 25
-      },
-      {
-        "source": "보물 상자 획득 (퀘스트)",
-        "amount": 50
-      },
-      {
-        "source": "탐색/RP (숲, 던전, 비문)",
-        "amount": 50
-      },
-      {
-        "source": "늑대 처치 (medium)",
-        "amount": 30
-      }
-    ]
+    "learned_skills": [],
+    "xp_log": []
   },
-  "party_role": "중열 (기습/유틸)",
-  "controlled_by": "agent"
+  "party_role": "backline_healer_support",
+  "appearance": {
+    "age": "early 20s",
+    "build": "neat and slim build",
+    "skin": "fair skin",
+    "hair": "silver hair neatly tied back",
+    "face": "sharp and cold gaze, intellectual impression",
+    "outfit": "pale blue-white priestly robes, light chain armor",
+    "notable": "silver holy symbol necklace, worn scripture in hand",
+    "gender": "female"
+  }
 }

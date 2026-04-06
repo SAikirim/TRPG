@@ -1,0 +1,43 @@
+{
+  "scenarios": [
+    {
+      "id": "lost_treasure",
+      "title": "잃어버린 보물의 숲 던전",
+      "description": "고대 숲 깊은 곳에 잠든 전설의 보물. 세 명의 모험가가 위험을 무릅쓰고 던전에 발을 들인다.",
+      "genre": "판타지",
+      "difficulty": "normal",
+      "recommended_level": 1,
+      "recommended_players": 3,
+      "ruleset": "fantasy_basic",
+      "scenario_file": "lost_treasure.json",
+      "initial_state": "scenarios/lost_treasure_initial.json",
+      "available_classes": ["전사", "마법사", "도적", "성직자", "궁수"],
+      "setting": "중세 판타지 숲 던전",
+      "estimated_turns": "20~40",
+      "tags": ["던전 탐험", "보물 사냥", "몬스터 전투"],
+      "standalone": true,
+      "worldbuilding": "karendel_world"
+    },
+    {
+      "id": "karendel_journey",
+      "title": "카렌델로 가는 길",
+      "description": "전설의 보물을 손에 넣은 세 모험가가 감정을 위해 교역도시 카렌델로 향한다.",
+      "genre": "판타지",
+      "difficulty": "normal",
+      "recommended_level": 3,
+      "recommended_players": 3,
+      "ruleset": "fantasy_basic",
+      "scenario_file": "karendel_journey.json",
+      "initial_state": "scenarios/karendel_journey_initial.json",
+      "available_classes": ["전사", "마법사", "도적", "성직자", "궁수"],
+      "setting": "중세 판타지 교역로/도시",
+      "estimated_turns": "20~40",
+      "tags": ["여행", "교역도시", "보물 감정", "NPC 교류"],
+      "standalone": true,
+      "prerequisite": "lost_treasure",
+      "prerequisite_required": false,
+      "worldbuilding": "karendel_world"
+    }
+  ],
+  "default_scenario": "lost_treasure"
+}

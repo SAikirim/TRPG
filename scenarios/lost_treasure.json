@@ -1,0 +1,93 @@
+{
+  "scenario_info": {
+    "title": "Lost Treasure Forest Dungeon",
+    "description": "A legendary treasure slumbers deep in an ancient forest. Three adventurers brave the dangers and step into the dungeon.",
+    "difficulty": "normal",
+    "recommended_level": 1,
+    "party_size": {"min": 3, "max": 3, "recommended": 3},
+    "backstory": "An ancient forest near Harun Village. Rumors have long told of a legendary treasure sleeping deep within the forest. Three young adventurers who grew up in the village set out into the forest to find the treasure."
+  },
+  "opening": {
+    "new_game": "New game start — begin with level 1 characters.",
+    "narrative": "The forest on the outskirts of Harun Village. The entrance to an ancient dungeon is faintly visible through the undergrowth. Three adventurers stand before the entrance, torches in hand."
+  },
+  "default_party": {
+    "description": "Default party for new game start (level 1)",
+    "players": [
+      {
+        "id": 1,
+        "name": "",
+        "class": "mage",
+        "race": "human",
+        "appearance": {"age": "Early 20s", "build": "Thin build", "skin": "Pale white skin", "hair": "Long silver-gray hair, loosely tied back", "face": "Intelligent gaze, sharp features", "outfit": "Navy blue robe, magical charm hanging from belt", "notable": "Always carrying a magic staff in hand"},
+        "level": 1,
+        "xp": 0,
+        "stats": {"STR": 8, "DEX": 14, "INT": 18, "CON": 10},
+        "hp_base": 10,
+        "mp_base": 12,
+        "starting_inventory": ["magic_staff", "mana_potion"],
+        "controlled_by": "user"
+      },
+      {
+        "id": 2,
+        "name": "",
+        "class": "rogue",
+        "race": "human",
+        "appearance": {"age": "Mid 20s", "build": "Slim and agile build", "skin": "Slightly tanned apricot complexion", "hair": "Short black hair, swept to one side", "face": "Sharp eyes, cunning expression", "outfit": "Black leather armor, two daggers at the waist", "notable": "Moves as if melting into the shadows"},
+        "level": 1,
+        "xp": 0,
+        "stats": {"STR": 8, "DEX": 18, "INT": 10, "CON": 14},
+        "hp_base": 15,
+        "mp_base": 5,
+        "starting_inventory": ["dual_daggers", "thieves_tools", "rope"],
+        "controlled_by": "ai"
+      },
+      {
+        "id": 3,
+        "name": "",
+        "class": "warrior",
+        "race": "human",
+        "appearance": {"age": "Late 20s", "build": "Muscular, sturdy build", "skin": "Bronze skin", "hair": "Short-cropped brown hair", "face": "Strong jawline, rough but dependable appearance", "outfit": "Chainmail armor, iron sword on back, leather shield on left arm", "notable": "Old battle scar on forearm"},
+        "level": 1,
+        "xp": 0,
+        "stats": {"STR": 16, "DEX": 12, "INT": 8, "CON": 14},
+        "hp_base": 25,
+        "mp_base": 5,
+        "starting_inventory": ["iron_sword", "leather_shield"],
+        "controlled_by": "ai"
+      }
+    ]
+  },
+  "default_npcs": [],
+  "chapters": [
+    {
+      "id": 1,
+      "name": "Forest Entrance",
+      "description": "The path leading into the ancient forest. Trees are dense and little light gets through. Herbs and traps are scattered about.",
+      "map_area": "forest_entrance"
+    },
+    {
+      "id": 2,
+      "name": "Ancient Dungeon",
+      "description": "A stone dungeon deep in the forest. Orcs and slimes inhabit it, with ancient inscriptions and hidden keys.",
+      "map_area": "ancient_dungeon"
+    },
+    {
+      "id": 3,
+      "name": "Treasure Room",
+      "description": "The golden chamber at the dungeon's deepest point. A treasure chest rigged with poison gas traps and a guardian golem await.",
+      "map_area": "treasure_room"
+    },
+    {
+      "id": 4,
+      "name": "Epilogue",
+      "description": "After obtaining the treasure and escaping the dungeon. Return to the village and prepare for the next journey.",
+      "map_area": "harun_village"
+    }
+  ],
+  "endings": [
+    {"id": "perfect", "condition": "all_alive_with_treasure", "title": "Perfect Victory", "narrative": "All three adventurers returned to the village alive with the legendary treasure."},
+    {"id": "pyrrhic", "condition": "treasure_with_casualties", "title": "Pyrrhic Victory", "narrative": "The treasure was obtained, but the cost was great."},
+    {"id": "escape", "condition": "alive_no_treasure", "title": "Escaped with Their Lives", "narrative": "They abandoned the treasure and escaped the dungeon. Being alive is enough."}
+  ]
+}

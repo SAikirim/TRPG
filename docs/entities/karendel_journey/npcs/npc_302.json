@@ -1,24 +1,29 @@
 {
   "id": 302,
-  "name": "짐말",
+  "name": "pack_horse",
   "type": "friendly",
-  "race": "말",
+  "race": "horse",
   "known": true,
   "status": "alive",
+  "travel_speed": {
+    "type": "cart",
+    "speed_kmh": 6,
+    "description": "pulling loaded cart"
+  },
   "location": "trade_road_karendel",
   "appearance": {
-    "age": "성체",
-    "build": "튼튼한 짐말 체형",
-    "skin": "갈색 털",
-    "hair": "검은 갈기",
-    "face": "온순한 눈",
-    "outfit": "마구(고삐, 안장, 짐받이)",
-    "notable": "늑대 습격 때 놀랐지만 무사. 할란에게 길들여져 있음"
+    "age": "adult",
+    "build": "sturdy packhorse build",
+    "skin": "brown coat",
+    "hair": "black mane",
+    "face": "gentle eyes",
+    "outfit": "harness (reins, saddle, pack frame)",
+    "notable": "startled during wolf attack but unharmed. Tamed by Hallan"
   },
   "personality": {
     "temperament": "docile",
     "intelligence": "animal",
-    "behavior_pattern": "주인(할란)을 따른다. 늑대 등 포식자에 겁을 먹는다. 친절한 사람에게는 온순.",
+    "behavior_pattern": "Follows its owner (Hallan). Frightened by predators like wolves. Docile with kind people.",
     "speech_style": "",
     "motivation": ""
   },
@@ -33,23 +38,30 @@
   "mp": 0,
   "max_mp": 0,
   "relationships": {
-    "할란": "주인. 오래 함께한 짐말.",
-    "미라": "자주 먹이를 준다. 친근함."
+    "hallan": "Owner. Long-time packhorse companion.",
+    "mira": "Often feeds it. Friendly."
   },
   "combat": {
     "attack_type": "melee",
     "attacks": {
-      "발차기": {"damage": "1d8 + STR_modifier", "description": "뒷발로 강하게 차기"},
-      "돌진": {"damage": "1d10 + STR_modifier", "description": "전력 돌진. 사용 후 1턴 행동 불가", "cooldown": 1}
+      "kick": {
+        "damage": "1d8 + STR_modifier",
+        "description": "Powerful kick with hind legs"
+      },
+      "charge": {
+        "damage": "1d10 + STR_modifier",
+        "description": "Full charge. Cannot act for 1 turn after use",
+        "cooldown": 1
+      }
     },
     "defense": 12,
     "speed": 6,
-    "description": "전투를 좋아하지 않지만, 위협받으면 발차기로 반격. 이동 속도가 빠르다."
+    "description": "Doesn't like combat, but counterattacks with kicks when threatened. Fast movement speed."
   },
   "memory": {
     "dialogue_history": [],
     "key_events": [
-      "늑대 습격 시 놀라서 날뛰다 할란이 고삐를 잡아 진정시킴"
+      "Panicked during wolf attack, Hallan grabbed the reins to calm it down"
     ]
   }
 }

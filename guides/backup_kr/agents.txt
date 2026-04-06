@@ -1,0 +1,314 @@
+에이전트 역할 및 호출 규칙
+===
+
+GM 턴 처리 및 나레이션 규칙: guides/gm_rules.txt 참조
+인게임 메커니즘 (주사위, 엄폐, 위험 요소): guides/game_rules.txt 참조
+
+에이전트 호출 공통 규칙
+===
+모든 에이전트는 매번 새로 생성되며 대화 맥락이 없다.
+따라서 GM이 phase 1b에서 에이전트를 호출할 때 다음을 반드시 제공해야 한다:
+- 이번 턴의 방향성 (GM이 phase 1a에서 결정)
+- 사용자의 원래 행동 선언
+- 관련 상황 맥락 (현재 위치, 동행 NPC, 진행 중인 퀘스트 등)
+- 에이전트에 대한 구체적인 질문
+
+에이전트는 제공된 맥락 + 필수 읽기 파일을 바탕으로 검증/생성 후 GM에게 결과를 반환한다.
+GM은 에이전트 결과를 받아 문제가 있으면 방향성을 수정하고, 수정된 결과로 phase 2 (나레이션)를 진행한다.
+
+스키마 기반 에이전트 호출 (Hybrid Architecture)
+===
+에이전트는 구조화된 입출력을 위해 pydantic 스키마를 사용한다 (core/schemas/).
+GM 오케스트레이터는 TurnPlan → AgentDispatch → TurnSynthesis 흐름을 사용한다.
+
+Phase 1a: TurnPlan 구성
+  - turn_number, user_action, gm_direction, mood, agents_needed 설정
+  - 이번 턴에 필요한 에이전트 결정
+
+Phase 1b: AgentCall 목록으로 AgentDispatch 구성
+  - 각 AgentCall은 다음을 지정: agent_type, priority, depends_on, payload, required_files
+  - AgentDispatch.parallel_groups()는 동시에 실행 가능한 배치를 반환
+  - 각 호출에 대해 GM은 AgentRequest를 다음으로 구성:
+    - TurnContext (turn_number, location, chapter, time, player/npc summaries, recent events, gm_direction)
+    - 에이전트 고유 payload (예: rule_arbiter용 RuleRequest, npc용 NPCRequest)
+    - 에이전트가 반드시 읽어야 할 파일 목록
+
+Runner 디스패치 (data/agent_config.json에서 에이전트별 runner 결정):
+  - claude runner: registry.dispatch_claude_prompt(request) → prompt 문자열 → Agent 툴에 전달
+  - cloud/local runner: registry.dispatch(request) → AgentResponse 직접 반환
+
+Phase 2: TurnSynthesis 구성
+  - 모든 AgentResponse를 agent_results dict에 수집
+  - merge_warnings()로 모든 에이전트의 경고/오류 집계
+  - has_errors()이면 진행 전 처리
+  - 종합된 결과를 바탕으로 나레이션 작성
+
+Phase 3: 턴 결과로 SystemRequest 구성
+  - narration, dice_rolls, npc_actions, player_actions, state_changes 포함
+  - System 에이전트가 GMUpdatePayload 조립 → /api/gm-update 호출
+
+전투 턴 AgentDispatch 예시:
+  calls:
+    - agent_type: rule_arbiter, priority: 1, payload: {checks: [...], combat_actions: [...]}
+    - agent_type: player, priority: 1, payload: {player_ids: [2,3], situation: "...", is_combat: true}
+    - agent_type: npc, priority: 1, payload: {npc_ids: [300], party_actions: "..."}
+    - agent_type: scenario, priority: 1, payload: {events_this_turn: ["combat_started"]}
+    - agent_type: system, priority: 2, depends_on: [rule_arbiter, player, npc, scenario]
+
+그룹: [[rule_arbiter, player, npc, scenario], [system]] → 첫 번째 그룹 병렬 실행, system은 대기.
+
+에이전트 호출 최적화 규칙
+===
+각 에이전트는 고정 오버헤드가 있다 (~8K 토큰). 턴 상황에 따라 유연하게 구성한다.
+
+구성 기준 (GM이 phase 1a에서 결정):
+- Player Agent: 항상 캐릭터별 개별 호출 (각자 고유 페르소나 agents/agent_*.json 보유)
+  - 여러 Player Agent를 하나로 합치지 않는다 — 성격 혼합으로 품질 저하
+  - Player Agent는 해당 에이전트 페르소나 파일(agents/agent_*.json)을 반드시 읽고 행동을 생성해야 한다
+  - 매칭: 에이전트의 current_character 필드 → 플레이어 id (예: agent_b.current_character = "player_2" → 루세나)
+  - 페르소나의 personality, play_style, decision_tendency를 행동/대사 생성에 반영해야 한다
+  - controlled_by: "user"인 캐릭터는 AI 에이전트 불필요 — 유저가 직접 조종
+  - 유저가 부재 시 AI가 대신 조종하려면 해당 에이전트의 current_character에 할당
+  - AI 플레이어는 적극적이어야 한다: 행동 제안, NPC에게 먼저 말 걸기, 의견/이견 표현 — 단순 반응만 하지 않는다
+  - 유저가 AI 플레이어에게 직접 말을 걸면 (예: "루세나, 어떻게 생각해?"), 해당 Player Agent를 즉시 호출하여 응답을 생성한다. GM이 AI 플레이어의 대사를 직접 쓰지 않는다.
+- NPC Agent: 주요 NPC (엔티티 파일 + 대화 있는 경우) → 개별 호출. 단역 NPC → 합쳐도 가능
+- 전투/판정/챕터 전환 → 전체 분리 (Player, NPC, Rules, Scenario, Worldbuilding, System Reflection)
+- 평화로운 이동/대화 → Player 개별, NPC 합산 가능, Rules/Scenario 각 분리
+- 단순 반응 (단일 NPC 대사 등) → 최소 구성 (2~3개), 단 Player는 항상 개별
+
+파일 내용 분량 기준:
+- 에이전트가 읽어야 할 파일 총합이 5,000 토큰 이하 → 합산 가능
+- 5,000~10,000 토큰 → 상황에 따라 판단
+- 10,000 토큰 초과 → 반드시 분리 (정확도 저하 방지)
+- 예: rules.json이 커지면 rule 에이전트를 독립 실행, scenario.json이 커지면 scenario 에이전트를 독립 실행
+
+병렬 실행 원칙:
+- 독립적인 에이전트는 반드시 병렬 호출 (실행 시간 = 가장 느린 에이전트 기준)
+- 의존 관계가 있으면 순차 실행 (예: rule 판정 결과 → 나레이션)
+
+세계관 에이전트 역할
+===
+GM이 phase 1b에서 세계관 관련 맥락을 제공하면, 에이전트는 worldbuilding.json에 대비해 검증한다.
+
+세계관 에이전트가 반드시 검증해야 할 항목:
+- 나레이션에 새 지역이 언급됨 → worldbuilding.json에 등록되어 있는가?
+- 새 지형 (바다, 강, 산맥 등) 언급됨 → 기존 세계관과 일관성이 있는가?
+- 방향/거리 언급됨 → connections의 기존 데이터와 일치하는가?
+- 새 세력/조직 언급됨 → factions에 등록되어 있는가?
+- NPC가 지역 정보를 언급함 → 해당 정보가 정확한가, 아니면 NPC의 오정보가 의도된 설정인가?
+
+미등록 요소 처리:
+1. GM에게 경고: "이 지역/세력은 worldbuilding.json에 등록되지 않았습니다"
+2. 의도적인 새 요소이면 → world_pos 포함하여 worldbuilding.json에 즉시 등록
+3. NPC의 부정확한 정보이면 → NPC 엔티티의 memory에 "잘못된 정보"로 기록
+4. GM 실수이면 → 나레이션을 수정하거나 세계관에 맞게 조정
+
+GM 턴 phase 1b에서 worldbuilding 태그와 함께 반드시 기록:
+- "새로운 요소 없음" — 기존 세계관 내에서 진행
+- "십자로 휴게소 등록됨" — worldbuilding.json에 새 지역 추가
+- "항구 언급됨 — 미등록, 다음 턴에 명세 필요" — 보류 항목 기록
+
+Rule 에이전트 역할
+===
+GM이 phase 1b에서 행동/판정 맥락을 제공하면, 에이전트는 rules.json과의 일관성을 검증한다.
+필수 읽기: data/rules.json + guides/game_rules.txt (인게임 메커니즘: 엄폐, 낙하 대미지, 위험 요소, LoS)
+
+Rule 에이전트가 반드시 검증해야 할 항목:
+- 판정이 필요한 상황에서 주사위를 굴렸는가? (전투, 스킬 체크, 함정 등)
+- 마법/스킬 사용 MP 비용이 skills.json과 일치하는가?
+- 공격이 사거리 규칙을 준수하는가? (근접 = 1칸, 원거리 = 사거리 내)
+- 대미지/회복량이 rules.json의 공식과 일치하는가?
+- 상태 이상 효과가 status_effects.json에 따라 적용되는가?
+- 상태 이상 지속 시간이 만료됐지만 제거되지 않았는가?
+- 요건 (레벨, 스탯)을 충족하지 않고 장비를 사용하는가?
+- HP/MP가 0 이하인 상태에서 캐릭터가 행동하는가?
+- 전투 이니셔티브 순서가 지켜지는가?
+
+위반 처리:
+1. GM에게 경고: "이 행동은 규칙에 위반됩니다 — [구체적 규칙]"
+2. 가능하면 즉시 수정 (예: HP/MP 차감 누락)
+3. 위반이 나레이션에 영향을 미치면 판정 재실행 요청
+4. 의도적인 규칙 변형 (GM 재량)이면 이유를 기록
+
+GM 턴 phase 1b에서 rules 태그와 함께 반드시 기록:
+- "판정 없음 — 대화/이동만" — 판정이 필요 없는 턴
+- "Fireball MP 8 차감 확인됨" — 비용 검증 완료
+- "늑대 공격 판정 d20+3=15 vs AC 12 — 명중 확인됨" — 전투 판정 검증
+- "상태 이상 '독' 3턴 경과 — 자동 제거됨" — 상태 이상 만료 처리
+
+Scenario 에이전트 역할
+===
+GM이 phase 1b에서 진행 맥락을 제공하면, 에이전트는 시나리오 구조 (scenario.json)와의 일관성을 검증한다.
+
+Scenario 에이전트가 반드시 검증해야 할 항목:
+- 현재 위치가 시나리오 챕터에서 예상된 구역과 일치하는가?
+- 챕터 전환 조건이 충족됐지만 챕터가 변경되지 않았는가?
+- 퀘스트 완료 조건이 충족됐지만 상태가 active로 남아 있는가?
+- 핵심 시나리오 NPC가 사망/이탈했는데 스토리 진행이 여전히 가능한가?
+- 필수 아이템이 분실/사용됐는데 메인 퀘스트에 영향을 주는가?
+- 엔딩 분기 조건이 가까워지는가? (플레이어에게 힌트가 필요한지)
+- 시나리오 외 예상치 못한 상황이 발생했는가? (애드립 이벤트 추적)
+
+시나리오 이탈 처리:
+1. 소규모 이탈 → 자연스러운 나레이션으로 메인 라인으로 유도
+2. 의도적 이탈 → 새 분기로 시나리오 확장 (scenario.json 업데이트)
+3. 회복 불가 이탈 → 대안 경로 생성 또는 엔딩 분기 변경
+
+GM 턴 phase 1b에서 scenario 태그와 함께 반드시 기록:
+- "챕터 1 진행 중 — 목표: 카렌델 도달" — 정상 진행
+- "퀘스트 '약초 배달' 대상 NPC 접근 중" — 퀘스트 진행 감지
+- "메인 경로 이탈 — 샛길 진입, 복귀 가능" — 이탈 추적
+- "엔딩 조건 접근: 보물 감정 완료 시 챕터 2 전환" — 분기점 알림
+
+월드맵 에이전트 역할
+===
+세계 지도의 지리적 합리성을 검증한다. 지리학, 지도학, 생태학 관점의 자동 검사.
+
+자동 호출 조건 (이런 상황에서는 반드시 월드맵 에이전트를 호출):
+- 새 세계관 생성 시 → 전체 검증
+- worldbuilding.json에 새 장소 등록 시 → 좌표/지형 검증
+- 지형 변경 시 → 지도 업데이트
+- 게임플레이 중 새 지역 발견/언급 시 → 배치 합리성 검증
+
+검증 항목:
+- 항구가 해안선에 위치하는가 (바다에 인접)?
+- 마을/도시가 바다에 배치되지 않았는가?
+- 강이 산에서 바다 방향으로 흐르는가?
+- 도로 연결이 합리적인가? (직선 vs. 우회 모순)
+- travel_hours와 좌표 거리가 일관성이 있는가?
+- 새 지역이 기존 지역 좌표와 충돌하지 않는가?
+- 도시가 교통 허브에 위치하는가 (강변, 교차로, 해안)?
+
+GM 턴 phase 1b에서 worldmap 태그와 함께 반드시 기록:
+- "새로운 지역 없음" — 세계 지도 변경 없음
+- "세렌 항구 좌표 검증 — 해안선 확인 OK" — 검증 통과
+- "새 지역 '폐광' 등록 — 좌표 [6,9] 숲 내부, 지리적으로 합리적" — 신규 등록
+
+System Reflection 에이전트 역할
+===
+GM이 나레이션을 확정한 후, System Reflection 에이전트가 위임받으면 자동으로 다음 항목들을 처리한다.
+메인 GM은 개별 항목을 직접 관리할 필요가 없다.
+
+System Reflection 에이전트가 처리하는 항목:
+1. game_state.json 업데이트 (turn_count, events, player/NPC 상태)
+2. entities/ 파일 동기화
+3. gm-update API 호출:
+   - 나레이션 텍스트 전달
+   - 판정이 있었으면 dice_rolls 필드에 판정 상세 포함 (항상 기록)
+   - 메커니즘 요청이 있었으면 mechanics 필드 포함 (결과는 events에 자동 기록)
+   - 위치 변경 시 player_updates/npc_updates (position, location)
+   - 배경 일러스트 교체 (위치/시간대 변경 감지)
+   - NPC 등장 시 new_npcs 또는 npc_updates
+4. 위치 변경 시 current_location 업데이트
+5. 배경 일러스트:
+   - 위치 변경 → 새 배경 생성 요청 (illustration 필드)
+   - 시간대 변경 → 시간대를 반영한 prompt (밤, 새벽 등)
+   - 기존 이미지 재사용 우선 (_find_existing_image)
+6. NPC 등록 확인:
+   - 나레이션에서 개별 묘사된 NPC가 game_state에 존재하는지
+   - 없으면 GM에게 경고 반환
+7. show_dice_result 확인:
+   - false로 설정 시 나레이션에 수치가 포함되면 경고
+8. gm_turn.py 로그 기록 (gm-update, state, entity 태그)
+9. git commit (매 턴) — 상세: guides/save_rules.txt
+10. git push (3턴마다 또는 사용자 지정 시, 백그라운드) — 상세: guides/save_rules.txt
+
+GM이 System Reflection 에이전트에 반드시 제공해야 할 정보:
+- 나레이션 텍스트
+- 위치 변경 여부 + 새 위치
+- 시간대 변경 여부 (낮/밤/새벽)
+- NPC 상태 변화 (HP, 위치, 상태 이상 등)
+- 플레이어 상태 변화 (HP, MP, 위치, 인벤토리 등)
+
+이 에이전트는 Agent 툴 (run_in_background=true)을 사용하여 호출한다.
+
+에이전트 검토 필수 규칙
+===
+세계관, 지리, NPC, 규칙, 시나리오에 관한 검토가 필요할 때 GM은 직접 판단하지 않고 반드시 관련 에이전트에 검토를 요청해야 한다.
+
+| 검토 내용 | 호출할 에이전트 |
+| 지명, 지역, 세력, 지리 정보 | Agent [세계관] (worldbuilding_agent) |
+| 좌표, 해안선, 도로 연결, 지형 배치 | Agent [월드맵] (worldmap_agent) |
+| 판정, 스킬, HP/MP, 전투 규칙 | Agent [Rule Judge] (rules_agent) |
+| 챕터 전환, 퀘스트, 스토리 분기 | Agent [시나리오] (scenario_agent) |
+| AI 플레이어 행동/대사/결정 | Agent [Player:{name}] (player_agent) |
+| NPC 상태, 대사, 행동, 자발적 결정 | Agent [NPC:{name}] (npc_agent) |
+
+GM이 JSON을 직접 읽고 판단하는 것은 금지한다. 에이전트가 검증한 결과를 바탕으로 판단해야 한다.
+- 나쁜 예: GM이 worldbuilding.json을 직접 읽고 "세렌 항구가 여기 있으니까..."라고 결정
+- 좋은 예: Agent [세계관]에 요청: "언급된 남쪽 해안 마을 할란이 등록되어 있는지 확인해줘"
+
+이 규칙은 모든 경우에 적용된다: 게임플레이 대화에서 나오는 설정 확인, 사용자 질문 답변, 새 지역/NPC 등록.
+
+GM 방향성 설정 → 에이전트 호출 원칙
+===
+에이전트는 매번 새로 생성되며 대화 맥락이 없다. 전체 흐름은 GM만 알고 있다.
+따라서 GM은 방향성을 먼저 설정하고, 그 방향성을 에이전트에게 전달해야 한다.
+
+- GM = 감독: 전체 흐름을 알고 "이번 턴에 무슨 일이 일어날지" 방향성을 설정
+- 에이전트 = 전문가: GM의 방향성이 일관성이 있는지 검증하고 구체적인 결과 생성 (대사, 판정 수치 등)
+
+Phase 1a (GM 방향성 설정):
+- GM은 대화 맥락 + 시나리오 흐름을 바탕으로 이번 턴 방향성을 결정
+- 어떤 에이전트가 필요한지, 무엇을 물어볼지 결정
+- 나쁜 예: Agent [시나리오]에 "숲 탐험이 시나리오에 맞나요?" 라고 물음 (맥락 없이 던짐)
+- 좋은 예: Agent [시나리오]에 "챕터 1 후반, 함정 이벤트 트리거 조건이 충족됐는지 확인해줘"
+
+Phase 1b (에이전트 호출 — 방향성 + 맥락 포함):
+- GM의 방향성 + 구체적 맥락을 포함하여 에이전트를 병렬 호출
+- NPC 대사는 반드시 NPC 에이전트가 생성 — GM이 직접 작성하지 않음
+- 판정은 반드시 Rule 에이전트가 처리 — GM이 직접 주사위를 굴리지 않음
+- 새 지역/설정은 Worldbuilding/월드맵 에이전트의 확인 후에만 나레이션에 포함
+- 에이전트는 파일을 읽어 GM의 방향성이 일관성이 있는지 검증하고 구체적인 결과를 반환
+
+Phase 3 (사후 검증):
+→ Phase 3 사후 검증: 아래 '에이전트 경고 처리 워크플로우' 섹션 참조
+
+나쁜 예: GM이 NPC 대사를 직접 작성하고 gm-update의 사후 검증에만 의존
+좋은 예: NPC 에이전트가 대사 생성 → GM이 나레이션에 반영 → gm-update 사후 검증으로 추가 확인
+
+에이전트 경고 처리 워크플로우
+===
+에이전트가 문제를 감지했을 때의 처리 흐름.
+경고는 두 지점에서 발생할 수 있다: phase 1b (사전 검증)와 phase 3 (사후 검증).
+
+[Phase 1b 경고 — 사전 검증]
+
+  에이전트가 GM의 방향성에서 문제를 발견하고 보고:
+  - 🌍 세계관: "항구가 언급됐지만 수계 설정이 없습니다"
+  - ⚖️ 규칙: "Fireball MP 8 비용이 차감되지 않았습니다"
+  - 📜 시나리오: "퀘스트 '약초 배달' 대상인 볼프를 만나지 않고 지나침"
+
+  → GM이 보고를 받고 결정:
+  - 🌍: ① 남쪽에 강 추가 ② 할란의 오해 ③ 해안 무역항
+  - ⚖️: ① MP 즉시 차감 ② GM 재량으로 무료 사용 허용 (이유 기록)
+  - 📜: ① NPC 대화를 통해 퀘스트 상기 ② 플레이어 선택 존중, 퀘스트 실패 처리
+
+  → GM이 결정을 데이터 파일에 반영:
+  - 🌍 → worldbuilding.json (지역/세력/지형 추가·수정)
+  - ⚖️ → game_state.json (HP/MP/스탯/상태 이상 수정)
+  - 📜 → scenario.json / quests.json (퀘스트 상태/챕터 전환)
+
+  → 수정된 방향성으로 phase 2 (나레이션 작성)로 진행.
+
+[Phase 3 경고 — 사후 검증 (안전망)]
+
+  gm-update API 호출 시 자동으로 실행되는 안전망.
+  phase 1b에서 놓친 모순을 포착.
+  - 사후 검증 경고 발생 → GM이 나레이션 수정 + 데이터 재반영 + gm-update 재호출
+
+[경고 결과의 플레이어 전달]
+
+  - 필요할 때 나레이션을 통해 자연스럽게 전달
+  - 직접 전달: NPC 대사, 환경 묘사, 이벤트에 녹여냄
+  - 간접 전달: 판정 결과 표시, 상태 변화 알림
+  - 전달 불필요: 내부 시스템 수정 (데이터 일관성 수정 등)
+
+  나쁜 예: "시스템 오류로 MP가 차감되지 않아 수정했습니다" (메타 발언)
+  좋은 예: 사이키는 마법 에너지를 소모한 피로감을 느꼈다. (MP 37 → 29)
+
+핵심 원칙:
+- 에이전트 경고는 플레이어에게 직접 보이지 않음 — GM이 내부적으로 처리
+- GM은 에이전트 경고를 무시할 수 있지만, 무시한 이유를 반드시 기록해야 함
+- 반영 결과는 반드시 데이터 파일에 저장 — 대화 맥락에만 보관하는 것은 금지
+- 플레이어 전달은 반드시 나레이션에 자연스럽게 녹여야 함 — 시스템 메시지 금지

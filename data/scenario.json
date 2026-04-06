@@ -1,70 +1,92 @@
 {
   "scenario_info": {
-    "title": "카렌델로 가는 길",
-    "description": "전설의 보물을 손에 넣은 세 모험가가 감정을 위해 교역도시 카렌델로 향한다.",
+    "title": "Lost Treasure Forest Dungeon",
+    "description": "A legendary treasure slumbers deep in an ancient forest. Three adventurers brave the dangers and step into the dungeon.",
     "difficulty": "normal",
-    "recommended_level": 3,
-    "prerequisite": "lost_treasure",
-    "prerequisite_required": false,
-    "backstory": "숲 깊은 곳의 던전에서 전설의 보물을 발견한 모험가들. 보물의 정체를 밝히기 위해 교역도시 카렌델로 향한다. 도중에 부상당한 상인 일행을 만나 동행하게 된다."
+    "recommended_level": 1,
+    "backstory": "An ancient forest near Harun Village. Rumors have long told of a legendary treasure sleeping deep within the forest. Three young adventurers who grew up in the village set out into the forest to find the treasure."
   },
   "opening": {
-    "continue": "전작에서 이어하기 — 캐릭터, 인벤토리, 레벨을 그대로 유지합니다.",
-    "new_game": "새 게임 시작 — 레벨 3 캐릭터로 시작합니다. 던전을 클리어하고 보물을 손에 넣은 상태입니다.",
-    "narrative": "세 명의 모험가가 숲의 던전에서 전설의 보물을 손에 넣었다. 정체를 알 수 없는 고대 장식함. 감정을 위해 교역도시 카렌델로 향하던 중, 교역로에서 늑대에게 습격당한 상인 일행을 발견한다."
+    "new_game": "New game start — begin with level 1 characters.",
+    "narrative": "The forest on the outskirts of Harun Village. The entrance to an ancient dungeon is faintly visible through the undergrowth. Three adventurers stand before the entrance, torches in hand."
   },
   "default_party": {
-    "description": "새 게임 시작 시 사용할 기본 파티 (레벨 3)",
+    "description": "Default party for new game start (level 1)",
     "players": [
       {
         "id": 1,
         "name": "",
-        "class": "마법사",
-        "level": 3,
-        "xp": 300,
+        "class": "mage",
+        "race": "human",
+        "appearance": {"age": "Early 20s", "build": "Thin build", "skin": "Pale white skin", "hair": "Long silver-gray hair, loosely tied back", "face": "Intelligent gaze, sharp features", "outfit": "Navy blue robe, magical charm hanging from belt", "notable": "Always carrying a magic staff in hand"},
+        "level": 1,
+        "xp": 0,
         "stats": {"STR": 8, "DEX": 14, "INT": 18, "CON": 10},
         "hp_base": 10,
         "mp_base": 12,
-        "starting_inventory": ["마법 지팡이", "마나 포션", "전설의 보물", "고대 열쇠"],
+        "starting_inventory": ["magic_staff", "mana_potion"],
         "controlled_by": "user"
       },
       {
         "id": 2,
         "name": "",
-        "class": "도적",
-        "level": 3,
-        "xp": 300,
+        "class": "rogue",
+        "race": "human",
+        "appearance": {"age": "Mid 20s", "build": "Slim and agile build", "skin": "Slightly tanned apricot complexion", "hair": "Short black hair, swept to one side", "face": "Sharp eyes, cunning expression", "outfit": "Black leather armor, two daggers at the waist", "notable": "Moves as if melting into the shadows"},
+        "level": 1,
+        "xp": 0,
         "stats": {"STR": 8, "DEX": 18, "INT": 10, "CON": 14},
         "hp_base": 15,
         "mp_base": 5,
-        "starting_inventory": ["단검 x2", "도둑 도구", "밧줄"],
-        "controlled_by": "agent"
+        "starting_inventory": ["dual_daggers", "thieves_tools", "rope"],
+        "controlled_by": "ai"
       },
       {
         "id": 3,
         "name": "",
-        "class": "전사",
-        "level": 3,
-        "xp": 300,
+        "class": "warrior",
+        "race": "human",
+        "appearance": {"age": "Late 20s", "build": "Muscular, sturdy build", "skin": "Bronze skin", "hair": "Short-cropped brown hair", "face": "Strong jawline, rough but dependable appearance", "outfit": "Chainmail armor, iron sword on back, leather shield on left arm", "notable": "Old battle scar on forearm"},
+        "level": 1,
+        "xp": 0,
         "stats": {"STR": 16, "DEX": 12, "INT": 8, "CON": 14},
         "hp_base": 25,
         "mp_base": 5,
-        "starting_inventory": ["철검", "가죽 방패", "황금 100개"],
-        "controlled_by": "agent"
+        "starting_inventory": ["iron_sword", "leather_shield"],
+        "controlled_by": "ai"
       }
     ]
   },
-  "default_npcs": [
-    {"id": 300, "name": "할란", "type": "friendly", "stats": {"STR": 10, "DEX": 8, "INT": 14, "CON": 10}, "hp": 8, "max_hp": 12, "mp": 3, "max_mp": 3, "position": [9, 5], "status": "alive", "location": "trade_road_karendel"},
-    {"id": 301, "name": "미라", "type": "friendly", "stats": {"STR": 8, "DEX": 14, "INT": 12, "CON": 10}, "hp": 10, "max_hp": 10, "mp": 5, "max_mp": 5, "position": [10, 5], "status": "alive", "location": "trade_road_karendel"}
-  ],
+  "default_npcs": [],
   "chapters": [
-    {"id": 1, "name": "교역로", "description": "하룬 마을에서 카렌델로 이어지는 교역로. 상인 할란과 미라와 동행 중.", "map_area": "trade_road_karendel"},
-    {"id": 2, "name": "카렌델 입성", "description": "북쪽의 교역 도시 카렌델. 다양한 종족과 상인이 모이는 곳.", "map_area": "karendel"},
-    {"id": 3, "name": "보물의 비밀", "description": "전설의 보물의 정체가 밝혀지고, 새로운 모험이 시작된다.", "map_area": "karendel"}
+    {
+      "id": 1,
+      "name": "Forest Entrance",
+      "description": "The path leading into the ancient forest. Trees are dense and little light gets through. Herbs and traps are scattered about.",
+      "map_area": "forest_entrance"
+    },
+    {
+      "id": 2,
+      "name": "Ancient Dungeon",
+      "description": "A stone dungeon deep in the forest. Orcs and slimes inhabit it, with ancient inscriptions and hidden keys.",
+      "map_area": "ancient_dungeon"
+    },
+    {
+      "id": 3,
+      "name": "Treasure Room",
+      "description": "The golden chamber at the dungeon's deepest point. A treasure chest rigged with poison gas traps and a guardian golem await.",
+      "map_area": "treasure_room"
+    },
+    {
+      "id": 4,
+      "name": "Epilogue",
+      "description": "After obtaining the treasure and escaping the dungeon. Return to the village and prepare for the next journey.",
+      "map_area": "harun_village"
+    }
   ],
   "endings": [
-    {"id": "treasure_revealed", "condition": "treasure_appraised", "title": "보물의 진실", "narrative": "전설의 보물의 정체가 밝혀졌다."},
-    {"id": "new_adventure", "condition": "accept_new_quest", "title": "새로운 모험의 시작", "narrative": "카렌델에서의 경험이 세 모험가를 더 큰 세계로 이끈다."}
+    {"id": "perfect", "condition": "all_alive_with_treasure", "title": "Perfect Victory", "narrative": "All three adventurers returned to the village alive with the legendary treasure."},
+    {"id": "pyrrhic", "condition": "treasure_with_casualties", "title": "Pyrrhic Victory", "narrative": "The treasure was obtained, but the cost was great."},
+    {"id": "escape", "condition": "alive_no_treasure", "title": "Escaped with Their Lives", "narrative": "They abandoned the treasure and escaped the dungeon. Being alive is enough."}
   ]
 }

@@ -1,14 +1,14 @@
 {
   "id": 3,
-  "name": "노을",
-  "class": "전사",
+  "name": "noel",
+  "class": "warrior",
   "background": {
-    "origin": "마을 외곽에서 혼자 살던 고아. 정식 훈련 받은 기사가 아니라 거리에서 몸으로 배운 싸움꾼.",
-    "motivation": "사이키네 집에서 밥을 얻어먹던 은혜를 갚겠다는 마음 반, 보물로 인생을 바꾸고 싶다는 욕심 반. '이번엔 내가 앞에 서서 지켜줄게.'",
-    "personality": "입은 거칠지만 뒤에서 남몰래 챙겨주는 겉바속촉 의리파. 위험한 일은 자기가 먼저 뛰어드는 무모한 면이 있다.",
+    "origin": "An orphan who lived alone on the village outskirts. Not a formally trained knight, but a street-taught fighter.",
+    "motivation": "Half wanting to repay the kindness of being fed at Saiki's house, half wanting to change his life with treasure. 'This time, I'll stand in front and protect everyone.'",
+    "personality": "Rough on the outside but secretly caring — a tough exterior hiding a soft heart. Recklessly jumps into danger first.",
     "relationships": {
-      "사이키": "형이라 부르며 따르는 이웃집 은인",
-      "루체나": "동갑내기 친구. 서로 티격태격하지만 통하는 사이"
+      "saiki": "Benefactor from next door whom he calls 'big brother'",
+      "lucena": "Same-age friend. They bicker but understand each other"
     }
   },
   "stats": {
@@ -22,35 +22,35 @@
     "CON": 17
   },
   "position": [
-    12,
-    12
+    4,
+    14
   ],
   "status_effects": [],
   "inventory": [
-    "가죽 방패",
-    "오크의 도끼",
-    "상처 치료 약병"
+    "leather_shield",
+    "orc_axe",
+    "wound_treatment_vial"
   ],
   "equipment": {
     "weapon": {
-      "name": "오크의 도끼",
+      "name": "orc_axe",
       "rarity": "uncommon",
       "properties": {
         "attack_bonus": 1
       }
     },
     "armor": {
-      "name": "가죽 방패",
+      "name": "leather_shield",
       "rarity": "common",
       "properties": {}
     },
     "accessory": null
   },
   "available_actions": [
-    "공격",
-    "방어",
-    "도주",
-    "강타"
+    "attack",
+    "defend",
+    "flee",
+    "power_strike"
   ],
   "combat_state": {
     "is_in_combat": false,
@@ -61,11 +61,11 @@
     "actions_taken": [
       {
         "turn": 3,
-        "action": "공격",
-        "target": "어두운 오크",
-        "roll": "18+3=21 명중",
+        "action": "attack",
+        "target": "dark orc",
+        "roll": "18+3=21 hit",
         "damage": 0,
-        "result": "대상 이미 사망"
+        "result": "target already dead"
       }
     ],
     "damage_dealt_total": 0,
@@ -85,35 +85,45 @@
     "xp_to_next": 600,
     "stat_points_available": 0,
     "learned_skills": [
-      "강타"
+      "power_strike"
     ],
     "xp_log": [
       {
-        "source": "오크 처치 (high)",
+        "source": "orc kill (high)",
         "amount": 60
       },
       {
-        "source": "챕터1 완료",
+        "source": "chapter 1 complete",
         "amount": 100
       },
       {
-        "source": "함정 해제 (퍼즐)",
+        "source": "trap disarm (puzzle)",
         "amount": 25
       },
       {
-        "source": "보물 상자 획득 (퀘스트)",
+        "source": "treasure chest obtained (quest)",
         "amount": 50
       },
       {
-        "source": "탐색/RP (숲, 던전, 비문)",
+        "source": "exploration/RP (forest, dungeon, inscription)",
         "amount": 50
       },
       {
-        "source": "늑대 처치 (medium)",
+        "source": "wolf kill (medium)",
         "amount": 30
       }
     ]
   },
-  "party_role": "전열 (탱커/근접딜)",
-  "controlled_by": "agent"
+  "party_role": "frontline_tank_melee_2",
+  "controlled_by": "ai",
+  "race": "human",
+  "appearance": {
+    "age": "15",
+    "build": "Sturdy, muscular for his age from years of street brawling",
+    "hair": "Wild, unkempt reddish-brown hair",
+    "face": "Scar on cheek. Fierce eyes but warm underneath — acts tough but genuinely cares.",
+    "outfit": "Mismatched scavenged armor — leather shield on one arm, worn iron sword in the other",
+    "notable": "Scar on cheek. Standing protectively in front of others."
+  },
+  "agent_id": "agent_c"
 }

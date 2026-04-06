@@ -1,0 +1,52 @@
+{
+  "id": 306,
+  "name": "volf",
+  "type": "friendly",
+  "race": "human",
+  "status": "alive",
+  "location": "red_chimney_inn_1f",
+  "appearance": {
+    "age": "Early 50s",
+    "build": "Tall and broad-shouldered, beer belly",
+    "skin": "Weathered tan skin",
+    "hair": "Salt-and-pepper dark brown hair, cut short",
+    "face": "Deep-set eyes, strong jaw, short stubble beard, gruff but not unkind expression, wrinkles around eyes",
+    "outfit": "Dark leather apron over a linen shirt, sleeves rolled up",
+    "notable": "Favors left knee slightly (bad knees). Large hands — used to hard work."
+  },
+  "personality": {
+    "temperament": "gruff",
+    "intelligence": "high",
+    "behavior_pattern": "Experienced innkeeper. Businesslike but fair. Never overcharges, never forgets a friend.",
+    "speech_style": "Low voice, short sentences. Not rude but not warm either. Warms up when trust is earned.",
+    "motivation": "Run the inn well. Honor old friendships (Ernes)."
+  },
+  "relationships": {
+    "ernes": "Old friend. Receives mountain herbs for his knees. Trusts Ernes completely."
+  },
+  "memory": {
+    "dialogue_history": [
+      "내가 볼프요. 에르네스가 보냈다고? 그 녀석, 잊지 않았군."
+    ],
+    "key_events": [
+      "Received Ernes letter and herb bundle from Saiki party"
+    ]
+  },
+  "description": "Owner of Red Chimney Inn. Old friend of Ernes. Bad knees.",
+  "known": true,
+  "display_name": "innkeeper",
+  "hp": 15,
+  "max_hp": 15,
+  "mp": 0,
+  "max_mp": 0,
+  "stats": {
+    "STR": 12,
+    "DEX": 8,
+    "INT": 12,
+    "CON": 11
+  },
+  "position": [
+    17,
+    5
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "obj_005",
+  "name": "traveler_tent",
+  "type": "shelter",
+  "status": "set_up",
+  "position": [
+    15,
+    12
+  ],
+  "location": "crossroads_rest",
+  "description": "A makeshift tent set up by another traveler. Made of worn cloth.",
+  "interactable": false,
+  "icon": "⛺",
+  "tactical": {
+    "cover": "half",
+    "defense_bonus": 1,
+    "blocks_ranged": false,
+    "destructible": true,
+    "hp": 5,
+    "flammable": true,
+    "description": "Weak cover behind the tent. Easily destroyed."
+  }
+}

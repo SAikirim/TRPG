@@ -1,0 +1,55 @@
+{
+  "id": 301,
+  "name": "미라",
+  "type": "friendly",
+  "race": "인간",
+  "known": true,
+  "status": "alive",
+  "location": "교역로 (수레 파손 현장)",
+  "appearance": {
+    "age": "20대",
+    "build": "날씬하고 민첩한 체형",
+    "skin": "밝은 피부",
+    "hair": "아버지를 닮은 갈색 머리, 하나로 묶어 올림",
+    "face": "밝은 갈색 눈, 호기심 많고 생기 있는 얼굴",
+    "outfit": "실용적인 여행복 — 짧은 외투, 긴 치마, 부츠",
+    "notable": "어깨에 가죽 가방 (약초 다발과 장부)"
+  },
+  "personality": {
+    "temperament": "cheerful",
+    "intelligence": "medium",
+    "behavior_pattern": "밝고 수다스러운 상인의 딸. 사람을 잘 사귀고 정보통. 아버지를 챙긴다.",
+    "speech_style": "활발하고 친근한 말투. 감사 표현을 잘 한다.",
+    "motivation": "아버지와 함께 무사히 카렌델 도착. 장사 성공."
+  },
+  "stats": {
+    "STR": 8,
+    "DEX": 14,
+    "INT": 12,
+    "CON": 10
+  },
+  "hp": 14,
+  "max_hp": 14,
+  "mp": 5,
+  "max_mp": 5,
+  "relationships": {
+    "할란": "아버지. 걱정되지만 존경한다.",
+    "사이키": "구해준 모험가. 호감."
+  },
+  "travel": {
+    "origin": "세렌 항구",
+    "destination": "카렌델",
+    "route": ["교역로 (카렌델 방면)", "갈림길 쉼터", "카렌델"],
+    "current_segment": "교역로 (카렌델 방면)",
+    "met_party_at": "교역로 (카렌델 방면)",
+    "travel_mode": "cart",
+    "origin_note": "에르시아 남동쪽의 작은 어항. 직물과 건어물을 싣고 교역로를 따라 카렌델로 북상 중."
+  },
+  "memory": {
+    "dialogue_history": [],
+    "key_events": [
+      "파티에게 늑대에서 구출됨.",
+      "사이키가 세이지를 만지는 걸 봤지만, 자연스럽게 물어봐서 의심 해소."
+    ]
+  }
+}

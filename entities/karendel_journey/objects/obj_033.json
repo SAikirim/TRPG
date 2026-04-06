@@ -1,0 +1,19 @@
+{
+  "id": "obj_033",
+  "name": "stairway",
+  "type": "stairs_obj",
+  "status": "placed",
+  "position": [22, 22],
+  "size": [2, 2],
+  "location": "red_chimney_inn_2f",
+  "description": "Wooden stairs leading down to the first floor.",
+  "interactable": true,
+  "interaction": "Stairs leading down to the first floor.",
+  "icon": "🪜",
+  "tactical": {
+    "cover": "none",
+    "defense_bonus": 0,
+    "destructible": false,
+    "flammable": false
+  }
+}

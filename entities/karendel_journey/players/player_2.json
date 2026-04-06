@@ -1,20 +1,20 @@
 {
   "id": 2,
-  "name": "루체나",
-  "class": "도적",
+  "name": "lucena",
+  "class": "rogue",
   "background": {
-    "origin": "사이키의 여동생. 오빠가 마법을 배우는 동안 뒷골목에서 생존술을 익힘. 소매치기, 자물쇠 따기가 그녀의 학교였다.",
-    "motivation": "오빠와 함께 보물을 찾아 가난에서 벗어나기. '오빠가 길을 밝히면, 내가 그림자에서 길을 열게.'",
-    "personality": "입은 거칠고 손은 빠르지만, 오빠 앞에서만은 아직도 투정부리는 열다섯 살 — 세상에서 가장 믿음직한 여동생.",
+    "origin": "Saiki's younger sister. While her brother learned magic, she learned survival skills in back alleys. Pickpocketing and lockpicking were her school.",
+    "motivation": "Escape poverty by finding treasure with her brother. 'If brother lights the way, I'll open the path from the shadows.'",
+    "personality": "Rough-spoken with quick hands, but still throws tantrums in front of her brother at fifteen — the most dependable little sister in the world.",
     "relationships": {
-      "사이키": "오빠. 세상에서 가장 소중한 사람",
-      "노을": "동갑내기 친구. 서로 티격태격하지만 통하는 사이"
+      "saiki": "Brother. The most precious person in the world",
+      "noel": "Same-age friend. They bicker but understand each other"
     }
   },
   "stats": {
     "hp": 30,
     "max_hp": 30,
-    "mp": 12,
+    "mp": 14,
     "max_mp": 14,
     "STR": 8,
     "DEX": 20,
@@ -23,17 +23,17 @@
   },
   "position": [
     14,
-    12
+    5
   ],
   "status_effects": [],
   "inventory": [
-    "단검 x2",
-    "도둑 도구",
-    "밧줄"
+    "dual_daggers",
+    "thieves_tools",
+    "rope"
   ],
   "equipment": {
     "weapon": {
-      "name": "단검 x2",
+      "name": "dual_daggers",
       "rarity": "common",
       "properties": {}
     },
@@ -41,10 +41,10 @@
     "accessory": null
   },
   "available_actions": [
-    "공격",
-    "습격",
-    "도주",
-    "독 바르기"
+    "attack",
+    "ambush",
+    "flee",
+    "poison_apply"
   ],
   "combat_state": {
     "is_in_combat": false,
@@ -55,25 +55,25 @@
     "actions_taken": [
       {
         "turn": 3,
-        "action": "습격",
-        "target": "어두운 오크",
-        "roll": "자동명중(은신)",
+        "action": "ambush",
+        "target": "dark orc",
+        "roll": "auto hit (stealth)",
         "damage": 14,
-        "result": "처치"
+        "result": "killed"
       },
       {
         "turn": 7,
-        "action": "함정 해제",
-        "target": "보물 상자 독 가스 함정",
-        "roll": "성공",
+        "action": "trap disarm",
+        "target": "treasure chest poison gas trap",
+        "roll": "success",
         "damage": 0,
-        "result": "함정 해제 완료"
+        "result": "trap disarmed"
       }
     ],
     "damage_dealt_total": 14,
     "damage_received_total": 0,
     "kills": [
-      "어두운 오크"
+      "dark orc"
     ],
     "items_used": [],
     "turns_played": 2
@@ -89,35 +89,45 @@
     "xp_to_next": 600,
     "stat_points_available": 0,
     "learned_skills": [
-      "독 바르기"
+      "poison_apply"
     ],
     "xp_log": [
       {
-        "source": "오크 처치 (high)",
+        "source": "orc kill (high)",
         "amount": 60
       },
       {
-        "source": "챕터1 완료",
+        "source": "chapter 1 complete",
         "amount": 100
       },
       {
-        "source": "함정 해제 (퍼즐)",
+        "source": "trap disarm (puzzle)",
         "amount": 25
       },
       {
-        "source": "보물 상자 획득 (퀘스트)",
+        "source": "treasure chest obtained (quest)",
         "amount": 50
       },
       {
-        "source": "탐색/RP (숲, 던전, 비문)",
+        "source": "exploration/RP (forest, dungeon, inscription)",
         "amount": 50
       },
       {
-        "source": "늑대 처치 (medium)",
+        "source": "wolf kill (medium)",
         "amount": 30
       }
     ]
   },
-  "party_role": "중열 (기습/유틸)",
-  "controlled_by": "agent"
+  "party_role": "midline_ambush_util",
+  "controlled_by": "ai",
+  "race": "human",
+  "appearance": {
+    "age": "15",
+    "build": "Quick, agile posture",
+    "hair": "Short messy hair tied back loosely",
+    "face": "Sharp, mischievous eyes with a confident smirk. Tough exterior but youthful softness.",
+    "outfit": "Dark leather street clothes — not proper armor, street urchin's practical outfit with many hidden pockets",
+    "notable": "Dual-wields two small daggers. Lockpicking tools hanging from belt."
+  },
+  "agent_id": "agent_b"
 }

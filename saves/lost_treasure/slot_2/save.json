@@ -1,0 +1,349 @@
+{
+  "save_info": {
+    "scenario_id": "lost_treasure",
+    "slot": 2,
+    "description": "Turn 1: Dungeon entry, trap disarmed",
+    "saved_at": "2026-03-29 01:47:31",
+    "turn_count": 1,
+    "chapter": 2,
+    "party_summary": [
+      {
+        "name": "가온",
+        "class": "전사",
+        "level": 1,
+        "controlled_by": "ai"
+      },
+      {
+        "name": "세라핀",
+        "class": "성직자",
+        "level": 1,
+        "controlled_by": "ai"
+      },
+      {
+        "name": "여울",
+        "class": "도적",
+        "level": 1,
+        "controlled_by": "ai"
+      }
+    ]
+  },
+  "game_state": {
+    "game_info": {
+      "title": "잃어버린 보물의 숲 던전",
+      "scenario_id": "lost_treasure",
+      "scenario": "고대 숲 깊은 곳에 잠든 전설의 보물을 찾아 던전에 발을 들인다",
+      "ruleset": "fantasy_basic",
+      "difficulty": "normal",
+      "stat_pool": 50,
+      "status": "active",
+      "ending": null,
+      "current_chapter": 1
+    },
+    "current_location": "lost_treasure_dungeon",
+    "players": [
+      {
+        "id": 1,
+        "name": "가온",
+        "class": "전사",
+        "level": 1,
+        "xp": 0,
+        "hp": 33,
+        "max_hp": 33,
+        "mp": 5,
+        "max_mp": 5,
+        "stats": {
+          "STR": 18,
+          "DEX": 10,
+          "INT": 6,
+          "CON": 16
+        },
+        "position": [
+          12,
+          18
+        ],
+        "status_effects": [],
+        "inventory": [
+          "철검",
+          "가죽 방패"
+        ],
+        "controlled_by": "ai",
+        "agent_id": "agent_a",
+        "race": "인간",
+        "appearance": {
+          "age": "20대 중반",
+          "build": "단단하고 다부진 체형",
+          "skin": "햇볕에 그을린 피부",
+          "hair": "짧게 자른 흑발",
+          "face": "날카로운 눈빛, 과묵한 인상",
+          "outfit": "낡은 쇠사슬 갑옷, 등에 철검, 왼팔에 가죽 방패",
+          "notable": "갑옷 위로 드러난 오래된 흉터"
+        }
+      },
+      {
+        "id": 2,
+        "name": "세라핀",
+        "class": "성직자",
+        "level": 1,
+        "xp": 0,
+        "hp": 26,
+        "max_hp": 26,
+        "mp": 24,
+        "max_mp": 24,
+        "stats": {
+          "STR": 6,
+          "DEX": 10,
+          "INT": 18,
+          "CON": 16
+        },
+        "position": [
+          12,
+          19
+        ],
+        "status_effects": [],
+        "inventory": [
+          "철퇴",
+          "성스러운 부적"
+        ],
+        "controlled_by": "ai",
+        "agent_id": "agent_b",
+        "race": "인간",
+        "appearance": {
+          "age": "20대 초반",
+          "build": "단정하고 슬림한 체형",
+          "skin": "밝은 피부",
+          "hair": "은빛 머리카락을 단정하게 묶음",
+          "face": "날카롭고 차가운 눈빛, 지적인 인상",
+          "outfit": "청백색 사제복, 가벼운 사슬 갑옷",
+          "notable": "은빛 성흔 목걸이, 손에 낡은 성전"
+        }
+      },
+      {
+        "id": 3,
+        "name": "여울",
+        "class": "도적",
+        "level": 1,
+        "xp": 0,
+        "hp": 20,
+        "max_hp": 20,
+        "mp": 12,
+        "max_mp": 12,
+        "stats": {
+          "STR": 8,
+          "DEX": 18,
+          "INT": 14,
+          "CON": 10
+        },
+        "position": [
+          12,
+          17
+        ],
+        "status_effects": [],
+        "inventory": [
+          "단검 x2",
+          "도둑 도구",
+          "밧줄"
+        ],
+        "controlled_by": "ai",
+        "agent_id": "agent_c",
+        "race": "인간",
+        "appearance": {
+          "age": "20대 초반",
+          "build": "가볍고 민첩한 체형",
+          "skin": "약간 그을린 피부",
+          "hair": "짧게 자른 흑발, 날카로운 눈매",
+          "face": "비실비실 웃는 입꼬리, 약삭빠른 인상",
+          "outfit": "다크그린 레더아머, 허리에 단검 두 자루",
+          "notable": "그림자 속에 녹아드는 듯한 움직임"
+        }
+      }
+    ],
+    "npcs": [],
+    "map": {
+      "width": 25,
+      "height": 25,
+      "tile_size": 40,
+      "locations": [
+        {
+          "name": "dungeon_entrance",
+          "type": "cave",
+          "area": {
+            "x1": 10,
+            "y1": 20,
+            "x2": 14,
+            "y2": 24
+          }
+        },
+        {
+          "name": "corridor_1",
+          "type": "dungeon",
+          "area": {
+            "x1": 10,
+            "y1": 14,
+            "x2": 14,
+            "y2": 19
+          }
+        },
+        {
+          "name": "ancient_dungeon",
+          "type": "dungeon",
+          "area": {
+            "x1": 5,
+            "y1": 6,
+            "x2": 19,
+            "y2": 13
+          }
+        },
+        {
+          "name": "treasure_room",
+          "type": "treasure",
+          "area": {
+            "x1": 9,
+            "y1": 0,
+            "x2": 15,
+            "y2": 5
+          }
+        }
+      ]
+    },
+    "turn_count": 1,
+    "current_scene": {
+      "background": "/static/illustrations/sd/background_dungeon_corridor.webp",
+      "layers": [
+        {
+          "type": "object",
+          "image": "/static/illustrations/sd/object_spring_trap_disarmed.webp",
+          "position": "center",
+          "name": "spring_trap_disarmed",
+          "distance": 4,
+          "size_class": "d3"
+        }
+      ]
+    },
+    "events": [
+      {
+        "turn": 0,
+        "message": "[GM] Generate yeoul portrait",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "00:28:14"
+      },
+      {
+        "turn": 0,
+        "message": "[GM] Regenerate gaon portrait (female)",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "00:34:17"
+      },
+      {
+        "turn": 0,
+        "message": "[GM] Regenerate yeoul portrait (female)",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "00:34:22"
+      },
+      {
+        "turn": 1,
+        "message": "[GM] Turn 1: Dungeon entry, trap found and disarmed by Yeoul",
+        "narrative": "어둠 속으로 첫 발을 내디뎠다.\n\n횃불이 축축한 석벽을 비추자, 천장에서 물방울이 똑 떨어졌다. 가온이 횃불을 높이 들어 통로 천장과 양쪽 벽면을 훑어본 뒤, 발소리를 죽이며 세 걸음 앞으로 나아갔다. 뒤따르는 일행에게 손으로 '잠깐' 신호를 보냈다.\n\n\"일단 멈춰. 냄새 맡아봐 -- 흙냄새만 나면 괜찮고, 썩은 내 섞이면 바로 알려.\"\n\n\"내가 5보 앞서간다. 간격 유지해. 몰려다니면 같이 죽어.\"\n\n퉁명스럽지만, 전장에 익숙한 사람의 말이었다.\n\n세라핀이 성스러운 부적에 손을 얹고 낮은 목소리로 주문을 중얼거렸다. 은은한 빛이 세 사람을 감싸며 얇은 보호 결계가 펼쳐졌다. 동시에 횃불 빛이 닿지 않는 벽면의 각문을 예리한 눈으로 훑었다.\n\n\"가온, 잠깐. 저 각문 -- 경고문이야. 이 복도, 함정 아니면 언데드 구역이에요.\"\n\n\"모두 붙어요. 축복을 걸었으니 2미터 이상 벌어지지 마세요.\"\n\n그 순간, 여울이 대열 앞으로 미끄러지듯 나섰다. 손가락 끝으로 바닥을 훑다가 세 번째 석판 이음새에서 멈췄다. 미세한 먼지 흔적이 끊겨 있었다 -- 누군가 최근에 밟은 자리.\n\n무릎을 꿇고 귀를 바닥에 가져다 대자, 석판 아래에서 금속 스프링 소리가 희미하게 느껴졌다.\n\n\"잠깐, 멈춰. 이 석판 -- 밟으면 재밌는 일이 생길 것 같은데.\"\n\n입꼬리가 올라갔다.\n\n\"스프링식이야. 아마 위에서 뭔가 떨어지거나... 아니면 옆에서. 벽 좀 봐줘.\"\n\n여울이 도둑 도구를 꺼내 석판 이음새에 집어넣었다. 숙련된 손놀림으로 스프링을 고정하고, 발동 핀을 비틀어 빼냈다. 딸깍. 금속이 잠기는 소리와 함께 석판이 미동도 없이 고정되었다.\n\n여울이 일어서며 먼지를 털었다.\n\n통로 안쪽으로, 더 깊은 어둠이 이어지고 있다.",
+        "user_input": "(AI 자동 진행)",
+        "dialogues": [
+          {
+            "speaker": "가온",
+            "line": "일단 멈춰. 냄새 맡아봐 -- 흙냄새만 나면 괜찮고, 썩은 내 섞이면 바로 알려.",
+            "tone": "commanding"
+          },
+          {
+            "speaker": "가온",
+            "line": "내가 5보 앞서간다. 간격 유지해. 몰려다니면 같이 죽어.",
+            "tone": "gruff"
+          },
+          {
+            "speaker": "세라핀",
+            "line": "가온, 잠깐. 저 각문 -- 경고문이야. 이 복도, 함정 아니면 언데드 구역이에요.",
+            "tone": "cold, alert"
+          },
+          {
+            "speaker": "세라핀",
+            "line": "모두 붙어요. 축복 걸었으니 2미터 이상 벌어지지 마세요.",
+            "tone": "practical"
+          },
+          {
+            "speaker": "여울",
+            "line": "잠깐, 멈춰. 이 석판 -- 밟으면 재밌는 일이 생길 것 같은데.",
+            "tone": "playful whisper"
+          },
+          {
+            "speaker": "여울",
+            "line": "스프링식이야. 아마 위에서 뭔가 떨어지거나... 아니면 옆에서. 벽 좀 봐줘.",
+            "tone": "focused but amused"
+          }
+        ],
+        "timestamp": "01:05:28",
+        "dice_rolls": [
+          {
+            "type": "skill_check",
+            "roller": "여울",
+            "stat": "DEX",
+            "roll": 18,
+            "modifier": 4,
+            "total": 22,
+            "dc": 12,
+            "result": "success",
+            "note": "trap disarm"
+          }
+        ]
+      },
+      {
+        "turn": 1,
+        "message": "[GM] Fix: dungeon entry scene + location update",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "01:15:35"
+      },
+      {
+        "turn": 1,
+        "message": "[GM] Fix: dungeon entry positions + trap object + skill correction",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "01:22:18"
+      },
+      {
+        "turn": 1,
+        "message": "[GM] Map refresh with objects + position fix",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "01:27:07"
+      },
+      {
+        "turn": 1,
+        "message": "[GM] Test object layer",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "01:33:15"
+      },
+      {
+        "turn": 1,
+        "message": "[GM] Fix: load dungeon interior map",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "01:40:00"
+      },
+      {
+        "turn": 1,
+        "message": "[GM] Map refresh — dungeon interior",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "01:41:17"
+      }
+    ]
+  }
+}

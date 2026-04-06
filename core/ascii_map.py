@@ -93,6 +93,28 @@ def show_map(state):
                 grid_color[row][col_i] = col
                 grid_char[row][col_i]  = ch
 
+    # 단일 타일 랜드마크 표시
+    LANDMARK_STYLE = {
+        '우물': (CYAN, '💧'),
+        '모닥불': (RED, '🔥'),
+        '이정표': (YELLOW, '📌'),
+        '제단': (PURPLE, '⛩️'),
+        '샘': (CYAN, '💧'),
+        '화톳불': (RED, '🔥'),
+        '표지판': (YELLOW, '📌'),
+    }
+    for loc in locations:
+        area = loc.get('area', {})
+        if area.get('x1') == area.get('x2') and area.get('y1') == area.get('y2'):
+            name = loc.get('name', '')
+            for keyword, (col, sym) in LANDMARK_STYLE.items():
+                if keyword in name:
+                    x, y = area['x1'], area['y1']
+                    if 0 <= x < width and 0 <= y < height:
+                        grid_color[y][x] = col
+                        grid_char[y][x] = sym
+                    break
+
     # NPC 배치
     for npc in npcs:
         pos = npc.get('position')
@@ -152,6 +174,7 @@ def show_map(state):
     print(f"  {BLUE}{BOLD}Mg{RESET}=마법사  {GREEN}{BOLD}Rg{RESET}=도적  {RED}{BOLD}Wr{RESET}=전사")
     print(f"  {RED}{BOLD}!!{RESET}=NPC(생존)  {GRAY}{BOLD}XX{RESET}=NPC(사망)")
     print(f"  {GREEN}{BOLD}::{RESET}=숲  {GRAY}{BOLD}##{RESET}=던전  {YELLOW}{BOLD}$${RESET}=보물실  {RESET}..=기타")
+    print(f"  💧=우물  🔥=모닥불  🪧=이정표")
 
     # 지역명 표시
     if locations:
@@ -401,7 +424,7 @@ def show_emoji_map(state):
     EMPTY    = '··'
     TERRAIN  = {'grass': '🌲', 'dungeon': '🪨', 'treasure': '🟡'}
     P_ICON   = {'마법사': '🔵', '도적': '🟢', '전사': '🔴'}
-    NPC_LIVE = '👾'
+    NPC_ICON = {'friendly': '😊', 'neutral': '👤', 'monster': '👹', 'hostile': '👹'}
     NPC_DEAD = '💀'
 
     map_info  = state.get('map', {})
@@ -418,6 +441,27 @@ def show_emoji_map(state):
             for x in range(a.get('x1', 0), min(a.get('x2', 0) + 1, width)):
                 grid[y][x] = tile
 
+    # 단일 타일 랜드마크 아이콘 (우물, 모닥불, 이정표 등)
+    LANDMARK_ICON = {
+        '우물': '💧',
+        '모닥불': '🔥',
+        '이정표': '📌',
+        '제단': '⛩️',
+        '샘': '💧',
+        '화톳불': '🔥',
+        '표지판': '📌',
+    }
+    for loc in locations:
+        a = loc.get('area', {})
+        if a.get('x1') == a.get('x2') and a.get('y1') == a.get('y2'):
+            name = loc.get('name', '')
+            for keyword, icon in LANDMARK_ICON.items():
+                if keyword in name:
+                    x, y = a['x1'], a['y1']
+                    if 0 <= x < width and 0 <= y < height:
+                        grid[y][x] = icon
+                    break
+
     # 오브젝트 렌더링 (entities/{scenario_id}/objects/ 로드)
     OBJ_ICON = {
         ('puzzle',        'unsolved'  ): '📋',
@@ -429,6 +473,12 @@ def show_emoji_map(state):
         ('rest_spot',     'used'      ): '💤',
         ('trap',          'active'    ): '⚠️',
         ('trap',          'disarmed'  ): '✅',
+        ('vehicle',       'parked'    ): '🛒',
+        ('container',     'full'      ): '💦',
+        ('container',     'sealed'    ): '🛢️',
+        ('container',     'empty'     ): '📦',
+        ('resource',      'available' ): '🔶',
+        ('shelter',       'set_up'    ): '⛺',
     }
     scenario_id = state.get('game_info', {}).get('scenario_id', '')
     if scenario_id:
@@ -451,7 +501,12 @@ def show_emoji_map(state):
                     ostatus = obj.get('status', '')
                     icon = OBJ_ICON.get((otype, ostatus))
                     if icon:
-                        grid[oy][ox] = icon
+                        obj_size = obj.get('size', [1, 1])
+                        for dy in range(obj_size[1]):
+                            for dx in range(obj_size[0]):
+                                tx, ty = ox + dx, oy + dy
+                                if 0 <= tx < width and 0 <= ty < height:
+                                    grid[ty][tx] = icon
                 except Exception:
                     pass
 
@@ -460,7 +515,11 @@ def show_emoji_map(state):
         if pos and len(pos) == 2:
             x, y = int(pos[0]), int(pos[1])
             if 0 <= x < width and 0 <= y < height:
-                grid[y][x] = NPC_DEAD if npc.get('status') == 'dead' else NPC_LIVE
+                if npc.get('status') == 'dead':
+                    grid[y][x] = NPC_DEAD
+                else:
+                    ntype = npc.get('type', 'neutral')
+                    grid[y][x] = NPC_ICON.get(ntype, '👾')
 
     for pl in state.get('players', []):
         pos = pl.get('position')
@@ -477,9 +536,34 @@ def show_emoji_map(state):
         print(f'{y:2d}│{row_str}│')
     print('  └' + '──' * width + '┘')
     print()
-    print('  🔵사이키(마법사)  🟢루체나(도적)  🔴노을(전사)')
-    print('  💀처치됨   🌲숲   🪨던전   🟡보물실')
-    print('  📋퍼즐(미해결)  📜퍼즐(해결)  🔒보물상자  🛌안식처  ⚠️함정  ✅함정(해제)')
+    # 플레이어 범례 — game_state에서 동적 생성
+    player_legend_parts = []
+    for pl in state.get('players', []):
+        icon = P_ICON.get(pl.get('class', ''), '🔵')
+        name = pl.get('name', '???')
+        cls = pl.get('class', '')
+        player_legend_parts.append(f'{icon}{name}({cls})')
+    if player_legend_parts:
+        print('  ' + '  '.join(player_legend_parts))
+    # NPC 범례 — 이름+위치로 개별 식별
+    npc_legend_parts = []
+    for npc in state.get('npcs', []):
+        pos = npc.get('position')
+        if not (pos and len(pos) == 2):
+            continue
+        name = npc.get('name', '???')
+        ntype = npc.get('type', 'neutral')
+        status = npc.get('status', 'alive')
+        if status == 'dead':
+            icon = NPC_DEAD
+        else:
+            icon = NPC_ICON.get(ntype, '👾')
+        npc_legend_parts.append(f'{icon}{name}({pos[0]},{pos[1]})')
+    if npc_legend_parts:
+        # 한 줄에 3개씩 출력
+        for i in range(0, len(npc_legend_parts), 3):
+            print('  ' + '  '.join(npc_legend_parts[i:i+3]))
+    print('  🌲숲  🪨던전  🟡보물실  📋퍼즐  🔒상자  🛌안식처  ⚠️함정  ✅해제')
     print()
 
 

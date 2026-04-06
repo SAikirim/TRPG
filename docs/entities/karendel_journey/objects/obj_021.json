@@ -1,0 +1,19 @@
+{
+  "id": "obj_021",
+  "name": "stairway",
+  "type": "stairs_obj",
+  "status": "placed",
+  "position": [22, 1],
+  "size": [2, 3],
+  "location": "red_chimney_inn_1f",
+  "description": "Wooden stairs leading up to the second floor. The steps creak under weight.",
+  "interactable": true,
+  "interaction": "Stairs leading up to the second floor.",
+  "icon": "🪜",
+  "tactical": {
+    "cover": "none",
+    "defense_bonus": 0,
+    "destructible": false,
+    "flammable": false
+  }
+}

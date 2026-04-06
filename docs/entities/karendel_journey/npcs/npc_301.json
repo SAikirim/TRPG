@@ -1,26 +1,26 @@
 {
   "id": 301,
-  "name": "미라",
+  "name": "mira",
   "type": "friendly",
-  "race": "인간",
+  "race": "human",
   "known": true,
   "status": "alive",
-  "location": "교역로 (수레 파손 현장)",
+  "location": "trade_road_karendel (cart_damage_site)",
   "appearance": {
-    "age": "20대",
-    "build": "날씬하고 민첩한 체형",
-    "skin": "밝은 피부",
-    "hair": "아버지를 닮은 갈색 머리, 하나로 묶어 올림",
-    "face": "밝은 갈색 눈, 호기심 많고 생기 있는 얼굴",
-    "outfit": "실용적인 여행복 — 짧은 외투, 긴 치마, 부츠",
-    "notable": "어깨에 가죽 가방 (약초 다발과 장부)"
+    "age": "20s",
+    "build": "slender and agile build",
+    "skin": "fair skin",
+    "hair": "brown hair like her father, tied up in a ponytail",
+    "face": "bright brown eyes, curious and lively face",
+    "outfit": "practical travel clothes — short coat, long skirt, boots",
+    "notable": "leather bag on shoulder (herb bundles and ledger)"
   },
   "personality": {
     "temperament": "cheerful",
     "intelligence": "medium",
-    "behavior_pattern": "밝고 수다스러운 상인의 딸. 사람을 잘 사귀고 정보통. 아버지를 챙긴다.",
-    "speech_style": "활발하고 친근한 말투. 감사 표현을 잘 한다.",
-    "motivation": "아버지와 함께 무사히 카렌델 도착. 장사 성공."
+    "behavior_pattern": "Bright and chatty merchant's daughter. Good with people and well-informed. Takes care of her father.",
+    "speech_style": "Lively and friendly manner of speaking. Readily expresses gratitude.",
+    "motivation": "Arrive safely in Karendel with her father. Successful trading."
   },
   "stats": {
     "STR": 8,
@@ -28,19 +28,32 @@
     "INT": 12,
     "CON": 10
   },
-  "hp": 10,
-  "max_hp": 10,
+  "hp": 14,
+  "max_hp": 14,
   "mp": 5,
   "max_mp": 5,
   "relationships": {
-    "할란": "아버지. 걱정되지만 존경한다.",
-    "사이키": "구해준 모험가. 호감."
+    "hallan": "Father. Worried about him but respects him.",
+    "saiki": "Adventurer who rescued them. Favorable impression."
+  },
+  "travel": {
+    "origin": "Seren Port",
+    "destination": "Karendel",
+    "route": [
+      "Trade Road (toward Karendel)",
+      "Crossroads Rest",
+      "Karendel"
+    ],
+    "current_segment": "Trade Road (toward Karendel)",
+    "met_party_at": "Trade Road (toward Karendel)",
+    "travel_mode": "cart",
+    "origin_note": "A small fishing port in southeastern Ersia. Heading north along the trade road to Karendel with textiles and dried fish."
   },
   "memory": {
     "dialogue_history": [],
     "key_events": [
-      "파티에게 늑대에서 구출됨.",
-      "사이키가 세이지를 만지는 걸 봤지만, 자연스럽게 물어봐서 의심 해소."
+      "Rescued from wolves by the party.",
+      "Saw Saiki touching sage but asked casually, dispelling suspicion."
     ]
   }
 }

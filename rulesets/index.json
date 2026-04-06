@@ -2,14 +2,14 @@
   "rulesets": [
     {
       "id": "fantasy_basic",
-      "title": "판타지 기본 룰셋",
-      "description": "D20 기반 판타지 TRPG 룰. 전투/마법/탐험 규칙 포함.",
-      "genre": "판타지",
+      "title": "Fantasy Basic Ruleset",
+      "description": "D20-based fantasy TRPG rules. Includes combat, magic, and exploration rules.",
+      "genre": "Fantasy",
       "dice_system": "d20",
       "rules_file": "fantasy_basic.json",
-      "features": ["전투", "마법", "상태이상", "휴식", "도주"],
+      "features": ["Combat", "Magic", "Status Effects", "Rest", "Flee"],
       "stat_system": ["STR", "DEX", "INT", "CON"],
-      "compatible_scenarios": ["lost_treasure"]
+      "compatible_scenarios": ["lost_treasure", "karendel_journey"]
     }
   ],
   "default_ruleset": "fantasy_basic"

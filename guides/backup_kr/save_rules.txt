@@ -1,0 +1,30 @@
+저장 규칙 상세
+===
+이 파일은 git commit/push 규칙을 다룬다.
+시스템 반영 에이전트만 이 파일을 읽으면 된다.
+GM 나레이션/웹 반영/주사위/이벤트 등 핵심 규칙은 guides/gm_rules.txt 참조.
+
+저장 규칙
+===
+commit과 push를 분리한다. commit은 로컬이므로 빠르고, push는 네트워크 I/O가 있어 느리다.
+
+- 커밋 메시지 형식: save: 턴N 내용 -- 결과 요약
+- 브랜치: claude/clarify-task-xApb3
+
+commit (매 턴):
+- 매 턴 3단계(시스템 반영) 완료 시 git commit 실행 (docs/ 동기화 포함)
+- 아래 상황에서 반드시 즉시 commit:
+| 상황                      | 저장 대상 파일                                                    |
+| 전투 종료                 | game_state.json, current_session.json, entities/{id}/npcs/        |
+| 아이템 획득/분배/사용     | game_state.json, current_session.json, entities/{id}/players/     |
+| 함정/오브젝트 상호작용    | game_state.json, current_session.json, entities/{id}/objects/     |
+| 챕터 전환                 | game_state.json, current_session.json 전체                        |
+| 캐릭터 HP/MP 변동         | game_state.json, current_session.json, entities/{id}/players/     |
+| 퍼즐/이벤트 해결          | game_state.json, current_session.json, entities/{id}/objects/     |
+
+push (3턴마다 또는 유저 명시):
+- 3턴마다 자동 push (python gm_turn.py should_push로 확인)
+- 유저가 "저장" 명시 시 즉시 push
+- 챕터 전환, 전투 종료 등 중요 이벤트 시 즉시 push
+- push는 반드시 백그라운드(Agent run_in_background=true)로 실행 — 나레이션을 블로킹하지 않는다
+- push 실패 시 다음 push 시점에 재시도 (게임 진행을 중단하지 않는다)

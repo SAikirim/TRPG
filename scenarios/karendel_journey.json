@@ -1,70 +1,77 @@
 {
   "scenario_info": {
-    "title": "카렌델로 가는 길",
-    "description": "전설의 보물을 손에 넣은 세 모험가가 감정을 위해 교역도시 카렌델로 향한다.",
+    "title": "The Road to Karendel",
+    "description": "Having obtained the legendary treasure, three adventurers head to the trade city of Karendel for appraisal.",
     "difficulty": "normal",
     "recommended_level": 3,
+    "party_size": {"min": 3, "max": 3, "recommended": 3},
     "prerequisite": "lost_treasure",
     "prerequisite_required": false,
-    "backstory": "숲 깊은 곳의 던전에서 전설의 보물을 발견한 모험가들. 보물의 정체를 밝히기 위해 교역도시 카렌델로 향한다. 도중에 부상당한 상인 일행을 만나 동행하게 된다."
+    "backstory": "The adventurers who discovered the legendary treasure in a dungeon deep in the forest. To uncover the treasure's true nature, they head for the trade city of Karendel. Along the way, they encounter a wounded merchant party and join forces."
   },
   "opening": {
-    "continue": "전작에서 이어하기 — 캐릭터, 인벤토리, 레벨을 그대로 유지합니다.",
-    "new_game": "새 게임 시작 — 레벨 3 캐릭터로 시작합니다. 던전을 클리어하고 보물을 손에 넣은 상태입니다.",
-    "narrative": "세 명의 모험가가 숲의 던전에서 전설의 보물을 손에 넣었다. 정체를 알 수 없는 고대 장식함. 감정을 위해 교역도시 카렌델로 향하던 중, 교역로에서 늑대에게 습격당한 상인 일행을 발견한다."
+    "continue": "Continue from previous scenario — characters, inventory, and levels carry over.",
+    "new_game": "New game start — begin with level 3 characters. The dungeon has been cleared and the treasure obtained.",
+    "narrative": "Three adventurers obtained the legendary treasure from the forest dungeon. An ancient ornamental chest of unknown origin. On their way to the trade city of Karendel for appraisal, they discover a merchant party that was attacked by wolves on the trade road."
   },
   "default_party": {
-    "description": "새 게임 시작 시 사용할 기본 파티 (레벨 3)",
+    "description": "Default party for new game start (level 3)",
     "players": [
       {
         "id": 1,
         "name": "",
-        "class": "마법사",
+        "class": "mage",
+        "race": "human",
+        "appearance": {"age": "Early 20s", "build": "Thin build", "skin": "Pale white skin", "hair": "Long silver-gray hair, loosely tied back", "face": "Intelligent gaze, sharp features", "outfit": "Navy blue robe, magical charm hanging from belt", "notable": "Always carrying a magic staff in hand"},
         "level": 3,
         "xp": 300,
         "stats": {"STR": 8, "DEX": 14, "INT": 18, "CON": 10},
         "hp_base": 10,
         "mp_base": 12,
-        "starting_inventory": ["마법 지팡이", "마나 포션", "전설의 보물", "고대 열쇠"],
+        "starting_inventory": ["magic_staff", "mana_potion", "legendary_treasure", "ancient_key"],
         "controlled_by": "user"
       },
       {
         "id": 2,
         "name": "",
-        "class": "도적",
+        "class": "rogue",
+        "race": "human",
+        "appearance": {"age": "Mid 20s", "build": "Slim and agile build", "skin": "Slightly tanned apricot complexion", "hair": "Short black hair, swept to one side", "face": "Sharp eyes, cunning expression", "outfit": "Black leather armor, two daggers at the waist", "notable": "Moves as if melting into the shadows"},
         "level": 3,
         "xp": 300,
         "stats": {"STR": 8, "DEX": 18, "INT": 10, "CON": 14},
         "hp_base": 15,
         "mp_base": 5,
-        "starting_inventory": ["단검 x2", "도둑 도구", "밧줄"],
-        "controlled_by": "agent"
+        "starting_inventory": ["dual_daggers", "thieves_tools", "rope"],
+        "controlled_by": "ai"
       },
       {
         "id": 3,
         "name": "",
-        "class": "전사",
+        "class": "warrior",
+        "race": "human",
+        "appearance": {"age": "Late 20s", "build": "Muscular, sturdy build", "skin": "Bronze skin", "hair": "Short-cropped brown hair", "face": "Strong jawline, rough but dependable appearance", "outfit": "Chainmail armor, iron sword on back, leather shield on left arm", "notable": "Old battle scar on forearm"},
         "level": 3,
         "xp": 300,
         "stats": {"STR": 16, "DEX": 12, "INT": 8, "CON": 14},
         "hp_base": 25,
         "mp_base": 5,
-        "starting_inventory": ["철검", "가죽 방패", "황금 100개"],
-        "controlled_by": "agent"
+        "starting_inventory": ["iron_sword", "leather_shield", "gold_100"],
+        "controlled_by": "ai"
       }
     ]
   },
   "default_npcs": [
-    {"id": 300, "name": "할란", "type": "friendly", "stats": {"STR": 10, "DEX": 8, "INT": 14, "CON": 10}, "hp": 8, "max_hp": 12, "mp": 3, "max_mp": 3, "position": [9, 5], "status": "alive", "location": "trade_road_karendel"},
-    {"id": 301, "name": "미라", "type": "friendly", "stats": {"STR": 8, "DEX": 14, "INT": 12, "CON": 10}, "hp": 10, "max_hp": 10, "mp": 5, "max_mp": 5, "position": [10, 5], "status": "alive", "location": "trade_road_karendel"}
+    {"id": 300, "name": "Hallan", "type": "friendly", "race": "human", "appearance": {"age": "Mid 40s", "build": "Average build, slightly portly", "skin": "Sun-tanned bronze", "hair": "Short brown hair, streaks of gray", "face": "Gentle expression, broad face with fine wrinkles", "outfit": "Worn travel cloak, leather vest, wide belt", "notable": "Bandage mark on left arm from a wolf bite"}, "stats": {"STR": 10, "DEX": 8, "INT": 14, "CON": 10}, "hp": 8, "max_hp": 12, "mp": 3, "max_mp": 3, "position": [9, 5], "status": "alive", "location": "trade_road_karendel"},
+    {"id": 301, "name": "Mira", "type": "friendly", "race": "human", "appearance": {"age": "Mid 20s", "build": "Slim and agile build", "skin": "Light apricot complexion", "hair": "Black hair to shoulders, tied back", "face": "Sharp eyes, wary expression", "outfit": "Light leather travel clothes, dagger sheath at waist", "notable": "Small charm bracelet on wrist"}, "stats": {"STR": 8, "DEX": 14, "INT": 12, "CON": 10}, "hp": 10, "max_hp": 10, "mp": 5, "max_mp": 5, "position": [10, 5], "status": "alive", "location": "trade_road_karendel"}
   ],
   "chapters": [
-    {"id": 1, "name": "교역로", "description": "하룬 마을에서 카렌델로 이어지는 교역로. 상인 할란과 미라와 동행 중.", "map_area": "trade_road_karendel"},
-    {"id": 2, "name": "카렌델 입성", "description": "북쪽의 교역 도시 카렌델. 다양한 종족과 상인이 모이는 곳.", "map_area": "karendel"},
-    {"id": 3, "name": "보물의 비밀", "description": "전설의 보물의 정체가 밝혀지고, 새로운 모험이 시작된다.", "map_area": "karendel"}
+    {"id": 1, "name": "Trade Road", "description": "The trade road from Harun Village to Karendel. Traveling with the merchant Hallan and Mira.", "map_area": "trade_road_karendel"},
+    {"id": 2, "name": "Entering Karendel", "description": "The northern trade city of Karendel. A place where diverse races and merchants gather.", "map_area": "karendel"},
+    {"id": 3, "name": "The Treasure's Secret", "description": "The true nature of the legendary treasure is revealed, and a new adventure begins.", "map_area": "karendel"}
   ],
   "endings": [
-    {"id": "treasure_revealed", "condition": "treasure_appraised", "title": "보물의 진실", "narrative": "전설의 보물의 정체가 밝혀졌다."},
-    {"id": "new_adventure", "condition": "accept_new_quest", "title": "새로운 모험의 시작", "narrative": "카렌델에서의 경험이 세 모험가를 더 큰 세계로 이끈다."}
+    {"id": "treasure_revealed", "condition": "treasure_appraised", "title": "The Truth of the Treasure", "narrative": "The true nature of the legendary treasure was revealed."},
+    {"id": "new_adventure", "condition": "accept_new_quest", "title": "The Beginning of a New Adventure", "narrative": "The experiences in Karendel lead the three adventurers into a greater world."}
   ]
 }

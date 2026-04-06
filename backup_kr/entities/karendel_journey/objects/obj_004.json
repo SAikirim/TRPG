@@ -1,0 +1,28 @@
+{
+  "id": "obj_004",
+  "name": "기름통",
+  "type": "container",
+  "status": "sealed",
+  "position": [9, 14],
+  "location": "crossroads_rest",
+  "description": "쉼터 한쪽에 놓인 작은 기름통. 다른 여행자의 것으로 보인다. 등불에 쓰는 기름이 들어있다.",
+  "interactable": true,
+  "interaction": "기름을 채취할 수 있다. 주인 허락 없이 가져가면 도둑질.",
+  "hazard": {
+    "near_fire": "모닥불 근처에서 기름통이 깨지면 화재 위험",
+    "effect": "화상"
+  },
+  "icon": "🛢️",
+  "tactical": {
+    "cover": "none",
+    "defense_bonus": 0,
+    "blocks_ranged": false,
+    "destructible": true,
+    "hp": 5,
+    "flammable": true,
+    "explosive": true,
+    "explosion_damage": 8,
+    "explosion_radius": 2,
+    "description": "엄폐 불가. 화염 공격에 폭발 — 반경 2타일 8 피해."
+  }
+}

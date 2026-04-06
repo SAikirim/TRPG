@@ -1,0 +1,25 @@
+{
+  "id": "obj_002",
+  "name": "water_barrel",
+  "type": "container",
+  "status": "full",
+  "position": [
+    13,
+    11
+  ],
+  "location": "crossroads_rest",
+  "description": "Two water barrels filled by Mira from the well. Wooden barrels with lids.",
+  "interactable": true,
+  "interaction": "Can drink water. Can take the water barrel.",
+  "icon": "💦",
+  "tactical": {
+    "cover": "half",
+    "defense_bonus": 2,
+    "blocks_ranged": false,
+    "destructible": true,
+    "hp": 10,
+    "flammable": false,
+    "special": "extinguish_fire",
+    "description": "Half cover behind the water barrel. Can be used to extinguish fires."
+  }
+}

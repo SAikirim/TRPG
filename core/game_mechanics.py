@@ -10,6 +10,7 @@ import math
 import os
 import random
 import sys
+sys.stdout.reconfigure(encoding='utf-8')
 from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -129,6 +130,8 @@ def create_npc_entity(npc_data, state=None):
             "dialogue_history": [],
             "key_events": []
         }),
+        "description": npc_data.get("description", ""),
+        "known": npc_data.get("known", False),
     }
 
     # 몬스터면 전투 스탯 포함
@@ -142,13 +145,25 @@ def create_npc_entity(npc_data, state=None):
         entity["threat_level"] = npc_data.get("threat_level", "medium")
         entity["position"] = npc_data.get("position", [0, 0])
 
-    # friendly NPC면 HP만
-    if npc_type == "friendly":
+    else:
+        # 비몬스터 NPC도 game_state의 HP/stats 복사
         if npc_data.get("hp") or npc_data.get("max_hp"):
-            entity["stats"] = {
-                "hp": npc_data.get("hp", 10),
-                "max_hp": npc_data.get("max_hp", 10),
-            }
+            entity["hp"] = npc_data.get("hp", npc_data.get("max_hp", 10))
+            entity["max_hp"] = npc_data.get("max_hp", 10)
+        if npc_data.get("stats"):
+            entity["stats"] = npc_data["stats"]
+        if npc_data.get("attack") is not None:
+            entity["attack"] = npc_data["attack"]
+        if npc_data.get("defense") is not None:
+            entity["defense"] = npc_data["defense"]
+        if npc_data.get("position"):
+            entity["position"] = npc_data.get("position", [0, 0])
+        if npc_data.get("race"):
+            entity["race"] = npc_data["race"]
+        if npc_data.get("note"):
+            entity["note"] = npc_data["note"]
+        if npc_data.get("threat_level"):
+            entity["threat_level"] = npc_data["threat_level"]
 
     # 추가 필드 병합 (personality 등 커스텀 데이터)
     for key in ("conditions", "equipment", "inventory"):
@@ -293,6 +308,37 @@ def get_move_range(position, max_distance, state):
                 if new_pos[0] >= 0 and new_pos[1] >= 0:
                     valid.append(new_pos)
     return valid
+
+
+def _find_nearest_empty(position, entity_id, state):
+    """Find nearest empty tile around *position* that no other entity occupies.
+
+    Returns [x, y] of the nearest unoccupied tile, or None if nothing found
+    within a reasonable radius (search up to Manhattan distance 5).
+    """
+    occupied = set()
+    for p in state.get("players", []):
+        if p.get("id") != entity_id:
+            pos = p.get("position")
+            if pos:
+                occupied.add(tuple(pos))
+    for n in state.get("npcs", []):
+        if n.get("id") != entity_id and n.get("status") not in ("dead", "fled", "gone"):
+            pos = n.get("position")
+            if pos:
+                occupied.add(tuple(pos))
+
+    # BFS-like expansion by Manhattan distance
+    for dist in range(1, 6):
+        for dx in range(-dist, dist + 1):
+            dy_abs = dist - abs(dx)
+            for dy in [dy_abs, -dy_abs] if dy_abs != 0 else [0]:
+                candidate = [position[0] + dx, position[1] + dy]
+                if candidate[0] < 0 or candidate[1] < 0:
+                    continue
+                if tuple(candidate) not in occupied:
+                    return candidate
+    return None
 
 
 def check_detection(observer_pos, target_pos, observer_int=10):
@@ -945,13 +991,22 @@ def grant_xp_party(amount, source="", state=None):
 
 
 def _check_level_up(entity, growth, state):
-    """XP 확인 후 레벨업 처리. 다중 레벨업도 지원."""
+    """XP 확인 후 레벨업 처리. 다중 레벨업 + 멀티 클래스 지원."""
     xp_table = _xp_table()
-    class_name = entity.get("class", "")
-    cg = _class_growth(class_name)
     rules = load_rules()
     stat_points_per_level = rules.get("level_up", {}).get("per_level", {}).get("stat_points", 2)
     leveled_info = []
+
+    # 멀티 클래스 지원: classes 배열이 있으면 사용, 없으면 단일 class
+    classes = entity.get("classes")
+    if not classes:
+        # 하위 호환: 단일 class → classes 배열로 변환
+        class_name = entity.get("class", "")
+        classes = [{"name": class_name, "level": growth.get("level", 1)}]
+
+    # 레벨업할 클래스 결정 (GM이 level_up_class로 지정, 없으면 주 클래스)
+    level_up_class_name = growth.pop("level_up_class", None) or classes[0]["name"]
+    cg = _class_growth(level_up_class_name)
 
     while True:
         next_level = growth["level"] + 1
@@ -962,21 +1017,29 @@ def _check_level_up(entity, growth, state):
         growth["level"] = next_level
         growth["stat_points_available"] += stat_points_per_level
 
-        # HP/MP 증가
+        # 해당 클래스의 레벨 증가
+        for c in classes:
+            if c["name"] == level_up_class_name:
+                c["level"] = c.get("level", 0) + 1
+                break
+
+        # HP/MP 증가 (레벨업한 클래스 기준)
         hp_gain = cg.get("hp_per_level", 3)
         mp_gain = cg.get("mp_per_level", 2)
         entity["stats"]["max_hp"] += hp_gain
-        entity["stats"]["hp"] += hp_gain  # 레벨업 시 증가분만큼 현재 HP도 회복
+        entity["stats"]["hp"] += hp_gain
         entity["stats"]["max_mp"] += mp_gain
         entity["stats"]["mp"] += mp_gain
 
-        # 신규 스킬 해금 체크
-        new_skill = cg.get("skills", {}).get(str(next_level))
+        # 신규 스킬 해금 (해당 클래스의 레벨 기준)
+        class_level = next(
+            (c["level"] for c in classes if c["name"] == level_up_class_name), next_level)
+        new_skill = cg.get("skills", {}).get(str(class_level))
         skill_name = None
         if new_skill:
             skill_name = new_skill["name"]
+            growth.setdefault("learned_skills", [])
             growth["learned_skills"].append(skill_name)
-            # available_actions에도 추가
             actions = entity.get("available_actions", [])
             if skill_name not in actions:
                 actions.append(skill_name)
@@ -984,16 +1047,96 @@ def _check_level_up(entity, growth, state):
 
         leveled_info.append({
             "new_level": next_level,
+            "class_leveled": level_up_class_name,
+            "class_level": class_level,
             "hp_gain": hp_gain, "mp_gain": mp_gain,
             "stat_points": stat_points_per_level,
             "new_skill": skill_name,
         })
+
+    # classes 배열 업데이트
+    entity["classes"] = classes
 
     # 다음 레벨 XP 갱신
     next_next = growth["level"] + 1
     growth["xp_to_next"] = xp_table.get(next_next, 99999)
 
     return leveled_info if leveled_info else None
+
+
+def add_class(player_id, new_class_name, state=None):
+    """플레이어에게 새 클래스를 추가 (멀티 클래스).
+    요구조건: 총 레벨 3 이상, 해당 클래스의 주 스탯 12 이상, 최대 3개 클래스."""
+    owned = state is None
+    if owned:
+        state = load_game_state()
+
+    entity, epath = _load_entity(state, player_id)
+    if not entity:
+        return {"error": f"엔티티 {player_id} 없음"}
+
+    rules = load_rules()
+    mc_rules = rules.get("level_up", {}).get("multiclass", {})
+    if not mc_rules.get("enabled"):
+        return {"error": "멀티 클래스가 비활성화되어 있습니다"}
+
+    growth = entity.get("growth", {})
+    total_level = growth.get("level", 1)
+
+    # 최소 레벨 체크
+    min_level = mc_rules.get("min_level_to_multiclass", 3)
+    if total_level < min_level:
+        return {"error": f"총 레벨 {min_level} 이상이어야 멀티 클래스 가능 (현재: {total_level})"}
+
+    # 최대 클래스 수 체크
+    classes = entity.get("classes", [{"name": entity.get("class", ""), "level": total_level}])
+    max_classes = mc_rules.get("max_classes", 3)
+    if len(classes) >= max_classes:
+        return {"error": f"최대 {max_classes}개 클래스까지 가능 (현재: {len(classes)}개)"}
+
+    # 이미 보유한 클래스인지 체크
+    if any(c["name"] == new_class_name for c in classes):
+        return {"error": f"이미 '{new_class_name}' 클래스를 보유하고 있습니다"}
+
+    # 스탯 요구조건 체크
+    requirements = mc_rules.get("requirements", {}).get(new_class_name, {})
+    for stat, req_val in requirements.items():
+        current_val = entity.get("stats", {}).get(stat, 0)
+        if current_val < req_val:
+            return {"error": f"'{new_class_name}' 클래스 요구조건 미충족: {stat} {req_val} 필요 (현재: {current_val})"}
+
+    # 새 클래스 추가
+    classes.append({"name": new_class_name, "level": 0})
+    entity["classes"] = classes
+
+    # 새 클래스의 기본 스킬 해금
+    cg = _class_growth(new_class_name)
+    classes_data_path = os.path.join(BASE_DIR, "templates", "character_classes.json")
+    if os.path.exists(classes_data_path):
+        classes_data = _load_json(classes_data_path)
+        class_def = classes_data.get("classes", {}).get(new_class_name, {})
+        starting_actions = class_def.get("available_actions", [])
+        current_actions = entity.get("available_actions", [])
+        for action in starting_actions:
+            if action not in current_actions:
+                current_actions.append(action)
+        entity["available_actions"] = current_actions
+
+    if epath:
+        _save_json(epath, entity)
+
+    result = {
+        "action": "add_class",
+        "player": entity.get("name", ""),
+        "new_class": new_class_name,
+        "classes": classes,
+        "total_level": total_level,
+    }
+
+    if owned:
+        save_game_state(state)
+
+    return result
 
 
 def allocate_stats(player_id, stat_increases, state=None):
@@ -1113,13 +1256,16 @@ def _sync_level_to_state(state, player_id, growth):
     if player:
         player["level"] = growth["level"]
         player["xp"] = growth["xp"]
-        # 엔티티에서 max_hp/max_mp도 동기화
+        # 엔티티에서 max_hp/max_mp + classes도 동기화
         entity, _ = _load_entity(state, player_id)
         if entity:
             player["max_hp"] = entity["stats"]["max_hp"]
             player["hp"] = min(player["hp"], player["max_hp"])
             player["max_mp"] = entity["stats"]["max_mp"]
             player["mp"] = min(player["mp"], player["max_mp"])
+            # 멀티 클래스 동기화
+            if "classes" in entity:
+                player["classes"] = entity["classes"]
 
 
 def growth_status(state=None):
@@ -1330,6 +1476,710 @@ def get_last_result():
     return None
 
 
+# ─── 타일 상호작용 시스템 ───
+
+def check_tile_interaction(entity_id, target_pos, state=None):
+    """Check tile interaction when entity moves to target_pos.
+    Returns: {allowed: bool, effects: [...], warnings: [...]}
+    """
+    if state is None:
+        state = load_game_state()
+
+    results = {"allowed": True, "effects": [], "warnings": []}
+    target_pos = list(target_pos)
+
+    # 1. Entity overlap check
+    overlap = _check_entity_overlap(target_pos, entity_id, state)
+    if overlap:
+        alt_pos = _find_nearest_empty(target_pos, entity_id, state)
+        if alt_pos:
+            results["warnings"].append(f"Position {target_pos} occupied by {overlap}. Relocated to {alt_pos}.")
+            target_pos = alt_pos
+        else:
+            results["allowed"] = False
+            results["warnings"].append(f"Position {target_pos} occupied. No adjacent empty tile.")
+            return results
+
+    # 2. Check object tile properties at target
+    objects = _get_objects_at(target_pos, state)
+    for obj in objects:
+        props = obj.get("tile_properties", {})
+
+        # Passable check
+        if not props.get("passable", True):
+            results["allowed"] = False
+            results["warnings"].append(f"Tile blocked by {obj.get('name', '?')}.")
+            return results
+
+        # Terrain modifier (movement check)
+        tm = props.get("terrain_modifier")
+        if tm:
+            results["effects"].append({
+                "type": "check",
+                "stat": tm["stat"],
+                "dc": tm["dc"],
+                "fail_effect": tm.get("fail", "none"),
+                "source": obj.get("name", "?")
+            })
+
+        # On-enter effect
+        on_enter = props.get("on_enter")
+        if on_enter:
+            results["effects"].append({
+                **on_enter,
+                "source": obj.get("name", "?"),
+                "trigger": "on_enter"
+            })
+
+    # 3. Check map location hazards (legacy support)
+    map_info = state.get("map", {})
+    for loc in map_info.get("locations", []):
+        area = loc.get("area", {})
+        if (area.get("x1") == area.get("x2") == target_pos[0] and
+            area.get("y1") == area.get("y2") == target_pos[1]):
+            hazard = _check_location_hazard(loc)
+            if hazard:
+                results["effects"].append(hazard)
+
+    results["final_position"] = target_pos
+    return results
+
+
+def _check_entity_overlap(pos, exclude_id, state):
+    """Check if any living entity occupies the position."""
+    for p in state.get("players", []):
+        if p.get("id") != exclude_id and p.get("position") == list(pos):
+            return p.get("name", f"player_{p['id']}")
+    for n in state.get("npcs", []):
+        if n.get("id") != exclude_id and n.get("status") not in ("dead", "fled", "gone"):
+            if n.get("position") == list(pos):
+                return n.get("name", f"npc_{n['id']}")
+    return None
+
+
+def _find_nearest_empty(pos, exclude_id, state):
+    """Find nearest empty adjacent tile. Cardinal first, then diagonal."""
+    directions = [(0,-1),(0,1),(-1,0),(1,0),(-1,-1),(1,-1),(-1,1),(1,1)]
+    for dx, dy in directions:
+        candidate = [pos[0]+dx, pos[1]+dy]
+        if not _check_entity_overlap(candidate, exclude_id, state):
+            return candidate
+    return None
+
+
+def _get_objects_at(pos, state):
+    """Get objects at the given position."""
+    scenario_id = state.get("game_info", {}).get("scenario_id", "")
+    if not scenario_id:
+        return []
+    obj_dir = os.path.join(BASE_DIR, "entities", scenario_id, "objects")
+    if not os.path.isdir(obj_dir):
+        return []
+
+    objects = []
+    current_loc = state.get("current_location", "")
+    for fname in os.listdir(obj_dir):
+        if not fname.endswith(".json"):
+            continue
+        try:
+            with open(os.path.join(obj_dir, fname), "r", encoding="utf-8") as f:
+                obj = json.load(f)
+            obj_loc = obj.get("location", "")
+            if current_loc and obj_loc and obj_loc != current_loc:
+                continue
+            if obj.get("position") == list(pos):
+                objects.append(obj)
+        except Exception:
+            pass
+    return objects
+
+
+def _check_location_hazard(loc):
+    """Legacy hazard check from map locations."""
+    HAZARD_MAP = {
+        "모닥불": {"type": "damage", "element": "fire", "value": "1d6", "source": loc.get("name", "?")},
+        "용암": {"type": "damage", "element": "fire", "value": "2d6", "source": loc.get("name", "?")},
+        "독늪": {"type": "status", "effect": "poisoned", "source": loc.get("name", "?")},
+    }
+    name = loc.get("name", "")
+    for keyword, effect in HAZARD_MAP.items():
+        if keyword in name:
+            return effect
+    return None
+
+
+def process_elemental_chain(element, target_entity, target_pos, state, depth=0):
+    """Process elemental chain reactions. Max depth 3.
+    Returns list of additional effects."""
+    if depth >= 3:
+        return []
+
+    effects = []
+    entity_status = []
+
+    # Get entity's current status effects
+    for p in state.get("players", []):
+        if p.get("id") == target_entity:
+            entity_status = [s.get("name", "") if isinstance(s, dict) else s for s in p.get("status_effects", [])]
+            break
+    else:
+        for n in state.get("npcs", []):
+            if n.get("id") == target_entity:
+                entity_status = [s.get("name", "") if isinstance(s, dict) else s for s in n.get("status_effects", [])]
+                break
+
+    # Fire interactions
+    if element == "fire":
+        if "wet" in entity_status:
+            effects.append({"type": "modifier", "damage_mult": 0.5, "remove_status": "wet", "desc": "Wet reduces fire damage by 50%, wet removed"})
+        if "oiled" in entity_status:
+            effects.append({"type": "modifier", "damage_mult": 2.0, "apply_status": "burning", "remove_status": "oiled", "desc": "Oiled doubles fire damage, ignited"})
+        if "frozen" in entity_status:
+            effects.append({"type": "modifier", "damage_mult": 1.5, "remove_status": "frozen", "desc": "Fire melts frozen, +50% damage"})
+
+    # Electric interactions
+    elif element == "electric":
+        if "wet" in entity_status:
+            effects.append({"type": "modifier", "damage_mult": 2.0, "desc": "Wet doubles electric damage"})
+        # Check if on water tile - chain to all entities in water
+        water_entities = _get_entities_in_connected_water(target_pos, state)
+        for eid in water_entities:
+            if eid != target_entity:
+                effects.append({"type": "chain_damage", "target": eid, "element": "electric", "value": "1d6", "desc": f"Chain lightning via water to entity {eid}"})
+
+    # Cold interactions
+    elif element == "cold":
+        if "wet" in entity_status:
+            effects.append({"type": "freeze_check", "stat": "CON", "dc": 13, "on_fail": "frozen", "desc": "Wet + cold: CON DC 13 or frozen"})
+
+    # Water interactions
+    elif element == "water":
+        if "burning" in entity_status:
+            effects.append({"type": "remove_status", "status": "burning", "desc": "Water extinguishes burning"})
+        effects.append({"type": "apply_status", "status": "wet", "desc": "Water applies wet"})
+
+    return effects
+
+
+def _get_entities_in_connected_water(pos, state):
+    """Get all entity IDs standing on water tiles connected to pos."""
+    water_entities = []
+    objects = _get_objects_at(pos, state)
+    is_water = any(o.get("tile_properties", {}).get("element") == "water" for o in objects)
+    if not is_water:
+        return []
+
+    for p in state.get("players", []):
+        p_objs = _get_objects_at(p.get("position", []), state)
+        if any(o.get("tile_properties", {}).get("element") == "water" for o in p_objs):
+            water_entities.append(p["id"])
+    for n in state.get("npcs", []):
+        if n.get("status") in ("dead", "fled"):
+            continue
+        n_objs = _get_objects_at(n.get("position", []), state)
+        if any(o.get("tile_properties", {}).get("element") == "water" for o in n_objs):
+            water_entities.append(n["id"])
+
+    return water_entities
+
+
+# Legacy wrapper for backward compatibility
+def check_hazard_tile(entity_id, new_position, state):
+    """Legacy wrapper: delegates to check_tile_interaction."""
+    result = check_tile_interaction(entity_id, new_position, state)
+    # Convert to old format for backward compatibility
+    for eff in result.get("effects", []):
+        if eff.get("type") == "damage" and eff.get("element") == "fire":
+            return {
+                'hazard': True,
+                'tile': eff.get("source", "?"),
+                'effect': '화상',
+                'entity_id': entity_id,
+                'message': f'{eff.get("source", "?")} 위로 이동! 화상 상태이상 적용.'
+            }
+        elif eff.get("type") == "status" and eff.get("effect") == "poisoned":
+            return {
+                'hazard': True,
+                'tile': eff.get("source", "?"),
+                'effect': '중독',
+                'entity_id': entity_id,
+                'message': f'{eff.get("source", "?")} 위로 이동! 중독 상태이상 적용.'
+            }
+    return {'hazard': False}
+
+
+# ─── 턴 시작 환경 체크 ───
+
+def turn_start_check(state=None):
+    """매 턴 시작 시 환경 효과 + 상태이상 틱을 통합 처리.
+    Agent [룰 심판]이 GM 턴 1b단계에서 호출한다.
+
+    주의: 이 함수는 내부에서 tick_status_effects()를 호출하므로,
+    turn_start_check를 호출한 턴에서는 tick_status를 별도로 호출하면 안 된다.
+    GM은 turn_start OR tick_status 중 하나만 호출해야 한다.
+
+    처리 순서:
+    1. 환경 효과: 모든 엔티티의 현재 위치 → 위험 타일 체크 → 상태이상 자동 적용
+    2. 상태이상 tick: 기존 상태이상 지속 피해 + 지속시간 감소
+    3. HP 0 이하 체크: 전투불능 판정
+    """
+    owned = state is None
+    if owned:
+        state = load_game_state()
+
+    results = {
+        "action": "turn_start_check",
+        "hazards": [],
+        "tile_interactions": [],
+        "status_ticks": [],
+        "knockouts": [],
+    }
+
+    # 1. 환경 효과: check_tile_interaction으로 통합 처리
+    all_entities = []
+    for p in state["players"]:
+        if p.get("position"):
+            all_entities.append(p)
+    for n in state.get("npcs", []):
+        if n.get("status") not in ("dead", "fled", "gone") and n.get("position"):
+            all_entities.append(n)
+
+    for entity in all_entities:
+        pos = entity.get("position")
+        eid = entity.get("id")
+        tile_result = check_tile_interaction(eid, pos, state)
+
+        if tile_result.get("effects"):
+            interaction_entry = {
+                "entity_id": eid,
+                "entity_name": entity.get("name", "?"),
+                "position": pos,
+                "effects": tile_result["effects"],
+                "warnings": tile_result.get("warnings", []),
+            }
+
+            # Process each effect
+            for eff in tile_result["effects"]:
+                eff_type = eff.get("type")
+
+                # Damage effects → apply status (legacy behavior)
+                if eff_type == "damage":
+                    element = eff.get("element", "")
+                    # Map element to Korean status name for legacy compatibility
+                    status_map = {"fire": "화상", "poison": "중독"}
+                    effect_name = status_map.get(element, element)
+                    existing = [e.get("name") if isinstance(e, dict) else e
+                               for e in entity.get("status_effects", [])]
+                    if effect_name not in existing:
+                        try:
+                            se_path = os.path.join(BASE_DIR, "data", "status_effects.json")
+                            se_data = _load_json(se_path)
+                            duration = se_data.get("effects", {}).get(effect_name, {}).get("duration", 2)
+                        except Exception:
+                            duration = 2
+                        if "status_effects" not in entity:
+                            entity["status_effects"] = []
+                        _apply_status(entity, effect_name, duration)
+                        interaction_entry["applied"] = True
+                    else:
+                        interaction_entry["applied"] = False
+
+                    # Process elemental chain reactions
+                    chains = process_elemental_chain(element, eid, pos, state)
+                    if chains:
+                        interaction_entry["chain_effects"] = chains
+
+                # Status effects → apply directly
+                elif eff_type == "status":
+                    effect_name = eff.get("effect", "")
+                    existing = [e.get("name") if isinstance(e, dict) else e
+                               for e in entity.get("status_effects", [])]
+                    if effect_name not in existing:
+                        try:
+                            se_path = os.path.join(BASE_DIR, "data", "status_effects.json")
+                            se_data = _load_json(se_path)
+                            duration = se_data.get("effects", {}).get(effect_name, {}).get("duration", 2)
+                        except Exception:
+                            duration = 2
+                        if "status_effects" not in entity:
+                            entity["status_effects"] = []
+                        _apply_status(entity, effect_name, duration)
+                        interaction_entry["applied"] = True
+                    else:
+                        interaction_entry["applied"] = False
+
+            results["tile_interactions"].append(interaction_entry)
+
+            # Also add to hazards for backward compatibility
+            results["hazards"].append({
+                "hazard": True,
+                "entity_id": eid,
+                "entity_name": entity.get("name", "?"),
+                "effects": tile_result["effects"],
+                "applied": interaction_entry.get("applied", False),
+            })
+
+    # 2. 상태이상 tick (기존 tick_status_effects 로직 재활용)
+    tick_result = tick_status_effects(state)
+    results["status_ticks"] = tick_result.get("results", [])
+
+    # 3. HP 0 이하 체크
+    for p in state["players"]:
+        if p["hp"] <= 0:
+            results["knockouts"].append({
+                "name": p["name"],
+                "type": "player",
+                "message": f'{p["name"]}이(가) 전투불능 상태!'
+            })
+    for n in state.get("npcs", []):
+        if n.get("hp", 0) <= 0 and n.get("status") != "dead":
+            n["status"] = "dead"
+            results["knockouts"].append({
+                "name": n["name"],
+                "type": "npc",
+                "message": f'{n["name"]}이(가) 쓰러졌다!'
+            })
+
+    if owned:
+        save_game_state(state)
+        sync_all_players(state)
+
+    return results
+
+
+# ─── 대화 이력 검색 ───
+
+def get_dialogue_history(character_name, state=None, last_n=20):
+    """특정 캐릭터의 최근 대화 이력을 반환.
+    모순적 언행 검출, NPC 기억 참조 등에 사용.
+
+    Args:
+        character_name: 캐릭터 이름 (예: "사이키", "루체나")
+        state: game_state (None이면 파일에서 로드)
+        last_n: 최근 N개 이벤트에서 검색
+
+    Returns:
+        list of {"turn": int, "speaker": str, "line": str, "target": str, "tone": str, "action": str, "type": str, "timestamp": str}
+    """
+    if state is None:
+        state = load_game_state()
+
+    events = state.get("events", [])
+    history = []
+
+    for event in events[-last_n:]:
+        # dialogues 배열에서 검색
+        for d in event.get("dialogues", []):
+            if d.get("speaker") == character_name:
+                history.append({
+                    "turn": event.get("turn", 0),
+                    "speaker": d["speaker"],
+                    "line": d.get("line", ""),
+                    "target": d.get("target", ""),
+                    "tone": d.get("tone", ""),
+                    "action": d.get("action", ""),
+                    "type": d.get("type", "대화"),
+                    "timestamp": event.get("timestamp", ""),
+                })
+
+        # user_input도 유저 캐릭터 발언으로 기록
+        user_input = event.get("user_input", "")
+        if user_input and character_name == _get_user_character_name(state):
+            history.append({
+                "turn": event.get("turn", 0),
+                "speaker": character_name,
+                "line": user_input,
+                "timestamp": event.get("timestamp", ""),
+                "source": "user_input",
+            })
+
+    return history
+
+
+def _get_user_character_name(state):
+    """controlled_by: 'user'인 캐릭터 이름 반환"""
+    for p in state.get("players", []):
+        if p.get("controlled_by") == "user":
+            return p.get("name", "")
+    return ""
+
+
+def check_dialogue_consistency(character_name, new_line, state=None, last_n=10, new_tone=""):
+    """새 대사가 최근 발언과 모순되는지 간단 체크.
+    직접적인 모순 감지는 GM/NPC 에이전트가 판단하지만,
+    이 함수는 키워드 기반 경고를 제공한다.
+    new_tone이 주어지면 최근 대사의 tone과 비교하여 감정 모순도 검출한다.
+
+    Returns:
+        {"consistent": True/False, "warnings": [...], "recent_lines": [...]}
+    """
+    history = get_dialogue_history(character_name, state, last_n)
+    recent_lines = [h["line"] for h in history]
+
+    warnings = []
+
+    # 간단한 모순 패턴 체크 (키워드 반전)
+    CONTRADICTIONS = [
+        (["싫", "안 ", "못 ", "거부", "반대"], ["좋", "할게", "그래", "동의", "찬성"]),
+        (["믿", "신뢰"], ["의심", "못 믿", "거짓"]),
+        (["가자", "출발", "떠나"], ["머물", "쉬자", "기다"]),
+    ]
+
+    new_lower = new_line.lower() if new_line else ""
+    for neg_words, pos_words in CONTRADICTIONS:
+        new_has_neg = any(w in new_lower for w in neg_words)
+        new_has_pos = any(w in new_lower for w in pos_words)
+
+        for prev_line in recent_lines[-5:]:
+            prev_lower = prev_line.lower() if prev_line else ""
+            prev_has_neg = any(w in prev_lower for w in neg_words)
+            prev_has_pos = any(w in prev_lower for w in pos_words)
+
+            if (new_has_neg and prev_has_pos) or (new_has_pos and prev_has_neg):
+                warnings.append(f"최근 발언 '{prev_line[:30]}...'과 모순 가능성: '{new_line[:30]}...'")
+
+    # tone 모순 체크
+    if new_tone:
+        TONE_CONTRADICTIONS = [
+            ({"화남", "분노", "적대"}, {"친근", "장난", "다정"}),
+            ({"공포", "두려움"}, {"용감", "대담", "도발"}),
+            ({"슬픔", "절망"}, {"기쁨", "흥분", "쾌활"}),
+        ]
+        recent_tones = [h.get("tone", "") for h in history[-5:] if h.get("tone")]
+        for neg_set, pos_set in TONE_CONTRADICTIONS:
+            new_in_neg = new_tone in neg_set
+            new_in_pos = new_tone in pos_set
+            for prev_tone in recent_tones:
+                prev_in_neg = prev_tone in neg_set
+                prev_in_pos = prev_tone in pos_set
+                if (new_in_neg and prev_in_pos) or (new_in_pos and prev_in_neg):
+                    warnings.append(f"감정 변화 감지: 최근 '{prev_tone}' → 현재 '{new_tone}'")
+
+    return {
+        "consistent": len(warnings) == 0,
+        "warnings": warnings,
+        "recent_lines": recent_lines[-5:],
+    }
+
+
+# ─── 전술 엄폐 시스템 ───
+
+# 랜드마크 전술 속성 (맵 locations 기반)
+LANDMARK_TACTICAL = {
+    '우물': {"cover": "half", "defense_bonus": 3, "blocks_ranged": False, "destructible": False, "description": "돌 우물 뒤 반 엄폐."},
+    '모닥불': {"cover": "none", "defense_bonus": 0, "hazard": "화상", "description": "엄폐 불가. 진입 시 화상."},
+    '이정표': {"cover": "none", "defense_bonus": 0, "description": "엄폐 불가."},
+}
+
+
+def get_cover_at(position, state=None):
+    """특정 위치에서 사용 가능한 엄폐물 확인.
+    인접 타일(상하좌우 + 대각선)의 오브젝트/랜드마크를 검색하여 엄폐 가능 여부 반환.
+
+    Args:
+        position: [x, y] 엔티티 현재 위치
+        state: game_state
+
+    Returns:
+        list of {"name": str, "direction": str, "cover": str, "defense_bonus": int, ...}
+    """
+    if state is None:
+        state = load_game_state()
+
+    px, py = int(position[0]), int(position[1])
+    covers = []
+
+    # 인접 8방향
+    directions = {
+        (-1, -1): "북서", (0, -1): "북", (1, -1): "북동",
+        (-1,  0): "서",                  (1,  0): "동",
+        (-1,  1): "남서", (0,  1): "남", (1,  1): "남동",
+    }
+
+    # 1. 오브젝트 엔티티 체크
+    scenario_id = state.get("game_info", {}).get("scenario_id", "")
+    objects = []
+    if scenario_id:
+        obj_dir = os.path.join(BASE_DIR, "entities", scenario_id, "objects")
+        if os.path.isdir(obj_dir):
+            for fname in sorted(os.listdir(obj_dir)):
+                if not fname.endswith(".json"):
+                    continue
+                try:
+                    with open(os.path.join(obj_dir, fname), "r", encoding="utf-8") as f:
+                        objects.append(json.load(f))
+                except Exception:
+                    pass
+
+    for obj in objects:
+        obj_pos = obj.get("position")
+        if not obj_pos:
+            continue
+        obj_size = obj.get("size", [1, 1])
+        tactical = obj.get("tactical", {})
+        if not tactical or tactical.get("cover", "none") == "none":
+            continue
+
+        # 오브젝트가 차지하는 모든 타일 체크
+        for dx_obj in range(obj_size[0]):
+            for dy_obj in range(obj_size[1]):
+                ox = int(obj_pos[0]) + dx_obj
+                oy = int(obj_pos[1]) + dy_obj
+                diff_x = ox - px
+                diff_y = oy - py
+                if (diff_x, diff_y) in directions:
+                    covers.append({
+                        "name": obj.get("name", "?"),
+                        "direction": directions[(diff_x, diff_y)],
+                        "cover": tactical.get("cover", "none"),
+                        "defense_bonus": tactical.get("defense_bonus", 0),
+                        "blocks_ranged": tactical.get("blocks_ranged", False),
+                        "flammable": tactical.get("flammable", False),
+                        "destructible": tactical.get("destructible", False),
+                        "obj_hp": tactical.get("hp", 0),
+                    })
+
+    # 2. 랜드마크 체크 (map.locations 단일 타일)
+    for loc in state.get("map", {}).get("locations", []):
+        area = loc.get("area", {})
+        if area.get("x1") != area.get("x2") or area.get("y1") != area.get("y2"):
+            continue
+        lx, ly = area["x1"], area["y1"]
+        diff_x = lx - px
+        diff_y = ly - py
+        if (diff_x, diff_y) in directions:
+            name = loc.get("name", "")
+            for keyword, tac in LANDMARK_TACTICAL.items():
+                if keyword in name and tac.get("cover", "none") != "none":
+                    covers.append({
+                        "name": name,
+                        "direction": directions[(diff_x, diff_y)],
+                        **tac,
+                    })
+                    break
+
+    return covers
+
+
+def apply_cover(attacker_pos, defender_pos, state=None):
+    """원거리 공격 시 방어자의 엄폐 보너스 계산.
+    공격 방향과 엄폐물 방향이 일치하면 엄폐 적용.
+
+    Args:
+        attacker_pos: [x, y] 공격자 위치
+        defender_pos: [x, y] 방어자 위치
+        state: game_state
+
+    Returns:
+        {"has_cover": bool, "cover_type": str, "defense_bonus": int,
+         "blocked": bool, "cover_name": str}
+    """
+    if state is None:
+        state = load_game_state()
+
+    covers = get_cover_at(defender_pos, state)
+    if not covers:
+        return {"has_cover": False, "cover_type": "none", "defense_bonus": 0, "blocked": False}
+
+    # 공격 방향 계산
+    ax, ay = int(attacker_pos[0]), int(attacker_pos[1])
+    dx, dy = int(defender_pos[0]), int(defender_pos[1])
+
+    # 공격이 오는 방향 (공격자→방어자의 반대 방향이 엄폐 방향)
+    attack_dx = 0 if ax == dx else (1 if ax > dx else -1)
+    attack_dy = 0 if ay == dy else (1 if ay > dy else -1)
+    # 엄폐물이 공격자 방향에 있어야 유효
+    cover_direction = (attack_dx, attack_dy)
+
+    DIRECTION_MAP = {
+        "북서": (-1, -1), "북": (0, -1), "북동": (1, -1),
+        "서": (-1, 0), "동": (1, 0),
+        "남서": (-1, 1), "남": (0, 1), "남동": (1, 1),
+    }
+
+    best_cover = {"has_cover": False, "cover_type": "none", "defense_bonus": 0, "blocked": False}
+
+    for c in covers:
+        c_dir = DIRECTION_MAP.get(c["direction"], (0, 0))
+        if c_dir == cover_direction:
+            if c.get("defense_bonus", 0) > best_cover["defense_bonus"]:
+                best_cover = {
+                    "has_cover": True,
+                    "cover_type": c.get("cover", "half"),
+                    "defense_bonus": c.get("defense_bonus", 0),
+                    "blocked": c.get("blocks_ranged", False),
+                    "cover_name": c.get("name", "?"),
+                    "flammable": c.get("flammable", False),
+                }
+
+    return best_cover
+
+
+def damage_object(obj_name, damage, state=None):
+    """오브젝트에 피해를 주어 파괴. 파괴 시 엄폐 소멸.
+
+    Returns:
+        {"destroyed": bool, "remaining_hp": int, "name": str, "explosion": dict or None}
+    """
+    if state is None:
+        state = load_game_state()
+
+    scenario_id = state.get("game_info", {}).get("scenario_id", "")
+    if not scenario_id:
+        return {"error": "scenario_id 없음"}
+
+    obj_dir = os.path.join(BASE_DIR, "entities", scenario_id, "objects")
+    for fname in sorted(os.listdir(obj_dir)):
+        if not fname.endswith(".json"):
+            continue
+        fpath = os.path.join(obj_dir, fname)
+        try:
+            with open(fpath, "r", encoding="utf-8") as f:
+                obj = json.load(f)
+            if obj.get("name") != obj_name:
+                continue
+
+            tactical = obj.get("tactical", {})
+            if not tactical.get("destructible", False):
+                return {"destroyed": False, "name": obj_name, "message": "파괴 불가능한 오브젝트."}
+
+            current_hp = tactical.get("hp", 0)
+            new_hp = max(0, current_hp - damage)
+            tactical["hp"] = new_hp
+
+            explosion = None
+            destroyed = new_hp <= 0
+
+            if destroyed:
+                obj["status"] = "destroyed"
+                tactical["cover"] = "none"
+                tactical["defense_bonus"] = 0
+                tactical["blocks_ranged"] = False
+
+                if tactical.get("explosive", False):
+                    explosion = {
+                        "damage": tactical.get("explosion_damage", 0),
+                        "radius": tactical.get("explosion_radius", 0),
+                        "position": obj.get("position"),
+                        "message": f"{obj_name} 폭발! 반경 {tactical.get('explosion_radius', 0)}타일에 {tactical.get('explosion_damage', 0)} 피해!"
+                    }
+
+            obj["tactical"] = tactical
+            with open(fpath, "w", encoding="utf-8") as f:
+                json.dump(obj, f, ensure_ascii=False, indent=2)
+
+            return {
+                "destroyed": destroyed,
+                "remaining_hp": new_hp,
+                "name": obj_name,
+                "explosion": explosion,
+            }
+        except Exception:
+            continue
+
+    return {"error": f"오브젝트 '{obj_name}' 찾을 수 없음"}
+
+
 # ─── CLI 인터페이스 ───
 
 def _print_result(result):
@@ -1360,11 +2210,13 @@ def main():
         print("  damage <tid> <amount>   직접 데미지")
         print("  initiative             이니셔티브 굴림")
         print("  tick                   상태이상 턴 처리")
+        print("  turn_start             턴 시작 환경 체크 (위험 타일 + 상태이상 tick + KO 판정)")
         print()
         print()
         print("  [NPC]")
         print("  npcs                   NPC 엔티티 목록")
         print("  check_npcs             누락 엔티티 검증 + 자동 생성")
+        print("  check_tile <id> <x> <y>  타일 상호작용 검사")
         print()
         print("  [장비]")
         print("  equip                  파티 장비 상태")
@@ -1444,6 +2296,9 @@ def main():
     elif cmd == "tick":
         _print_result(tick_status_effects())
 
+    elif cmd == "turn_start":
+        output(turn_start_check())
+
     elif cmd == "npcs":
         for n in list_npc_entities():
             status_icon = {"alive": "🟢", "dead": "💀", "fled": "🏃", "active": "⚔️"}.get(n["status"], "❓")
@@ -1456,6 +2311,16 @@ def main():
                 print(f"  ✅ 생성: npc_{c['id']}.json — {c['name']}")
         else:
             print("  모든 NPC 엔티티 정상")
+
+    elif cmd == "check_tile":
+        # check_tile <entity_id> <x> <y>
+        if len(sys.argv) < 5:
+            print("Usage: check_tile <entity_id> <x> <y>")
+            sys.exit(1)
+        eid = int(sys.argv[2])
+        tx, ty = int(sys.argv[3]), int(sys.argv[4])
+        result = check_tile_interaction(eid, [tx, ty])
+        print(json.dumps(result, ensure_ascii=False, indent=2))
 
     elif cmd == "equip":
         state = load_game_state()
