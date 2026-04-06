@@ -395,6 +395,9 @@ class SaveManager:
         # 오래된 이벤트 아카이브 (game_state.events 트리밍) — 슬롯별 저장
         archive_old_events(GAME_STATE_PATH, slot=slot)
 
+        # git commit + push 자동 실행
+        self._git_commit_push(scenario_id, slot, save_data["save_info"])
+
         return save_data["save_info"]
 
     def load_game(self, scenario_id, slot=1):
@@ -743,6 +746,36 @@ class SaveManager:
                     shutil.rmtree(dst_d)
 
         return copied
+
+    def _git_commit_push(self, scenario_id, slot, save_info):
+        """게임 저장 후 자동 git commit + push."""
+        import subprocess
+        try:
+            turn = save_info.get("turn_count", "?")
+            desc = save_info.get("description", "")
+            msg = f"save: {scenario_id} slot{slot} turn{turn} — {desc}"
+
+            subprocess.run(["git", "add", "-A"], cwd=BASE_DIR,
+                           capture_output=True, timeout=10)
+            result = subprocess.run(
+                ["git", "commit", "-m", msg],
+                cwd=BASE_DIR, capture_output=True, text=True, timeout=15
+            )
+            if result.returncode == 0:
+                push = subprocess.run(
+                    ["git", "push"], cwd=BASE_DIR,
+                    capture_output=True, text=True, timeout=30
+                )
+                if push.returncode == 0:
+                    print(f"  [OK] git commit + push 완료")
+                else:
+                    print(f"  [WARN] git commit 성공, push 실패: {push.stderr.strip()}")
+            elif "nothing to commit" in result.stdout:
+                print(f"  [OK] 변경 없음 — commit 스킵")
+            else:
+                print(f"  [WARN] git commit 실패: {result.stderr.strip()}")
+        except Exception as e:
+            print(f"  [WARN] git 자동 저장 실패: {e}")
 
     def _sync_docs(self, game_state):
         """docs/ 증분 동기화 (GitHub Pages용).

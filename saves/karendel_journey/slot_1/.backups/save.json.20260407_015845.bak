@@ -2,10 +2,10 @@
   "save_info": {
     "scenario_id": "karendel_journey",
     "slot": 1,
-    "description": "자동 저장 (턴 27)",
-    "saved_at": "2026-04-07 01:01:36",
-    "turn_count": 27,
-    "chapter": 2,
+    "description": "Turn 30: Red Chimney Inn, bags dropped, food served",
+    "saved_at": "2026-04-07 01:40:36",
+    "turn_count": 30,
+    "chapter": 1,
     "party_summary": [
       {
         "name": "saiki",
@@ -58,8 +58,8 @@
           "CON": 10
         },
         "position": [
-          11,
-          22
+          7,
+          5
         ],
         "status_effects": [],
         "inventory": [
@@ -76,7 +76,8 @@
           "shared_gold_1",
           "rope",
           "flint",
-          "spice_pouch"
+          "spice_pouch",
+          "free_stay_1night"
         ],
         "controlled_by": "user",
         "original_image": "/static/portraits/original/player_1_saiki.png"
@@ -98,8 +99,8 @@
           "CON": 15
         },
         "position": [
-          12,
-          22
+          8,
+          5
         ],
         "status_effects": [],
         "inventory": [
@@ -127,8 +128,8 @@
           "CON": 17
         },
         "position": [
-          13,
-          22
+          6,
+          5
         ],
         "status_effects": [],
         "inventory": [
@@ -271,7 +272,7 @@
         "name": "volf",
         "display_name": "innkeeper",
         "type": "friendly",
-        "known": false,
+        "known": true,
         "hp": 15,
         "max_hp": 15,
         "mp": 0,
@@ -392,64 +393,8 @@
         }
       ]
     },
-    "turn_count": 27,
+    "turn_count": 30,
     "events": [
-      {
-        "turn": 27,
-        "message": "[GM] ko sync test",
-        "narrative": "",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "22:15:00"
-      },
-      {
-        "turn": 27,
-        "message": "[GM] Turn 29: Farewell Mira, arrive Red Chimney Inn, meet Volf",
-        "narrative": "\"기회가 된다면 다음에 또 봅시다.\"\n\n사이키가 미라에게 말했다. 미라가 고개를 끄덕이며 한 번 더 손을 흔들었다. 할란이 짐마차를 이끌고 직물 거리 안쪽으로 사라졌다. 미라의 갈색 포니테일이 인파 속으로 멀어졌다.\n\n셋은 직물 거리를 지나 북쪽으로 걸었다. 좁은 골목이 넓어지고, 숙소 밀집지의 간판들이 보이기 시작했다. 그리고 이내 -- 붉은 벽돌로 쌓은 굴뚝이 오후의 연기를 옅게 내뿜고 있는 2층짜리 석조 건물이 눈에 들어왔다.\n\n붉은 굴뚝 여관.\n\n문을 열자 구운 보리빵 냄새와 나무가 타는 향이 먼저 맞이했다. 홀은 좁지 않지만 붐비지도 않았다 -- 낮 시간이라 손님은 구석에 혼자 앉아 맥주를 홀짝이는 노인 하나뿐. 테이블은 닳았지만 깨끗하고, 바닥에는 지푸라기 대신 마른 허브가 뿌려져 있었다.\n\n루세나가 홀 입구에서 카운터 위 먼지를 손가락으로 툭 닦으며 말했다.\n\n\"음... 냄새는 그럭저럭이네. 외양간 냄새보다는 낫잖아.\"\n\n노엘은 등의 짐을 고쳐 메며 눈으로 창문과 출구 위치를 훑었다.\n\n\"앉을 자리부터.\"\n\n카운터 뒤에서 커다란 남자가 행주로 잔을 닦고 있었다. 오십대 초반, 키가 크고 어깨가 넓지만 배가 나왔다. 소금후추색 머리를 짧게 친 얼굴에 사흘치 수염. 왼쪽 무릎을 약간 감싸며 서 있는 걸 눈치 빠른 사람이라면 알아챌 수 있었다.\n\n세 사람이 들어서자 시선이 올라왔다. 오래 이 일을 해온 사람의, 평가하는 눈빛.\n\n\"어서 오시오.\"\n\n잔을 내려놓으며 말했다. 목소리는 낮고 무뚝뚝하지만 거칠지는 않았다.\n\n\"방 찾으시오, 식사 찾으시오? 방은 1인실이 동쪽으로 둘 남았고, 3인 합실은 하나 있소. 저녁은 해 질 무렵부터요.\"\n\n잠깐 멈추더니 일행을 한 번 훑었다 -- 여행 먼지, 짐의 무게, 지친 기색.\n\n\"멀리서 오셨소?\"",
-        "user_input": "기회가 된다면 다음에 또 봅시다. 여관으로 간다.",
-        "dialogues": [
-          {
-            "speaker": "saiki",
-            "line": "기회가 된다면 다음에 또 봅시다.",
-            "tone": "calm",
-            "target": "mira"
-          },
-          {
-            "speaker": "lucena",
-            "line": "음... 냄새는 그럭저럭이네. 외양간 냄새보다는 낫잖아.",
-            "tone": "casual"
-          },
-          {
-            "speaker": "noel",
-            "line": "앉을 자리부터.",
-            "tone": "dry"
-          },
-          {
-            "speaker": "volf",
-            "line": "어서 오시오.",
-            "tone": "businesslike"
-          },
-          {
-            "speaker": "volf",
-            "line": "방 찾으시오, 식사 찾으시오? 방은 1인실이 동쪽으로 둘 남았고, 3인 합실은 하나 있소.",
-            "tone": "businesslike"
-          },
-          {
-            "speaker": "volf",
-            "line": "멀리서 오셨소?",
-            "tone": "neutral"
-          }
-        ],
-        "timestamp": "22:25:27"
-      },
-      {
-        "turn": 27,
-        "message": "[GM] Fix: remove separated NPCs from map",
-        "narrative": "",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "22:43:06"
-      },
       {
         "turn": 27,
         "message": "[GM] Map refresh after NPC separation",
@@ -505,6 +450,30 @@
         "user_input": "",
         "dialogues": [],
         "timestamp": "23:23:11"
+      },
+      {
+        "turn": 28,
+        "message": "",
+        "narrative": "사이키가 카운터 앞으로 걸어갔다.\n\n\"안녕하세요. 여기 볼프씨 있으신가요, 여기 에르네스의 소개장과 약초 봉투가 있다고 알려주세요.\"\n\n카운터 뒤의 남자가 행주를 닦던 손을 멈췄다. 눈썹이 올라갔다. 천천히 행주를 내려놓으며 몸을 앞으로 기댔다.\n\n\"...내가 볼프요.\"\n\n잠깐의 침묵. 그의 시선이 사이키의 얼굴에서 짐으로, 다시 뒤의 두 동료에게로 옮겨갔다.\n\n\"에르네스가 보냈다고? 소개장이랑 약초 봉투, 여기 놓으시오.\"\n\n사이키가 가방에서 에르네스의 소개장과 약초 묶음을 꺼내 카운터 위에 올렸다. 볼프가 소개장을 펼쳐 읽기 시작했다. 약초 봉투를 한 번 만져보더니 입꼬리가 아주 미세하게 올라갔다.\n\n\"그 녀석, 잊지 않았군.\"\n\n낮은 목소리에 뭔가 말랑한 것이 스쳤다. 하지만 곧 원래의 무뚝뚝한 표정으로 돌아왔다.\n\n\"아, 그리고 우리들을 위한 음식과 음료를 주세요. 이 둘은 애들이라 시원한 우유로 주시고요.\"\n\n루체나가 카운터에 팔짱을 끼고 기대며 사이키를 쏘아봤다.\n\n\"야, 잠깐만요. 저 애 아니고요, 우유도 됐어요. 저한테는 에일이나 한 잔 주세요, 아저씨. 아, 그리고 사이키 오빠 -- 애들이라고 하면 다음엔 소개장 잃어버릴 수도 있으니까 참고해요.\"\n\n눈은 사이키를 째려보면서도, 그 시선은 이미 홀 안을 훑고 있었다.\n\n노엘은 입구 쪽 벽에 등을 대고 앉을 수 있는 자리를 골라 짐을 내렸다. 문과 양쪽 창문이 한눈에 보이는 위치. 오크 도끼를 벽에 기대고, 무심한 눈으로 사이키를 보며 한마디 했다.\n\n\"...애라고 했나.\"\n\n볼프가 세 사람을 한 번 훑어보더니, 허탈한 듯 코를 한 번 훌쩍였다.\n\n\"꼬맹이들 우유는 알았소. 음식은 지금 낸다. 뭘 드실 거요?\"",
+        "user_input": "Saiki presents letter and herbs, orders food/milk",
+        "dialogues": [],
+        "timestamp": "01:13:08"
+      },
+      {
+        "turn": 29,
+        "message": "",
+        "narrative": "사이키가 루체나 근처 자리에 앉으며 볼프를 올려다봤다.\n\n\"여기서 추천하는 음식이 뭐에요? 4인분 같은 3인분 주세요. 한창 먹고 클 나이라.\"\n\n루체나와 노엘을 보며 살짝 미소지었다.\n\n루체나가 이마에 핏줄이 서는 것을 꾹 참으며 대답했다.\n\n\"지금 세 시 반쯤 됐어. ...그리고 클 나이가 두 번째야, 사이키. 한 번 더 하면 나중에 네 지갑에서 실수로 동전 몇 개 빠진다.\"\n\n노엘은 자리에서 식기를 정리하며 무심하게 한마디 보탰다.\n\n\"...한 번 더 하면 몫 뺏는다.\"\n\n볼프가 카운터 아래에서 분필판 메뉴를 꺼내며 말했다.\n\n\"오늘은 양고기 스튜에 흑빵, 구운 닭 반 마리씩 나온다.\"\n\n\"스튜는 아침부터 끓인 거라 지금이 제일 맛있을 때고.\"\n\n잠깐 일행을 훑어보더니,\n\n\"4인분을 3명이 먹겠다고? ...뭐, 크는 애들한테 그게 맞는 양이지.\"\n\n루체나가 볼프까지 가세했다는 듯 눈을 치켜떴지만, 볼프는 아랑곳하지 않고 소개장을 다시 한 번 들어 보였다.\n\n\"에르네스 영감 소개장에 하룻밤 무료라고 적혀 있으니, 방은 2층 제일 안쪽으로 잡아뒀다.\"\n\n행주를 어깨에 걸치며 주방 쪽으로 몸을 돌렸다.\n\n\"짐 풀고 내려와라. 스튜 식기 전에.\"",
+        "user_input": "적당한 자리에 앉아 추천 음식 4인분급 3인분 주문, 클 나이 드립, 루체나에게 시간 물음",
+        "dialogues": [],
+        "timestamp": "01:20:55"
+      },
+      {
+        "turn": 30,
+        "message": "",
+        "narrative": "\"알겠어, 장난이야. 짐 내려두고 밥 먹고 감정받으러 가자. 위치는 알고 있어?\"\n\n사이키가 짐을 들고 계단 쪽으로 걸었다.\n\n\"장난치다 혼나기 전에 얼른 올라가.\" 루체나가 자기 짐을 낚아채며 뒤를 따랐다. \"멜로스 골동품 상회라고, 카렌델 구시가지 쪽에 있다고 들었어. 에르네스 편지에도 나왔잖아, 안 읽었어?\"\n\n노엘이 벽에 기댄 오크 도끼와 방패를 집어 들며 짧게 말했다.\n\n\"짐 먼저 풀고.\"\n\n나무 계단이 세 사람의 무게에 삐걱거렸다. 2층 복도는 좁고 어두웠다 -- 작은 창 하나에서 오후의 빛이 비스듬히 들어왔다. 제일 안쪽 문을 열자 3인 합실이 나왔다. 넓지는 않지만 깨끗했다. 침대 셋, 작은 탁자 하나, 벽에 걸린 옷걸이. 창문 너머로 카렌델의 지붕들이 보였다.\n\n노엘이 도끼를 침대 옆에 세우고 방패를 벽에 기댔다. 루체나는 짐을 침대 위에 던지고 창문 잠금 장치를 한 번 확인했다 -- 도적의 습관.\n\n사이키도 짐을 내려놓았다. 아래에서 양고기 스튜 냄새가 올라오고 있었다.\n\n셋은 다시 1층으로 내려갔다. 카운터 앞 테이블에 김이 모락모락 나는 양고기 스튜 세 그릇, 흑빵, 구운 닭 반 마리씩, 그리고 보리 에일 한 잔과 -- 우유 두 잔이 놓여 있었다.\n\n루체나가 우유 잔을 보고 사이키를 째려봤지만, 볼프는 이미 다른 손님에게 가 있었다.",
+        "user_input": "짐 내려두고 밥 먹고 감정받으러 가자, 위치 알아? 2층으로 올라감",
+        "dialogues": [],
+        "timestamp": "01:34:05"
       }
     ],
     "current_scene": {
@@ -519,11 +488,19 @@
           "size_class": "d3"
         },
         {
+          "type": "portrait",
+          "image": "static/portraits/sd/portrait_volf.webp",
+          "position": "far-left",
+          "name": "volf",
+          "distance": 2,
+          "size_class": "d2"
+        },
+        {
           "type": "object",
-          "image": "static/illustrations/sd/object_barrel_stack.webp",
+          "image": "static/illustrations/sd/object_round_table_2.webp",
           "position": "center",
-          "name": "barrel_stack",
-          "distance": 4,
+          "name": "round_table_2",
+          "distance": 5,
           "size_class": "d3"
         },
         {
@@ -531,7 +508,15 @@
           "image": "static/illustrations/sd/object_bar_counter.webp",
           "position": "center",
           "name": "bar_counter",
-          "distance": 4,
+          "distance": 2,
+          "size_class": "d2"
+        },
+        {
+          "type": "object",
+          "image": "static/illustrations/sd/object_chair.webp",
+          "position": "center",
+          "name": "chair",
+          "distance": 3,
           "size_class": "d3"
         },
         {
@@ -539,7 +524,15 @@
           "image": "static/illustrations/sd/object_kitchen_table.webp",
           "position": "center",
           "name": "kitchen_table",
-          "distance": 4,
+          "distance": 5,
+          "size_class": "d3"
+        },
+        {
+          "type": "object",
+          "image": "static/illustrations/sd/object_barrel_stack.webp",
+          "position": "center",
+          "name": "barrel_stack",
+          "distance": 6,
           "size_class": "d3"
         }
       ]

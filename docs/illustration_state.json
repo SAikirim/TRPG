@@ -10,36 +10,12 @@
       "size_class": "d3"
     },
     {
-      "type": "portrait",
-      "image": "static/portraits/sd/portrait_volf.webp",
-      "position": "far-left",
-      "name": "volf",
-      "distance": 2,
-      "size_class": "d2"
-    },
-    {
-      "type": "object",
-      "image": "static/illustrations/sd/object_round_table_2.webp",
-      "position": "center",
-      "name": "round_table_2",
-      "distance": 5,
-      "size_class": "d3"
-    },
-    {
       "type": "object",
       "image": "static/illustrations/sd/object_bar_counter.webp",
       "position": "center",
       "name": "bar_counter",
       "distance": 2,
       "size_class": "d2"
-    },
-    {
-      "type": "object",
-      "image": "static/illustrations/sd/object_chair.webp",
-      "position": "center",
-      "name": "chair",
-      "distance": 3,
-      "size_class": "d3"
     },
     {
       "type": "object",
@@ -55,6 +31,46 @@
       "position": "center",
       "name": "barrel_stack",
       "distance": 6,
+      "size_class": "d3"
+    },
+    {
+      "type": "portrait",
+      "image": "static/portraits/sd/portrait_volf.webp",
+      "position": "far-left",
+      "name": "volf",
+      "distance": 10,
+      "size_class": "d4"
+    },
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_round_table_1.webp",
+      "position": "center",
+      "name": "round_table_1",
+      "distance": 3,
+      "size_class": "d3"
+    },
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_round_table_2.webp",
+      "position": "center",
+      "name": "round_table_2",
+      "distance": 3,
+      "size_class": "d3"
+    },
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_long_table.webp",
+      "position": "center",
+      "name": "long_table",
+      "distance": 3,
+      "size_class": "d3"
+    },
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_chair.webp",
+      "position": "center",
+      "name": "chair",
+      "distance": 5,
       "size_class": "d3"
     }
   ],
