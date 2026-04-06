@@ -45,6 +45,8 @@ EMOJI_FALLBACK = {
     '🫙': '📦',  # 항아리 → package
     '🫗': '💧',  # 붓기 → water
     '🧱': '🟫',  # 벽돌 → brown square
+    '🪜': '⬆️',  # 사다리/계단 → up arrow
+    '🪑': '🔲',  # 의자 → black square
 }
 
 
@@ -81,10 +83,8 @@ class MapGenerator:
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
 
-    def generate_map(self):
-        state = self.load_game_state()
-
-        # ko.json 로드 (맵 전체에서 번역 사용)
+    def _init_translation(self):
+        """Load ko.json and set up _t_name helper."""
         self._ko = {}
         try:
             ko_path = os.path.join(self.base_dir, "lang", "ko.json")
@@ -101,9 +101,11 @@ class MapGenerator:
             return en_name
         self._t_name = _t_name
 
-        # Try to load location-based map from worldbuilding
+    def _load_map_data(self, state):
+        """Load map dimensions and location areas from worldbuilding or game_state."""
         current_loc = state.get("current_location", "")
         wb_map = None
+        loc_data = {}
         if current_loc:
             try:
                 wb_path = os.path.join(self.base_dir, "data", "worldbuilding.json")
@@ -123,16 +125,10 @@ class MapGenerator:
             map_h = state["map"]["height"]
             locations = state["map"]["locations"]
 
-        margin_left = 22   # 세로 좌표 표시 여백
-        margin_top = 16    # 가로 좌표 표시 여백
-        grid_w = map_w * self.tile_size
-        grid_h = map_h * self.tile_size
-        img_w = grid_w + margin_left
-        img_h = grid_h + margin_top
-        img = Image.new("RGB", (img_w, img_h), "#1a1a1a")
-        draw = ImageDraw.Draw(img)
+        return current_loc, wb_map, loc_data, map_w, map_h, locations
 
-        # 좌표 표시용 작은 폰트
+    def _init_fonts(self):
+        """Initialize all fonts used by map rendering. Returns dict of fonts."""
         coord_font = ImageFont.load_default()
         for fp in font_paths_global:
             try:
@@ -140,6 +136,58 @@ class MapGenerator:
                 break
             except (OSError, IOError):
                 continue
+
+        font = font_small = font_name = ImageFont.load_default()
+        bold_paths = ["C:/Windows/Fonts/malgunbd.ttf", "C:/Windows/Fonts/arialbd.ttf"] + font_paths_global
+        for fp in font_paths_global:
+            try:
+                font = ImageFont.truetype(fp, 14)
+                font_small = ImageFont.truetype(fp, 11)
+                break
+            except (OSError, IOError):
+                continue
+        for fp in bold_paths:
+            try:
+                font_name = ImageFont.truetype(fp, 14)
+                break
+            except (OSError, IOError):
+                continue
+
+        emoji_font = None
+        try:
+            emoji_font = ImageFont.truetype("C:/Windows/Fonts/seguiemj.ttf", 20)
+        except (OSError, IOError):
+            pass
+
+        return {
+            "coord": coord_font,
+            "font": font,
+            "small": font_small,
+            "name": font_name,
+            "emoji": emoji_font,
+        }
+
+    def generate_background(self, state=None):
+        """Draw terrain/grid/coordinates/location labels → save to map_bg.png + meta.
+
+        Only regenerates when current_location changes.
+        Returns the PIL Image.
+        """
+        if state is None:
+            state = self.load_game_state()
+
+        self._init_translation()
+        current_loc, wb_map, loc_data, map_w, map_h, locations = self._load_map_data(state)
+        fonts = self._init_fonts()
+
+        margin_left = 22
+        margin_top = 16
+        grid_w = map_w * self.tile_size
+        grid_h = map_h * self.tile_size
+        img_w = grid_w + margin_left
+        img_h = grid_h + margin_top
+        img = Image.new("RGB", (img_w, img_h), "#1a1a1a")
+        draw = ImageDraw.Draw(img)
 
         # Draw location areas
         location_colors = {
@@ -149,8 +197,17 @@ class MapGenerator:
             "village": "#8B7355",
             "road": "#A0926B",
             "house": "#6B4226",
+            # Interior tile types
+            "floor_wood": "#8B6914",
+            "floor_stone": "#808080",
+            "wall": "#4A4A4A",
+            "wall_exterior": "#3A3A3A",
+            "counter": "#6B3A2A",
+            "stairs": "#B8860B",
+            "door": "#CD853F",
+            "fireplace": "#8B0000",
+            "kitchen": "#696969",
         }
-        # 배경 채우기 (그리드 영역)
         draw.rectangle([margin_left, margin_top, img_w, img_h], fill="#2d5a1e")
 
         for loc in locations:
@@ -159,10 +216,39 @@ class MapGenerator:
             y1 = area["y1"] * self.tile_size + margin_top
             x2 = (area["x2"] + 1) * self.tile_size + margin_left
             y2 = (area["y2"] + 1) * self.tile_size + margin_top
-            color = location_colors.get(loc["type"], "#4a8c2a")
+            loc_type = loc["type"]
+            color = location_colors.get(loc_type, "#4a8c2a")
             draw.rectangle([x1, y1, x2, y2], fill=color)
 
-        # Draw grid + 좌표
+            # Wall types: thick white outline to visually distinguish
+            if loc_type in ("wall", "wall_exterior"):
+                draw.rectangle([x1, y1, x2, y2], outline="white", width=2)
+
+            # Door type: lighter overlay + door icon if emoji available
+            elif loc_type == "door":
+                draw.rectangle([x1 + 2, y1 + 2, x2 - 2, y2 - 2], outline="#FFE4B5", width=1)
+                if fonts.get("emoji"):
+                    door_cx = (x1 + x2) // 2 - 10
+                    door_cy = (y1 + y2) // 2 - 10
+                    safe = safe_emoji('\U0001f6aa', fonts["emoji"])  # 🚪
+                    try:
+                        draw.text((door_cx, door_cy), safe, font=fonts["emoji"], embedded_color=True)
+                    except TypeError:
+                        draw.text((door_cx, door_cy), safe, font=fonts["emoji"])
+
+            # Stairs type: directional arrow indicator
+            elif loc_type == "stairs":
+                cx = (x1 + x2) // 2
+                cy = (y1 + y2) // 2
+                arrow_size = 6
+                # Draw up-arrow triangle
+                draw.polygon([
+                    (cx, cy - arrow_size),
+                    (cx - arrow_size, cy + arrow_size),
+                    (cx + arrow_size, cy + arrow_size),
+                ], fill="#FFD700", outline="white")
+
+        # Draw grid
         for i in range(map_w + 1):
             x = i * self.tile_size + margin_left
             draw.line([(x, margin_top), (x, img_h)], fill="#1a1a1a", width=2)
@@ -173,48 +259,89 @@ class MapGenerator:
         # 가로 좌표 (상단)
         for i in range(map_w):
             x = i * self.tile_size + margin_left + self.tile_size // 2 - 6
-            draw.text((x, 4), str(i), fill="#888888", font=coord_font)
+            draw.text((x, 4), str(i), fill="#888888", font=fonts["coord"])
 
         # 세로 좌표 (좌측)
         for i in range(map_h):
             y = i * self.tile_size + margin_top + self.tile_size // 2 - 8
-            draw.text((4, y), str(i), fill="#888888", font=coord_font)
+            draw.text((4, y), str(i), fill="#888888", font=fonts["coord"])
 
-        # Draw location labels
-        font = font_small = font_name = ImageFont.load_default()
-        bold_paths = ["C:/Windows/Fonts/malgunbd.ttf", "C:/Windows/Fonts/arialbd.ttf"] + font_paths_global
-        for fp in font_paths_global:
-            try:
-                font = ImageFont.truetype(fp, 14)
-                font_small = ImageFont.truetype(fp, 11)
-                break
-            except (OSError, IOError):
+        # Draw location labels (static area names only, not entity-dependent)
+        label_font = fonts["name"]
+        for loc in locations:
+            area = loc["area"]
+            # 단일 타일 랜드마크는 엔티티 레이어에서 처리하므로 여기서는 스킵
+            if area["x1"] == area["x2"] and area["y1"] == area["y2"]:
                 continue
-        # 이름 표시용 볼드 폰트
-        for fp in bold_paths:
-            try:
-                font_name = ImageFont.truetype(fp, 14)
-                break
-            except (OSError, IOError):
-                continue
+            text = self._t_name(loc["name"], "area_names", "locations")
+            tw = len(text) * 8 + 4
+            label_cx = ((area["x1"] + area["x2"]) / 2) * self.tile_size + margin_left
+            label_y = area["y1"] * self.tile_size + margin_top + 3
+            lx1, ly1 = label_cx - tw // 2, label_y - 1
+            lx2, ly2 = label_cx + tw // 2, label_y + 16
+            draw.rectangle([lx1, ly1, lx2, ly2], fill="#000000aa")
+            draw.text((lx1 + 2, label_y), text, fill="white", font=label_font)
 
-        # Emoji font for entity icons
-        emoji_font = None
-        try:
-            emoji_font = ImageFont.truetype("C:/Windows/Fonts/seguiemj.ttf", 20)
-        except (OSError, IOError):
-            pass
+        # Save background + metadata
+        out_dir = os.path.join(self.base_dir, "static", "maps", "local")
+        os.makedirs(out_dir, exist_ok=True)
+        bg_path = os.path.join(out_dir, "map_bg.png")
+        img.save(bg_path, "PNG")
+
+        import hashlib
+        map_hash = hashlib.md5(json.dumps({"w": map_w, "h": map_h, "loc": current_loc}, sort_keys=True).encode()).hexdigest()
+        meta = {"location": current_loc, "map_hash": map_hash}
+        meta_path = os.path.join(out_dir, "map_bg_meta.json")
+        with open(meta_path, "w", encoding="utf-8") as f:
+            json.dump(meta, f, ensure_ascii=False)
+
+        return img
+
+    def generate_map(self):
+        state = self.load_game_state()
+
+        self._init_translation()
+        current_loc, wb_map, loc_data, map_w, map_h, locations = self._load_map_data(state)
+
+        # Check if cached background is valid
+        out_dir = os.path.join(self.base_dir, "static", "maps", "local")
+        bg_path = os.path.join(out_dir, "map_bg.png")
+        meta_path = os.path.join(out_dir, "map_bg_meta.json")
+
+        bg_valid = False
+        if os.path.isfile(bg_path) and os.path.isfile(meta_path):
+            try:
+                with open(meta_path, "r", encoding="utf-8") as f:
+                    meta = json.load(f)
+                if meta.get("location") == current_loc:
+                    bg_valid = True
+            except Exception:
+                pass
+
+        if bg_valid:
+            img = Image.open(bg_path).copy()
+        else:
+            img = self.generate_background(state).copy()
+
+        draw = ImageDraw.Draw(img)
+        fonts = self._init_fonts()
+        emoji_font = fonts["emoji"]
+        font = fonts["font"]
+        font_small = fonts["small"]
+        font_name = fonts["name"]
+
+        margin_left = 22
+        margin_top = 16
 
         # Emoji maps
         player_emojis = {"전사": "\u2694\ufe0f", "마법사": "\U0001f52e", "도적": "\U0001f5e1\ufe0f", "궁수": "\U0001f3f9", "성직자": "\u271d\ufe0f"}
         npc_emojis = {"friendly": "\U0001f60a", "monster": "\U0001f479", "neutral": "\U0001f464"}
 
         # === 충돌 회피 라벨 시스템 ===
-        # 1) 모든 엔티티 아이콘 위치 수집
         entity_icons = []  # [(cx, cy, r)] 아이콘 중심과 반경
 
         # === 단일 타일 랜드마크 아이콘 ===
-        landmark_positions = set()  # 아이콘으로 표시된 단일 타일 위치
+        landmark_positions = set()
         LANDMARK_EMOJI = {
             '우물': '\U0001f4a7',     # 💧
             '모닥불': '\U0001f525',    # 🔥
@@ -233,7 +360,6 @@ class MapGenerator:
                             cx = lx * self.tile_size + self.tile_size // 2 + margin_left
                             cy = ly * self.tile_size + self.tile_size // 2 + margin_top
                             landmark_positions.add((lx, ly))
-                            # 배경 원
                             draw.ellipse([cx - 10, cy - 10, cx + 10, cy + 10], fill="#00000066")
                             if emoji_font:
                                 safe = safe_emoji(emoji_char, emoji_font)
@@ -250,6 +376,15 @@ class MapGenerator:
             'container': '\U0001f4a6',   # 💦
             'resource': '\U0001f536',    # 🔶
             'shelter': '\u26fa',         # ⛺
+            # Furniture types
+            'furniture': '\U0001fa91',   # 🪑
+            'table': '\U0001f37d\ufe0f', # 🍽️
+            'counter_obj': '\U0001f37a', # 🍺
+            'fireplace_obj': '\U0001f525', # 🔥
+            'stairs_obj': '\U0001fa9c',  # 🪜
+            'bed': '\U0001f6cf\ufe0f',   # 🛏️
+            'barrel': '\U0001f6e2\ufe0f', # 🛢️
+            'chair': '\U0001fa91',       # 🪑
         }
         scenario_id = state.get("game_info", {}).get("scenario_id", "")
         if scenario_id:
@@ -264,7 +399,6 @@ class MapGenerator:
                         pos = obj.get("position")
                         if not (pos and len(pos) == 2):
                             continue
-                        # 같은 위치(current_location)에 있는 오브젝트만 표시
                         obj_loc = obj.get("location", "")
                         if current_loc and obj_loc and obj_loc != current_loc:
                             continue
@@ -272,7 +406,6 @@ class MapGenerator:
                         if not (0 <= ox < map_w and 0 <= oy < map_h):
                             continue
                         obj_type = obj.get("type", "")
-                        # 오브젝트 JSON에 icon 필드가 있으면 그걸 사용
                         emoji_char = obj.get("icon", OBJ_EMOJI.get(obj_type, "\U0001f4e6"))  # 📦 fallback
                         obj_size = obj.get("size", [1, 1])
                         for dy in range(obj_size[1]):
@@ -289,7 +422,6 @@ class MapGenerator:
                                         draw.text((cx - 10, cy - 10), safe, font=emoji_font, embedded_color=True)
                                     except TypeError:
                                         draw.text((cx - 10, cy - 10), safe, font=emoji_font)
-                        # entity_icons는 기준 위치(좌상단)에만 등록
                         cx0 = ox * self.tile_size + self.tile_size // 2 + margin_left
                         cy0 = oy * self.tile_size + self.tile_size // 2 + margin_top
                         entity_icons.append({"cx": cx0, "cy": cy0, "r": 9, "name": "", "color": "#888888", "type": "object"})
@@ -300,7 +432,7 @@ class MapGenerator:
         r = 12
         for npc in state["npcs"]:
             if npc.get("status") in ("fled", "gone", "separated"):
-                continue  # 도주/퇴장/헤어진 NPC는 맵에서 제외
+                continue
             px, py = npc["position"]
             if px < 0 or py < 0 or px >= map_w or py >= map_h:
                 continue
@@ -313,7 +445,6 @@ class MapGenerator:
             is_dead = npc.get("status") == "dead"
 
             if is_dead:
-                # 시체: 회색 + 💀
                 color = "#555555"
                 emoji_char = "\U0001f480"  # 💀
             elif npc_type == "monster":
@@ -337,8 +468,11 @@ class MapGenerator:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
 
             label_color = "#666" if is_dead else (color if npc_type != "monster" else "white")
-            # NPC name - always show name (translated via ko.json)
-            npc_name = self._t_name(npc["name"], "npcs", "creatures")[:4]
+            # NPC name — use display_name if unknown
+            if npc.get("known") == False and npc.get("display_name"):
+                npc_name = self._t_name(npc["display_name"], "npcs", "creatures")[:4]
+            else:
+                npc_name = self._t_name(npc["name"], "npcs", "creatures")[:4]
             entity_icons.append({"cx": cx, "cy": cy, "r": r, "name": npc_name, "color": label_color, "type": "npc"})
 
         # 플레이어 아이콘 그리기 + 위치 수집
@@ -366,8 +500,41 @@ class MapGenerator:
                 draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=3)
             entity_icons.append({"cx": cx, "cy": cy, "r": r, "name": self._t_name(player["name"], "npcs")[:3], "color": "white", "type": "player"})
 
+        # === Exit zone markers ===
+        # Load exits from worldbuilding data for current location
+        if loc_data and loc_data.get("exits"):
+            exits = loc_data["exits"]
+            for exit_name, exit_info in exits.items():
+                ex_area = exit_info.get("area")
+                if not ex_area:
+                    continue
+                ex_x1 = int(ex_area["x1"]) * self.tile_size + margin_left
+                ex_y1 = int(ex_area["y1"]) * self.tile_size + margin_top
+                ex_x2 = (int(ex_area["x2"]) + 1) * self.tile_size + margin_left
+                ex_y2 = (int(ex_area["y2"]) + 1) * self.tile_size + margin_top
+                mid_x = (ex_x1 + ex_x2) // 2 - 10
+                mid_y = (ex_y1 + ex_y2) // 2 - 10
+
+                is_stairs = "stairs" in exit_name
+                if is_stairs:
+                    draw.rectangle([ex_x1, ex_y1, ex_x2, ex_y2], outline="#FFD700", width=2)
+                    if emoji_font:
+                        safe = safe_emoji('\U0001fa9c', emoji_font)
+                        try:
+                            draw.text((mid_x, mid_y), safe, font=emoji_font, embedded_color=True)
+                        except TypeError:
+                            draw.text((mid_x, mid_y), safe, font=emoji_font)
+                else:
+                    draw.rectangle([ex_x1, ex_y1, ex_x2, ex_y2], outline="#00FF7F", width=2)
+                    if emoji_font:
+                        safe = safe_emoji('\U0001f6aa', emoji_font)
+                        try:
+                            draw.text((mid_x, mid_y), safe, font=emoji_font, embedded_color=True)
+                        except TypeError:
+                            draw.text((mid_x, mid_y), safe, font=emoji_font)
+
         # 2) 점유 영역 추적 (충돌 회피용)
-        occupied = []  # [(x1, y1, x2, y2)] 이미 배치된 라벨/아이콘 영역
+        occupied = []
         for e in entity_icons:
             occupied.append((e["cx"] - e["r"], e["cy"] - e["r"], e["cx"] + e["r"], e["cy"] + e["r"]))
 
@@ -377,7 +544,7 @@ class MapGenerator:
                     return True
             return False
 
-        # 3) 장소 라벨 — 충돌 회피하며 배치
+        # 3) 장소 라벨 — 단일 타일 랜드마크만 (충돌 회피)
         label_font = font_name
         for loc in locations:
             area = loc["area"]
@@ -385,14 +552,16 @@ class MapGenerator:
             if (area["x1"] == area["x2"] and area["y1"] == area["y2"] and
                 (area["x1"], area["y1"]) in landmark_positions):
                 continue
+            # 멀티타일 영역 라벨은 배경에 이미 그려져 있으므로 스킵
+            if area["x1"] != area["x2"] or area["y1"] != area["y2"]:
+                continue
+            # 단일 타일이지만 랜드마크가 아닌 경우 라벨 표시
             text = self._t_name(loc["name"], "area_names", "locations")
             tw = len(text) * 8 + 4
             label_cx = ((area["x1"] + area["x2"]) / 2) * self.tile_size + margin_left
-            # 기본: 영역 상단
             label_y = area["y1"] * self.tile_size + margin_top + 3
             lx1, ly1 = label_cx - tw // 2, label_y - 1
             lx2, ly2 = label_cx + tw // 2, label_y + 16
-            # 충돌 시 위로 이동
             if is_overlapping(lx1, ly1, lx2, ly2):
                 label_y -= self.tile_size
                 lx1, ly1 = label_cx - tw // 2, label_y - 1
@@ -406,14 +575,11 @@ class MapGenerator:
             name = e["name"]
             fill = e["color"] if e["type"] == "npc" else "white"
             ntw = len(name) * 8 + 4
-            # 기본: 아이콘 아래
             nx = e["cx"] - ntw // 2
             ny = e["cy"] + e["r"] + 2
             if is_overlapping(nx, ny, nx + ntw, ny + 16):
-                # 아래 충돌 → 위로
                 ny = e["cy"] - e["r"] - 16
                 if is_overlapping(nx, ny, nx + ntw, ny + 16):
-                    # 위도 충돌 → 오른쪽
                     nx = e["cx"] + e["r"] + 2
                     ny = e["cy"] - 7
             draw.text((nx, ny), name, fill=fill, font=font_name)
@@ -454,7 +620,11 @@ class MapGenerator:
                 continue
             npc_type = npc.get("type", "neutral")
             emoji = npc_emojis.get(npc_type, "\U0001f464")
-            npc_name = _t_name(npc["name"], "npcs", "creatures")[:4]
+            # NPC legend name — use display_name if unknown
+            if npc.get("known") == False and npc.get("display_name"):
+                npc_name = _t_name(npc["display_name"], "npcs", "creatures")[:4]
+            else:
+                npc_name = _t_name(npc["name"], "npcs", "creatures")[:4]
             legend_items.append((emoji, npc_name))
 
         # 랜드마크
@@ -491,22 +661,29 @@ class MapGenerator:
                     except Exception:
                         pass
 
+        # 범례 중복 제거 (같은 이모지+이름 조합은 1개만)
+        seen_legend = set()
+        unique_legend = []
+        for item in legend_items:
+            if item not in seen_legend:
+                seen_legend.add(item)
+                unique_legend.append(item)
+        legend_items = unique_legend
+
         if legend_items:
+            img_w, img_h = img.size
             legend_h = 28
-            # 이미지 하단에 범례 공간 확장
             from PIL import Image as PILImage
             new_img = PILImage.new("RGB", (img_w, img_h + legend_h), "#1a1a1a")
             new_img.paste(img, (0, 0))
             img = new_img
             draw = ImageDraw.Draw(img)
 
-            legend_y = img_h  # 원래 이미지 하단부터
+            legend_y = img_h
             draw.rectangle([0, legend_y, img_w, img_h + legend_h], fill="#000000cc")
 
-            # 아이템 배치
             lx = 8
             for emoji_char, label in legend_items:
-                # 이모지
                 if emoji_font:
                     safe = safe_emoji(emoji_char, emoji_font)
                     try:
@@ -514,7 +691,6 @@ class MapGenerator:
                     except TypeError:
                         draw.text((lx, legend_y + 3), safe, font=emoji_font)
                 lx += 22
-                # 라벨
                 draw.text((lx, legend_y + 7), label, fill="#cccccc", font=font_small)
                 lx += len(label) * 8 + 12
 
