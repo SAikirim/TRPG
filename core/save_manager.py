@@ -759,12 +759,14 @@ class SaveManager:
                            capture_output=True, timeout=10)
             result = subprocess.run(
                 ["git", "commit", "-m", msg],
-                cwd=BASE_DIR, capture_output=True, text=True, timeout=15
+                cwd=BASE_DIR, capture_output=True, text=True,
+                encoding="utf-8", errors="replace", timeout=15
             )
             if result.returncode == 0:
                 push = subprocess.run(
                     ["git", "push"], cwd=BASE_DIR,
-                    capture_output=True, text=True, timeout=30
+                    capture_output=True, text=True,
+                    encoding="utf-8", errors="replace", timeout=30
                 )
                 if push.returncode == 0:
                     print(f"  [OK] git commit + push 완료")
