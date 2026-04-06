@@ -223,7 +223,9 @@
     "talis": "탈리스",
     "karla": "카를라",
     "surha": "수르하",
-    "forest_entrance": "숲 입구"
+    "forest_entrance": "숲 입구",
+    "red_chimney_inn_1f": "붉은 굴뚝 여관 1층",
+    "red_chimney_inn_2f": "붉은 굴뚝 여관 2층"
   },
   "area_names": {
     "village_entrance": "마을 입구",
@@ -271,7 +273,27 @@
     "lighthouse": "등대",
     "corridor_1": "복도 1",
     "ancient_dungeon": "고대 던전",
-    "treasure_room": "보물실"
+    "treasure_room": "보물실",
+    "entrance_hall": "입구 홀",
+    "common_room": "공용 홀",
+    "bar_counter": "카운터",
+    "counter": "카운터",
+    "work_area": "작업 공간",
+    "fireplace_area": "벽난로",
+    "south_seating": "남쪽 좌석",
+    "storage": "창고",
+    "stairway": "계단",
+    "hallway_south": "남쪽 복도",
+    "main_entrance": "정문",
+    "hallway": "복도",
+    "room_1": "1호실",
+    "room_2": "2호실",
+    "room_3_shared": "3호실 (합실)",
+    "room_4": "4호실",
+    "room_5": "5호실",
+    "stairs_area": "계단",
+    "kitchen": "주방",
+    "fireplace": "fireplace"
   },
   "npcs": {
     "hallan": "할란",
@@ -289,7 +311,8 @@
     "hooded_figure": "후드 인물",
     "swordsman": "검객",
     "pack_horse": "짐말",
-    "peddler": "행상인"
+    "peddler": "행상인",
+    "innkeeper": "여관 주인"
   },
   "agent_names": {
     "junhyeok": "준혁",
@@ -425,7 +448,17 @@
     "firewood_pile": "장작더미",
     "oil_barrel": "기름통",
     "traveler_tent": "여행자 텐트",
-    "spring_trap_disarmed": "해제된 스프링 함정"
+    "spring_trap_disarmed": "해제된 스프링 함정",
+    "round_table_1": "원탁 1",
+    "round_table_2": "원탁 2",
+    "long_table": "긴 탁자",
+    "bar_counter": "카운터",
+    "fireplace": "벽난로",
+    "chair": "의자",
+    "kitchen_table": "주방 탁자",
+    "barrel_stack": "통 더미",
+    "stairway": "계단",
+    "bed": "침대"
   },
   "equipment_properties": {
     "attack_bonus": "명중 보너스",

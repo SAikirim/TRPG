@@ -872,7 +872,16 @@
         function tSkill(key) { return koData.skills?.[key] || koData.actions?.[key] || key; }
         function tClass(key) { return koData.classes?.[key] || key; }
         function tLocation(key) { return koData.locations?.[key] || koData.area_names?.[key] || key; }
-        function tNpc(key) { return koData.npcs?.[key] || key; }
+        function tNpc(key) {
+            // known: false인 NPC는 display_name으로 표시
+            if (gameState) {
+                const npc = (gameState.npcs || []).find(n => n.name === key);
+                if (npc && npc.known === false && npc.display_name) {
+                    return koData.npcs?.[npc.display_name] || npc.display_name;
+                }
+            }
+            return koData.npcs?.[key] || key;
+        }
         function tCreature(key) { return koData.creatures?.[key] || key; }
         function tStatus(key) { return koData.status_effects?.[key] || key; }
         function tScenario(key) { return koData.scenario_titles?.[key] || key; }
@@ -1293,7 +1302,18 @@
         }
 
         function filterNpcNames(text) {
-            // known: false인 NPC도 특징명(name)을 그대로 표시
+            // known: false인 NPC 이름을 display_name(번역)으로 치환
+            if (!gameState) return text;
+            (gameState.npcs || []).forEach(n => {
+                if (n.known === false && n.display_name) {
+                    const realName = koData.npcs?.[n.name] || n.name;
+                    const masked = koData.npcs?.[n.display_name] || n.display_name;
+                    if (realName && realName !== masked) {
+                        text = text.split(realName).join(masked);
+                        text = text.split(n.name).join(n.display_name);
+                    }
+                }
+            });
             return text;
         }
 
@@ -1312,9 +1332,10 @@
         function updateEventsList() {
             const container = document.getElementById('events-list');
             if (!gameState || !gameState.events) return;
-            // narrative가 있는 이벤트만 표시 (시스템 이벤트 필터링)
-            const allEvents = (gameState.events || []).filter(e => e.narrative);
-            const events = showFullLog ? [...allEvents].reverse() : allEvents.slice(-5).reverse();
+            const rawEvents = gameState.events || [];
+            // 최근: narrative 있는 이벤트만, 전체: 모든 이벤트
+            const narrativeOnly = rawEvents.filter(e => e.narrative);
+            const events = showFullLog ? [...rawEvents].reverse() : narrativeOnly.slice(-5).reverse();
             container.innerHTML = events.map(e => {
                 const message = filterNpcNames(e.message || '');
                 const rawNarr = e.narrative ? filterNpcNames(e.narrative) : '';
@@ -1372,13 +1393,17 @@
                     }
                 }
             });
-            // 오브젝트 범례 (현재 위치 오브젝트만 표시)
+            // 오브젝트 범례 (현재 위치 오브젝트만, 중복 제거)
             const curLoc = gameState.current_location || '';
+            const seenObj = new Set();
             (gameState.objects || []).forEach(obj => {
                 if (obj.status === 'destroyed') return;
                 if (curLoc && obj.location && obj.location !== curLoc) return;
                 const icon = obj.icon || '📦';
                 const objName = t('objects', obj.id || obj.name) !== (obj.id || obj.name) ? t('objects', obj.id || obj.name) : t('objects', obj.name);
+                const key = icon + objName;
+                if (seenObj.has(key)) return;
+                seenObj.add(key);
                 html += `<div class="legend-item">${icon} ${objName}</div>`;
             });
             container.innerHTML = html;
@@ -1449,7 +1474,8 @@
                     data.layers.forEach((layer, idx) => {
                         const posClass = 'pos-' + (layer.position || 'center');
                         const sizeClass = 'size-' + (layer.size_class || 'd2');
-                        const displayName = layer.name || '';
+                        const rawName = layer.name || '';
+                        const displayName = tNpc(rawName);
                         if (layer.type === 'portrait') {
                             html += '<div class="portrait-wrapper ' + posClass + ' ' + sizeClass + '">';
                             html += '<span class="layer-name">' + displayName + '</span>';
