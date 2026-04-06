@@ -1,0 +1,20 @@
+{
+  "id": "obj_030",
+  "name": "bed",
+  "type": "bed",
+  "status": "placed",
+  "position": [19, 3],
+  "size": [2, 1],
+  "location": "red_chimney_inn_2f",
+  "description": "A simple bed with a straw mattress and a wool blanket.",
+  "interactable": true,
+  "interaction": "Rest on the bed.",
+  "icon": "🛏️",
+  "tactical": {
+    "cover": "none",
+    "defense_bonus": 0,
+    "destructible": true,
+    "hp": 10,
+    "flammable": true
+  }
+}

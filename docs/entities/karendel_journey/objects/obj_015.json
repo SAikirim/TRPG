@@ -1,0 +1,21 @@
+{
+  "id": "obj_015",
+  "name": "chair",
+  "type": "chair",
+  "status": "placed",
+  "position": [3, 3],
+  "size": [1, 1],
+  "location": "red_chimney_inn_1f",
+  "description": "A simple wooden chair.",
+  "interactable": true,
+  "interaction": "Sit down.",
+  "icon": "🪑",
+  "tactical": {
+    "cover": "none",
+    "defense_bonus": 0,
+    "blocks_ranged": false,
+    "destructible": true,
+    "hp": 5,
+    "flammable": true
+  }
+}

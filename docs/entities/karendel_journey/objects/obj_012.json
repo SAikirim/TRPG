@@ -1,0 +1,21 @@
+{
+  "id": "obj_012",
+  "name": "long_table",
+  "type": "table",
+  "status": "placed",
+  "position": [7, 8],
+  "size": [3, 1],
+  "location": "red_chimney_inn_1f",
+  "description": "A long wooden table in the center of the common room. Seats six.",
+  "interactable": true,
+  "interaction": "Sit down at the table.",
+  "icon": "🍽️",
+  "tactical": {
+    "cover": "half",
+    "defense_bonus": 2,
+    "blocks_ranged": false,
+    "destructible": true,
+    "hp": 15,
+    "flammable": true
+  }
+}

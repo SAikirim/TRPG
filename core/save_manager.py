@@ -16,15 +16,30 @@ CURRENT_SESSION_PATH = os.path.join(BASE_DIR, "data", "current_session.json")
 MAX_BACKUPS = 5
 
 
-EVENTS_ARCHIVE_PATH = os.path.join(BASE_DIR, "data", "events_archive.json")
+def _events_archive_path(scenario_id, slot=None):
+    """세이브 슬롯별 이벤트 아카이브 경로를 반환.
+    slot이 지정되면 saves/{scenario_id}/slot_{slot}/events_archive.json,
+    없으면 current_session.json의 active_save_slot을 사용."""
+    if slot is None:
+        if os.path.isfile(CURRENT_SESSION_PATH):
+            try:
+                with open(CURRENT_SESSION_PATH, "r", encoding="utf-8") as f:
+                    session = json.load(f)
+                slot = session.get("active_save_slot", 1)
+            except Exception:
+                slot = 1
+        else:
+            slot = 1
+    return os.path.join(SAVES_DIR, scenario_id, f"slot_{slot}", "events_archive.json")
 
 
-def archive_old_events(game_state_path=None, max_recent=10):
+def archive_old_events(game_state_path=None, max_recent=10, slot=None):
     """game_state의 events가 max_recent를 초과하면 오래된 이벤트를 아카이브 파일로 이동.
 
     - 최근 max_recent개만 game_state에 유지
-    - 나머지는 data/events_archive.json에 추가 (append)
-    - 아카이브 파일은 시나리오별로 구분
+    - 나머지는 saves/{scenario_id}/slot_{slot}/events_archive.json에 추가 (append)
+    - 각 아카이브 이벤트에 scenario_id 필드 추가
+    - slot 미지정 시 current_session.json의 active_save_slot 사용
     """
     if game_state_path is None:
         game_state_path = GAME_STATE_PATH
@@ -46,11 +61,12 @@ def archive_old_events(game_state_path=None, max_recent=10):
     to_archive = events[:-max_recent]
     to_keep = events[-max_recent:]
 
-    # 4. Append archived events to data/events_archive.json
+    # 4. Append archived events to saves/{scenario_id}/events_archive.json
     scenario_id = game_state.get("game_info", {}).get("scenario_id", "unknown")
     today = datetime.now().strftime("%Y-%m-%d")
 
-    archive_path = os.path.join(os.path.dirname(game_state_path), "events_archive.json")
+    archive_path = _events_archive_path(scenario_id, slot)
+    os.makedirs(os.path.dirname(archive_path), exist_ok=True)
 
     if os.path.isfile(archive_path):
         with open(archive_path, "r", encoding="utf-8") as f:
@@ -61,14 +77,10 @@ def archive_old_events(game_state_path=None, max_recent=10):
             "archived_events": [],
         }
 
-    # 시나리오 ID가 다르면 경고하되 계속 진행 (동일 파일에 누적)
-    if archive_data.get("scenario_id") != scenario_id:
-        print(f"[WARN] archive: 기존 아카이브 scenario_id='{archive_data.get('scenario_id')}' ≠ 현재='{scenario_id}'")
-        archive_data["scenario_id"] = scenario_id
-
-    # archived_at 타임스탬프 추가
+    # archived_at 타임스탬프 + scenario_id 추가
     for evt in to_archive:
         evt["archived_at"] = today
+        evt["scenario_id"] = scenario_id
 
     archive_data["archived_events"].extend(to_archive)
 
@@ -84,6 +96,180 @@ def archive_old_events(game_state_path=None, max_recent=10):
     archived_count = len(to_archive)
     print(f"[INFO] archive: {archived_count}개 이벤트 아카이브 완료 (유지: {len(to_keep)}개)")
     return archived_count
+
+
+def restore_archived_events(scenario_id, game_state_path=None, slot=None):
+    """아카이브된 이벤트를 game_state.events 앞에 병합하여 복원.
+
+    - saves/{scenario_id}/slot_{slot}/events_archive.json이 있으면 로드
+    - 아카이브 이벤트(오래된 것)를 현재 events 앞에 prepend
+    - 병합된 결과를 game_state.json에 기록
+    - slot 미지정 시 current_session.json의 active_save_slot 사용
+    - 반환: 복원된 아카이브 이벤트 수
+    """
+    if game_state_path is None:
+        game_state_path = GAME_STATE_PATH
+
+    archive_path = _events_archive_path(scenario_id, slot)
+    if not os.path.isfile(archive_path):
+        return 0
+
+    if not os.path.isfile(game_state_path):
+        return 0
+
+    with open(archive_path, "r", encoding="utf-8") as f:
+        archive_data = json.load(f)
+
+    archived_events = archive_data.get("archived_events", [])
+    if not archived_events:
+        return 0
+
+    with open(game_state_path, "r", encoding="utf-8") as f:
+        game_state = json.load(f)
+
+    current_events = game_state.get("events", [])
+
+    # 중복 방지: 아카이브 이벤트 중 이미 current_events에 있는 것은 제외
+    # turn + message 조합으로 간이 중복 판별
+    existing_keys = set()
+    for evt in current_events:
+        key = (evt.get("turn"), evt.get("message", ""))
+        existing_keys.add(key)
+
+    unique_archived = []
+    for evt in archived_events:
+        key = (evt.get("turn"), evt.get("message", ""))
+        if key not in existing_keys:
+            unique_archived.append(evt)
+
+    if not unique_archived:
+        return 0
+
+    # 아카이브(오래된 이벤트)를 앞에, 현재 이벤트를 뒤에
+    game_state["events"] = unique_archived + current_events
+
+    with open(game_state_path, "w", encoding="utf-8") as f:
+        json.dump(game_state, f, ensure_ascii=False, indent=2)
+
+    restored_count = len(unique_archived)
+    print(f"[INFO] restore: {restored_count}개 아카이브 이벤트 복원 완료 (총 {len(game_state['events'])}개)")
+    return restored_count
+
+
+def migrate_events_archive():
+    """이벤트 아카이브를 슬롯별 구조로 마이그레이션.
+
+    1단계: data/events_archive.json → 시나리오별 분류 → 슬롯별 저장
+    2단계: saves/{scenario_id}/events_archive.json (시나리오 레벨) → 슬롯별 저장
+
+    슬롯 판별: current_session.json의 active_save_slot, 또는 가장 최근 세이브 슬롯.
+    마이그레이션 완료 후 원본을 .migrated로 이름 변경.
+    """
+    migrated_any = False
+
+    # --- 1단계: data/events_archive.json (레거시 단일 파일) ---
+    old_path = os.path.join(BASE_DIR, "data", "events_archive.json")
+    if os.path.isfile(old_path):
+        with open(old_path, "r", encoding="utf-8") as f:
+            old_data = json.load(f)
+
+        default_scenario = old_data.get("scenario_id", "unknown")
+        archived_events = old_data.get("archived_events", [])
+
+        if archived_events:
+            # 시나리오별 그룹핑
+            groups = {}
+            for evt in archived_events:
+                sid = evt.get("scenario_id", default_scenario)
+                evt["scenario_id"] = sid
+                groups.setdefault(sid, []).append(evt)
+
+            for sid, events in groups.items():
+                slot = _find_best_slot(sid)
+                _write_to_slot_archive(sid, slot, events)
+                print(f"  {sid}/slot_{slot}: {len(events)}개 이벤트")
+
+            migrated_any = True
+
+        os.rename(old_path, old_path + ".migrated")
+        print(f"[INFO] migrate: data/events_archive.json → 슬롯별 분리 완료")
+
+    # --- 2단계: saves/{scenario_id}/events_archive.json (시나리오 레벨) ---
+    if os.path.isdir(SAVES_DIR):
+        for sid in os.listdir(SAVES_DIR):
+            scenario_archive = os.path.join(SAVES_DIR, sid, "events_archive.json")
+            if not os.path.isfile(scenario_archive):
+                continue
+
+            with open(scenario_archive, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            events = data.get("archived_events", [])
+            if events:
+                slot = _find_best_slot(sid)
+                _write_to_slot_archive(sid, slot, events)
+                print(f"  {sid}/slot_{slot}: {len(events)}개 이벤트 (시나리오 레벨 → 슬롯)")
+                migrated_any = True
+
+            os.rename(scenario_archive, scenario_archive + ".migrated")
+
+    if not migrated_any:
+        print("[INFO] migrate: 마이그레이션 대상 없음")
+
+
+def _find_best_slot(scenario_id):
+    """시나리오의 가장 적합한 슬롯 번호를 반환.
+    current_session과 일치하면 active_save_slot, 아니면 가장 최근 세이브 슬롯."""
+    # current_session에서 활성 슬롯 확인
+    if os.path.isfile(CURRENT_SESSION_PATH):
+        try:
+            with open(CURRENT_SESSION_PATH, "r", encoding="utf-8") as f:
+                session = json.load(f)
+            if session.get("active_scenario") == scenario_id:
+                return session.get("active_save_slot", 1)
+        except Exception:
+            pass
+
+    # 가장 최근 세이브 슬롯 찾기
+    scenario_path = os.path.join(SAVES_DIR, scenario_id)
+    if not os.path.isdir(scenario_path):
+        return 1
+
+    latest_slot = 1
+    latest_time = ""
+    for slot_dir in os.listdir(scenario_path):
+        if not slot_dir.startswith("slot_"):
+            continue
+        save_file = os.path.join(scenario_path, slot_dir, "save.json")
+        if os.path.isfile(save_file):
+            try:
+                with open(save_file, "r", encoding="utf-8") as f:
+                    info = json.load(f).get("save_info", {})
+                saved_at = info.get("saved_at", "")
+                if saved_at > latest_time:
+                    latest_time = saved_at
+                    latest_slot = int(slot_dir.replace("slot_", "").replace("complete", "0"))
+            except Exception:
+                pass
+
+    return latest_slot
+
+
+def _write_to_slot_archive(scenario_id, slot, events):
+    """슬롯별 아카이브 파일에 이벤트를 기록 (기존 데이터와 병합)."""
+    archive_path = _events_archive_path(scenario_id, slot)
+    os.makedirs(os.path.dirname(archive_path), exist_ok=True)
+
+    if os.path.isfile(archive_path):
+        with open(archive_path, "r", encoding="utf-8") as f:
+            existing = json.load(f)
+    else:
+        existing = {"scenario_id": scenario_id, "slot": slot, "archived_events": []}
+
+    existing["archived_events"].extend(events)
+
+    with open(archive_path, "w", encoding="utf-8") as f:
+        json.dump(existing, f, ensure_ascii=False, indent=2)
 
 
 class SaveManager:
@@ -206,6 +392,9 @@ class SaveManager:
         # docs/ 동기화 (GitHub Pages용)
         self._sync_docs(game_state)
 
+        # 오래된 이벤트 아카이브 (game_state.events 트리밍) — 슬롯별 저장
+        archive_old_events(GAME_STATE_PATH, slot=slot)
+
         return save_data["save_info"]
 
     def load_game(self, scenario_id, slot=1):
@@ -230,6 +419,13 @@ class SaveManager:
 
         with open(GAME_STATE_PATH, "w", encoding="utf-8") as f:
             json.dump(save_data["game_state"], f, ensure_ascii=False, indent=2)
+
+        # 아카이브된 이벤트 복원 (web UI에서 전체 이벤트 볼 수 있도록) — 슬롯별 로드
+        restored = restore_archived_events(scenario_id, GAME_STATE_PATH, slot=slot)
+        if restored > 0:
+            # 복원된 이벤트가 포함된 game_state를 다시 읽어서 세션 갱신에 반영
+            with open(GAME_STATE_PATH, "r", encoding="utf-8") as f:
+                save_data["game_state"] = json.load(f)
 
         # current_session.json도 로드한 게임에 맞게 갱신
         self._update_current_session(scenario_id, slot, save_data["game_state"])
