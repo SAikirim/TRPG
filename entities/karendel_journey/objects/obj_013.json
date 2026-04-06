@@ -1,0 +1,21 @@
+{
+  "id": "obj_013",
+  "name": "bar_counter",
+  "type": "counter_obj",
+  "status": "placed",
+  "position": [16, 3],
+  "size": [2, 5],
+  "location": "red_chimney_inn_1f",
+  "description": "A polished wooden counter. Mugs and bottles line the shelves behind it.",
+  "interactable": true,
+  "interaction": "Approach the counter to order food or drinks.",
+  "icon": "🍺",
+  "tactical": {
+    "cover": "half",
+    "defense_bonus": 3,
+    "blocks_ranged": true,
+    "destructible": true,
+    "hp": 25,
+    "flammable": true
+  }
+}

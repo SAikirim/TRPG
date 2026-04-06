@@ -1,0 +1,24 @@
+{
+  "id": "obj_014",
+  "name": "fireplace",
+  "type": "fireplace_obj",
+  "status": "lit",
+  "position": [1, 12],
+  "size": [2, 3],
+  "location": "red_chimney_inn_1f",
+  "description": "A large stone fireplace with a red brick chimney. Crackling warmth fills the room.",
+  "interactable": true,
+  "interaction": "Warm yourself by the fire.",
+  "icon": "🔥",
+  "tactical": {
+    "cover": "none",
+    "defense_bonus": 0,
+    "destructible": false,
+    "flammable": false,
+    "hazard": {
+      "type": "fire",
+      "damage": "1d4",
+      "trigger": "on_enter"
+    }
+  }
+}

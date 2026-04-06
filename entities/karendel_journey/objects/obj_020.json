@@ -1,0 +1,21 @@
+{
+  "id": "obj_020",
+  "name": "barrel_stack",
+  "type": "barrel",
+  "status": "placed",
+  "position": [21, 10],
+  "size": [1, 1],
+  "location": "red_chimney_inn_1f",
+  "description": "A stack of wooden barrels filled with ale and preserved goods.",
+  "interactable": true,
+  "interaction": "Inspect the barrels.",
+  "icon": "🛢️",
+  "tactical": {
+    "cover": "half",
+    "defense_bonus": 2,
+    "blocks_ranged": false,
+    "destructible": true,
+    "hp": 10,
+    "flammable": true
+  }
+}
