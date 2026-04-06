@@ -625,12 +625,20 @@ def gm_update():
         new_loc = data["location"]
         old_loc = state.get("current_location", "")
         if new_loc != old_loc:
-            state["current_location"] = new_loc
-            # worldbuilding에서 새 location의 맵 데이터 로드
+            # Load worldbuilding data (needed for both map and auto-positioning)
+            wb = {}
+            old_loc_data = {}
             try:
                 wb_path = os.path.join(BASE_DIR, "data", "worldbuilding.json")
                 with open(wb_path, "r", encoding="utf-8") as f:
                     wb = json.load(f)
+                old_loc_data = wb.get("locations", {}).get(old_loc, {})
+            except Exception:
+                pass
+
+            state["current_location"] = new_loc
+            # worldbuilding에서 새 location의 맵 데이터 로드
+            try:
                 loc_data = wb.get("locations", {}).get(new_loc, {})
                 if loc_data.get("map"):
                     state["map"] = {
@@ -639,6 +647,35 @@ def gm_update():
                         "tile_size": state.get("map", {}).get("tile_size", 40),
                         "locations": loc_data["map"]["areas"],
                     }
+
+                # Auto-position players at entrance/exit when changing locations
+                if "positions" not in data:
+                    positioned = False
+
+                    # Floor transition within same building
+                    if (old_loc_data.get("building_id") and
+                            loc_data.get("building_id") == old_loc_data.get("building_id")):
+                        for exit_info in old_loc_data.get("exits", {}).values():
+                            if exit_info.get("target") == new_loc:
+                                tp = exit_info["target_position"]
+                                for i, p in enumerate(state["players"]):
+                                    p["position"] = [tp[0] + (i % 3) - 1, tp[1]]
+                                positioned = True
+                                break
+
+                    # Exiting building — position at parent_position
+                    if not positioned and old_loc_data.get("parent_location") == new_loc:
+                        exit_pos = old_loc_data.get("entrance", {}).get("parent_position", [12, 12])
+                        for i, p in enumerate(state["players"]):
+                            p["position"] = [exit_pos[0] + (i % 3) - 1, exit_pos[1]]
+                        positioned = True
+
+                    # Entering building — position at entrance
+                    if not positioned and loc_data.get("entrance"):
+                        entry_pos = loc_data["entrance"]["position"]
+                        for i, p in enumerate(state["players"]):
+                            p["position"] = [entry_pos[0] + (i % 3) - 1, entry_pos[1]]
+
             except Exception:
                 pass
 
@@ -922,6 +959,17 @@ def _auto_npc_proximity(state):
 
     current_loc = state.get("current_location", "")
 
+    # 인테리어 맵 여부 확인 — 같은 건물 안이면 거리 기반 separated 스킵
+    is_interior = False
+    try:
+        wb_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "worldbuilding.json")
+        with open(wb_path, "r", encoding="utf-8") as f:
+            wb = json.load(f)
+        loc_data = wb.get("locations", {}).get(current_loc, {})
+        is_interior = bool(loc_data.get("parent_location"))
+    except Exception:
+        pass
+
     for npc in state.get("npcs", []):
         status = npc.get("status", "")
         npc_type = npc.get("type", "")
@@ -945,12 +993,16 @@ def _auto_npc_proximity(state):
             continue
 
         # 같은 location이지만 거리가 먼 friendly NPC → separated
-        if status == "alive" and npc_type == "friendly" and dist > PROXIMITY_THRESHOLD:
-            npc["status"] = "separated"
-
-        # separated NPC가 파티 근처로 돌아오면 → alive 복원
-        elif status == "separated" and dist <= PROXIMITY_THRESHOLD:
-            npc["status"] = "alive"
+        # (인테리어 맵에서는 같은 건물 안이므로 스킵)
+        if not is_interior:
+            if status == "alive" and npc_type == "friendly" and dist > PROXIMITY_THRESHOLD:
+                npc["status"] = "separated"
+            elif status == "separated" and dist <= PROXIMITY_THRESHOLD:
+                npc["status"] = "alive"
+        else:
+            # 인테리어: separated NPC가 같은 location이면 alive 복원
+            if status == "separated":
+                npc["status"] = "alive"
 
 
 def _auto_update_ko(state):
