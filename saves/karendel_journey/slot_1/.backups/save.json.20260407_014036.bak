@@ -2,8 +2,8 @@
   "save_info": {
     "scenario_id": "karendel_journey",
     "slot": 1,
-    "description": "Turn 30: Red Chimney Inn, bags dropped, food served",
-    "saved_at": "2026-04-07 01:40:36",
+    "description": "자동 저장 (턴 30)",
+    "saved_at": "2026-04-07 01:34:05",
     "turn_count": 30,
     "chapter": 1,
     "party_summary": [
@@ -58,7 +58,7 @@
           "CON": 10
         },
         "position": [
-          7,
+          15,
           5
         ],
         "status_effects": [],
@@ -99,7 +99,7 @@
           "CON": 15
         },
         "position": [
-          8,
+          14,
           5
         ],
         "status_effects": [],
@@ -128,8 +128,8 @@
           "CON": 17
         },
         "position": [
-          6,
-          5
+          4,
+          14
         ],
         "status_effects": [],
         "inventory": [

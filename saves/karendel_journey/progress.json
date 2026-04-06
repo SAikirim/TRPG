@@ -1,71 +1,8 @@
 {
   "scenario_id": "karendel_journey",
   "first_played": "2026-03-21 03:50:21",
-  "total_saves": 48,
+  "total_saves": 57,
   "history": [
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-28 00:42:41"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "Turn 26: trade road conversation with Mira/Hallan",
-      "saved_at": "2026-03-28 00:46:47"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-28 20:42:10"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 24,
-      "description": "자동 저장 (턴 24)",
-      "saved_at": "2026-03-28 20:52:07"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 27,
-      "description": "자동 저장 (턴 27)",
-      "saved_at": "2026-03-28 21:00:32"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 27,
-      "description": "자동 저장 (턴 27)",
-      "saved_at": "2026-03-28 21:04:16"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 27,
-      "description": "자동 저장 (턴 27)",
-      "saved_at": "2026-03-28 21:44:23"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 27,
-      "description": "자동 저장 (턴 27)",
-      "saved_at": "2026-03-28 21:45:42"
-    },
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 27,
-      "description": "자동 저장 (턴 27)",
-      "saved_at": "2026-03-28 21:59:30"
-    },
     {
       "slot": 1,
       "chapter": 2,
@@ -142,9 +79,72 @@
       "turn": 29,
       "description": "Turn 29: Red Chimney Inn, meet Volf",
       "saved_at": "2026-03-29 00:12:08"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 27,
+      "description": "자동 저장 (턴 27)",
+      "saved_at": "2026-04-07 00:57:37"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 27,
+      "description": "자동 저장 (턴 27)",
+      "saved_at": "2026-04-07 00:59:51"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 27,
+      "description": "자동 저장 (턴 27)",
+      "saved_at": "2026-04-07 01:00:41"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 27,
+      "description": "자동 저장 (턴 27)",
+      "saved_at": "2026-04-07 01:01:36"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 27,
+      "description": "자동 저장 (턴 27)",
+      "saved_at": "2026-04-07 01:02:18"
+    },
+    {
+      "slot": 1,
+      "chapter": 2,
+      "turn": 28,
+      "description": "자동 저장 (턴 28)",
+      "saved_at": "2026-04-07 01:13:08"
+    },
+    {
+      "slot": 1,
+      "chapter": 1,
+      "turn": 29,
+      "description": "자동 저장 (턴 29)",
+      "saved_at": "2026-04-07 01:20:55"
+    },
+    {
+      "slot": 1,
+      "chapter": 1,
+      "turn": 30,
+      "description": "자동 저장 (턴 30)",
+      "saved_at": "2026-04-07 01:34:05"
+    },
+    {
+      "slot": 1,
+      "chapter": 1,
+      "turn": 30,
+      "description": "Turn 30: Red Chimney Inn, bags dropped, food served",
+      "saved_at": "2026-04-07 01:40:36"
     }
   ],
-  "last_played": "2026-03-29 00:12:08",
-  "last_chapter": 2,
-  "last_turn": 29
+  "last_played": "2026-04-07 01:40:36",
+  "last_chapter": 1,
+  "last_turn": 30
 }

@@ -22,8 +22,8 @@
     "CON": 10
   },
   "position": [
-    20,
-    6
+    15,
+    5
   ],
   "status_effects": [],
   "inventory": [
@@ -40,7 +40,8 @@
     "shared_gold_1",
     "rope",
     "flint",
-    "spice_pouch"
+    "spice_pouch",
+    "free_stay_1night"
   ],
   "equipment": {
     "weapon": {
