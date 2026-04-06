@@ -85,13 +85,14 @@ Check `data/game_state.json` players and `agents/` files for current assignments
 
 > GM = director (knows the overall flow and sets direction), agents = specialists (verify direction consistency + generate specific results)
 > Agents are freshly created each time and have no conversation context. Only the GM knows the overall flow.
-> Therefore, the GM must set direction first, then communicate that direction to agents.
+> **Key principle: Player Agents act BEFORE GM direction. GM synthesizes player actions to set NPC/world direction.**
 
 ```
 User declares action
- → [1a] GM sets direction (event/mood/development decision, agent selection)
- → [1b] Parallel agent calls (send direction + context + questions → receive verification + results)
- → [2]  Write narration (synthesize agent results)
+ → [1a] Player Agent calls (AI players decide actions independently based on game situation)
+ → [1b] GM direction setting (synthesize user + AI player actions, decide NPC/world reaction direction)
+ → [1c] NPC/Rule/Worldbuilding Agent calls (based on GM direction)
+ → [2]  Write narration (synthesize all results)
  → [3]  System reflection (Agent [System Reflection]: state/gm-update/illustrations/logs/git)
  → Output narration + display map + await action
 ```
@@ -102,7 +103,7 @@ User declares action
 
 > **gm_turn.py is mandatory**: Track each turn with `start → phase/agent/log → end` calls.
 > gm_turn.py automatically controls terminal output based on the show_system_log setting.
-> Core flow: `gm_turn.py start` → phase 1a (direction) → phase 1b (agents) → phase 2 (narration) → phase 3 (system reflection) → `gm_turn.py end`
+> Core flow: `gm_turn.py start` → phase 1a (Player Agents) → phase 1b (GM direction) → phase 1c (NPC/Rule/World agents) → phase 2 (narration) → phase 3 (system reflection) → `gm_turn.py end`
 > show_system_log: phase headers/agent names are always shown, detailed content is on/off, internal logs are always recorded.
 > Detailed template + show_system_log output examples: see guides/gm_rules.txt
 
@@ -129,7 +130,7 @@ Synthesize results → narration + map output + game_state.json update + save (g
 
 > **Agent Required Reading Rule**: All sub-agents must read their "required reading" files first before operating when called. Operating without reading the guides is prohibited.
 
-> **Agent Call Common Rule**: Agents are freshly created each time and have no conversation context. The GM must send direction + context + specific questions in phase 1b. Details: see guides/gm_rules.txt.
+> **Agent Call Common Rule**: Agents are freshly created each time and have no conversation context. The GM must send direction + context + specific questions in phase 1b/1c. Details: see guides/gm_rules.txt.
 
 ### Hybrid Multi-Agent Architecture (Runner Abstraction)
 
@@ -156,7 +157,7 @@ AgentRequest (pydantic)  →  AgentRegistry (dispatcher)  →  AgentResponse (py
 **Schema files**: `core/schemas/` — Request/Response types per agent.
 **Runner files**: `core/runners/` — Backend implementations + registry.
 
-> The GM operates as an **Orchestrator**: set direction (TurnPlan) → dispatch agents (AgentDispatch) → synthesize results (TurnSynthesis) → narrate.
+> The GM operates as an **Orchestrator**: dispatch Player Agents (1a) → set direction from all player actions (TurnPlan, 1b) → dispatch NPC/Rule/World agents (AgentDispatch, 1c) → synthesize results (TurnSynthesis) → narrate.
 > When using `claude` runner: GM builds prompt via `registry.dispatch_claude_prompt(request)` and passes it to Agent tool.
 > When using `cloud`/`local` runner: GM calls `registry.dispatch(request)` for programmatic execution.
 
@@ -286,8 +287,9 @@ After that, the GM delivers the opening narration (GM Turn 0).
 
 1. Check scenario.json's opening.narrative
 2. Proceed following the GM turn template:
-   - [1a] Set opening direction (first scene, mood, characters appearing)
-   - [1b] Call agents (worldbuilding consistency, NPC dialogue if present)
+   - [1a] Player Agent calls (AI player opening actions/reactions if applicable)
+   - [1b] Set opening direction (first scene, mood, characters appearing)
+   - [1c] Call NPC/Rule/World agents (worldbuilding consistency, NPC dialogue if present)
    - [2] Write opening narration (character introduction + scene description)
    - [3] System reflection (gm-update: background illustration + character layers)
 3. Output narration → await user action

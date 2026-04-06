@@ -71,7 +71,7 @@ System Log Display Rules (show_system_log)
 The show_system_log setting in current_session.json controls the visibility of GM turn processing details.
 
 3-level visibility rules:
-  ① Phase headers ([1a], [1b], [2], [3])     → Always displayed
+  ① Phase headers ([1a], [1b], [1c], [2], [3])     → Always displayed
   ② Agent names (which agent is active)       → Always displayed
   ③ Detail content (specific decisions/results of each agent) → Toggled by show_system_log
   ④ Internal logs (gm_turn logs)              → Always recorded (regardless of display setting)
@@ -79,11 +79,12 @@ The show_system_log setting in current_session.json controls the visibility of G
 show_system_log: false (default):
   - Only phase headers + agent names displayed; specific content is hidden
   - Example:
-    [1a] GM Direction Setting
-    [1b] Agent Calls
+    [1a] Player Agent Calls
       → Agent [Player:Gaon] Action Selection
       → Agent [Player:Seraphine] Action Selection
       → Agent [Player:Yeoul] Action Selection
+    [1b] GM Direction Setting
+    [1c] NPC/Rule/World Agent Calls
       → Agent [Rule Judge] Ruling
       → Agent [NPC:Hallan] Dialogue/Action
       → Agent [Worldbuilding] Consistency Check
@@ -95,17 +96,19 @@ show_system_log: false (default):
 show_system_log: true:
   - Phase headers + agent names + all specific details displayed
   - Example:
-    [1a] GM Direction Setting
-      → Trap detection event
-      → Establish dungeon atmosphere
-      → Opportunity to introduce Yeoul's rogue utility
-    [1b] Agent Calls
+    [1a] Player Agent Calls
       → Agent [Player:Gaon] Action Selection
         - On guard at the front line, shield raised, taking point
       → Agent [Player:Seraphine] Action Selection
         - Attempts divine sense, assumes prayer stance
       → Agent [Player:Yeoul] Action Selection
         - Searches for traps using rogue utility, examines the floor
+    [1b] GM Direction Setting
+      → Trap detection event
+      → Establish dungeon atmosphere
+      → Opportunity to introduce Yeoul's rogue utility
+      → Synthesize: user advances cautiously, AI players take defensive/scouting positions
+    [1c] NPC/Rule/World Agent Calls
       → Agent [Rule Judge] Ruling
         - DEX check DC 12, Yeoul bonus +3, result: success
       → Agent [NPC:Hallan] Dialogue/Action
@@ -128,13 +131,15 @@ gm_turn.py Integration (mandatory):
 
   Call order for each turn:
     1. python core/gm_turn.py start
-    2. python core/gm_turn.py phase 1a "Direction setting summary"
-    3. python core/gm_turn.py phase 1b
-    4. (For each agent call) python core/gm_turn.py agent "{name}" "Result summary"
-    5. python core/gm_turn.py phase 2 "Narration writing summary"
-    6. python core/gm_turn.py phase 3 "System reflection summary"
-    7. (System reflection agent also records log tags: gm-update, state, entity, etc.)
-    8. python core/gm_turn.py end
+    2. python core/gm_turn.py phase 1a  (Player Agent calls)
+    3. (For each AI player) python core/gm_turn.py agent "Player:{name}" "Result summary"
+    4. python core/gm_turn.py phase 1b "GM direction summary"
+    5. python core/gm_turn.py phase 1c  (NPC/Rule/World agent calls)
+    6. (For each agent) python core/gm_turn.py agent "{name}" "Result summary"
+    7. python core/gm_turn.py phase 2 "Narration writing summary"
+    8. python core/gm_turn.py phase 3 "System reflection summary"
+    9. (System reflection agent also records log tags: gm-update, state, entity, etc.)
+    10. python core/gm_turn.py end
 
   The detail argument of the agent command:
     - Summarize the key result returned by the agent in one line
@@ -342,8 +347,9 @@ game_start.py only initializes the data. GM Turn 0 is required for characters to
 New game opening procedure:
 1. Check opening.narrative in scenario.json
 2. Proceed according to the GM turn template:
-   [1a] Opening direction — Set first scene atmosphere, characters, starting situation
-   [1b] Agent calls — Worldbuilding consistency check, generate first dialogue if NPCs are present
+   [1a] Player Agent calls — AI player opening actions/reactions if applicable
+   [1b] Opening direction — Set first scene atmosphere, characters, starting situation (synthesize player actions)
+   [1c] NPC/Rule/World agent calls — Worldbuilding consistency check, generate first dialogue if NPCs are present
    [2] Write opening narration — Describe the scene where characters appear in the world
    [3] System reflection — gm-update (background illustration + character layers + event recording)
 3. Output narration → Wait for user action

@@ -23,8 +23,9 @@ GM 턴 추적기 — 실제 동작만 기록하고, 턴 종료 시 누락 경고
   scenario — 시나리오 검증 완료 (챕터 목표/퀘스트/이벤트 확인)
 
 단계(phase) 태그:
-  1a — GM 방향 설정
-  1b — 에이전트 호출
+  1a — 플레이어 에이전트 호출
+  1b — GM 방향 설정
+  1c — NPC/룰/세계관 에이전트 호출
   2  — 나레이션 작성
   3  — 시스템 반영
 
@@ -51,8 +52,9 @@ SESSION_PATH = os.path.join(BASE_DIR, "data", "current_session.json")
 
 # 단계 헤더 이름
 PHASE_NAMES = {
-    "1a": "GM 방향 설정",
-    "1b": "에이전트 호출",
+    "1a": "플레이어 에이전트 호출",
+    "1b": "GM 방향 설정",
+    "1c": "NPC/룰/세계관 에이전트 호출",
     "2": "나레이션 작성",
     "3": "시스템 반영",
 }
@@ -370,7 +372,7 @@ def main():
         print("사용법: python gm_turn.py <start|log|phase|agent|end|status>")
         print("  start                     턴 처리 시작")
         print("  log <tag> <msg>           작업 기록")
-        print("  phase <1a|1b|2|3> [msg]   단계 시작 기록")
+        print("  phase <1a|1b|1c|2|3> [msg]   단계 시작 기록")
         print("  agent <name> [detail]     에이전트 호출 기록")
         print("  end                       턴 종료 검증")
         print("  status                    진행 상황")
