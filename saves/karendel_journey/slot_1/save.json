@@ -2,9 +2,9 @@
   "save_info": {
     "scenario_id": "karendel_journey",
     "slot": 1,
-    "description": "자동 저장 (턴 30)",
-    "saved_at": "2026-07-31 22:11:04",
-    "turn_count": 30,
+    "description": "자동 저장 (턴 32)",
+    "saved_at": "2026-07-31 22:11:19",
+    "turn_count": 32,
     "chapter": 1,
     "party_summary": [
       {
@@ -393,16 +393,8 @@
         }
       ]
     },
-    "turn_count": 30,
+    "turn_count": 32,
     "events": [
-      {
-        "turn": 27,
-        "message": "[GM] Fix: set inn interior background",
-        "narrative": "",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "22:47:40"
-      },
       {
         "turn": 27,
         "message": "[GM] Fix: turn count + Volf portrait",
@@ -474,84 +466,25 @@
         "user_input": "",
         "dialogues": [],
         "timestamp": "22:11:04"
+      },
+      {
+        "turn": 32,
+        "message": "[GM] Turn 30: saiki: 주변을 조용히 둘러본다.; lucena: 음식 확인 음식이 정말 많네요. 볼프씨, 고맙습니다.; noel: 주변 경계 잠시 주변을 ",
+        "narrative": "사이키는 주변을 조용히 둘러보며, 루체나는 음식을 확인하고 볼프에게 고마움을 표합니다. 노엘은 주변 경계를 잠시 확인하며 이상한 사람이 없는지 살피고 있습니다. 볼프는 이미 다른 손님에게 가있어, 일행의 대화에 끼지 못합니다.\n\n주변을 조용히 둘러본 사이키는 인원이 많지 않은 레드 치미니 인의 1층을 바라보았다. 루체나는 음식을 확인하며 볼프에게 감사함을 표현했고, 노엘은 주변 경계를 위해 잠시 주변을 확인했다. 이상한 사람이 없는지 확인해야겠다는 생각을 했다.",
+        "user_input": "saiki: 주변을 조용히 둘러본다.; lucena: 음식 확인 음식이 정말 많네요. 볼프씨, 고맙습니다.; noel: 주변 경계 잠시 주변을 확인해야겠다. 이상한 사람이 없는지 확인해야 하니까.",
+        "dialogues": [
+          {
+            "speaker": "lucena",
+            "line": "음식이 정말 많네요. 볼프씨, 고맙습니다.",
+            "tone": "friendly"
+          }
+        ],
+        "timestamp": "22:11:19"
       }
     ],
     "current_scene": {
-      "background": "/static/illustrations/sd/background_red_chimney_inn.webp",
-      "layers": [
-        {
-          "type": "object",
-          "image": "static/illustrations/sd/object_stairway.webp",
-          "position": "center",
-          "name": "stairway",
-          "distance": 5,
-          "size_class": "d3"
-        },
-        {
-          "type": "object",
-          "image": "static/illustrations/sd/object_bar_counter.webp",
-          "position": "center",
-          "name": "bar_counter",
-          "distance": 2,
-          "size_class": "d2"
-        },
-        {
-          "type": "object",
-          "image": "static/illustrations/sd/object_kitchen_table.webp",
-          "position": "center",
-          "name": "kitchen_table",
-          "distance": 5,
-          "size_class": "d3"
-        },
-        {
-          "type": "object",
-          "image": "static/illustrations/sd/object_barrel_stack.webp",
-          "position": "center",
-          "name": "barrel_stack",
-          "distance": 6,
-          "size_class": "d3"
-        },
-        {
-          "type": "portrait",
-          "image": "static/portraits/sd/portrait_volf.webp",
-          "position": "far-left",
-          "name": "volf",
-          "distance": 10,
-          "size_class": "d4"
-        },
-        {
-          "type": "object",
-          "image": "static/illustrations/sd/object_round_table_1.webp",
-          "position": "center",
-          "name": "round_table_1",
-          "distance": 3,
-          "size_class": "d3"
-        },
-        {
-          "type": "object",
-          "image": "static/illustrations/sd/object_round_table_2.webp",
-          "position": "center",
-          "name": "round_table_2",
-          "distance": 3,
-          "size_class": "d3"
-        },
-        {
-          "type": "object",
-          "image": "static/illustrations/sd/object_long_table.webp",
-          "position": "center",
-          "name": "long_table",
-          "distance": 3,
-          "size_class": "d3"
-        },
-        {
-          "type": "object",
-          "image": "static/illustrations/sd/object_chair.webp",
-          "position": "center",
-          "name": "chair",
-          "distance": 5,
-          "size_class": "d3"
-        }
-      ]
+      "background": "/static/illustrations/pixel/default.png",
+      "layers": []
     }
   }
 }

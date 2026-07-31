@@ -1,0 +1,57 @@
+INFO:     Started server process [37868]
+INFO:     Waiting for application startup.
+
+   ██╗     ██╗████████╗███████╗██╗     ██╗     ███╗   ███╗
+   ██║     ██║╚══██╔══╝██╔════╝██║     ██║     ████╗ ████║
+   ██║     ██║   ██║   █████╗  ██║     ██║     ██╔████╔██║
+   ██║     ██║   ██║   ██╔══╝  ██║     ██║     ██║╚██╔╝██║
+   ███████╗██║   ██║   ███████╗███████╗███████╗██║ ╚═╝ ██║
+   ╚══════╝╚═╝   ╚═╝   ╚══════╝╚══════╝╚══════╝╚═╝     ╚═╝
+
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=3a9454b175e03b2138c8d403316ef32356d6c97c62fdf6fdaea579ed519c9e41 not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=b116df9c660af1902c1201b0093288cf905eea217f3b64bd7aa864c9ef33a581 not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=f2296ba1aa85fe2c74436cbd054aad25f89d37a341703f5bc61db317296bd30d not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=e17ee1499e51ff59e7c3f6662e2d45f40680d34dc3f0695166c36e6bbce48769 not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=ec0f4c7cc795bafe305922b4a9a06edb561c3b5eea323ef63747b63174f75044 not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=d41e6a2ad47b43b42efbe0742ab76290975d959968a651ba4974b0c9c58b5578 not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=535ae12c6d70117dc04fded29f7348e7ea5b9354cac684b2423b7f8419ed8d34 not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=5c4247c96544d8087e9d72354618c0f7994d9189953bc7105ca9698b4876c919 not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=e73fb1ecedfd9e947acdb3c02691e397251a6ccaa589892b736e69c722196299 not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=08cd3df3179cb0192f53c295e7092a95b5491c22173bbde28cb9b343cef2321a not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=openai/opus not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=63756e084e05064977ba2606080ef3d07420c0c998d4d9c4f6afe30de58c678d not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=openai/lumimaid12-8k not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=136208ced12c14c205e3a339e10ff2ff392dd898f079ffe7a99b672e0cbcffdf not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+[92m22:10:20 - LiteLLM:WARNING[0m: utils.py:2705 - register_model: model=openai/karendel-engine not in built-in cost map and no prefix/region variant matched; cache cost fields will default to 0. To track cache cost, add cache_creation_input_token_cost and cache_read_input_token_cost to model_info
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:4000 (Press CTRL+C to quit)
+
+[1;37m#------------------------------------------------------------#[0m
+[1;37m#                                                            #[0m
+[1;37m#         'The worst thing about this product is...'          #[0m
+[1;37m#        https://github.com/BerriAI/litellm/issues/new        #[0m
+[1;37m#                                                            #[0m
+[1;37m#------------------------------------------------------------#[0m
+
+ Thank you for using LiteLLM! - Krrish & Ishaan
+
+
+
+[1;31mGive Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new[0m
+
+
+[32mLiteLLM: Proxy initialized with Config, Set models:[0m
+[32m    gemini-flash[0m
+[32m    gemini-flash[0m
+[32m    gemini-flash[0m
+[32m    gemini-flash[0m
+[32m    gemini-pro[0m
+[32m    groq-llama-3.3-70b[0m
+[32m    groq-llama-3.3-70b[0m
+[32m    groq-llama-3.3-70b[0m
+[32m    groq-llama-3.3-70b[0m
+[32m    claude-opus[0m
+[32m    lumimaid-12b[0m
+[32m    karendel-engine[0m
+INFO:     127.0.0.1:9799 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:9800 - "GET /v1/models HTTP/1.1" 200 OK

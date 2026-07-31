@@ -22,7 +22,18 @@
     "motivation": "Run the inn well. Honor old friendships (Ernes)."
   },
   "relationships": {
-    "ernes": "Old friend. Receives mountain herbs for his knees. Trusts Ernes completely."
+    "ernes": "Old friend. Receives mountain herbs for his knees. Trusts Ernes completely.",
+    "lucena": {
+      "affinity": 55,
+      "trust": 53,
+      "history": [
+        {
+          "turn": 30,
+          "change": 5,
+          "reason": "친절한 대화"
+        }
+      ]
+    }
   },
   "memory": {
     "dialogue_history": [

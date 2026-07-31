@@ -2,7 +2,7 @@
   "active_scenario": "karendel_journey",
   "active_save_slot": 1,
   "ruleset": "fantasy_basic",
-  "turn": 30,
+  "turn": 32,
   "chapter": 2,
   "chapter_name": "common_room",
   "party_summary": [
@@ -53,7 +53,6 @@
     }
   ],
   "progress_notes": [
-    "[GM] Fix: set inn interior background",
     "[GM] Fix: turn count + Volf portrait",
     "[GM] Generate Volf portrait",
     "[GM] Fix: inn interior background",
@@ -62,7 +61,8 @@
     "",
     "",
     "",
-    "[GM] Session restore"
+    "[GM] Session restore",
+    "[GM] Turn 30: saiki: 주변을 조용히 둘러본다.; lucena: 음식 확인 음식이 정말 많네요. 볼프씨, 고맙습니다.; noel: 주변 경계 잠시 주변을 "
   ],
   "next_objective": "",
   "display_mode": "mobile",

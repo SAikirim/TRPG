@@ -538,6 +538,16 @@
       "timestamp": "22:44:00",
       "archived_at": "2026-07-31",
       "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 27,
+      "message": "[GM] Fix: set inn interior background",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:47:40",
+      "archived_at": "2026-07-31",
+      "scenario_id": "karendel_journey"
     }
   ]
 }

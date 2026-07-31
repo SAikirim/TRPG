@@ -1,38 +1,6 @@
 {
-  "background": "static/illustrations/sd/background_red_chimney_inn.webp",
+  "background": "static/illustrations/pixel/default.png",
   "layers": [
-    {
-      "type": "object",
-      "image": "static/illustrations/sd/object_stairway.webp",
-      "position": "center",
-      "name": "stairway",
-      "distance": 5,
-      "size_class": "d3"
-    },
-    {
-      "type": "object",
-      "image": "static/illustrations/sd/object_bar_counter.webp",
-      "position": "center",
-      "name": "bar_counter",
-      "distance": 2,
-      "size_class": "d2"
-    },
-    {
-      "type": "object",
-      "image": "static/illustrations/sd/object_kitchen_table.webp",
-      "position": "center",
-      "name": "kitchen_table",
-      "distance": 5,
-      "size_class": "d3"
-    },
-    {
-      "type": "object",
-      "image": "static/illustrations/sd/object_barrel_stack.webp",
-      "position": "center",
-      "name": "barrel_stack",
-      "distance": 6,
-      "size_class": "d3"
-    },
     {
       "type": "portrait",
       "image": "static/portraits/sd/portrait_volf.webp",
@@ -40,38 +8,6 @@
       "name": "volf",
       "distance": 10,
       "size_class": "d4"
-    },
-    {
-      "type": "object",
-      "image": "static/illustrations/sd/object_round_table_1.webp",
-      "position": "center",
-      "name": "round_table_1",
-      "distance": 3,
-      "size_class": "d3"
-    },
-    {
-      "type": "object",
-      "image": "static/illustrations/sd/object_round_table_2.webp",
-      "position": "center",
-      "name": "round_table_2",
-      "distance": 3,
-      "size_class": "d3"
-    },
-    {
-      "type": "object",
-      "image": "static/illustrations/sd/object_long_table.webp",
-      "position": "center",
-      "name": "long_table",
-      "distance": 3,
-      "size_class": "d3"
-    },
-    {
-      "type": "object",
-      "image": "static/illustrations/sd/object_chair.webp",
-      "position": "center",
-      "name": "chair",
-      "distance": 5,
-      "size_class": "d3"
     }
   ],
   "generating": {
