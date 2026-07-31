@@ -53,7 +53,6 @@
     }
   ],
   "progress_notes": [
-    "[GM] Map refresh after NPC separation",
     "[GM] Fix: set inn interior background",
     "[GM] Fix: turn count + Volf portrait",
     "[GM] Generate Volf portrait",
@@ -62,12 +61,13 @@
     "[GM] Regenerate Volf SD portrait (fix)",
     "",
     "",
-    ""
+    "",
+    "[GM] Session restore"
   ],
   "next_objective": "",
   "display_mode": "mobile",
   "show_dice_result": false,
   "show_system_log": false,
   "sd_illustration": true,
-  "last_updated": "2026-04-07"
+  "last_updated": "2026-07-31"
 }

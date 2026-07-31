@@ -368,14 +368,6 @@
   "events": [
     {
       "turn": 27,
-      "message": "[GM] Map refresh after NPC separation",
-      "narrative": "",
-      "user_input": "",
-      "dialogues": [],
-      "timestamp": "22:44:00"
-    },
-    {
-      "turn": 27,
       "message": "[GM] Fix: set inn interior background",
       "narrative": "",
       "user_input": "",
@@ -445,6 +437,14 @@
       "user_input": "짐 내려두고 밥 먹고 감정받으러 가자, 위치 알아? 2층으로 올라감",
       "dialogues": [],
       "timestamp": "01:34:05"
+    },
+    {
+      "turn": 30,
+      "message": "[GM] Session restore",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:11:04"
     }
   ],
   "current_scene": {
@@ -492,9 +492,25 @@
       },
       {
         "type": "object",
+        "image": "static/illustrations/sd/object_round_table_1.webp",
+        "position": "center",
+        "name": "round_table_1",
+        "distance": 3,
+        "size_class": "d3"
+      },
+      {
+        "type": "object",
         "image": "static/illustrations/sd/object_round_table_2.webp",
         "position": "center",
         "name": "round_table_2",
+        "distance": 3,
+        "size_class": "d3"
+      },
+      {
+        "type": "object",
+        "image": "static/illustrations/sd/object_long_table.webp",
+        "position": "center",
+        "name": "long_table",
         "distance": 3,
         "size_class": "d3"
       },
@@ -504,22 +520,6 @@
         "position": "center",
         "name": "chair",
         "distance": 5,
-        "size_class": "d3"
-      },
-      {
-        "type": "object",
-        "image": "/static/illustrations/sd/object_long_table.webp",
-        "position": "center",
-        "name": "long_table",
-        "distance": 3,
-        "size_class": "d3"
-      },
-      {
-        "type": "object",
-        "image": "/static/illustrations/sd/object_round_table_1.webp",
-        "position": "center",
-        "name": "round_table_1",
-        "distance": 3,
         "size_class": "d3"
       }
     ]

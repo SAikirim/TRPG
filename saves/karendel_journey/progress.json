@@ -1,15 +1,8 @@
 {
   "scenario_id": "karendel_journey",
   "first_played": "2026-03-21 03:50:21",
-  "total_saves": 58,
+  "total_saves": 59,
   "history": [
-    {
-      "slot": 1,
-      "chapter": 2,
-      "turn": 27,
-      "description": "자동 저장 (턴 27)",
-      "saved_at": "2026-03-28 22:25:27"
-    },
     {
       "slot": 1,
       "chapter": 2,
@@ -142,9 +135,16 @@
       "turn": 30,
       "description": "Turn 30: Red Chimney Inn, auto git test",
       "saved_at": "2026-04-07 01:58:45"
+    },
+    {
+      "slot": 1,
+      "chapter": 1,
+      "turn": 30,
+      "description": "자동 저장 (턴 30)",
+      "saved_at": "2026-07-31 22:11:04"
     }
   ],
-  "last_played": "2026-04-07 01:58:45",
+  "last_played": "2026-07-31 22:11:04",
   "last_chapter": 1,
   "last_turn": 30
 }

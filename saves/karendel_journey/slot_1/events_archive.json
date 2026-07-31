@@ -528,6 +528,16 @@
       "timestamp": "22:43:06",
       "archived_at": "2026-04-07",
       "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 27,
+      "message": "[GM] Map refresh after NPC separation",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:44:00",
+      "archived_at": "2026-07-31",
+      "scenario_id": "karendel_journey"
     }
   ]
 }
