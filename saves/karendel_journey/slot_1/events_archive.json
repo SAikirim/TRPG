@@ -558,6 +558,16 @@
       "timestamp": "22:52:04",
       "archived_at": "2026-08-22",
       "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 27,
+      "message": "[GM] Generate Volf portrait",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:52:24",
+      "archived_at": "2026-08-22",
+      "scenario_id": "karendel_journey"
     }
   ]
 }

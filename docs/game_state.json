@@ -364,16 +364,8 @@
       }
     ]
   },
-  "turn_count": 32,
+  "turn_count": 33,
   "events": [
-    {
-      "turn": 27,
-      "message": "[GM] Generate Volf portrait",
-      "narrative": "",
-      "user_input": "",
-      "dialogues": [],
-      "timestamp": "22:52:24"
-    },
     {
       "turn": 27,
       "message": "[GM] Fix: inn interior background",
@@ -451,6 +443,14 @@
       "user_input": "",
       "dialogues": [],
       "timestamp": "08:16:13"
+    },
+    {
+      "turn": 33,
+      "message": "[GM] Turn 32: saiki: ??? ????; lucena: 주변을 경계하며 따라간다.; noel: 주변을 경계하며 따라간다.",
+      "narrative": "",
+      "user_input": "saiki: ??? ????; lucena: 주변을 경계하며 따라간다.; noel: 주변을 경계하며 따라간다.",
+      "dialogues": [],
+      "timestamp": "08:16:43"
     }
   ],
   "current_scene": {
@@ -458,7 +458,7 @@
     "layers": [
       {
         "type": "portrait",
-        "image": "static/portraits/sd/portrait_volf.webp",
+        "image": "/static/portraits/sd/portrait_volf.webp",
         "position": "far-left",
         "name": "volf",
         "distance": 10,
@@ -466,7 +466,7 @@
       },
       {
         "type": "object",
-        "image": "static/illustrations/sd/object_round_table_1.webp",
+        "image": "/static/illustrations/sd/object_round_table_1.webp",
         "position": "center",
         "name": "round_table_1",
         "distance": 3,
@@ -474,7 +474,7 @@
       },
       {
         "type": "object",
-        "image": "static/illustrations/sd/object_round_table_2.webp",
+        "image": "/static/illustrations/sd/object_round_table_2.webp",
         "position": "center",
         "name": "round_table_2",
         "distance": 3,
@@ -482,7 +482,7 @@
       },
       {
         "type": "object",
-        "image": "static/illustrations/sd/object_long_table.webp",
+        "image": "/static/illustrations/sd/object_long_table.webp",
         "position": "center",
         "name": "long_table",
         "distance": 3,
@@ -490,7 +490,7 @@
       },
       {
         "type": "object",
-        "image": "static/illustrations/sd/object_chair.webp",
+        "image": "/static/illustrations/sd/object_chair.webp",
         "position": "center",
         "name": "chair",
         "distance": 5,
