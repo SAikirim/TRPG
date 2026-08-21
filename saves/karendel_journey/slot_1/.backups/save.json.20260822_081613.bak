@@ -2,9 +2,9 @@
   "save_info": {
     "scenario_id": "karendel_journey",
     "slot": 1,
-    "description": "자동 저장 (턴 29)",
-    "saved_at": "2026-04-07 01:20:55",
-    "turn_count": 29,
+    "description": "자동 저장 (턴 32)",
+    "saved_at": "2026-07-31 22:11:19",
+    "turn_count": 32,
     "chapter": 1,
     "party_summary": [
       {
@@ -58,7 +58,7 @@
           "CON": 10
         },
         "position": [
-          15,
+          7,
           5
         ],
         "status_effects": [],
@@ -76,7 +76,8 @@
           "shared_gold_1",
           "rope",
           "flint",
-          "spice_pouch"
+          "spice_pouch",
+          "free_stay_1night"
         ],
         "controlled_by": "user",
         "original_image": "/static/portraits/original/player_1_saiki.png"
@@ -98,7 +99,7 @@
           "CON": 15
         },
         "position": [
-          14,
+          8,
           5
         ],
         "status_effects": [],
@@ -127,8 +128,8 @@
           "CON": 17
         },
         "position": [
-          4,
-          14
+          6,
+          5
         ],
         "status_effects": [],
         "inventory": [
@@ -392,32 +393,8 @@
         }
       ]
     },
-    "turn_count": 29,
+    "turn_count": 32,
     "events": [
-      {
-        "turn": 27,
-        "message": "[GM] Fix: remove separated NPCs from map",
-        "narrative": "",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "22:43:06"
-      },
-      {
-        "turn": 27,
-        "message": "[GM] Map refresh after NPC separation",
-        "narrative": "",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "22:44:00"
-      },
-      {
-        "turn": 27,
-        "message": "[GM] Fix: set inn interior background",
-        "narrative": "",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "22:47:40"
-      },
       {
         "turn": 27,
         "message": "[GM] Fix: turn count + Volf portrait",
@@ -473,52 +450,41 @@
         "user_input": "적당한 자리에 앉아 추천 음식 4인분급 3인분 주문, 클 나이 드립, 루체나에게 시간 물음",
         "dialogues": [],
         "timestamp": "01:20:55"
+      },
+      {
+        "turn": 30,
+        "message": "",
+        "narrative": "\"알겠어, 장난이야. 짐 내려두고 밥 먹고 감정받으러 가자. 위치는 알고 있어?\"\n\n사이키가 짐을 들고 계단 쪽으로 걸었다.\n\n\"장난치다 혼나기 전에 얼른 올라가.\" 루체나가 자기 짐을 낚아채며 뒤를 따랐다. \"멜로스 골동품 상회라고, 카렌델 구시가지 쪽에 있다고 들었어. 에르네스 편지에도 나왔잖아, 안 읽었어?\"\n\n노엘이 벽에 기댄 오크 도끼와 방패를 집어 들며 짧게 말했다.\n\n\"짐 먼저 풀고.\"\n\n나무 계단이 세 사람의 무게에 삐걱거렸다. 2층 복도는 좁고 어두웠다 -- 작은 창 하나에서 오후의 빛이 비스듬히 들어왔다. 제일 안쪽 문을 열자 3인 합실이 나왔다. 넓지는 않지만 깨끗했다. 침대 셋, 작은 탁자 하나, 벽에 걸린 옷걸이. 창문 너머로 카렌델의 지붕들이 보였다.\n\n노엘이 도끼를 침대 옆에 세우고 방패를 벽에 기댔다. 루체나는 짐을 침대 위에 던지고 창문 잠금 장치를 한 번 확인했다 -- 도적의 습관.\n\n사이키도 짐을 내려놓았다. 아래에서 양고기 스튜 냄새가 올라오고 있었다.\n\n셋은 다시 1층으로 내려갔다. 카운터 앞 테이블에 김이 모락모락 나는 양고기 스튜 세 그릇, 흑빵, 구운 닭 반 마리씩, 그리고 보리 에일 한 잔과 -- 우유 두 잔이 놓여 있었다.\n\n루체나가 우유 잔을 보고 사이키를 째려봤지만, 볼프는 이미 다른 손님에게 가 있었다.",
+        "user_input": "짐 내려두고 밥 먹고 감정받으러 가자, 위치 알아? 2층으로 올라감",
+        "dialogues": [],
+        "timestamp": "01:34:05"
+      },
+      {
+        "turn": 30,
+        "message": "[GM] Session restore",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "22:11:04"
+      },
+      {
+        "turn": 32,
+        "message": "[GM] Turn 30: saiki: 주변을 조용히 둘러본다.; lucena: 음식 확인 음식이 정말 많네요. 볼프씨, 고맙습니다.; noel: 주변 경계 잠시 주변을 ",
+        "narrative": "사이키는 주변을 조용히 둘러보며, 루체나는 음식을 확인하고 볼프에게 고마움을 표합니다. 노엘은 주변 경계를 잠시 확인하며 이상한 사람이 없는지 살피고 있습니다. 볼프는 이미 다른 손님에게 가있어, 일행의 대화에 끼지 못합니다.\n\n주변을 조용히 둘러본 사이키는 인원이 많지 않은 레드 치미니 인의 1층을 바라보았다. 루체나는 음식을 확인하며 볼프에게 감사함을 표현했고, 노엘은 주변 경계를 위해 잠시 주변을 확인했다. 이상한 사람이 없는지 확인해야겠다는 생각을 했다.",
+        "user_input": "saiki: 주변을 조용히 둘러본다.; lucena: 음식 확인 음식이 정말 많네요. 볼프씨, 고맙습니다.; noel: 주변 경계 잠시 주변을 확인해야겠다. 이상한 사람이 없는지 확인해야 하니까.",
+        "dialogues": [
+          {
+            "speaker": "lucena",
+            "line": "음식이 정말 많네요. 볼프씨, 고맙습니다.",
+            "tone": "friendly"
+          }
+        ],
+        "timestamp": "22:11:19"
       }
     ],
     "current_scene": {
-      "background": "/static/illustrations/sd/background_red_chimney_inn.webp",
-      "layers": [
-        {
-          "type": "object",
-          "image": "static/illustrations/sd/object_stairway.webp",
-          "position": "center",
-          "name": "stairway",
-          "distance": 5,
-          "size_class": "d3"
-        },
-        {
-          "type": "object",
-          "image": "static/illustrations/sd/object_barrel_stack.webp",
-          "position": "center",
-          "name": "barrel_stack",
-          "distance": 4,
-          "size_class": "d3"
-        },
-        {
-          "type": "object",
-          "image": "static/illustrations/sd/object_bar_counter.webp",
-          "position": "center",
-          "name": "bar_counter",
-          "distance": 4,
-          "size_class": "d3"
-        },
-        {
-          "type": "object",
-          "image": "static/illustrations/sd/object_kitchen_table.webp",
-          "position": "center",
-          "name": "kitchen_table",
-          "distance": 4,
-          "size_class": "d3"
-        },
-        {
-          "type": "portrait",
-          "image": "/static/portraits/sd/portrait_volf.webp",
-          "position": "far-left",
-          "name": "volf",
-          "distance": 17,
-          "size_class": "d4"
-        }
-      ]
+      "background": "/static/illustrations/pixel/default.png",
+      "layers": []
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "background": "static/illustrations/pixel/default.png",
+  "background": "static/illustrations/sd/background_red_chimney_inn.webp",
   "layers": [
     {
       "type": "portrait",
@@ -8,6 +8,38 @@
       "name": "volf",
       "distance": 10,
       "size_class": "d4"
+    },
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_round_table_1.webp",
+      "position": "center",
+      "name": "round_table_1",
+      "distance": 3,
+      "size_class": "d3"
+    },
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_round_table_2.webp",
+      "position": "center",
+      "name": "round_table_2",
+      "distance": 3,
+      "size_class": "d3"
+    },
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_long_table.webp",
+      "position": "center",
+      "name": "long_table",
+      "distance": 3,
+      "size_class": "d3"
+    },
+    {
+      "type": "object",
+      "image": "static/illustrations/sd/object_chair.webp",
+      "position": "center",
+      "name": "chair",
+      "distance": 5,
+      "size_class": "d3"
     }
   ],
   "generating": {

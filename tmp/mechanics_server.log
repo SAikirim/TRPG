@@ -1,0 +1,589 @@
+ * Serving Flask app 'mechanics_server'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5102
+ * Running on http://192.168.0.140:5102
+Press CTRL+C to quit
+127.0.0.1 - - [01/Aug/2026 22:56:40] "POST /illustration HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:56:57] "GET /mapgrid HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:56:57] "GET /status HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:56:59] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:57:06] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:57:06] "GET /bgimg?path=/static/illustrations/sd/background_seraphina_glade.webp&t=1785592626611 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:57:20] "POST /illustration HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:57:20] "GET /bgimg?path=/static/illustrations/sd/background_sillytavern_system.webp&t=1785592640397 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:58:30] "GET /mapgrid HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:58:30] "GET /status HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:58:31] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:58:31] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:58:31] "GET /bgimg?path=/static/illustrations/sd/background_seraphina_glade.webp&t=1785592711288 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:58:36] "POST /illustration HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 22:58:36] "GET /bgimg?path=/static/illustrations/sd/background_sillytavern_system.webp&t=1785592716870 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:03:13] "GET /mapgrid HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:03:13] "GET /status HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:03:15] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:03:15] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:03:15] "GET /bgimg?path=/static/illustrations/sd/background_seraphina_glade.webp&t=1785592995683 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:09:35] "POST /illustration HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:09:35] "GET /bgimg?path=/static/illustrations/sd/background_sillytavern_system.webp&t=1785593375454 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:12:04] "GET /mapgrid?game=Lucena%20-%202026-08-01@19h52m23s902ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:12:04] "GET /status?game=Lucena%20-%202026-08-01@19h52m23s902ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:12:04] "GET /mapgrid?game=Lucena%20-%202026-08-01@19h52m23s902ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:12:04] "GET /status?game=Lucena%20-%202026-08-01@19h52m23s902ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:12:29] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:12:29] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:12:29] "GET /bgimg?path=/static/illustrations/sd/background_seraphina_glade.webp&t=1785593549889 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:13:55] "POST /illustration HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:13:55] "GET /bgimg?path=/static/illustrations/sd/background_sillytavern_system.webp&t=1785593635503 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:14:21] "GET /mapgrid HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:14:21] "GET /status HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:14:31] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:14:31] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:14:31] "GET /bgimg?path=/static/illustrations/sd/background_seraphina_glade.webp&t=1785593671726 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:16:59] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:17:21] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:25:59] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:29:53] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:29:57] "GET /mapgrid HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:29:57] "GET /status HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:29:59] "GET /mapgrid?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:29:59] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:29:59] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:29:59] "GET /bgimg?path=/static/illustrations/sd/background_seraphina_glade.webp&t=1785594599649 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:30:07] "GET /mapgrid?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:30:07] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:39:28] "GET /mapgrid?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:39:28] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:39:30] "GET /mapgrid?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:39:30] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:39:33] "GET /mapgrid HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:39:33] "GET /status HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:39:35] "GET /mapgrid?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:39:35] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:39:35] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:39:35] "GET /bgimg?path=/static/illustrations/sd/background_seraphina_glade.webp&t=1785595175275 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:44:03] "GET /mapgrid?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:44:03] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:44:06] "GET /mapgrid?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:44:06] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:44:08] "GET /mapgrid?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:44:08] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:44:14] "GET /mapgrid HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:44:14] "GET /status HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:44:16] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:44:16] "GET /bgimg?path=/static/illustrations/sd/background_eldoria_hideout.webp&t=1785595456031 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:46:11] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [01/Aug/2026 23:46:11] "GET /worldmap?t=1785595571902&game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 00:31:17] "GET /bgimg?path=/static/illustrations/sd/background_eldoria_hideout.webp&t=1785595456031 HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 00:32:18] "GET /status?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 00:32:18] "GET /worldmap?t=1785598338408&game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "C:\git\trpg-st-bridge\tools\mechanics_server.py", line 445, in illustration
+    with urllib.request.urlopen(req, timeout=600) as r:  # SD render can take a while
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 519, in open
+    response = self._open(req, data)
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 536, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 496, in _call_chain
+    result = func(*args)
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 1377, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 1352, in do_open
+    r = h.getresponse()
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1374, in getresponse
+    response.begin()
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 318, in begin
+    version, status, reason = self._read_status()
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 279, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\socket.py", line 705, in readinto
+    return self._sock.recv_into(b)
+TimeoutError: timed out
+127.0.0.1 - - [02/Aug/2026 00:32:24] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 00:32:24] "GET /bgimg?name=eldoria_glade&t=1785598344667 HTTP/1.1" 404 -
+Traceback (most recent call last):
+  File "C:\git\trpg-st-bridge\tools\mechanics_server.py", line 445, in illustration
+    with urllib.request.urlopen(req, timeout=600) as r:  # SD render can take a while
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 519, in open
+    response = self._open(req, data)
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 536, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 496, in _call_chain
+    result = func(*args)
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 1377, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 1352, in do_open
+    r = h.getresponse()
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1374, in getresponse
+    response.begin()
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 318, in begin
+    version, status, reason = self._read_status()
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 279, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\socket.py", line 705, in readinto
+    return self._sock.recv_into(b)
+TimeoutError: timed out
+127.0.0.1 - - [02/Aug/2026 00:38:21] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 00:38:21] "GET /bgimg?name=eldoria_glade&t=1785598701557 HTTP/1.1" 404 -
+Traceback (most recent call last):
+  File "C:\git\trpg-st-bridge\tools\mechanics_server.py", line 445, in illustration
+    with urllib.request.urlopen(req, timeout=600) as r:  # SD render can take a while
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 519, in open
+    response = self._open(req, data)
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 536, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 496, in _call_chain
+    result = func(*args)
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 1377, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 1352, in do_open
+    r = h.getresponse()
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1374, in getresponse
+    response.begin()
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 318, in begin
+    version, status, reason = self._read_status()
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 279, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "C:\Users\SAiki\AppData\Local\Programs\Python\Python310\lib\socket.py", line 705, in readinto
+    return self._sock.recv_into(b)
+TimeoutError: timed out
+127.0.0.1 - - [02/Aug/2026 00:40:18] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 00:40:18] "GET /bgimg?name=eldoria_glade&t=1785598818437 HTTP/1.1" 404 -
+127.0.0.1 - - [02/Aug/2026 01:10:13] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 01:10:13] "GET /bgimg?path=/static/illustrations/sd/background_eldoria_glade.webp&t=1785600613127 HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 01:35:13] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 01:35:13] "GET /bgimg?path=/static/illustrations/sd/background_seraphina_glade.webp&t=1785602113216 HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 01:49:31] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 01:49:31] "GET /bgimg?path=/static/illustrations/sd/background_eldoria_glade.webp&t=1785602971932 HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 08:49:29] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 08:49:30] "GET /bgimg?path=/static/illustrations/sd/background_seraphina_glade.webp&t=1785628170950 HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 08:56:55] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 08:56:55] "GET /bgimg?path=/static/illustrations/sd/background_eldoria_glade.webp&t=1785628616270 HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 13:10:17] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 13:10:17] "GET /bgimg?path=/static/illustrations/sd/background_eldoria_hideout.webp&t=1785643817325 HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 18:55:47] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [02/Aug/2026 18:55:47] "GET /bgimg?path=/static/illustrations/sd/background_eldoria_glade.webp&t=1785664547660 HTTP/1.1" 200 -
+127.0.0.1 - - [03/Aug/2026 08:10:43] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [03/Aug/2026 08:10:43] "GET /bgimg?path=/static/illustrations/sd/background_eldoria_hideout.webp&t=1785712244621 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 00:46:32] "GET /mapgrid?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 00:46:32] "GET /status?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 00:54:37] "GET /status HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 00:57:55] "GET /mapgrid?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 00:57:56] "GET /status?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 01:29:44] "POST /illustration HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 01:29:44] "GET /bgimg?path=/static/illustrations/sd/background_sakana.webp&t=1785774584049 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 01:33:01] "POST /illustration HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 01:33:01] "GET /bgimg?path=/static/illustrations/sd/background_sakana.webp&t=1785774781161 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 01:42:43] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 01:42:43] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1785775363055 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 01:44:40] "POST /illustration HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 01:47:01] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 01:47:01] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1785775621588 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 01:48:09] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 01:48:09] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1785775689449 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 01:54:05] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 01:54:05] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1785776045243 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 02:19:02] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 02:19:02] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785777542030 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 02:26:00] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785777542030 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 02:26:00] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 02:26:00] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785777960871 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 08:04:08] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 08:04:08] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785798248585 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 08:06:25] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 08:06:25] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785798385997 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 08:29:57] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 08:29:57] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785799798510 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 11:41:37] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785799798510 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 11:41:38] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 11:41:38] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785811300035 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 18:59:58] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785811300035 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 18:59:58] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 18:59:58] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785837601179 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 21:53:47] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785837601179 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 21:53:48] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [04/Aug/2026 21:53:48] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785848028065 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 08:52:22] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 08:52:23] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785887544422 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 09:59:24] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 09:59:25] "GET /bgimg?path=/static/illustrations/sd/background_apartment_workspace_sofa_noon_sunny_spring.webp&t=1785891566844 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 15:39:43] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 15:39:44] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785911987522 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 15:42:58] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 15:42:58] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785912181368 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 18:07:56] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 18:07:56] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785920879570 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 21:19:31] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785920879570 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 21:19:32] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 21:19:32] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785932372089 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 21:24:49] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785932372089 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 21:24:50] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 21:24:50] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785932690077 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 21:43:26] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785932690077 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 21:43:26] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 21:43:26] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785933806598 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 21:44:02] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 21:44:02] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785933846461 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:01:31] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785933846461 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:01:31] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:01:31] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785934891501 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:01:44] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785934891501 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:01:44] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:01:44] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785934904518 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:02:30] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:02:30] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785934954748 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:16:43] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785934954748 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:16:43] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:16:43] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785935803912 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:17:16] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785935803912 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:17:17] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:17:17] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785935837572 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:21:22] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:21:22] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785936086148 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:26:07] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785936086148 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:26:07] "POST /illustration?game=Sakana%20-%202026-07-27@23h17m39s939ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:26:07] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1785936367333 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:31:42] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:31:42] "GET /bgimg?path=/static/illustrations/sd/background_eldoria_glade.webp&t=1785936702614 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:36:06] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:36:06] "GET /bgimg?path=/static/illustrations/sd/background_eldoria_glade.webp&t=1785936970810 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:42:05] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:42:05] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1785937325357 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:54:32] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1785937325357 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:54:32] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:54:32] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1785938072467 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:55:32] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1785938072467 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:55:32] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:55:32] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1785938132875 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 22:57:57] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 23:01:44] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 23:01:44] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_day.webp&t=1785938504493 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 23:09:35] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_day.webp&t=1785938504493 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 23:09:36] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 23:09:36] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_day.webp&t=1785938976060 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 23:28:16] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 23:28:16] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1785940096106 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 23:30:44] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 23:30:44] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1785940244242 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 23:32:46] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 23:32:46] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1785940366627 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 23:47:01] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [05/Aug/2026 23:47:08] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_room_interior_evening.webp&t=1785941228139 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 00:01:35] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 00:01:35] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_room_interior_evening.webp&t=1785942095756 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 00:08:22] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 00:08:22] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_room_interior_evening.webp&t=1785942502780 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 01:51:09] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 01:51:10] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_room_interior_evening.webp&t=1785948670184 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 01:54:55] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 01:54:55] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_dining_night.webp&t=1785948895611 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 07:46:46] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_dining_night.webp&t=1785948895611 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 07:46:46] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 07:46:46] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_dining_night.webp&t=1785970007714 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 08:10:12] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 08:10:12] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_dining_night.webp&t=1785971413748 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 08:14:45] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 08:14:45] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1785971686443 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 08:16:38] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 08:16:43] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785971804170 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 08:20:35] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 08:20:35] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785972036350 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 09:18:16] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785972036350 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 09:18:17] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 09:18:18] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785975499971 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 09:18:41] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 09:18:41] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785975522971 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 09:46:46] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 09:46:46] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785977207493 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 11:03:02] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 11:03:02] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785981783709 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 11:10:30] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 11:10:30] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785982232359 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 13:33:09] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785982232359 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 13:33:10] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 13:33:12] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_day.webp&t=1785990794725 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 14:23:54] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_day.webp&t=1785990794725 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 14:23:54] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 14:23:54] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785993836723 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 14:28:33] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785993836723 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 14:28:33] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 14:28:37] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_day.webp&t=1785994119852 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 14:34:48] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_day.webp&t=1785994119852 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 14:34:48] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 14:34:48] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785994490932 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 15:04:11] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785994490932 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 15:04:11] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 15:04:12] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_day.webp&t=1785996254812 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 15:11:49] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_day.webp&t=1785996254812 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 15:11:49] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 15:11:50] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1785996714887 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 15:24:02] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 15:24:02] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_dining_night.webp&t=1785997447743 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 15:32:29] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 15:32:29] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1785997954500 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:11:22] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1785997954500 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:11:22] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:11:25] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786000288141 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:12:58] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:12:58] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786000381505 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:28:33] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:28:33] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786001315855 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:29:50] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786001315855 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:29:51] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:29:52] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786001394702 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:33:55] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:33:57] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786001639769 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:50:04] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:50:04] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786002607398 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:59:05] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 16:59:05] "GET /bgimg?path=/static/illustrations/sd/background_apartment_hallway_afternoon_sunny_spring.webp&t=1786003148094 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 17:03:33] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 17:03:34] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786003417073 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 20:11:44] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786003417073 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 20:11:44] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 20:11:45] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786014708343 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 20:17:36] "POST /illustration?game=Minerva%20Goldenwheel%20-%202026-08-02@13h05m11s010ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 20:17:36] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1786015060077 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 21:33:56] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 21:33:58] "GET /bgimg?path=/static/illustrations/sd/background_eldoria_hideout.webp&t=1786019641668 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 21:41:46] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786014708343 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 21:41:47] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 21:41:47] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786020110930 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 21:41:55] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786002607398 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 21:41:56] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms%20-%20Checkpoint%20%231%20esse%20등장 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 21:41:58] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786020121541 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 23:15:01] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786002607398 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 23:15:02] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms%20-%20Checkpoint%20%231%20esse%20등장 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 23:15:02] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786025706031 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 23:15:11] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786014708343 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 23:15:12] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [06/Aug/2026 23:15:13] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786025717262 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 08:50:11] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786025717262 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 08:50:12] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms%20-%20Checkpoint%20%231%20esse%20등장 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 08:50:15] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786060216893 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 08:50:16] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms%20-%20Checkpoint%20%231%20esse%20등장 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 08:50:17] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786060218520 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 08:50:27] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786060218520 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 08:50:29] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786025717262 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 08:50:29] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 08:50:29] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786060231272 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 08:57:09] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 08:57:09] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786060630656 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 10:21:20] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786060630656 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 10:21:20] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 10:21:20] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1786065682201 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 19:37:08] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1786015060077 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 19:37:08] "POST /illustration?game=Minerva%20Goldenwheel%20-%202026-08-02@13h05m11s010ms HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 19:37:09] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1786099032682 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 21:22:30] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1786099032682 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 21:22:30] "POST /illustration?game=Minerva%20Goldenwheel%20-%202026-08-02@13h05m11s010ms HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 21:22:30] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1786105354663 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 21:32:24] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1786105354663 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 21:32:25] "POST /illustration?game=Minerva%20Goldenwheel%20-%202026-08-02@13h05m11s010ms HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 21:32:25] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1786105948840 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 22:09:50] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_morning.webp&t=1786065682201 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 22:09:50] "POST /illustration?game=Yu\xe8%20L\xecng%20-%202026-07-31@21h26m31s197ms HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 22:09:51] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_suite_dawn_fog_autumn.webp&t=1786108194820 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 22:24:47] "POST /illustration?game=Alma%20-%202026-08-07@22h19m06s388ms HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 22:24:48] "GET /bgimg?path=/static/illustrations/sd/background_alma_apartment_bedroom_day.webp&t=1786109092237 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 22:39:37] "GET /bgimg?path=/static/illustrations/sd/background_alma_apartment_bedroom_day.webp&t=1786109092237 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 22:39:37] "POST /illustration?game=Alma%20-%202026-08-07@22h19m06s388ms HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 22:39:37] "GET /bgimg?path=/static/illustrations/sd/background_alma_apartment_bedroom_day.webp&t=1786109981447 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 22:54:33] "POST /illustration?game=Aspen%20-%202026-08-07@22h50m27s400ms HTTP/1.1" 200 -
+127.0.0.1 - - [07/Aug/2026 22:54:33] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1786110877709 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 07:10:56] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1786110877709 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 07:10:57] "POST /illustration?game=Aspen%20-%202026-08-07@22h50m27s400ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 07:10:57] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_room_interior_evening.webp&t=1786140658999 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 07:15:50] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_room_interior_evening.webp&t=1786140658999 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 07:15:50] "POST /illustration?game=Aspen%20-%202026-08-07@22h50m27s400ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 07:15:51] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1786140952493 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 07:21:55] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1786140952493 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 07:21:55] "POST /illustration?game=Aspen%20-%202026-08-07@22h50m27s400ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 07:21:55] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_room_interior_evening.webp&t=1786141317034 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 08:04:43] "POST /illustration?game=Aspen%20-%202026-08-07@22h50m27s400ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 08:04:43] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1786143884639 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 08:17:10] "POST /illustration?game=Common%20Sense%20Modification%20-%202026-08-08@08h13m29s774ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 08:17:10] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1786144631403 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 08:59:27] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1786144631403 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 08:59:27] "POST /illustration?game=Common%20Sense%20Modification%20-%202026-08-08@08h13m29s774ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 08:59:28] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1786147169697 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 09:35:56] "POST /illustration?game=Yui%20-%202026-08-08@09h33m53s993ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 09:35:56] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786149358048 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 09:53:44] "POST /illustration?game=Yes,%20My%20Liege%20-%202026-08-08@09h22m11s097ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 09:53:44] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_day.webp&t=1786150425759 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 09:59:50] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_day.webp&t=1786150425759 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 09:59:51] "POST /illustration?game=Yes,%20My%20Liege%20-%202026-08-08@09h22m11s097ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 09:59:51] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_day.webp&t=1786150793136 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 10:35:43] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 10:35:43] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786152945555 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 10:35:59] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786152945555 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 10:35:59] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 10:35:59] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786152961282 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 11:25:36] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786152961282 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 11:25:36] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 11:25:37] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786155939154 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 11:25:58] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786155939154 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 11:25:58] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 11:25:59] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786155960875 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 11:31:55] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786155960875 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 11:31:55] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 11:31:56] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786156317876 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 12:12:45] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786156317876 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 12:12:46] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 12:12:46] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786158768439 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 12:20:57] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 12:20:57] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786159259657 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 13:06:18] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786159259657 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 13:06:18] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 13:06:18] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786161981005 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 14:25:07] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786161981005 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 14:25:07] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 14:25:07] "GET /bgimg?path=/static/illustrations/sd/background_old_forest_night_fog.webp&t=1786166710149 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 14:48:21] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 14:48:21] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1786168104014 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 17:33:22] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 17:33:22] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1786178005671 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 17:55:07] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 17:55:07] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1786179310549 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:04:52] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1786179310549 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:04:53] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:04:53] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1786179896918 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:13:39] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1786179896918 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:18:28] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:18:30] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1786180713731 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:20:04] "POST /illustration?game=Yes,%20My%20Liege%20-%202026-08-08@09h22m11s097ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:20:05] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_lobby_day.webp&t=1786180808329 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:22:40] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:22:41] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1786180964854 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:27:35] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:27:36] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1786181259315 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:33:33] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:33:33] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1786181616947 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:48:49] "POST /illustration?game=Seraphina%20-%202026-07-31@20h35m32s436ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 18:49:00] "GET /bgimg?path=/static/illustrations/sd/background_seraphina_glade.webp&t=1786182534561 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 19:12:05] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 19:12:06] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1786183929545 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 20:20:52] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 20:20:52] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1786188056043 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 20:22:01] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 20:22:03] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_entrance_day.webp&t=1786188127208 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 20:22:18] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 20:22:18] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1786188141972 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 20:31:12] "POST /illustration?game=Alba%20-%202026-08-08@10h25m43s598ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 20:31:12] "GET /bgimg?path=/static/illustrations/sd/background_old_cabin_exterior_day.webp&t=1786188676052 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 21:18:01] "POST /illustration?game=Alba%20-%202026-08-08@20h48m57s508ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 21:18:02] "GET /bgimg?path=/static/illustrations/sd/background_dark_forest_night_clear_summer.webp&t=1786191482254 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 21:31:39] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786149358048 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 21:31:39] "POST /illustration?game=Yui%20-%202026-08-08@09h33m53s993ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 21:31:39] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786192299525 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 21:34:50] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786192299525 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 21:34:50] "POST /illustration?game=Yui%20-%202026-08-08@09h33m53s993ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 21:34:50] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786192490888 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 21:40:21] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786192490888 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 21:40:22] "POST /illustration?game=Yui%20-%202026-08-08@09h33m53s993ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 21:40:22] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786192822015 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 22:21:35] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 22:21:35] "GET /bgimg?path=/static/illustrations/sd/background_shrine_gate_dusk_fog.webp&t=1786195295832 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 23:05:10] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 23:05:10] "GET /bgimg?path=/static/illustrations/sd/background_shrine_gate_dusk_fog.webp&t=1786197910295 HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 23:13:32] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [08/Aug/2026 23:13:32] "GET /bgimg?path=/static/illustrations/sd/background_shrine_gate_dusk_fog.webp&t=1786198412383 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 00:26:02] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 00:26:02] "GET /bgimg?path=/static/illustrations/sd/background_shrine_gate_dusk_fog.webp&t=1786202762083 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 00:54:07] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 00:54:07] "GET /bgimg?path=/static/illustrations/sd/background_shrine_gate_dusk_fog.webp&t=1786204447878 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 01:15:26] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 01:15:30] "GET /bgimg?path=/static/illustrations/sd/background_boundary_cliff_dusk_fog.webp&t=1786205730912 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 08:39:51] "GET /bgimg?path=/static/illustrations/sd/background_boundary_cliff_dusk_fog.webp&t=1786205730912 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 08:39:51] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 08:39:51] "GET /bgimg?path=/static/illustrations/sd/background_boundary_cliff_dusk_fog.webp&t=1786232393117 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 09:06:09] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 09:06:10] "GET /bgimg?path=/static/illustrations/sd/background_shrine_gate_dusk_fog.webp&t=1786233971749 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 09:10:28] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 09:10:28] "GET /bgimg?path=/static/illustrations/sd/background_boundary_cliff_dusk_fog.webp&t=1786234229987 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 09:21:00] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 09:21:02] "GET /bgimg?path=/static/illustrations/sd/background_pure_white_boundary_dawn.webp&t=1786234864234 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 09:28:52] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 09:28:52] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786235333964 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 09:30:59] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 09:31:00] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786235461502 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 11:58:44] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 11:58:44] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786235461502 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 11:58:49] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786244326646 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 12:14:44] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786244326646 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 12:14:44] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 12:14:46] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786245288251 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:19:58] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786245288251 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:19:58] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:19:58] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786252798451 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:28:20] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:28:20] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786253300612 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:32:09] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:32:09] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786253531500 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:36:52] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786253531500 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:36:53] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:36:55] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786253817349 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:37:50] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786253817349 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:37:51] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:37:51] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786253871026 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:45:09] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 14:45:09] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786254312043 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 19:31:59] "POST /illustration?game=Reimu%20Hakurei%20-%202026-08-08@10h24m05s442ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 19:31:59] "GET /bgimg?path=/static/illustrations/sd/background_school_hallway_morning.webp&t=1786271522471 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 22:44:50] "POST /illustration?game=Leah%20-%202026-08-08@22h07m56s499ms HTTP/1.1" 200 -
+127.0.0.1 - - [09/Aug/2026 22:44:50] "GET /bgimg?path=/static/illustrations/sd/background_convenience_store_interior.webp&t=1786283090523 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 02:18:15] "POST /illustration?game=Leah%20-%202026-08-08@22h07m56s499ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 02:18:18] "GET /bgimg?path=/static/illustrations/sd/background_developer_private_room.webp&t=1786295898324 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 02:25:21] "POST /illustration?game=Leah%20-%202026-08-08@22h07m56s499ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 02:25:22] "GET /bgimg?path=/static/illustrations/sd/background_abandoned_building_security_office_pitch_black.webp&t=1786296321693 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 02:35:14] "POST /illustration?game=Leah%20-%202026-08-08@22h07m56s499ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 02:35:14] "GET /bgimg?path=/static/illustrations/sd/background_abandoned_building_security_office_pitch_black.webp&t=1786296914534 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 02:43:49] "POST /illustration?game=Leah%20-%202026-08-08@22h07m56s499ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 02:43:49] "GET /bgimg?path=/static/illustrations/sd/background_abandoned_building_security_office_pitch_black.webp&t=1786297429452 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 02:55:52] "POST /illustration?game=Leah%20-%202026-08-08@22h07m56s499ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 02:55:52] "GET /bgimg?path=/static/illustrations/sd/background_abandoned_building_security_office_pitch_black.webp&t=1786298152373 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 03:06:47] "POST /illustration?game=Leah%20-%202026-08-08@22h07m56s499ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 03:06:47] "GET /bgimg?path=/static/illustrations/sd/background_abandoned_building_security_office_pitch_black.webp&t=1786298807164 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 09:33:57] "GET /bgimg?path=/static/illustrations/sd/background_abandoned_building_security_office_pitch_black.webp&t=1786298807164 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 09:33:57] "POST /illustration?game=Leah%20-%202026-08-08@22h07m56s499ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 09:33:57] "GET /bgimg?path=/static/illustrations/sd/background_abandoned_building_security_office_pitch_black.webp&t=1786322039167 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 09:57:05] "POST /illustration?game=Sister%20Theresia%20-%202026-08-10@09h47m14s412ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 09:57:06] "GET /bgimg?path=/static/illustrations/sd/background_chapel_interior_night_storm_autumn.webp&t=1786323428143 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 10:33:01] "POST /illustration?game=Sister%20Theresia%20-%202026-08-10@09h47m14s412ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 10:33:01] "GET /bgimg?path=/static/illustrations/sd/background_chapel_interior_night_storm_autumn.webp&t=1786325582782 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 10:33:59] "POST /illustration?game=Sister%20Theresia%20-%202026-08-10@09h47m14s412ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 10:33:59] "GET /bgimg?path=/static/illustrations/sd/background_chapel_interior_night_storm_autumn.webp&t=1786325640666 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 10:47:00] "POST /illustration?game=Sister%20Theresia%20-%202026-08-10@09h47m14s412ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 10:47:00] "GET /bgimg?path=/static/illustrations/sd/background_chapel_interior_night_storm_autumn.webp&t=1786326422180 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 10:50:04] "POST /illustration?game=Sister%20Theresia%20-%202026-08-10@09h47m14s412ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 10:50:05] "GET /bgimg?path=/static/illustrations/sd/background_chapel_interior_night_storm_autumn.webp&t=1786326606586 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 10:52:59] "POST /illustration?game=Sister%20Theresia%20-%202026-08-10@09h47m14s412ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 10:52:59] "GET /bgimg?path=/static/illustrations/sd/background_chapel_interior_night_storm_autumn.webp&t=1786326780966 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 10:53:44] "POST /illustration?game=Sister%20Theresia%20-%202026-08-10@09h47m14s412ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 10:53:45] "GET /bgimg?path=/static/illustrations/sd/background_foggy_forest_path_storm_night.webp&t=1786326826488 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 12:52:48] "GET /bgimg?path=/static/illustrations/sd/background_foggy_forest_path_storm_night.webp&t=1786326826488 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 12:52:48] "POST /illustration?game=Sister%20Theresia%20-%202026-08-10@09h47m14s412ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 12:52:48] "GET /bgimg?path=/static/illustrations/sd/background_foggy_forest_path_storm_night.webp&t=1786333968805 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 13:59:37] "GET /bgimg?path=/static/illustrations/sd/background_dark_forest_night_clear_summer.webp&t=1786191482254 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 13:59:37] "POST /illustration?game=Alba%20-%202026-08-08@20h48m57s508ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 13:59:37] "GET /bgimg?path=/static/illustrations/sd/background_dark_forest_night_clear_summer.webp&t=1786337977607 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 18:06:50] "POST /illustration?game=Chie%20-%202026-08-08@21h44m18s777ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 18:06:50] "GET /bgimg?path=/static/illustrations/sd/background_guiyangong_hotel_room_interior_evening.webp&t=1786352810735 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 22:14:27] "POST /illustration?game=Stranded%20with%20futa%20-%202026-08-08@22h12m29s454ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 22:14:28] "GET /bgimg?path=/static/illustrations/sd/background_stranded_beach_day_clear_summer.webp&t=1786367667117 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 22:15:50] "GET /bgimg?path=/static/illustrations/sd/background_stranded_beach_day_clear_summer.webp&t=1786367667117 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 22:15:50] "POST /illustration?game=Stranded%20with%20futa%20-%202026-08-08@22h12m29s454ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 22:15:50] "GET /bgimg?path=/static/illustrations/sd/background_stranded_beach_day_clear_summer.webp&t=1786367750364 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 22:35:24] "GET /bgimg?path=/static/illustrations/sd/background_stranded_beach_day_clear_summer.webp&t=1786367750364 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 22:35:24] "POST /illustration?game=Stranded%20with%20futa%20-%202026-08-08@22h12m29s454ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 22:35:24] "GET /bgimg?path=/static/illustrations/sd/background_stranded_beach_day_clear_summer.webp&t=1786368924494 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 22:56:53] "GET /bgimg?path=/static/illustrations/sd/background_stranded_beach_day_clear_summer.webp&t=1786368924494 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 22:56:53] "POST /illustration?game=Stranded%20with%20futa%20-%202026-08-08@22h12m29s454ms HTTP/1.1" 200 -
+127.0.0.1 - - [10/Aug/2026 22:56:53] "GET /bgimg?path=/static/illustrations/sd/background_stranded_beach_day_clear_summer.webp&t=1786370213934 HTTP/1.1" 200 -

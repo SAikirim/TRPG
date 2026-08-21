@@ -865,6 +865,99 @@ def get_illustration():
     return jsonify(state)
 
 
+@app.route("/api/illustration/scene", methods=["POST"])
+def illustration_scene():
+    """Reuse-first background for a named scene (used by SillyTavern trpg-hud).
+    request_illustration() checks the name cache via _find_existing_image FIRST and
+    reuses the existing background_<name>.webp when present; otherwise it makes a
+    Skia placeholder immediately (+ SD in background when SD WebUI is on).
+    Body: {"name": "<stable slug>", "prompt": "<english SD prompt>"}."""
+    b = request.get_json(force=True, silent=True) or {}
+    name = (b.get("name") or "").strip()
+    prompt = (b.get("prompt") or "").strip()
+    if not name:
+        return jsonify({"ok": False, "error": "name required"}), 400
+    try:
+        # SD-ONLY (no Skia placeholder): reuse existing, else render via SD synchronously.
+        # If SD is off/unreachable it returns ok:False and the client keeps its background.
+        from core.sd_generator import generate_scene_background_sd
+        res = generate_scene_background_sd(name, prompt) or {}
+        image = res.get("image") or res.get("image_url")
+        # Also drop the SD image into SillyTavern's backgrounds folder so it shows up
+        # in ST's UI background gallery (ST only lists files from that folder).
+        if image and image.startswith("/static/"):
+            try:
+                import shutil
+                src = os.path.join(BASE_DIR, image.replace("/static/", "static/", 1).replace("/", os.sep))
+                st_bg_dir = r"C:\git\SillyTavern\data\default-user\backgrounds"
+                if os.path.exists(src) and os.path.isdir(st_bg_dir):
+                    dst = os.path.join(st_bg_dir, os.path.basename(src))
+                    if not os.path.exists(dst):
+                        shutil.copy2(src, dst)
+            except Exception as _e:
+                pass
+        return jsonify({"ok": bool(image), "image": image, **res})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/api/illustration/npc", methods=["POST"])
+def illustration_npc():
+    """Shared NPC sprite (used by SillyTavern VN-mode multi-character display).
+    Reuse-first from the global static/portraits/npc/ pool (shared across ALL chats);
+    otherwise SD-render + background-removal (transparent) and save there. Non-human
+    NPCs (objects, animals) supported. Body: {"name": "<stable slug>", "prompt": "<english>"}.
+    Returns {ok, image} — client falls back to the tracker emoji/avatar when ok is false."""
+    b = request.get_json(force=True, silent=True) or {}
+    name = (b.get("name") or "").strip()
+    prompt = (b.get("prompt") or "").strip()
+    expression = (b.get("expression") or "neutral").strip()
+    if not name:
+        return jsonify({"ok": False, "error": "name required"}), 400
+    try:
+        from core.sd_generator import (generate_npc_sprite, list_npc_variants, find_npc_sprite,
+                                       ingest_card_sprite, generate_expression_from_base,
+                                       has_exact_npc_sprite)
+        # A SillyTavern character CARD image may be supplied (image_b64). Prefer it as the base
+        # (neutral) sprite when suitable — it is the character's canonical look — instead of having
+        # SD invent a new face. Expressions are then img2img'd from it so they stay the same person.
+        card_b64 = b.get("image_b64")
+        card_res = None
+        if card_b64 and not has_exact_npc_sprite(name, "neutral"):
+            card_res = ingest_card_sprite(name, card_b64) or {}
+        res = None
+        # Exact checks: a missing expression must NOT look present via the tolerant neutral fallback.
+        if expression != "neutral" and has_exact_npc_sprite(name, "neutral") and not has_exact_npc_sprite(name, expression):
+            res = generate_expression_from_base(name, expression, prompt) or {}
+            if not res.get("ok"):
+                res = None      # img2img unavailable (SD off / low VRAM) -> fall through
+        if res is None:
+            res = generate_npc_sprite(name, prompt, expression=expression) or {}
+        image = res.get("image") or res.get("image_url")
+        if not image and card_res and card_res.get("image"):
+            image = card_res["image"]          # card base worked even if the expression render didn't
+            res = {**res, "image": image, "source": "card"}
+        if card_res is not None:
+            res = {**res, "card": {k: card_res.get(k) for k in ("ok", "reason", "subject_ratio")}}
+        # Bonus appearance variants (var_<feature>.webp) for this NPC — independent of
+        # generation success; the VN client uses these for its variant switcher/event tags.
+        variants = list_npc_variants(name)
+        return jsonify({"ok": bool(image), "image": image, **res, "variants": variants})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/api/illustration/npc/ingest", methods=["POST"])
+def illustration_npc_ingest():
+    """Process user-dropped flat images in static/portraits/npc/ : remove background and move
+    into per-NPC folders (<slug>/neutral.webp). Idempotent. Call after dropping new base images."""
+    try:
+        from core.sd_generator import ingest_manual_npc_sprites
+        return jsonify({"ok": True, **(ingest_manual_npc_sprites() or {})})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
 @app.route("/api/illustration/clear", methods=["POST"])
 def clear_illustration():
     clear_scene()
@@ -1337,4 +1430,7 @@ def _kill_port_process(port):
 
 if __name__ == "__main__":
     _startup_init()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # use_reloader=False: the debug reloader spawns a child that ALSO runs __main__/_startup_init
+    # (which kills whatever holds :5000) — parent and child then kill-and-respawn each other,
+    # nesting into multiple app.py processes. A single process avoids the duplicate-instance storm.
+    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)

@@ -548,6 +548,16 @@
       "timestamp": "22:47:40",
       "archived_at": "2026-07-31",
       "scenario_id": "karendel_journey"
+    },
+    {
+      "turn": 27,
+      "message": "[GM] Fix: turn count + Volf portrait",
+      "narrative": "",
+      "user_input": "",
+      "dialogues": [],
+      "timestamp": "22:52:04",
+      "archived_at": "2026-08-22",
+      "scenario_id": "karendel_journey"
     }
   ]
 }

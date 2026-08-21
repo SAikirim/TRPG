@@ -9,3 +9,4 @@ WARNING: This is a development server. Do not use it in a production deployment.
 Press CTRL+C to quit
 127.0.0.1 - - [31/Jul/2026 22:09:50] "GET /v1/models HTTP/1.1" 200 -
 127.0.0.1 - - [31/Jul/2026 22:09:50] "GET /v1/models HTTP/1.1" 200 -
+127.0.0.1 - - [31/Jul/2026 22:11:25] "POST /v1/chat/completions HTTP/1.1" 200 -

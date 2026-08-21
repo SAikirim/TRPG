@@ -3,7 +3,7 @@
     "scenario_id": "karendel_journey",
     "slot": 1,
     "description": "자동 저장 (턴 32)",
-    "saved_at": "2026-07-31 22:11:19",
+    "saved_at": "2026-08-22 08:16:13",
     "turn_count": 32,
     "chapter": 1,
     "party_summary": [
@@ -397,14 +397,6 @@
     "events": [
       {
         "turn": 27,
-        "message": "[GM] Fix: turn count + Volf portrait",
-        "narrative": "",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "22:52:04"
-      },
-      {
-        "turn": 27,
         "message": "[GM] Generate Volf portrait",
         "narrative": "",
         "user_input": "",
@@ -480,11 +472,60 @@
           }
         ],
         "timestamp": "22:11:19"
+      },
+      {
+        "turn": 32,
+        "message": "[GM] Session restore",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "08:16:13"
       }
     ],
     "current_scene": {
-      "background": "/static/illustrations/pixel/default.png",
-      "layers": []
+      "background": "/static/illustrations/sd/background_red_chimney_inn.webp",
+      "layers": [
+        {
+          "type": "portrait",
+          "image": "static/portraits/sd/portrait_volf.webp",
+          "position": "far-left",
+          "name": "volf",
+          "distance": 10,
+          "size_class": "d4"
+        },
+        {
+          "type": "object",
+          "image": "static/illustrations/sd/object_round_table_1.webp",
+          "position": "center",
+          "name": "round_table_1",
+          "distance": 3,
+          "size_class": "d3"
+        },
+        {
+          "type": "object",
+          "image": "static/illustrations/sd/object_round_table_2.webp",
+          "position": "center",
+          "name": "round_table_2",
+          "distance": 3,
+          "size_class": "d3"
+        },
+        {
+          "type": "object",
+          "image": "static/illustrations/sd/object_long_table.webp",
+          "position": "center",
+          "name": "long_table",
+          "distance": 3,
+          "size_class": "d3"
+        },
+        {
+          "type": "object",
+          "image": "static/illustrations/sd/object_chair.webp",
+          "position": "center",
+          "name": "chair",
+          "distance": 5,
+          "size_class": "d3"
+        }
+      ]
     }
   }
 }

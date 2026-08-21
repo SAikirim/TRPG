@@ -1,0 +1,2365 @@
+Node version: v24.14.0. Running in undefined environment. Server directory: C:\git\SillyTavern
+Using config path: ./config.yaml
+Using data root: ./data
+Preferring IPv4 for DNS resolution
+
+SillyTavern 1.18.0
+Running 'release' (8172dcd0e) - 7/8/2026, 2:36:20 AM GMT+9
+
+
+Warning: listen is enabled but private request filter is disabled. This may expose your server to SSRF attacks.
+To enable, provide trusted addresses in privateAddressWhitelist.allowedRanges and set privateAddressWhitelist.enabled to true in config.yaml and restart the server.
+
+Compiling frontend libraries...
+webpack 5.105.4 compiled [1m[32msuccessfully[39m[22m in 393 ms
+
+SillyTavern is listening on IPv4: 0.0.0.0:8000
+
+To limit connections to internal localhost only ([::1] or 127.0.0.1), change the setting in config.yaml to "listen: false".
+Check the "access.log" file in the data directory to inspect incoming connections: data\access.log
+
+=================================================
+
+Go to: http://127.0.0.1:8000/ to open SillyTavern
+
+=================================================
+
+New connection from 127.0.0.1; User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+
+Extensions available for default-user [
+  { type: 'system', name: 'assets' },
+  { type: 'system', name: 'attachments' },
+  { type: 'system', name: 'caption' },
+  { type: 'system', name: 'connection-manager' },
+  { type: 'system', name: 'expressions' },
+  { type: 'system', name: 'gallery' },
+  { type: 'system', name: 'memory' },
+  { type: 'system', name: 'quick-reply' },
+  { type: 'system', name: 'regex' },
+  { type: 'system', name: 'stable-diffusion' },
+  { type: 'system', name: 'token-counter' },
+  { type: 'system', name: 'translate' },
+  { type: 'system', name: 'tts' },
+  { type: 'system', name: 'vectors' },
+  { type: 'local', name: 'third-party/rpg-companion-sillytavern' },
+  { type: 'local', name: 'third-party/trpg-hud' },
+  { type: 'global', name: 'third-party/Extension-Dice' }
+]
+Available models: [
+  'claude-opus',
+  'gemini-flash',
+  'gemini-pro',
+  'groq-llama-3.3-70b',
+  'karendel-engine',
+  'lumimaid-12b'
+]
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'DJttaqfoKNme1e8Pgtq06Q4',
+  created: 1785568011,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'D5ttauGmCcXV1e8PvZyOoA8',
+  created: 1785568014,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+New connection from 100.95.214.82; User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36
+
+Extensions available for default-user [
+  { type: 'system', name: 'assets' },
+  { type: 'system', name: 'attachments' },
+  { type: 'system', name: 'caption' },
+  { type: 'system', name: 'connection-manager' },
+  { type: 'system', name: 'expressions' },
+  { type: 'system', name: 'gallery' },
+  { type: 'system', name: 'memory' },
+  { type: 'system', name: 'quick-reply' },
+  { type: 'system', name: 'regex' },
+  { type: 'system', name: 'stable-diffusion' },
+  { type: 'system', name: 'token-counter' },
+  { type: 'system', name: 'translate' },
+  { type: 'system', name: 'tts' },
+  { type: 'system', name: 'vectors' },
+  { type: 'local', name: 'third-party/rpg-companion-sillytavern' },
+  { type: 'local', name: 'third-party/trpg-hud' },
+  { type: 'global', name: 'third-party/Extension-Dice' }
+]
+Instantiated the tokenizer for gemma
+Available models: [
+  'claude-opus',
+  'gemini-flash',
+  'gemini-pro',
+  'groq-llama-3.3-70b',
+  'karendel-engine',
+  'lumimaid-12b'
+]
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: '3ZxtatfACo6lvr0P8NnHiQ8',
+  created: 1785568476,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Extensions available for default-user [
+  { type: 'system', name: 'assets' },
+  { type: 'system', name: 'attachments' },
+  { type: 'system', name: 'caption' },
+  { type: 'system', name: 'connection-manager' },
+  { type: 'system', name: 'expressions' },
+  { type: 'system', name: 'gallery' },
+  { type: 'system', name: 'memory' },
+  { type: 'system', name: 'quick-reply' },
+  { type: 'system', name: 'regex' },
+  { type: 'system', name: 'stable-diffusion' },
+  { type: 'system', name: 'token-counter' },
+  { type: 'system', name: 'translate' },
+  { type: 'system', name: 'tts' },
+  { type: 'system', name: 'vectors' },
+  { type: 'local', name: 'third-party/rpg-companion-sillytavern' },
+  { type: 'local', name: 'third-party/trpg-hud' },
+  { type: 'global', name: 'third-party/Extension-Dice' }
+]
+Available models: [
+  'claude-opus',
+  'gemini-flash',
+  'gemini-pro',
+  'groq-llama-3.3-70b',
+  'karendel-engine',
+  'lumimaid-12b'
+]
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'bJ1tavO_KczV1e8P6LCW0A8',
+  created: 1785568619,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'b51tarvlHLW3vr0P89vzoA8',
+  created: 1785568622,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Extensions available for default-user [
+  { type: 'system', name: 'assets' },
+  { type: 'system', name: 'attachments' },
+  { type: 'system', name: 'caption' },
+  { type: 'system', name: 'connection-manager' },
+  { type: 'system', name: 'expressions' },
+  { type: 'system', name: 'gallery' },
+  { type: 'system', name: 'memory' },
+  { type: 'system', name: 'quick-reply' },
+  { type: 'system', name: 'regex' },
+  { type: 'system', name: 'stable-diffusion' },
+  { type: 'system', name: 'token-counter' },
+  { type: 'system', name: 'translate' },
+  { type: 'system', name: 'tts' },
+  { type: 'system', name: 'vectors' },
+  { type: 'local', name: 'third-party/rpg-companion-sillytavern' },
+  { type: 'local', name: 'third-party/trpg-hud' },
+  { type: 'global', name: 'third-party/Extension-Dice' }
+]
+Available models: [
+  'claude-opus',
+  'gemini-flash',
+  'gemini-pro',
+  'groq-llama-3.3-70b',
+  'karendel-engine',
+  'lumimaid-12b'
+]
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'hZ5taprSJY6i9tMP9JP9sA8',
+  created: 1785568900,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'iJ5tasL6BJ-8vr0P4bb0oQI',
+  created: 1785568903,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'caring',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 2,
+    prompt_tokens: 405,
+    total_tokens: 407,
+    completion_tokens_details: { text_tokens: 2 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'ip9tavSPDpj82roPkY_XoQ4',
+  created: 1785569160,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'j59tasThEqqA0-kPhfrcuQ0',
+  created: 1785569166,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Extensions available for default-user [
+  { type: 'system', name: 'assets' },
+  { type: 'system', name: 'attachments' },
+  { type: 'system', name: 'caption' },
+  { type: 'system', name: 'connection-manager' },
+  { type: 'system', name: 'expressions' },
+  { type: 'system', name: 'gallery' },
+  { type: 'system', name: 'memory' },
+  { type: 'system', name: 'quick-reply' },
+  { type: 'system', name: 'regex' },
+  { type: 'system', name: 'stable-diffusion' },
+  { type: 'system', name: 'token-counter' },
+  { type: 'system', name: 'translate' },
+  { type: 'system', name: 'tts' },
+  { type: 'system', name: 'vectors' },
+  { type: 'local', name: 'third-party/rpg-companion-sillytavern' },
+  { type: 'local', name: 'third-party/trpg-hud' },
+  { type: 'global', name: 'third-party/Extension-Dice' }
+]
+Available models: [
+  'claude-opus',
+  'gemini-flash',
+  'gemini-pro',
+  'groq-llama-3.3-70b',
+  'karendel-engine',
+  'lumimaid-12b'
+]
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: '8p9tatrnB4Kl0-kPt-uoqA8',
+  created: 1785569265,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: '9J9taqeAI-aD2roP84vv6Q4',
+  created: 1785569267,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Extensions available for default-user [
+  { type: 'system', name: 'assets' },
+  { type: 'system', name: 'attachments' },
+  { type: 'system', name: 'caption' },
+  { type: 'system', name: 'connection-manager' },
+  { type: 'system', name: 'expressions' },
+  { type: 'system', name: 'gallery' },
+  { type: 'system', name: 'memory' },
+  { type: 'system', name: 'quick-reply' },
+  { type: 'system', name: 'regex' },
+  { type: 'system', name: 'stable-diffusion' },
+  { type: 'system', name: 'token-counter' },
+  { type: 'system', name: 'translate' },
+  { type: 'system', name: 'tts' },
+  { type: 'system', name: 'vectors' },
+  { type: 'local', name: 'third-party/rpg-companion-sillytavern' },
+  { type: 'local', name: 'third-party/trpg-hud' },
+  { type: 'global', name: 'third-party/Extension-Dice' }
+]
+Available models: [
+  'claude-opus',
+  'gemini-flash',
+  'gemini-pro',
+  'groq-llama-3.3-70b',
+  'karendel-engine',
+  'lumimaid-12b'
+]
+Extensions available for default-user [
+  { type: 'system', name: 'assets' },
+  { type: 'system', name: 'attachments' },
+  { type: 'system', name: 'caption' },
+  { type: 'system', name: 'connection-manager' },
+  { type: 'system', name: 'expressions' },
+  { type: 'system', name: 'gallery' },
+  { type: 'system', name: 'memory' },
+  { type: 'system', name: 'quick-reply' },
+  { type: 'system', name: 'regex' },
+  { type: 'system', name: 'stable-diffusion' },
+  { type: 'system', name: 'token-counter' },
+  { type: 'system', name: 'translate' },
+  { type: 'system', name: 'tts' },
+  { type: 'system', name: 'vectors' },
+  { type: 'local', name: 'third-party/rpg-companion-sillytavern' },
+  { type: 'local', name: 'third-party/trpg-hud' },
+  { type: 'global', name: 'third-party/Extension-Dice' }
+]
+Available models: [
+  'claude-opus',
+  'gemini-flash',
+  'gemini-pro',
+  'groq-llama-3.3-70b',
+  'karendel-engine',
+  'lumimaid-12b'
+]
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'X6BtatvlA_mA0-kP0ZjD4AM',
+  created: 1785569374,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'YaBtar34K87MrfcP683PoQg',
+  created: 1785569376,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Extensions available for default-user [
+  { type: 'system', name: 'assets' },
+  { type: 'system', name: 'attachments' },
+  { type: 'system', name: 'caption' },
+  { type: 'system', name: 'connection-manager' },
+  { type: 'system', name: 'expressions' },
+  { type: 'system', name: 'gallery' },
+  { type: 'system', name: 'memory' },
+  { type: 'system', name: 'quick-reply' },
+  { type: 'system', name: 'regex' },
+  { type: 'system', name: 'stable-diffusion' },
+  { type: 'system', name: 'token-counter' },
+  { type: 'system', name: 'translate' },
+  { type: 'system', name: 'tts' },
+  { type: 'system', name: 'vectors' },
+  { type: 'local', name: 'third-party/rpg-companion-sillytavern' },
+  { type: 'local', name: 'third-party/trpg-hud' },
+  { type: 'global', name: 'third-party/Extension-Dice' }
+]
+Available models: [
+  'claude-opus',
+  'gemini-flash',
+  'gemini-pro',
+  'groq-llama-3.3-70b',
+  'karendel-engine',
+  'lumimaid-12b'
+]
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'oKBtauuoDfvI0-kP4Mq4qA0',
+  created: 1785569439,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Extensions available for default-user [
+  { type: 'system', name: 'assets' },
+  { type: 'system', name: 'attachments' },
+  { type: 'system', name: 'caption' },
+  { type: 'system', name: 'connection-manager' },
+  { type: 'system', name: 'expressions' },
+  { type: 'system', name: 'gallery' },
+  { type: 'system', name: 'memory' },
+  { type: 'system', name: 'quick-reply' },
+  { type: 'system', name: 'regex' },
+  { type: 'system', name: 'stable-diffusion' },
+  { type: 'system', name: 'token-counter' },
+  { type: 'system', name: 'translate' },
+  { type: 'system', name: 'tts' },
+  { type: 'system', name: 'vectors' },
+  { type: 'local', name: 'third-party/rpg-companion-sillytavern' },
+  { type: 'local', name: 'third-party/trpg-hud' },
+  { type: 'global', name: 'third-party/Extension-Dice' }
+]
+Available models: [
+  'claude-opus',
+  'gemini-flash',
+  'gemini-pro',
+  'groq-llama-3.3-70b',
+  'karendel-engine',
+  'lumimaid-12b'
+]
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'xaBtaoOVFpuh2roP1Ia7mA4',
+  created: 1785569476,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'x6BtavXWLYeQrfcPguiryQ4',
+  created: 1785569478,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'caring',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 2,
+    prompt_tokens: 405,
+    total_tokens: 407,
+    completion_tokens_details: { text_tokens: 2 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: '1aBtatf2DprKrfcP7onniAs',
+  created: 1785569492,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: '2aBtaprJOOio2roPvumGgA8',
+  created: 1785569496,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: '26BtaozmI_CD2roPrcfe-Qk',
+  created: 1785569498,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: '3qBtarfjFdfv2roPjfDsyAo',
+  created: 1785569501,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: '66BtarKCCKmQ0-kPq6K2iA8',
+  created: 1785569514,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: '8KBtaqCnGePG2roPnt_eyAk',
+  created: 1785569519,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Extensions available for default-user [
+  { type: 'system', name: 'assets' },
+  { type: 'system', name: 'attachments' },
+  { type: 'system', name: 'caption' },
+  { type: 'system', name: 'connection-manager' },
+  { type: 'system', name: 'expressions' },
+  { type: 'system', name: 'gallery' },
+  { type: 'system', name: 'memory' },
+  { type: 'system', name: 'quick-reply' },
+  { type: 'system', name: 'regex' },
+  { type: 'system', name: 'stable-diffusion' },
+  { type: 'system', name: 'token-counter' },
+  { type: 'system', name: 'translate' },
+  { type: 'system', name: 'tts' },
+  { type: 'system', name: 'vectors' },
+  { type: 'local', name: 'third-party/rpg-companion-sillytavern' },
+  { type: 'local', name: 'third-party/trpg-hud' },
+  { type: 'global', name: 'third-party/Extension-Dice' }
+]
+Available models: [
+  'claude-opus',
+  'gemini-flash',
+  'gemini-pro',
+  'groq-llama-3.3-70b',
+  'karendel-engine',
+  'lumimaid-12b'
+]
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'BKFtapWoIdb22roPv-y4mA4',
+  created: 1785569539,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Extensions available for default-user [
+  { type: 'system', name: 'assets' },
+  { type: 'system', name: 'attachments' },
+  { type: 'system', name: 'caption' },
+  { type: 'system', name: 'connection-manager' },
+  { type: 'system', name: 'expressions' },
+  { type: 'system', name: 'gallery' },
+  { type: 'system', name: 'memory' },
+  { type: 'system', name: 'quick-reply' },
+  { type: 'system', name: 'regex' },
+  { type: 'system', name: 'stable-diffusion' },
+  { type: 'system', name: 'token-counter' },
+  { type: 'system', name: 'translate' },
+  { type: 'system', name: 'tts' },
+  { type: 'system', name: 'vectors' },
+  { type: 'local', name: 'third-party/rpg-companion-sillytavern' },
+  { type: 'local', name: 'third-party/trpg-hud' },
+  { type: 'global', name: 'third-party/Extension-Dice' }
+]
+Available models: [
+  'claude-opus',
+  'gemini-flash',
+  'gemini-pro',
+  'groq-llama-3.3-70b',
+  'karendel-engine',
+  'lumimaid-12b'
+]
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'GaFtaqzBHdvB0-kPsZjliA4',
+  created: 1785569560,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'G6FtatLBOP2g2roPg-LU0QE',
+  created: 1785569562,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'IqFtarHNIbyc0-kP6pu0YQ',
+  created: 1785569569,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'JKFtaof_Htbz2roPwZ3TkA4',
+  created: 1785569571,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Extensions available for default-user [
+  { type: 'system', name: 'assets' },
+  { type: 'system', name: 'attachments' },
+  { type: 'system', name: 'caption' },
+  { type: 'system', name: 'connection-manager' },
+  { type: 'system', name: 'expressions' },
+  { type: 'system', name: 'gallery' },
+  { type: 'system', name: 'memory' },
+  { type: 'system', name: 'quick-reply' },
+  { type: 'system', name: 'regex' },
+  { type: 'system', name: 'stable-diffusion' },
+  { type: 'system', name: 'token-counter' },
+  { type: 'system', name: 'translate' },
+  { type: 'system', name: 'tts' },
+  { type: 'system', name: 'vectors' },
+  { type: 'local', name: 'third-party/rpg-companion-sillytavern' },
+  { type: 'local', name: 'third-party/trpg-hud' },
+  { type: 'global', name: 'third-party/Extension-Dice' }
+]
+Available models: [
+  'claude-opus',
+  'gemini-flash',
+  'gemini-pro',
+  'groq-llama-3.3-70b',
+  'karendel-engine',
+  'lumimaid-12b'
+]
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'M6FtavHvNYHa2roPxY-viQs',
+  created: 1785569586,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'ZaFtaomBFYnF0-kPi8vVyA0',
+  created: 1785569636,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}
+Chat Completion request: {
+  messages: [
+    {
+      role: 'system',
+      content: 'Ignore previous instructions. Classify the emotion of the last message. Output just one word, e.g. "joy" or "anger". Choose only one of the following labels: "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion", "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness", "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"'
+    },
+    {
+      role: 'user',
+      content: '노엘은 김이 모락모락 피어오르는 양고기 스튜 그릇을 앞으로 당기며, 힐끗 사이키를 곁눈질했다. 그러고는 흑빵을 무심하게 뜯어 스튜 국물에 적시며 낮게 뇌까렸다.\n' +
+        '\n' +
+        '...애 아니라고 했잖아.\n' +
+        '\n' +
+        '입으로는 투덜거렸지만, 숟가락을 집어든 노엘의 손길은 꽤나 진지했다. 숟가락으로 큼직한 양고기 한 조각을 떠서 입에 넣고는, 우유 잔을 밀어내는 루세나를 한 번 보고 다시 사이키를 바라보았다. 뺨에 난 흉터가 음식의 열기에 살짝 붉어져 있었다.\n' +
+        '\n' +
+        '...빨리 먹고 가자. 멜로스 영감 상회, 늦으면 문 닫아.\n' +
+        '\n' +
+        '말을 마치고는 흑빵 한 조각을 입에 구겨 넣으며, 창밖으로 보이는 구시가지 쪽 하늘을 묵묵히 응시했다. 무뚝뚝한 태도와는 달리, 숟가락을 움직이는 속도는 일행 중에서 가장 빨랐다.'
+    }
+  ],
+  prompt: undefined,
+  model: 'gemini-flash',
+  temperature: 1,
+  max_tokens: 8192,
+  max_completion_tokens: undefined,
+  stream: false,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  top_p: 1,
+  top_k: undefined,
+  stop: undefined,
+  logit_bias: undefined,
+  seed: undefined,
+  n: undefined,
+  logprobs: undefined,
+  top_logprobs: undefined
+}
+Chat Completion response: {
+  id: 'a6FtaprkKMHMrfcPn975yAo',
+  created: 1785569642,
+  model: 'gemini-flash',
+  object: 'chat.completion',
+  choices: [
+    {
+      finish_reason: 'stop',
+      index: 0,
+      message: {
+        content: 'annoyance',
+        role: 'assistant',
+        images: [],
+        thinking_blocks: [],
+        provider_specific_fields: { thought_signatures: [Array] }
+      }
+    }
+  ],
+  usage: {
+    completion_tokens: 3,
+    prompt_tokens: 405,
+    total_tokens: 408,
+    completion_tokens_details: { text_tokens: 3 },
+    prompt_tokens_details: { text_tokens: 405 }
+  },
+  vertex_ai_grounding_metadata: [],
+  vertex_ai_url_context_metadata: [],
+  vertex_ai_safety_results: [],
+  vertex_ai_citation_metadata: [],
+  service_tier: 'default'
+}

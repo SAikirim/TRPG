@@ -1,0 +1,15 @@
+{
+  "game_info": {},
+  "players": [],
+  "npcs": [],
+  "map": {
+    "width": 25,
+    "height": 25,
+    "tile_size": 40,
+    "locations": []
+  },
+  "current_location": null,
+  "turn_count": 0,
+  "events": [],
+  "current_scene": {}
+}

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Valeria 표정 확인</title>
+<style>
+  :root{color-scheme:dark;}
+  body{margin:0;background:#15121a;color:#e8e2f0;font-family:system-ui,'Malgun Gothic',sans-serif;
+       display:flex;flex-direction:column;align-items:center;min-height:100vh;}
+  h1{font-size:16px;font-weight:600;margin:14px 0 4px;color:#cbb6ff;}
+  .sub{font-size:12px;color:#8a819c;margin-bottom:10px;text-align:center;padding:0 12px;}
+  .stage{width:min(88vw,380px);height:min(70vh,520px);
+         background:radial-gradient(ellipse at center,#2a2233,#15121a);
+         border:1px solid #3a3348;border-radius:12px;display:flex;align-items:flex-end;
+         justify-content:center;overflow:hidden;position:relative;}
+  .stage img{max-height:100%;max-width:100%;object-fit:contain;
+             filter:drop-shadow(0 4px 10px #000a);}
+  .label{position:absolute;top:8px;left:10px;font-size:12px;background:#0008;padding:3px 8px;
+         border-radius:6px;color:#cbb6ff;}
+  .row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px;max-width:420px;}
+  button{font-size:22px;width:52px;height:52px;border-radius:10px;border:1px solid #3a3348;
+         background:#221c2c;cursor:pointer;transition:.12s;}
+  button:hover{background:#322a40;transform:translateY(-2px);}
+  button.on{border-color:#a877ff;background:#3a2d55;box-shadow:0 0 0 2px #a877ff44;}
+  button small{display:block;font-size:9px;color:#9a90ad;margin-top:-2px;}
+  .miss{opacity:.4;}
+</style></head><body>
+<h1>🎭 Valeria 표정 확인</h1>
+<div class="sub">vn-sprites와 동일한 <b>이모지→표정</b> 매핑. 버튼을 눌러 표정 전환을 확인하세요.<br>
+스프라이트는 app.py(:5000)에서 실제 로드됩니다.</div>
+<div class="stage"><span class="label" id="lbl">neutral</span>
+  <img id="sp" alt="valeria"></div>
+<div class="row" id="btns"></div>
+<script>
+  // vn-sprites EMOJI_EXPR 와 동일
+  var MAP=[[/😐|😑|😶|🙄/,'neutral'],[/😊|😄|😁|🙂|😌|☺/,'joy'],[/😍|🥰|❤|💕|😘/,'love'],
+    [/😠|😡|👿|💢/,'anger'],[/😢|😭|🥺|😞|😔/,'sadness'],[/😨|😰|😱|😧/,'fear'],
+    [/🤢|🤮/,'disgust'],[/😒|😏|😤/,'annoyance'],[/😳|😅|😬/,'embarrassment'],
+    [/😮|😲|😯|😦/,'surprise'],[/🤔|🧐/,'curiosity']];
+  function toExpr(e){for(var i=0;i<MAP.length;i++)if(MAP[i][0].test(e))return MAP[i][1];return 'neutral';}
+  var HAVE=['neutral','joy','anger','sadness','surprise','embarrassment','love']; // 생성한 7종
+  var BASE='/static/portraits/npc/valeria/';  // same-origin (app.py serves this page)
+  var samples=[['😐','neutral'],['😊','joy'],['😍','love'],['😠','anger'],['😢','sadness'],
+    ['😲','surprise'],['😳','embarrassment'],['😨','fear'],['🤔','curiosity'],['😏','annoyance']];
+  var img=document.getElementById('sp'),lbl=document.getElementById('lbl'),btns=document.getElementById('btns');
+  function show(emoji,btn){
+    var ex=toExpr(emoji), has=HAVE.indexOf(ex)>=0, use=has?ex:'neutral';
+    img.src=BASE+use+'.webp?t='+Date.now();
+    lbl.textContent=emoji+' → '+ex+(has?'':' (파일없음→neutral 폴백)');
+    [].forEach.call(btns.children,function(b){b.classList.remove('on');});
+    if(btn)btn.classList.add('on');
+  }
+  samples.forEach(function(s,i){
+    var has=HAVE.indexOf(toExpr(s[0]))>=0;
+    var b=document.createElement('button'); if(!has)b.className='miss';
+    b.innerHTML=s[0]+'<small>'+toExpr(s[0])+'</small>';
+    b.onclick=function(){show(s[0],b);};
+    btns.appendChild(b);
+    if(i===0)show(s[0],b);
+  });
+</script></body></html>

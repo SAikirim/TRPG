@@ -53,7 +53,6 @@
     }
   ],
   "progress_notes": [
-    "[GM] Fix: turn count + Volf portrait",
     "[GM] Generate Volf portrait",
     "[GM] Fix: inn interior background",
     "[GM] Generate Volf SD portrait",
@@ -62,13 +61,14 @@
     "",
     "",
     "[GM] Session restore",
-    "[GM] Turn 30: saiki: 주변을 조용히 둘러본다.; lucena: 음식 확인 음식이 정말 많네요. 볼프씨, 고맙습니다.; noel: 주변 경계 잠시 주변을 "
+    "[GM] Turn 30: saiki: 주변을 조용히 둘러본다.; lucena: 음식 확인 음식이 정말 많네요. 볼프씨, 고맙습니다.; noel: 주변 경계 잠시 주변을 ",
+    "[GM] Session restore"
   ],
   "next_objective": "",
   "display_mode": "mobile",
   "show_dice_result": false,
   "show_system_log": false,
   "sd_illustration": true,
-  "last_updated": "2026-07-31",
+  "last_updated": "2026-08-22",
   "difficulty": "normal"
 }

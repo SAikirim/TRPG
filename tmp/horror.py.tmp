@@ -1,0 +1,43 @@
+# -*- coding: utf-8 -*-
+import sys, io, base64, time, os, requests
+sys.stdout.reconfigure(encoding='utf-8')
+from PIL import Image
+
+SD = "http://127.0.0.1:7860"
+OUT = r"C:\git\TRPG\static\illustrations\sd\horror_abandoned_ward.webp"
+
+def set_model(sub):
+    ms = requests.get(SD + "/sdapi/v1/sd-models", timeout=30).json()
+    t = next((m['title'] for m in ms if sub.lower() in m['model_name'].lower()), None)
+    cur = requests.get(SD + "/sdapi/v1/options", timeout=30).json().get("sd_model_checkpoint", "")
+    if t and sub.lower() not in cur.lower():
+        print("switch ->", t)
+        requests.post(SD + "/sdapi/v1/options", json={"sd_model_checkpoint": t}, timeout=300)
+
+POS = ("abandoned hospital ward at night, long corridor of rusted iron beds, "
+       "peeling paint and black mold creeping up the walls, shattered windows, "
+       "a single flickering emergency lamp casting a weak sickly light, "
+       "thick darkness swallowing the far end of the corridor, "
+       "(a faint humanoid silhouette barely visible in the darkness:1.15), "
+       "overturned wheelchair, scattered papers, dust motes in the dim beam, "
+       "cold desaturated palette, deep shadows, eerie oppressive atmosphere, "
+       "horror, cinematic wide shot, volumetric light, highly detailed, sharp focus")
+NEG = ("gore, blood, corpse, mutilation, jump scare face, monster closeup, "
+       "people, crowd, bright, cheerful, colorful, cartoon, anime, "
+       "lowres, blurry, text, watermark, signature, worst quality, low quality")
+
+set_model("dreamshaper_8")
+pl = {"prompt": POS, "negative_prompt": NEG, "steps": 34, "sampler_name": "DPM++ 2M Karras",
+      "width": 896, "height": 512, "cfg_scale": 7, "batch_size": 1, "n_iter": 1, "seed": -1,
+      "alwayson_scripts": {"random": {"args": [False]}}}
+t = time.time()
+r = requests.post(SD + "/sdapi/v1/txt2img", json=pl, timeout=600); r.raise_for_status()
+res = r.json()
+img = Image.open(io.BytesIO(base64.b64decode(res["images"][0]))).convert("RGB")
+
+os.makedirs(os.path.dirname(OUT), exist_ok=True)
+ex = img.getexif()
+ex[0x010e] = ("horror_abandoned_ward\n" + POS + "\nNegative: " + NEG +
+              "\nModel: dreamshaper_8, Sampler: DPM++ 2M Karras, Steps: 34, CFG: 7, Size: 896x512")
+img.save(OUT, "WEBP", quality=92, exif=ex.tobytes())
+print("saved:", OUT, "(%.0fs)" % (time.time() - t))

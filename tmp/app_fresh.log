@@ -1,0 +1,6 @@
+ * Serving Flask app 'app'
+ * Debug mode: on
+Settings -> Mode=base, Device=cpu, Torchscript=disabled
+Settings -> Mode=base, Device=cpu, Torchscript=disabled
+Settings -> Mode=base, Device=cpu, Torchscript=disabled
+Settings -> Mode=base, Device=cpu, Torchscript=disabled
