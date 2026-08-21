@@ -1,9 +1,9 @@
 {
   "save_info": {
     "type": "auto",
-    "turn_count": 31,
-    "description": "turn 31",
-    "saved_at": "2026-07-31 22:11:25"
+    "turn_count": 33,
+    "description": "turn 33",
+    "saved_at": "2026-08-22 08:16:48"
   },
   "game_state": {
     "game_info": {
@@ -371,24 +371,8 @@
         }
       ]
     },
-    "turn_count": 32,
+    "turn_count": 33,
     "events": [
-      {
-        "turn": 27,
-        "message": "[GM] Fix: turn count + Volf portrait",
-        "narrative": "",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "22:52:04"
-      },
-      {
-        "turn": 27,
-        "message": "[GM] Generate Volf portrait",
-        "narrative": "",
-        "user_input": "",
-        "dialogues": [],
-        "timestamp": "22:52:24"
-      },
       {
         "turn": 27,
         "message": "[GM] Fix: inn interior background",
@@ -458,11 +442,68 @@
           }
         ],
         "timestamp": "22:11:19"
+      },
+      {
+        "turn": 32,
+        "message": "[GM] Session restore",
+        "narrative": "",
+        "user_input": "",
+        "dialogues": [],
+        "timestamp": "08:16:13"
+      },
+      {
+        "turn": 33,
+        "message": "[GM] Turn 32: saiki: ??? ????; lucena: 주변을 경계하며 따라간다.; noel: 주변을 경계하며 따라간다.",
+        "narrative": "",
+        "user_input": "saiki: ??? ????; lucena: 주변을 경계하며 따라간다.; noel: 주변을 경계하며 따라간다.",
+        "dialogues": [],
+        "timestamp": "08:16:43"
       }
     ],
     "current_scene": {
-      "background": "/static/illustrations/pixel/default.png",
-      "layers": []
+      "background": "/static/illustrations/sd/background_red_chimney_inn.webp",
+      "layers": [
+        {
+          "type": "portrait",
+          "image": "/static/portraits/sd/portrait_volf.webp",
+          "position": "far-left",
+          "name": "volf",
+          "distance": 10,
+          "size_class": "d4"
+        },
+        {
+          "type": "object",
+          "image": "/static/illustrations/sd/object_round_table_1.webp",
+          "position": "center",
+          "name": "round_table_1",
+          "distance": 3,
+          "size_class": "d3"
+        },
+        {
+          "type": "object",
+          "image": "/static/illustrations/sd/object_round_table_2.webp",
+          "position": "center",
+          "name": "round_table_2",
+          "distance": 3,
+          "size_class": "d3"
+        },
+        {
+          "type": "object",
+          "image": "/static/illustrations/sd/object_long_table.webp",
+          "position": "center",
+          "name": "long_table",
+          "distance": 3,
+          "size_class": "d3"
+        },
+        {
+          "type": "object",
+          "image": "/static/illustrations/sd/object_chair.webp",
+          "position": "center",
+          "name": "chair",
+          "distance": 5,
+          "size_class": "d3"
+        }
+      ]
     }
   }
 }
