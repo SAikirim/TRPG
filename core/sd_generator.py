@@ -4,9 +4,12 @@ import logging
 import os
 import subprocess
 import threading
+import urllib.error
 from datetime import datetime
 
 import requests
+
+from core.sd_backend import BACKEND, ComfyError, RenderSpec
 
 logger = logging.getLogger(__name__)
 
@@ -17,26 +20,9 @@ SD_PORTRAITS_DIR = os.path.join(BASE_DIR, "static", "portraits", "sd")
 # sprites for present characters/NPCs incl. non-human (objects, animals) for VN-mode display.
 SD_NPC_DIR = os.path.join(BASE_DIR, "static", "portraits", "npc")
 CURRENT_SESSION_PATH = os.path.join(BASE_DIR, "data", "current_session.json")
-_SD_PORT_FILE = os.path.join(BASE_DIR, "data", "sd_port.txt")
-_sd_url_cache = {"mtime": None, "url": None}
-def _sd_url():
-    """SD API base URL, resolved dynamically so the client follows manage_st's port choice:
-    data/sd_port.txt (written when SD falls back off a busy 7860) -> env SD_BASE_URL -> :7860.
-    mtime-cached so it's cheap to call per request."""
-    try:
-        st = os.stat(_SD_PORT_FILE)
-        if _sd_url_cache["mtime"] != st.st_mtime:
-            with open(_SD_PORT_FILE, encoding="utf-8") as f:
-                v = f.read().strip()
-            _sd_url_cache["url"] = (v if v.startswith("http") else ("http://127.0.0.1:" + v)) if v else None
-            _sd_url_cache["mtime"] = st.st_mtime
-        if _sd_url_cache["url"]:
-            return _sd_url_cache["url"]
-    except FileNotFoundError:
-        pass
-    except Exception:
-        pass
-    return os.environ.get("SD_BASE_URL", "http://127.0.0.1:7860")
+# 생성 백엔드 주소는 `core/sd_backend.py` 가 갖는다 (env COMFY_URL, 기본 127.0.0.1:8188).
+# A1111 시절의 data/sd_port.txt 탐색은 ComfyUI 로 옮기면서 쓰이지 않게 됐다 — 포트가 고정이고
+# manage_st 가 폴백 포트를 쓰지 않는다.
 # Minimum free VRAM (MB) required to start a NEW SD render. On an 8GB card SD and the local
 # LLM (ollama) can't both fit; if the LLM holds the VRAM, free drops well below this and we
 # skip SD generation (keep the placeholder/emoji) instead of OOMing or thrashing to CPU.
@@ -124,12 +110,10 @@ def vram_breakdown():
     except Exception:
         pass
     accounted = 0
-    try:  # SD WebUI torch 점유
-        m = requests.get(f"{_sd_url()}/sdapi/v1/memory", timeout=4).json()
-        used = m.get("cuda", {}).get("system", {}).get("used")
-        if used:
-            mb = round(used / 1048576)
-            info["consumers"].append({"name": "SD WebUI(torch)", "mb": mb}); accounted += mb
+    try:  # ComfyUI torch 점유 — A1111 의 /sdapi/v1/memory 자리
+        mb = BACKEND.vram().get("torch_used_mb") or 0
+        if mb:
+            info["consumers"].append({"name": "ComfyUI(torch)", "mb": mb}); accounted += mb
     except Exception:
         pass
     try:  # ollama 로드 모델(로컬 LLM)
@@ -480,34 +464,21 @@ def face_height_px(image_or_path):
         return None
 
 
-def adetailer_args(prompt, negative_prompt=""):
-    """txt2img/img2img payload 의 alwayson_scripts 에 넣을 ADetailer 설정."""
-    return {"ADetailer": {"args": [True, False, {
-        "ad_model": ADETAILER_MODEL,
-        "ad_prompt": "face, " + (prompt or ""),
-        "ad_negative_prompt": negative_prompt or "",
-        "ad_denoising_strength": ADETAILER_DENOISE,
-        "ad_inpaint_only_masked": True,
-        "ad_inpaint_only_masked_padding": 32,
-        "ad_mask_blur": 4,
-        "ad_confidence": 0.3,
-    }]}}
+def apply_adetailer(spec, prompt, negative_prompt=""):
+    """얼굴만 따로 전체 해상도로 다시 그리게 한다 (A1111 의 ADetailer = ComfyUI 의 FaceDetailer).
+
+    A1111 에서는 payload 의 `alwayson_scripts` 에 끼워 넣는 확장이었지만, ComfyUI 에서는
+    VAEDecode 뒤에 붙는 노드다. 호출부는 그 차이를 알 필요가 없어서 spec 필드만 채운다."""
+    spec.adetailer = True
+    spec.ad_prompt = prompt or ""
+    spec.ad_negative_prompt = negative_prompt or ""
+    spec.ad_denoise = ADETAILER_DENOISE
+    spec.ad_model = "bbox/" + ADETAILER_MODEL      # ComfyUI 는 탐지기를 종류별 폴더로 나눈다
+    spec.ad_confidence = 0.3
+    return spec
 
 
-def _ensure_checkpoint(ckpt, timeout=180):
-    """필요할 때만 체크포인트를 바꾼다. 실패해도 진행한다 (기존 동작 유지)."""
-    try:
-        opts = requests.get(f"{_sd_url()}/sdapi/v1/options", timeout=10).json()
-        if ckpt not in opts.get("sd_model_checkpoint", ""):
-            requests.post(f"{_sd_url()}/sdapi/v1/options",
-                          json={"sd_model_checkpoint": ckpt}, timeout=timeout)
-            return True
-    except Exception:
-        pass  # 로드된 모델이 무엇이든 그대로 진행
-    return False
-
-
-def _build_payload(illustration_type, prompt, negative_prompt, seed=-1):
+def _build_spec(illustration_type, prompt, negative_prompt, seed=-1):
     sizes = {
         "portrait": (384, 512),
         "sprite": (728, 1104),   # 1.2x of the Seraphina reference (608x920), full-body VN sprites
@@ -528,21 +499,21 @@ def _build_payload(illustration_type, prompt, negative_prompt, seed=-1):
         default_neg += ", close-up, cropped, out of frame, upper body only"
     neg_prompt = negative_prompt or default_neg
 
-    return {
-        "prompt": prompt,
-        "negative_prompt": neg_prompt,
-        "steps": 20,
-        "sampler_name": "DPM++ 2M Karras",
-        "width": w,
-        "height": h,
-        "cfg_scale": 7,
-        "batch_size": 1,
-        "n_iter": 1,
-        "seed": seed,   # -1 = random; a fixed int keeps NPC expressions visually consistent
-        "alwayson_scripts": {
-            "random": {"args": [False]}
-        },
-    }
+    # 백엔드 중립 spec. 체크포인트는 여기서 정해 spec 에 실어 보낸다 — ComfyUI 에는 "현재 모델"
+    # 전역 상태가 없어서 요청마다 그래프에 박아 넣는 것이 유일한 방법이고, 그 덕에 모델 교체
+    # 경쟁(다른 요청이 중간에 체크포인트를 바꿔 엉뚱한 모델로 그려지는 일)도 사라진다.
+    return RenderSpec(
+        prompt=prompt,
+        negative_prompt=neg_prompt,
+        checkpoint=checkpoint_for(illustration_type),
+        width=w,
+        height=h,
+        steps=20,
+        cfg_scale=7,
+        sampler_name="DPM++ 2M Karras",
+        seed=seed,   # -1 = random; a fixed int keeps NPC expressions visually consistent
+        kind=illustration_type,
+    )
 
 
 def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, position, name, distance=0, size_class="close"):
@@ -553,22 +524,13 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
     pending_key = (illustration_type, name)
 
     try:
-        # Ensure correct model is loaded
-        _ensure_checkpoint(checkpoint_for(illustration_type), timeout=120)
-
-        payload = _build_payload(illustration_type, prompt, negative_prompt)
+        spec = _build_spec(illustration_type, prompt, negative_prompt)
         if illustration_type in PERSON_TYPES:
-            payload["alwayson_scripts"] = adetailer_args(prompt, payload.get("negative_prompt"))
-        response = requests.post(
-            f"{_sd_url()}/sdapi/v1/txt2img",
-            json=payload,
-            timeout=600,
-        )
-        response.raise_for_status()
-        result = response.json()
+            apply_adetailer(spec, prompt, spec.negative_prompt)
+        result = BACKEND.txt2img(spec, timeout=600)
 
         if result.get("images"):
-            img_data = base64.b64decode(result["images"][0])
+            img_data = result["images"][0]
             if illustration_type == "portrait":
                 save_dir = SD_PORTRAITS_DIR
             else:
@@ -669,8 +631,8 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
                     "status": "idle",
                     "error": "No images in SD response (Skia placeholder retained)",
                 })
-    except requests.exceptions.ConnectionError:
-        logger.warning("SD WebUI not reachable — Skia placeholder retained")
+    except (ComfyError, urllib.error.URLError, requests.exceptions.ConnectionError):
+        logger.warning("생성 백엔드(ComfyUI) 에 닿지 않음 — Skia 플레이스홀더 유지")
         with _lock:
             _scene_state["generating"]["status"] = "idle"
     except Exception as e:
@@ -1085,17 +1047,13 @@ def generate_scene_background_sd(name, prompt, negative_prompt=""):
         logger.warning("SD 생성 스킵(low_vram, 기준 %dMB): %s", MIN_SD_FREE_MB, bd["summary"])
         return {"ok": False, "reason": "low_vram", "free_vram_mb": bd["free_mb"], "vram": bd}
     try:
-        # 올바른 모델 로드 보장
-        _ensure_checkpoint(SCENE_CHECKPOINT)
-        payload = _build_payload("background", prompt, negative_prompt)
-        response = requests.post(f"{_sd_url()}/sdapi/v1/txt2img", json=payload, timeout=600)
-        response.raise_for_status()
-        result = response.json()
+        spec = _build_spec("background", prompt, negative_prompt)
+        result = BACKEND.txt2img(spec, timeout=600)
         if not result.get("images"):
             return {"ok": False, "reason": "no_image"}
         import io
         from PIL import Image
-        img_data = base64.b64decode(result["images"][0])
+        img_data = result["images"][0]
         os.makedirs(SD_ILLUSTRATIONS_DIR, exist_ok=True)
         safe_name = name.replace(" ", "_")
         filename = f"background_{safe_name}.webp"
@@ -1116,7 +1074,7 @@ def generate_scene_background_sd(name, prompt, negative_prompt=""):
             _scene_state["generating"]["status"] = "idle"
         logger.info(f"SD-only background generated: {filename}")
         return {"ok": True, "image": image_url, "source": "sd"}
-    except requests.exceptions.ConnectionError:
+    except (ComfyError, urllib.error.URLError, requests.exceptions.ConnectionError):
         return {"ok": False, "reason": "sd_unreachable"}
     except Exception as e:
         logger.warning(f"SD-only background failed: {e}")
@@ -1350,7 +1308,6 @@ def generate_npc_sprite(name, prompt, expression="neutral", negative_prompt=""):
         logger.warning("SD 생성 스킵(low_vram, 기준 %dMB): %s", MIN_SD_FREE_MB, bd["summary"])
         return {"ok": False, "reason": "low_vram", "free_vram_mb": bd["free_mb"], "vram": bd}
     try:
-        _ensure_checkpoint(PERSON_CHECKPOINT)
         expr_phrase = _EXPR_PHRASE.get(expression, expression + " expression")
         # 상반신 + 단색 배경(깔끔한 배경제거) + 표정. portrait 타입 negative에 배경 억제 포함.
         full_prompt = (prompt or (name or "character")) + ", " + expr_phrase + \
@@ -1371,45 +1328,47 @@ def generate_npc_sprite(name, prompt, expression="neutral", negative_prompt=""):
         # 측정된 것 중 가장 큰 얼굴을 채택한다. 미검출(None)을 "충분함"으로 보면 안 된다 -
         # 앞 단계에서 얼굴이 잡혔는데 다음 단계에서 안 잡히면 그건 검출 실패지 개선이 아니다.
         # 한 번도 못 잡으면(동물/사물 스프라이트) 첫 결과를 그대로 쓴다.
-        best = None          # (face_px, label, result)
+        best = None          # (face_px, label, result, spec)
         first = None
         for label, framing in FRAMING_LADDER:
-            payload = _build_payload("sprite", full_prompt + ", " + framing,
-                                     negative_prompt, seed=_npc_seed(name))
-            payload["alwayson_scripts"] = adetailer_args(full_prompt, payload.get("negative_prompt"))
-            response = requests.post(f"{_sd_url()}/sdapi/v1/txt2img", json=payload, timeout=600)
-            response.raise_for_status()
-            r_json = response.json()
+            spec = _build_spec("sprite", full_prompt + ", " + framing,
+                               negative_prompt, seed=_npc_seed(name))
+            apply_adetailer(spec, full_prompt, spec.negative_prompt)
+            r_json = BACKEND.txt2img(spec, timeout=600)
             if not r_json.get("images"):
                 return {"ok": False, "reason": "no_image"}
             if first is None:
-                first = (label, r_json)
-            fh = face_height_px(Image.open(io.BytesIO(base64.b64decode(r_json["images"][0]))))
+                first = (label, r_json, spec)
+            fh = face_height_px(Image.open(io.BytesIO(r_json["images"][0])))
             if fh is None:
                 logger.info("sprite framing=%s 얼굴 미검출 - 계속", label)
                 continue
             if best is None or fh > best[0]:
-                best = (fh, label, r_json)
+                best = (fh, label, r_json, spec)
             if fh >= MIN_FACE_PX:
                 logger.info("sprite framing=%s face=%dpx (기준 %d) - 채택", label, fh, MIN_FACE_PX)
                 break
             logger.info("sprite framing=%s face=%dpx < %d - 한 단계 좁혀 재시도",
                         label, fh, MIN_FACE_PX)
         if best is not None:
-            face_px, framing_used, result = best
+            face_px, framing_used, result, used_spec = best
             if face_px < MIN_FACE_PX:
                 logger.warning("sprite 얼굴이 끝까지 기준 미달: %dpx < %d (framing=%s)",
                                face_px, MIN_FACE_PX, framing_used)
         else:
-            framing_used, result = first
+            framing_used, result, used_spec = first
             logger.info("sprite 얼굴 미검출 - 첫 구도(%s) 사용", framing_used)
-        img_data = base64.b64decode(result["images"][0])
+        img_data = result["images"][0]
         _safe, _expr, filepath = _npc_sprite_path(name, expression)
         os.makedirs(os.path.dirname(filepath), exist_ok=True)   # 인물별 폴더 생성
         img = Image.open(io.BytesIO(img_data)).convert("RGB")
         # 어떤 구도로 갔는지와 그때 얼굴이 몇 px 였는지를 남긴다. 다음에 같은 캐릭터를 뽑을 때
         # 사다리를 처음부터 다시 타지 않아도 되고, 화질 문제를 추적할 근거가 된다.
-        meta = _render_meta(payload, result.get("info"), PERSON_CHECKPOINT,
+        # 채택된 구도의 spec 으로 기록한다 — 사다리를 돌다 보면 마지막으로 시도한 구도와
+        # 실제 채택된 구도가 다를 수 있고, 그때 프롬프트가 어긋난 메타가 남는다.
+        meta = _render_meta(used_spec.meta_payload(),
+                            {"seed": result.get("seed"), "backend": "comfyui"},
+                            PERSON_CHECKPOINT,
                             extra={"character": name or "", "expression": expression,
                                    "framing": framing_used,
                                    "face_px": face_height_px(img),
@@ -1569,26 +1528,22 @@ def generate_expression_from_base(name, expression, prompt="", denoise=0.45):
     from PIL import Image
     try:
         base = Image.open(base_path).convert("RGB")   # flatten alpha for img2img
-        buf = io.BytesIO()
-        base.save(buf, "PNG")
-        init_b64 = base64.b64encode(buf.getvalue()).decode()
         expr_phrase = _EXPR_PHRASE.get(expression, expression + " expression")
-        payload = _build_payload("sprite", (prompt or name) + ", " + expr_phrase +
-                                 ", same character, same outfit, plain solid background, character sprite",
-                                 "", seed=_npc_seed(name))
-        payload.update({"init_images": [init_b64], "denoising_strength": denoise,
-                        "resize_mode": 1, "width": base.width, "height": base.height})
+        spec = _build_spec("sprite", (prompt or name) + ", " + expr_phrase +
+                           ", same character, same outfit, plain solid background, character sprite",
+                           "", seed=_npc_seed(name))
+        # 베이스와 같은 크기로 그려야 얼굴 위치가 어긋나지 않는다 (A1111 의 resize_mode 대신
+        # 잠재 인코딩이 원본 해상도를 그대로 따라간다).
+        spec.width, spec.height = base.width, base.height
+        spec.denoise = denoise
         # 표정은 얼굴에서 읽혀야 하므로 여기야말로 ADetailer 가 필요하다.
-        payload["alwayson_scripts"] = adetailer_args(
-            (prompt or name) + ", " + expr_phrase, payload.get("negative_prompt"))
-        r = requests.post(f"{_sd_url()}/sdapi/v1/img2img", json=payload, timeout=600)
-        r.raise_for_status()
-        res = r.json()
+        apply_adetailer(spec, (prompt or name) + ", " + expr_phrase, spec.negative_prompt)
+        res = BACKEND.img2img(spec, base, timeout=600)
         if not res.get("images"):
             return {"ok": False, "reason": "no_image"}
         safe, expr, filepath = _npc_sprite_path(name, expression)
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        Image.open(io.BytesIO(base64.b64decode(res["images"][0]))).convert("RGB").save(
+        Image.open(io.BytesIO(res["images"][0])).convert("RGB").save(
             filepath, "WEBP", quality=90)
         remove_portrait_background(filepath)
         url = "/static/portraits/npc/" + safe + "/" + expr + ".webp"
