@@ -17,7 +17,26 @@ SD_PORTRAITS_DIR = os.path.join(BASE_DIR, "static", "portraits", "sd")
 # sprites for present characters/NPCs incl. non-human (objects, animals) for VN-mode display.
 SD_NPC_DIR = os.path.join(BASE_DIR, "static", "portraits", "npc")
 CURRENT_SESSION_PATH = os.path.join(BASE_DIR, "data", "current_session.json")
-SD_API_URL = "http://127.0.0.1:7860"
+_SD_PORT_FILE = os.path.join(BASE_DIR, "data", "sd_port.txt")
+_sd_url_cache = {"mtime": None, "url": None}
+def _sd_url():
+    """SD API base URL, resolved dynamically so the client follows manage_st's port choice:
+    data/sd_port.txt (written when SD falls back off a busy 7860) -> env SD_BASE_URL -> :7860.
+    mtime-cached so it's cheap to call per request."""
+    try:
+        st = os.stat(_SD_PORT_FILE)
+        if _sd_url_cache["mtime"] != st.st_mtime:
+            with open(_SD_PORT_FILE, encoding="utf-8") as f:
+                v = f.read().strip()
+            _sd_url_cache["url"] = (v if v.startswith("http") else ("http://127.0.0.1:" + v)) if v else None
+            _sd_url_cache["mtime"] = st.st_mtime
+        if _sd_url_cache["url"]:
+            return _sd_url_cache["url"]
+    except FileNotFoundError:
+        pass
+    except Exception:
+        pass
+    return os.environ.get("SD_BASE_URL", "http://127.0.0.1:7860")
 # Minimum free VRAM (MB) required to start a NEW SD render. On an 8GB card SD and the local
 # LLM (ollama) can't both fit; if the LLM holds the VRAM, free drops well below this and we
 # skip SD generation (keep the placeholder/emoji) instead of OOMing or thrashing to CPU.
@@ -106,7 +125,7 @@ def vram_breakdown():
         pass
     accounted = 0
     try:  # SD WebUI torch 점유
-        m = requests.get(f"{SD_API_URL}/sdapi/v1/memory", timeout=4).json()
+        m = requests.get(f"{_sd_url()}/sdapi/v1/memory", timeout=4).json()
         used = m.get("cuda", {}).get("system", {}).get("used")
         if used:
             mb = round(used / 1048576)
@@ -182,6 +201,312 @@ def remove_layer(name):
         _scene_state["layers"] = [l for l in _scene_state["layers"] if l.get("name") != name]
 
 
+# 체크포인트는 그리는 대상에 따라 다르다.
+#
+# 인물: 세미리얼리즘 — 애니 캐릭터의 이목구비를 유지하되 천·피부·조명은 실사에 가깝게.
+# 설치된 체크포인트 34종(해시 중복 제외)을 같은 프롬프트·시드로 전수 비교했다(2026-09-15).
+#
+# aniverse 를 고른 이유:
+#   - 애니 얼굴 + 따뜻하고 입체적인 피부·조명. dreamshaper_8 은 인물을 실사 서양인으로 그려
+#     '2D 캐릭터가 현실에 있는' 이 아니라 그냥 사진이 됐고, xxmix9realistic/chilloutmix 도 같은
+#     방향이다. 반대쪽 끝(pastelMix, OrangePastel 등)은 완전 평면 2D.
+#   - **실제 스프라이트 크기(728x1104)에서 배경이 깨끗하다.** 이게 결정적이었다. 384x512
+#     썸네일로만 비교했을 때는 semi_realistic(8.2) 가 좋아 보였는데, 스프라이트 크기로 올리자
+#     장식 문양·떠다니는 칼날 같은 배경을 그려냈다. plain solid background 를 요구해도 그렇다.
+#     스프라이트는 배경 제거가 전제라 이건 탈락 사유다. semi_realistic_background2.5,
+#     neverendingDream 도 같은 문제(글로우·별 배경)를 보였다.
+#   - 기존 풀(로이·가스주)이 이미 aniverse 라 캐스트 화풍이 갈리지 않고, 그 사이드카에 기록된
+#     체크포인트와도 일치한다.
+#   차점: perfectWorld_v5Baked — 배경은 가장 깨끗하나 3D 렌더 느낌이 강해 '2D 캐릭터' 에서 멀다.
+#
+# 스타일 토큰('cinematic lighting, depth of field' 류)은 일부러 넣지 않는다. 같은 비교에서
+# 그 토큰들이 plain solid background 지시를 이겨서 배경이 딸려 들어왔고, 그러면 스프라이트
+# 배경 제거가 깨진다. 원하는 느낌은 체크포인트만으로 이미 나온다.
+#
+# 배경/장면은 dreamshaper_8 을 유지한다 — 인물이 아니라서 위 문제가 없고, 기존 배경들이
+# 그 모델로 만들어져 새 배경만 튀면 곤란하다.
+PERSON_CHECKPOINT = os.environ.get("SD_PERSON_CKPT", "neverendingDreamNED_v122BakedVae.safetensors")
+
+# 모델마다 애니↔실사 편향이 다르므로, 프롬프트가 반대쪽으로 보정한다.
+# 카탈로그(측정 근거): trpg-st-bridge\sillytavern-custom\sd_model_catalog.csv
+# 규칙·함정: Claude-Code\Rules_Guide\reference\sd_model_selection_ref.md
+_REALISM = ("natural skin texture, subtle skin imperfections, individual hair strands, "
+            "natural facial asymmetry, realistic fabric folds")
+_ANIME = "stylized anime face, large expressive anime eyes"
+STYLE_COMPENSATION = {
+    "aniverse": _REALISM,                 # 애니 편향 -> 현실화
+    "neverendingDream": _REALISM,
+    "CounterfeitV30": _REALISM,
+    "AnythingV5": _REALISM,
+    "abyssorangemix": _REALISM,
+    "perfectWorld": _ANIME,               # 3D 렌더 편향 -> 애니 이목구비
+    "chikmix": _ANIME,                    # 실사 편향 -> 캐릭터성 되살리기
+    "chilloutmix": _ANIME,
+    "xxmix9realistic": _ANIME,
+    "dreamshaper": "",                    # 이미 중간 -> 보정 없음
+}
+
+
+def style_compensation(checkpoint):
+    """이 체크포인트가 어느 쪽으로 치우쳐 있는지에 따라 붙일 보정 토큰."""
+    for key, tokens in STYLE_COMPENSATION.items():
+        if key.lower() in (checkpoint or "").lower():
+            return tokens
+    return ""
+SCENE_CHECKPOINT = os.environ.get("SD_SCENE_CKPT", "dreamshaper_8.safetensors")
+PERSON_TYPES = ("portrait", "sprite")
+
+
+def _render_meta(payload, sd_info, checkpoint, extra=None):
+    """이 이미지를 무엇이 그렸는지 — 나중에 같은 조건으로 다시 그리는 데 필요한 값만.
+
+    표정 스프라이트는 '같은 그림의 얼굴만 다른 것'이어야 하는데, 그러려면 베이스와 똑같은
+    체크포인트·시드·샘플러·크기로 렌더해야 한다. 그 정보가 파일에 없으면 다음 사람은 추측할
+    수밖에 없고, 실제로 그래서 aniverse 로 그린 베이스에 dreamshaper_8 로 표정을 얹어 그림체가
+    바뀐 적이 있다. 요청 payload 가 아니라 SD 가 돌려준 info 를 함께 남기는 이유는 seed 가
+    -1(랜덤)로 나갔을 때 실제로 쓰인 값은 응답에만 있기 때문이다.
+    """
+    seed = payload.get("seed")
+    info = None
+    if sd_info:
+        try:
+            info = json.loads(sd_info) if isinstance(sd_info, str) else sd_info
+            if info.get("seed") is not None:
+                seed = info["seed"]
+        except Exception:
+            info = None
+    meta = {
+        "created": datetime.now().isoformat(timespec="seconds"),
+        "sd_model_checkpoint": checkpoint,
+        "prompt": payload.get("prompt"),
+        "negative_prompt": payload.get("negative_prompt"),
+        "seed": seed,
+        "steps": payload.get("steps"),
+        "sampler_name": payload.get("sampler_name"),
+        "cfg_scale": payload.get("cfg_scale"),
+        "size": [payload.get("width"), payload.get("height")],
+        "tool": "sd_generator.py",
+    }
+    if info:
+        meta["sd_info"] = info      # SD 자신의 parameters 블록 = 권위 있는 기록
+    if extra:
+        meta.update(extra)
+    return meta
+
+
+def a1111_parameters(meta):
+    """A1111 이 이미지에 심는 것과 같은 형식의 파라미터 문자열.
+
+    이 형식이어야 WebUI 의 PNG Info 탭이 읽어서 txt2img 로 되보낼 수 있다. 우리 JSON 메타는
+    기계용이고, 이건 사람이 WebUI 에서 그대로 재현하기 위한 것이다.
+    """
+    hires = meta.get("hires") or {}
+    fields = [
+        ("Steps", meta.get("steps")),
+        ("Sampler", meta.get("sampler_name")),
+        ("CFG scale", meta.get("cfg_scale")),
+        ("Seed", meta.get("seed")),
+        ("Size", "%sx%s" % tuple(meta.get("base_size") or meta.get("size") or ["", ""])),
+        ("Model", (meta.get("sd_model_checkpoint") or "").replace(".safetensors", "")),
+        ("Denoising strength", meta.get("denoising_strength")),
+        ("Clip skip", meta.get("clip_skip")),
+        ("Hires upscale", hires.get("upscale")),
+        ("Hires steps", hires.get("steps")),
+        ("Hires upscaler", hires.get("upscaler")),
+    ]
+    tail = ", ".join("%s: %s" % (k, v) for k, v in fields if v not in (None, "", "x"))
+    out = (meta.get("prompt") or "")
+    if meta.get("negative_prompt"):
+        out += chr(10) + "Negative prompt: " + meta["negative_prompt"]
+    return out + chr(10) + tail
+
+
+def _save_with_meta(img, filepath, meta, fmt="WEBP", quality=90):
+    """메타를 EXIF 에 심어 저장한다. 두 군데에 쓴다 - 기계용과 사람용.
+
+      0x010e ImageDescription : 우리 JSON (read_image_meta 가 읽는다)
+      0x9286 UserComment      : A1111 파라미터 문자열 (WebUI PNG Info 가 읽는다)
+
+    UserComment 를 쓰는 이유: WEBP 로 저장된 A1111 출력이 파라미터를 여기에 넣는다. 실제로
+    사용자가 WebUI 에서 만든 왓슨 이미지를 받았을 때 ImageDescription 만 보고 "파라미터가 없다"
+    고 잘못 판단한 적이 있다. 규격은 EXIF 사양대로 UNICODE 접두 8바이트 + UTF-16BE 다.
+
+    PIL 로 다시 저장하면 EXIF 가 사라지므로 저장하는 지점마다 이걸 거쳐야 한다. 실제로 NPC
+    스프라이트는 저장 직후 배경 제거가 한 번 더 저장하면서 EXIF 를 날리고 있었다.
+    """
+    try:
+        exif = img.getexif()
+        exif[0x010e] = json.dumps(meta, ensure_ascii=False)
+        try:
+            params = a1111_parameters(meta)
+            exif.get_ifd(0x8769)[0x9286] = b"UNICODE" + bytes(1) + params.encode("utf-16-be")
+        except Exception:
+            pass          # UserComment 실패해도 JSON 쪽은 남긴다
+        img.save(filepath, fmt, quality=quality, exif=exif.tobytes())
+    except Exception:
+        img.save(filepath, fmt, quality=quality)
+
+
+def _decode_user_comment(raw):
+    """EXIF UserComment 바이트를 문자열로. A1111 은 UTF-16BE, 다른 도구는 UTF-8 을 쓴다."""
+    if not raw:
+        return None
+    b = raw if isinstance(raw, bytes) else str(raw).encode("utf-8", "ignore")
+    if b[:8] == b"UNICODE" + bytes(1):
+        b = b[8:]
+    for enc in ("utf-16-be", "utf-16-le", "utf-8", "latin-1"):
+        try:
+            t = b.decode(enc)
+            if "Steps:" in t or "Negative prompt:" in t:
+                return t
+        except Exception:
+            pass
+    return None
+
+
+def read_image_meta(path):
+    """저장해 둔 렌더 메타를 돌려준다 (없으면 {}).
+
+    우리 JSON 이 먼저고, 없으면 A1111 UserComment 를 파싱해 같은 모양으로 돌려준다 - WebUI 에서
+    사람이 직접 만든 이미지도 이 함수 하나로 읽히게 하기 위해서다.
+    """
+    try:
+        from PIL import Image as _I
+        ex = _I.open(path).getexif()
+        raw = ex.get(0x010e)
+        if raw:
+            try:
+                return json.loads(raw)
+            except Exception:
+                pass
+        try:
+            txt = _decode_user_comment(ex.get_ifd(0x8769).get(0x9286))
+        except Exception:
+            txt = None
+        return parse_a1111_parameters(txt) if txt else {}
+    except Exception:
+        return {}
+
+
+def parse_a1111_parameters(text):
+    """A1111 파라미터 문자열 -> 우리 메타 dict."""
+    import re
+    pos, _, rest = text.partition("Negative prompt:")
+    neg, _, cfg = rest.partition("Steps:")
+    if not cfg:
+        pos, _, cfg = text.partition("Steps:")
+        neg = ""
+    cfg = "Steps:" + cfg
+    def g(key, cast=str):
+        m = re.search(re.escape(key) + r":\s*([^,]+)", cfg)
+        if not m:
+            return None
+        try:
+            return cast(m.group(1).strip())
+        except Exception:
+            return m.group(1).strip()
+    size = (g("Size") or "x").split("x")
+    meta = {
+        "prompt": pos.strip(), "negative_prompt": neg.strip(),
+        "steps": g("Steps", int), "sampler_name": g("Sampler"),
+        "cfg_scale": g("CFG scale", float), "seed": g("Seed", int),
+        "denoising_strength": g("Denoising strength", float),
+        "clip_skip": g("Clip skip", lambda v: int(float(v))),
+        "source": "parsed from EXIF UserComment (A1111 format)",
+    }
+    model = g("Model")
+    if model:
+        meta["sd_model_checkpoint"] = model if model.endswith(".safetensors") else model + ".safetensors"
+    if len(size) == 2 and size[0].isdigit():
+        meta["base_size"] = [int(size[0]), int(size[1])]
+    up = g("Hires upscale", float)
+    if up:
+        meta["hires"] = {"upscale": up, "steps": g("Hires steps", int), "upscaler": g("Hires upscaler")}
+    return {k: v for k, v in meta.items() if v not in (None, "")}
+
+
+def checkpoint_for(illustration_type):
+    return PERSON_CHECKPOINT if illustration_type in PERSON_TYPES else SCENE_CHECKPOINT
+
+
+# 얼굴은 프레임에서 차지하는 픽셀이 곧 화질이다. 실측(2026-09-16, dreamshaper_8, 동일 시드,
+# 구도만 변경): 클로즈업 455px / 흉상 293px / 상반신 330px / 허리위 243px / 허벅지위 239px /
+# 무릎위 195px / 전신 105px. 200px 아래로 내려가면 Hires 2차 패스가 채워 넣을 여지가 없다.
+# 전신은 105px 라 구조적으로 얼굴이 무너지므로 인물 렌더에서 전신 구도를 쓰지 않는다.
+# 대신 ADetailer 가 얼굴만 따로 전체 해상도로 다시 그린다 - 비용 +3.5초(17.2 -> 20.9),
+# 얼굴이 작을수록 효과가 크다(클로즈업에서는 차이가 거의 없다).
+ADETAILER_MODEL = "face_yolov8n.pt"
+ADETAILER_DENOISE = 0.4
+
+
+# 구도는 전신이 기본이다. 다만 전신이면 얼굴이 작아져 디테일이 무너지므로, 실제로 재보고
+# 모자라면 한 단계씩 좁힌다. 실측(2026-09-16, dreamshaper_8, 동일 시드, 구도만 변경)한
+# 얼굴 높이: 전신 105px / 무릎위 195px / 허벅지위 239px / 허리위 243px / 상반신 330px.
+# 200px 아래로 내려가면 Hires 2차 패스가 채워 넣을 여지가 없다.
+FRAMING_LADDER = [
+    ("full body", "(full body:1.3), head to toe visible, standing"),
+    ("knee up", "(knee up shot:1.4), standing"),
+    ("cowboy", "(cowboy shot:1.4), from mid-thigh up, standing"),
+    ("waist up", "(waist up shot:1.45), standing"),
+]
+MIN_FACE_PX = int(os.environ.get("SD_MIN_FACE_PX", "200"))
+
+
+def face_height_px(image_or_path):
+    """이미지에서 가장 큰 얼굴의 높이(px). 측정 불가면 None.
+
+    구도를 좁힐지 말지는 추측이 아니라 이 숫자로 정한다. OpenCV 가 없으면 None 을 돌려주고,
+    호출부는 그때 사다리를 타지 않는다 (없는 근거로 재렌더하지 않는다).
+    """
+    try:
+        import cv2
+        import numpy as np
+        from PIL import Image as _I
+        im = image_or_path if hasattr(image_or_path, "convert") else _I.open(image_or_path)
+        rgb = im.convert("RGBA")
+        flat = _I.new("RGBA", rgb.size, (255, 255, 255, 255))
+        flat.alpha_composite(rgb)
+        gray = cv2.cvtColor(np.array(flat.convert("RGB")), cv2.COLOR_RGB2GRAY)
+        cas = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+        # 상단 45% 안에서만 찾는다 - 전신 샷에서 허리띠를 얼굴로 잡은 적이 있다
+        top = gray[:int(gray.shape[0] * 0.45), :]
+        found = cas.detectMultiScale(top, 1.05, 4, minSize=(20, 20))
+        if len(found) == 0:
+            found = cas.detectMultiScale(gray, 1.05, 4, minSize=(20, 20))
+        if len(found) == 0:
+            return None
+        return int(max(h for (_x, _y, _w, h) in found))
+    except Exception:
+        return None
+
+
+def adetailer_args(prompt, negative_prompt=""):
+    """txt2img/img2img payload 의 alwayson_scripts 에 넣을 ADetailer 설정."""
+    return {"ADetailer": {"args": [True, False, {
+        "ad_model": ADETAILER_MODEL,
+        "ad_prompt": "face, " + (prompt or ""),
+        "ad_negative_prompt": negative_prompt or "",
+        "ad_denoising_strength": ADETAILER_DENOISE,
+        "ad_inpaint_only_masked": True,
+        "ad_inpaint_only_masked_padding": 32,
+        "ad_mask_blur": 4,
+        "ad_confidence": 0.3,
+    }]}}
+
+
+def _ensure_checkpoint(ckpt, timeout=180):
+    """필요할 때만 체크포인트를 바꾼다. 실패해도 진행한다 (기존 동작 유지)."""
+    try:
+        opts = requests.get(f"{_sd_url()}/sdapi/v1/options", timeout=10).json()
+        if ckpt not in opts.get("sd_model_checkpoint", ""):
+            requests.post(f"{_sd_url()}/sdapi/v1/options",
+                          json={"sd_model_checkpoint": ckpt}, timeout=timeout)
+            return True
+    except Exception:
+        pass  # 로드된 모델이 무엇이든 그대로 진행
+    return False
+
+
 def _build_payload(illustration_type, prompt, negative_prompt, seed=-1):
     sizes = {
         "portrait": (384, 512),
@@ -194,9 +519,12 @@ def _build_payload(illustration_type, prompt, negative_prompt, seed=-1):
 
     default_neg = "lowres, bad anatomy, bad hands, text, watermark, worst quality, low quality"
     if illustration_type in ("portrait", "object", "sprite"):
-        default_neg += ", detailed background, scenery, landscape"
+        # 인물이면 배경을 negative 로 막지 않는다 - 위와 같은 이유로 결과가 나빠진다.
+        # 잘라내기는 후처리(remove_portrait_background)의 몫이다.
+        if illustration_type == "object":
+            default_neg += ", detailed background, scenery, landscape"
     if illustration_type == "sprite":
-        # discourage tight framing so the whole body (at least knee-up) is shown
+        # 너무 당겨 찍는 것만 막는다. 구도 자체는 FRAMING_LADDER 가 결정한다.
         default_neg += ", close-up, cropped, out of frame, upper body only"
     neg_prompt = negative_prompt or default_neg
 
@@ -226,20 +554,13 @@ def _generate_worker(illustration_type, prompt, negative_prompt, turn_count, pos
 
     try:
         # Ensure correct model is loaded
-        try:
-            opts = requests.get(f"{SD_API_URL}/sdapi/v1/options", timeout=10).json()
-            if "dreamshaper_8" not in opts.get("sd_model_checkpoint", ""):
-                requests.post(
-                    f"{SD_API_URL}/sdapi/v1/options",
-                    json={"sd_model_checkpoint": "dreamshaper_8.safetensors"},
-                    timeout=120,
-                )
-        except Exception:
-            pass  # proceed anyway with whatever model is loaded
+        _ensure_checkpoint(checkpoint_for(illustration_type), timeout=120)
 
         payload = _build_payload(illustration_type, prompt, negative_prompt)
+        if illustration_type in PERSON_TYPES:
+            payload["alwayson_scripts"] = adetailer_args(prompt, payload.get("negative_prompt"))
         response = requests.post(
-            f"{SD_API_URL}/sdapi/v1/txt2img",
+            f"{_sd_url()}/sdapi/v1/txt2img",
             json=payload,
             timeout=600,
         )
@@ -607,13 +928,16 @@ def remove_portrait_background(image_path):
         img = img.convert("RGB")
         try:
             import numpy as np
+            _kept_meta = read_image_meta(image_path)
             remover = _get_remover()
             result = remover.process(img, type="rgba")
             if isinstance(result, np.ndarray):
                 img = Image.fromarray(result)
             else:
                 img = result
-            img.save(image_path, "WEBP", quality=90)
+            # 원본에 심어둔 렌더 메타를 그대로 들고 간다. 이 재저장이 EXIF 를 날려서
+            # 스프라이트들이 자기 출생 정보를 잃고 있었다.
+            _save_with_meta(img, image_path, _kept_meta or {})
             logger.info(f"Background removed: {image_path}")
             return {"success": True, "path": image_path}
         except ImportError:
@@ -762,15 +1086,9 @@ def generate_scene_background_sd(name, prompt, negative_prompt=""):
         return {"ok": False, "reason": "low_vram", "free_vram_mb": bd["free_mb"], "vram": bd}
     try:
         # 올바른 모델 로드 보장
-        try:
-            opts = requests.get(f"{SD_API_URL}/sdapi/v1/options", timeout=10).json()
-            if "dreamshaper_8" not in opts.get("sd_model_checkpoint", ""):
-                requests.post(f"{SD_API_URL}/sdapi/v1/options",
-                              json={"sd_model_checkpoint": "dreamshaper_8.safetensors"}, timeout=180)
-        except Exception:
-            pass
+        _ensure_checkpoint(SCENE_CHECKPOINT)
         payload = _build_payload("background", prompt, negative_prompt)
-        response = requests.post(f"{SD_API_URL}/sdapi/v1/txt2img", json=payload, timeout=600)
+        response = requests.post(f"{_sd_url()}/sdapi/v1/txt2img", json=payload, timeout=600)
         response.raise_for_status()
         result = response.json()
         if not result.get("images"):
@@ -1032,35 +1350,80 @@ def generate_npc_sprite(name, prompt, expression="neutral", negative_prompt=""):
         logger.warning("SD 생성 스킵(low_vram, 기준 %dMB): %s", MIN_SD_FREE_MB, bd["summary"])
         return {"ok": False, "reason": "low_vram", "free_vram_mb": bd["free_mb"], "vram": bd}
     try:
-        try:
-            opts = requests.get(f"{SD_API_URL}/sdapi/v1/options", timeout=10).json()
-            if "dreamshaper_8" not in opts.get("sd_model_checkpoint", ""):
-                requests.post(f"{SD_API_URL}/sdapi/v1/options",
-                              json={"sd_model_checkpoint": "dreamshaper_8.safetensors"}, timeout=180)
-        except Exception:
-            pass
+        _ensure_checkpoint(PERSON_CHECKPOINT)
         expr_phrase = _EXPR_PHRASE.get(expression, expression + " expression")
         # 상반신 + 단색 배경(깔끔한 배경제거) + 표정. portrait 타입 negative에 배경 억제 포함.
         full_prompt = (prompt or (name or "character")) + ", " + expr_phrase + \
-                      ", full body, standing, whole body visible from head to knees, plain solid background, character sprite, high quality"
-        payload = _build_payload("sprite", full_prompt, negative_prompt, seed=_npc_seed(name))
-        response = requests.post(f"{SD_API_URL}/sdapi/v1/txt2img", json=payload, timeout=600)
-        response.raise_for_status()
-        result = response.json()
-        if not result.get("images"):
-            return {"ok": False, "reason": "no_image"}
+                      ", high quality"     # 구도는 FRAMING_LADDER 가 붙인다
+        # 배경을 일부러 만들게 둔다. 실측(2026-09-15): plain solid background 를 강제하면 모델이
+        # 학습 분포 밖으로 밀려 인물 자체가 망가진다 - chikmix 는 거의 빈 이미지를 냈다. 배경이
+        # 있어야 자세·해부·조명이 자연스럽고, 피부에 환경 반사광이 생겨 "현실에 있는" 느낌이 난다.
+        # 배경은 어차피 remove_portrait_background 가 지운다(문양·이펙트·별 배경 모두 깨끗이
+        # 제거되는 것을 확인). 생성 단계에서 지울 이유가 없다.
+        comp = style_compensation(PERSON_CHECKPOINT)
+        if comp:
+            full_prompt += ", " + comp
         import io
         from PIL import Image
+        # 전신으로 먼저 뽑고, 얼굴이 MIN_FACE_PX 에 못 미치면 한 단계씩 좁혀 다시 뽑는다.
+        # 추측이 아니라 실제로 검출한 얼굴 높이로 판정한다. 측정이 불가능하면(OpenCV 부재,
+        # 얼굴 미검출 - 동물/사물 스프라이트 포함) 첫 결과를 그대로 쓴다.
+        # 측정된 것 중 가장 큰 얼굴을 채택한다. 미검출(None)을 "충분함"으로 보면 안 된다 -
+        # 앞 단계에서 얼굴이 잡혔는데 다음 단계에서 안 잡히면 그건 검출 실패지 개선이 아니다.
+        # 한 번도 못 잡으면(동물/사물 스프라이트) 첫 결과를 그대로 쓴다.
+        best = None          # (face_px, label, result)
+        first = None
+        for label, framing in FRAMING_LADDER:
+            payload = _build_payload("sprite", full_prompt + ", " + framing,
+                                     negative_prompt, seed=_npc_seed(name))
+            payload["alwayson_scripts"] = adetailer_args(full_prompt, payload.get("negative_prompt"))
+            response = requests.post(f"{_sd_url()}/sdapi/v1/txt2img", json=payload, timeout=600)
+            response.raise_for_status()
+            r_json = response.json()
+            if not r_json.get("images"):
+                return {"ok": False, "reason": "no_image"}
+            if first is None:
+                first = (label, r_json)
+            fh = face_height_px(Image.open(io.BytesIO(base64.b64decode(r_json["images"][0]))))
+            if fh is None:
+                logger.info("sprite framing=%s 얼굴 미검출 - 계속", label)
+                continue
+            if best is None or fh > best[0]:
+                best = (fh, label, r_json)
+            if fh >= MIN_FACE_PX:
+                logger.info("sprite framing=%s face=%dpx (기준 %d) - 채택", label, fh, MIN_FACE_PX)
+                break
+            logger.info("sprite framing=%s face=%dpx < %d - 한 단계 좁혀 재시도",
+                        label, fh, MIN_FACE_PX)
+        if best is not None:
+            face_px, framing_used, result = best
+            if face_px < MIN_FACE_PX:
+                logger.warning("sprite 얼굴이 끝까지 기준 미달: %dpx < %d (framing=%s)",
+                               face_px, MIN_FACE_PX, framing_used)
+        else:
+            framing_used, result = first
+            logger.info("sprite 얼굴 미검출 - 첫 구도(%s) 사용", framing_used)
         img_data = base64.b64decode(result["images"][0])
         _safe, _expr, filepath = _npc_sprite_path(name, expression)
         os.makedirs(os.path.dirname(filepath), exist_ok=True)   # 인물별 폴더 생성
         img = Image.open(io.BytesIO(img_data)).convert("RGB")
+        # 어떤 구도로 갔는지와 그때 얼굴이 몇 px 였는지를 남긴다. 다음에 같은 캐릭터를 뽑을 때
+        # 사다리를 처음부터 다시 타지 않아도 되고, 화질 문제를 추적할 근거가 된다.
+        meta = _render_meta(payload, result.get("info"), PERSON_CHECKPOINT,
+                            extra={"character": name or "", "expression": expression,
+                                   "framing": framing_used,
+                                   "face_px": face_height_px(img),
+                                   "min_face_px": MIN_FACE_PX})
+        _save_with_meta(img, filepath, meta)
+        # 사이드카도 같이 쓴다. 표정 스프라이트 도구(npc_sprite_regen.py)가 읽는 계약이
+        # <풀>/<슬러그>/<표정>.json 이고, neutral 이 기록돼 있지 않으면 그 도구는 아예 멈춘다
+        # (모르는 조건으로 렌더하는 것이 그림체가 틀어진 원인이라 기본값 대신 중단하게 돼 있다).
+        # 여기서 써 두면 TRPG 가 만든 베이스로 바로 표정을 뽑을 수 있다 - --record-base 불필요.
         try:
-            exif = img.getexif()
-            exif[0x010e] = (name or "") + "|" + expression + "\n" + (prompt or "")
-            img.save(filepath, "WEBP", quality=90, exif=exif.tobytes())
-        except Exception:
-            img.save(filepath, "WEBP", quality=90)
+            with open(os.path.splitext(filepath)[0] + ".json", "w", encoding="utf-8") as _f:
+                json.dump(meta, _f, ensure_ascii=False, indent=2)
+        except Exception as _e:
+            logger.warning(f"sidecar write failed for {filepath}: {_e}")
         remove_portrait_background(filepath)   # 투명 배경 (VN 배경 위 합성용)
         image_url = "/static/portraits/npc/" + _safe + "/" + _expr + ".webp"
         logger.info(f"NPC sprite generated: {os.path.basename(filepath)} (seed={_npc_seed(name)})")
@@ -1215,7 +1578,10 @@ def generate_expression_from_base(name, expression, prompt="", denoise=0.45):
                                  "", seed=_npc_seed(name))
         payload.update({"init_images": [init_b64], "denoising_strength": denoise,
                         "resize_mode": 1, "width": base.width, "height": base.height})
-        r = requests.post(f"{SD_API_URL}/sdapi/v1/img2img", json=payload, timeout=600)
+        # 표정은 얼굴에서 읽혀야 하므로 여기야말로 ADetailer 가 필요하다.
+        payload["alwayson_scripts"] = adetailer_args(
+            (prompt or name) + ", " + expr_phrase, payload.get("negative_prompt"))
+        r = requests.post(f"{_sd_url()}/sdapi/v1/img2img", json=payload, timeout=600)
         r.raise_for_status()
         res = r.json()
         if not res.get("images"):
