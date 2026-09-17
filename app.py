@@ -1400,7 +1400,15 @@ def _check_and_shutdown():
 
     print(f"\n[AUTO] {_IDLE_TIMEOUT}초간 게임 상태 변경 없음 — 서버 자동 종료")
 
-    # SD WebUI 종료 (포트 7860)
+    # 생성 백엔드 종료. 기본은 ComfyUI(:8188) — A1111(:7860)은 폴백이라 보통 떠 있지 않지만,
+    # 수동으로 띄워 뒀다면 같이 정리한다(이전 동작 유지).
+    import os as _os
+    _comfy_port = 8188
+    try:
+        _comfy_port = int(_os.environ.get("COMFY_URL", "http://127.0.0.1:8188").rsplit(":", 1)[1].split("/")[0])
+    except Exception:
+        pass
+    _kill_port_process(_comfy_port)
     _kill_port_process(7860)
 
     # Flask 자신 종료

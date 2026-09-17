@@ -520,13 +520,16 @@ def check_services():
     session = load_json_safe("data/current_session.json") or {}
     sd_enabled = session.get("sd_illustration", False)
 
-    sd_status = _is_service_alive("http://localhost:7860/sdapi/v1/options", timeout=5)
+    # 생성 백엔드는 ComfyUI(:8188)다. A1111(:7860)은 설치만 남겨둔 폴백이라 꺼져 있는 것이 정상이고,
+    # 그걸로 생존을 판정하면 멀쩡한 상태를 "SD 죽음"으로 잘못 보고한다.
+    comfy_url = os.environ.get("COMFY_URL", "http://127.0.0.1:8188").rstrip("/")
+    sd_status = _is_service_alive(f"{comfy_url}/system_stats", timeout=5)
     if sd_status == 200:
-        log("ok", "SD WebUI (localhost:7860) 정상")
+        log("ok", f"ComfyUI ({comfy_url}) 정상")
     elif sd_enabled:
-        log("warn", "SD WebUI (localhost:7860) 접속 불가 — sd_illustration=true인데 미실행. Skia 폴백 사용")
+        log("warn", f"ComfyUI ({comfy_url}) 접속 불가 — sd_illustration=true인데 미실행. Skia 폴백 사용")
     else:
-        log("ok", "SD WebUI 미실행 (sd_illustration=false, Skia 폴백 사용)")
+        log("ok", "ComfyUI 미실행 (sd_illustration=false, Skia 폴백 사용)")
 
 
 def check_illustrations(state):

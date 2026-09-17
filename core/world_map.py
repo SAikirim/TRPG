@@ -12,44 +12,6 @@ from PIL import Image
 from core.skia_utils import skia_rgba, skia_paint, pil_to_skia_image
 
 
-def _switch_sd_model(model_name):
-    """SD WebUI 모델 전환 + 로딩 완료 대기"""
-    try:
-        import requests
-        import time
-        from core.sd_generator import SD_API_URL
-        SD_API = SD_API_URL
-
-        # 현재 모델 확인 — 이미 같으면 스킵
-        try:
-            current = requests.get(f"{SD_API}/sdapi/v1/options", timeout=10).json()
-            if model_name in current.get("sd_model_checkpoint", ""):
-                return True
-        except Exception:
-            pass
-
-        # 모델 전환 요청
-        requests.post(
-            f"{SD_API}/sdapi/v1/options",
-            json={"sd_model_checkpoint": model_name},
-            timeout=180,
-        )
-
-        # 로딩 완료 대기 (최대 120초)
-        for _ in range(60):
-            time.sleep(2)
-            try:
-                opts = requests.get(f"{SD_API}/sdapi/v1/options", timeout=10).json()
-                if model_name in opts.get("sd_model_checkpoint", ""):
-                    return True
-            except Exception:
-                continue
-
-        return False
-    except Exception:
-        return False
-
-
 def _draw_parchment_bg(canvas, W, H, _rng):
     """양피지 배경 텍스처 — 판타지 지도 스타일 (다층 그라디언트 + 섬유 + 접힌 자국) [Skia]"""
     PI2 = 2 * math.pi
@@ -1590,19 +1552,16 @@ def generate_sd_background(guide_path, output_dir):
         return None
 
     try:
-        import requests
-        import base64
         import io
-        from core.sd_generator import SD_API_URL
+        from core.sd_backend import BACKEND, RenderSpec
+        from core.sd_generator import SCENE_CHECKPOINT
 
-        # 색 가이드 이미지 로드 + base64 인코딩
         sd_input = Image.open(guide_path).convert("RGB")
-        buffered = io.BytesIO()
-        sd_input.save(buffered, format="PNG")
-        img_b64 = base64.b64encode(buffered.getvalue()).decode()
 
+        # LoRA 는 프롬프트 안의 `<lora:…>` 문법(A1111 전용)이 아니라 그래프 노드로 얹는다 —
+        # ComfyUI 는 프롬프트 속 그 표기를 그냥 텍스트로 읽는다(= 조용히 무시된다).
         prompt = (
-            "fantasy map, <lora:AZovyaRPGArtistToolsLORAV2art:0.6>, "
+            "fantasy map, "
             "medieval cartography, parchment texture, hand painted, "
             "watercolor terrain, top down view, aged paper"
         )
@@ -1612,36 +1571,30 @@ def generate_sd_background(guide_path, output_dir):
             "close up, anime"
         )
 
-        payload = {
-            "init_images": [img_b64],
-            "prompt": prompt,
-            "negative_prompt": negative_prompt,
-            "steps": 25,
-            "sampler_name": "DPM++ 2M Karras",
-            "width": 1024,
-            "height": 1024,
-            "cfg_scale": 8,
-            # 기본값 0.75 (추천), 차선 0.45 (입력에 더 충실)
-            "denoising_strength": 0.75,
-            # 후보 2장 순차 생성 (batch_size보다 VRAM 안정적)
-            "n_iter": 2,
-        }
-
-        resp = requests.post(
-            f"{SD_API_URL}/sdapi/v1/img2img", json=payload, timeout=600
-        )
-        resp.raise_for_status()
-
-        result = resp.json()
-        images = result.get("images", [])
-        if len(images) < 2:
-            return None
+        # 후보 2장은 시드를 달리해 순차 생성한다 (batch 보다 8GB 에서 안정적이고, 어느 시드가
+        # 채택됐는지도 남는다). denoise 0.75 = 색 가이드의 배치만 따르고 질감은 새로 그린다.
+        images = []
+        for seed in (1000, 2000):
+            spec = RenderSpec(
+                prompt=prompt,
+                negative_prompt=negative_prompt,
+                checkpoint=SCENE_CHECKPOINT,
+                width=1024, height=1024,
+                steps=25, cfg_scale=8, seed=seed,
+                sampler_name="DPM++ 2M Karras",
+                denoise=0.75,
+                loras=(("AZovyaRPGArtistToolsLORAV2art.safetensors", 0.6),),
+                kind="worldmap",
+            )
+            out = BACKEND.img2img(spec, sd_input, timeout=600)
+            if not out.get("images"):
+                return None
+            images.append(out["images"][0])
 
         os.makedirs(output_dir, exist_ok=True)
         candidate_paths = []
         for idx in range(2):
-            img_data = base64.b64decode(images[idx])
-            sd_bg = Image.open(io.BytesIO(img_data)).convert("RGB")
+            sd_bg = Image.open(io.BytesIO(images[idx])).convert("RGB")
             sd_bg = sd_bg.resize((1024, 1024), Image.LANCZOS)
             cand_path = os.path.join(output_dir, f"candidate_{idx + 1}.webp")
             sd_bg.save(cand_path, "WEBP", quality=90)

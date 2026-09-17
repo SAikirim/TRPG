@@ -55,6 +55,26 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 logger = logging.getLogger(__name__)
 
+
+def _helper_python() -> str:
+    """맵 생성·Flask 기동 같은 보조 프로세스를 돌릴 파이썬.
+
+    이건 SD 백엔드와 무관하다 — PIL/torch 가 깔린 인터프리터가 필요할 뿐이다. 예전에는 A1111 venv 를
+    1순위로 골랐는데, 생성 백엔드를 ComfyUI 로 옮기면서 그 venv 는 언젠가 사라질 수 있는 폴백이 됐다.
+    그래서 ComfyUI 를 돌리는 인터프리터(이 환경은 글로벌 파이썬) → A1111 venv → 현재 인터프리터 순으로
+    찾는다. 환경변수 `TRPG_HELPER_PYTHON` 으로 고정할 수 있다.
+    """
+    pinned = os.environ.get("TRPG_HELPER_PYTHON")
+    if pinned and os.path.isfile(pinned):
+        return pinned
+    comfy_python = os.environ.get("COMFY_PYTHON")
+    if comfy_python and os.path.isfile(comfy_python):
+        return comfy_python
+    a1111 = os.path.join("C:\\", "git", "WebUI", "stable-diffusion-webui", "venv", "Scripts", "Python.exe")
+    if os.path.isfile(a1111):
+        return a1111
+    return sys.executable
+
 # ─── 파일 경로 상수 ───
 GAME_STATE_PATH = os.path.join(BASE_DIR, "data", "game_state.json")
 SESSION_PATH = os.path.join(BASE_DIR, "data", "current_session.json")
@@ -724,9 +744,7 @@ class TurnOrchestrator:
 
     def _regenerate_map(self) -> bool:
         """로컬 맵 + 월드맵 재생성. SD venv Python 사용."""
-        sd_python = os.path.join("C:\\", "git", "WebUI", "stable-diffusion-webui", "venv", "Scripts", "Python.exe")
-        if not os.path.isfile(sd_python):
-            sd_python = sys.executable
+        sd_python = _helper_python()
         try:
             # 로컬 맵
             subprocess.run(
@@ -746,9 +764,7 @@ class TurnOrchestrator:
     def _start_flask_server(self) -> None:
         """Flask 서버를 백그라운드로 기동."""
         # SD venv Python 우선, 없으면 시스템 Python
-        sd_python = os.path.join("C:\\", "git", "WebUI", "stable-diffusion-webui", "venv", "Scripts", "Python.exe")
-        if not os.path.isfile(sd_python):
-            sd_python = sys.executable
+        sd_python = _helper_python()
 
         app_path = os.path.join(BASE_DIR, "app.py")
         try:
@@ -962,8 +978,7 @@ class TurnOrchestrator:
 
     @staticmethod
     def _get_sd_python() -> str:
-        sd = os.path.join("C:\\", "git", "WebUI", "stable-diffusion-webui", "venv", "Scripts", "Python.exe")
-        return sd if os.path.isfile(sd) else sys.executable
+        return _helper_python()
 
     def _auto_save(self, turn: int, description: str = "") -> None:
         """매 턴 slot_auto에 저장 + git commit + push (백그라운드).

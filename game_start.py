@@ -1173,7 +1173,11 @@ def _start_flask_server():
 
 
 def _start_sd_webui():
-    """sd_illustration=true이면 SD WebUI가 미실행 시 백그라운드로 자동 시작."""
+    """sd_illustration=true 인데 ComfyUI 가 꺼져 있으면 백그라운드로 올린다.
+
+    생성 백엔드는 ComfyUI(:8188) 다. A1111 은 설치만 남겨 둔 폴백이라 여기서 기동하지 않는다 —
+    쓰지도 않는 것을 매번 띄우면 VRAM 과 기동 시간만 먹는다. 굳이 띄우려면 TRPG_START_A1111=1.
+    """
     import socket
 
     # current_session에서 sd_illustration 확인
@@ -1187,18 +1191,27 @@ def _start_sd_webui():
     except Exception:
         return True  # 세션 파일 없으면 스킵
 
-    # 포트 7860 점유 확인
+    comfy_url = os.environ.get("COMFY_URL", "http://127.0.0.1:8188").rstrip("/")
+    port = 8188
+    try:
+        port = int(comfy_url.rsplit(":", 1)[1].split("/")[0])
+    except Exception:
+        pass
+
+    # 포트 점유 확인 — 이미 떠 있으면 그대로 쓴다
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         s.settimeout(2)
-        s.connect(("127.0.0.1", 7860))
-        s.close()
-        print("  [OK] SD WebUI 이미 실행 중 (localhost:7860)")
+        s.connect(("127.0.0.1", port))
+        print(f"  [OK] ComfyUI 이미 실행 중 ({comfy_url})")
         return True
     except (ConnectionRefusedError, OSError):
         pass
     finally:
-        s.close()
+        try:
+            s.close()
+        except Exception:
+            pass
 
     # 프로세스 기반 중복 감지 (포트 바인딩 전 로딩 중인 경우)
     try:
@@ -1207,39 +1220,35 @@ def _start_sd_webui():
             ["wmic", "process", "where", "name='python.exe'", "get", "CommandLine"],
             capture_output=True, text=True, timeout=5
         )
-        if "launch.py" in result.stdout:
-            print("  [OK] SD WebUI 이미 로딩 중 (프로세스 감지)")
+        if "ComfyUI" in result.stdout and "main.py" in result.stdout:
+            print("  [OK] ComfyUI 이미 로딩 중 (프로세스 감지)")
             return True
     except Exception:
         pass
 
-    # SD WebUI 백그라운드 시작
+    # ComfyUI 백그라운드 시작. venv 가 아니라 글로벌 파이썬으로 돈다(이 환경의 설치 방식).
     import subprocess
-    sd_dir = r"C:\git\WebUI\stable-diffusion-webui"
-    sd_python = os.path.join(sd_dir, "venv", "Scripts", "Python.exe")
-    launch_py = os.path.join(sd_dir, "launch.py")
+    comfy_dir = os.environ.get("COMFY_DIR", r"C:\git\WebUI\ComfyUI")
+    main_py = os.path.join(comfy_dir, "main.py")
+    comfy_python = os.environ.get("COMFY_PYTHON") or sys.executable
 
-    if not os.path.exists(sd_python) or not os.path.exists(launch_py):
-        print(f"  [WARN] SD WebUI 경로 없음: {sd_dir}")
+    if not os.path.exists(main_py):
+        print(f"  [WARN] ComfyUI 경로 없음: {comfy_dir}")
         return False
 
     try:
         subprocess.Popen(
-            [sd_python, launch_py,
-             "--theme", "dark", "--xformers", "--xformers-flash-attention",
-             "--deepdanbooru", "--no-half-vae", "--api",
-             "--cors-allow-origins=http://127.0.0.1:7860",
-             "--listen", "--enable-insecure-extension-access"],
-            cwd=sd_dir,
+            [comfy_python, main_py, "--port", str(port), "--listen"],
+            cwd=comfy_dir,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
         )
-        print("  [INFO] SD WebUI 시작 중... (포트 7860, 로딩에 1~2분 소요)")
-        # SD는 로딩이 오래 걸리므로 대기하지 않음 — Skia 폴백으로 진행, SD 준비되면 자동 전환
+        print(f"  [INFO] ComfyUI 시작 중... (포트 {port}, 모델 로딩은 첫 생성 때)")
+        # 기동을 기다리지 않는다 — 준비 전에는 Skia 폴백으로 진행하고, 뜨면 자동 전환된다.
         return True
     except Exception as e:
-        print(f"  [WARN] SD WebUI 시작 실패: {e}")
+        print(f"  [WARN] ComfyUI 시작 실패: {e}")
         return False
 
 

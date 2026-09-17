@@ -250,11 +250,22 @@ class ComfyBackend:
                   "inputs": {"width": spec.width, "height": spec.height, "batch_size": 1}}
         return self._sampler_chain(g, h, spec, ["4", 0])
 
-    def build_img2img(self, spec, image_name):
+    def build_img2img(self, spec, image_name, mask_name=None):
+        """mask_name 을 주면 그 흰 영역만 다시 그린다 (A1111 의 마스크 img2img 대응).
+
+        `SetLatentNoiseMask` 를 쓰는 이유: `VAEEncodeForInpaint` 는 마스크 영역을 지우고 새로 채우는
+        전용 인페인트라 denoise 를 1 로 밀어붙인다. 표정만 바꾸는 작업은 원본 얼굴을 남긴 채 낮은
+        denoise 로 흔드는 쪽(= A1111 inpainting_fill=original)이 맞아서 노이즈 마스크를 얹는다."""
         g, h = self._base_nodes(spec)
         g["4"] = {"class_type": "LoadImage", "inputs": {"image": image_name}}
         g["41"] = {"class_type": "VAEEncode", "inputs": {"pixels": ["4", 0], "vae": h["vae"]}}
-        return self._sampler_chain(g, h, spec, ["41", 0])
+        latent = ["41", 0]
+        if mask_name:
+            g["42"] = {"class_type": "LoadImageMask", "inputs": {"image": mask_name, "channel": "red"}}
+            g["43"] = {"class_type": "SetLatentNoiseMask",
+                       "inputs": {"samples": latent, "mask": ["42", 0]}}
+            latent = ["43", 0]
+        return self._sampler_chain(g, h, spec, latent)
 
     # --- 실행 ---------------------------------------------------------------
 
@@ -296,9 +307,10 @@ class ComfyBackend:
         images = self.run(graph, timeout)
         return {"images": images, "seed": seed, "graph": graph}
 
-    def img2img(self, spec, init_image, timeout=None):
+    def img2img(self, spec, init_image, timeout=None, mask=None):
         name, _ = self.upload_image(init_image)
-        graph, seed = self.build_img2img(spec, name)
+        mask_name = self.upload_image(mask, name="trpg_mask_%s.png" % uuid.uuid4().hex[:8])[0] if mask is not None else None
+        graph, seed = self.build_img2img(spec, name, mask_name)
         images = self.run(graph, timeout)
         return {"images": images, "seed": seed, "graph": graph}
 
