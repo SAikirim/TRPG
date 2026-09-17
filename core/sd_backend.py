@@ -75,6 +75,7 @@ class RenderSpec:
     hires_steps: int = 9
     hires_denoise: float = 0.35
     tome_ratio: float = 0.0               # 0 이면 사용하지 않음
+    vae_name: str = ""                    # 외부 VAE 파일명. 비우면 체크포인트 내장 VAE
     kind: str = "image"                   # 저장 경로 구분용 라벨
 
     def meta_payload(self):
@@ -164,6 +165,11 @@ class ComfyBackend:
         sampler, scheduler = split_sampler(spec.sampler_name)
         g = {"1": {"class_type": "CheckpointLoaderSimple", "inputs": {"ckpt_name": spec.checkpoint}}}
         model, clip, vae = ["1", 0], ["1", 1], ["1", 2]
+        if spec.vae_name:
+            # A1111 의 전역 `sd_vae` 설정에 해당한다. 지정하지 않으면 체크포인트 내장 VAE 를 쓴다 —
+            # 내장이 깨진 모델(NaN/보라색 출력)이나 색감을 맞춰야 할 때만 외부 VAE 를 건다.
+            g["32"] = {"class_type": "VAELoader", "inputs": {"vae_name": spec.vae_name}}
+            vae = ["32", 0]
         for i, (lora_name, weight) in enumerate(spec.loras or (), start=40):
             nid = str(i)
             g[nid] = {"class_type": "LoraLoader",

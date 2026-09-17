@@ -115,6 +115,34 @@ class Txt2ImgGraph(unittest.TestCase):
         self.assertEqual(g[fdi["bbox_detector"][0]]["class_type"], "UltralyticsDetectorProvider")
         self.assertTrue(g[fdi["positive"][0]]["inputs"]["text"].startswith("face, "))
 
+    def test_external_vae_replaces_checkpoint_vae(self):
+        # A1111 의 전역 sd_vae 대응. 지정하면 디코드/인코드가 모두 그 VAE 를 봐야 한다 —
+        # 한쪽만 바뀌면 색이 어긋난 채로 조용히 돈다.
+        spec = RenderSpec(prompt="x", checkpoint=PERSON_CKPT,
+                          vae_name="vae-ft-mse-840000-ema-pruned.safetensors")
+        g, _ = BACKEND.build_txt2img(spec)
+        loader = find(g, "VAELoader")
+        self.assertEqual(len(loader), 1)
+        self.assertEqual(g[loader[0]]["inputs"]["vae_name"], "vae-ft-mse-840000-ema-pruned.safetensors")
+        self.assertEqual(inputs_of(g, "VAEDecode")["vae"], [loader[0], 0])
+        gi, _ = BACKEND.build_img2img(spec, "init.png")
+        self.assertEqual(inputs_of(gi, "VAEEncode")["vae"], [find(gi, "VAELoader")[0], 0])
+
+    def test_no_vae_loader_by_default(self):
+        g, _ = BACKEND.build_txt2img(self.spec)
+        self.assertEqual(find(g, "VAELoader"), [])
+        self.assertEqual(inputs_of(g, "VAEDecode")["vae"], ["1", 2])   # 체크포인트 내장
+
+    def test_masked_img2img_sets_noise_mask(self):
+        spec = RenderSpec(prompt="smile", checkpoint=PERSON_CKPT, denoise=0.6)
+        g, _ = BACKEND.build_img2img(spec, "init.png", "mask.png")
+        self.assertEqual(inputs_of(g, "LoadImageMask")["image"], "mask.png")
+        self.assertEqual(inputs_of(g, "SetLatentNoiseMask")["samples"], ["41", 0])
+        self.assertEqual(inputs_of(g, "KSampler")["latent_image"], ["43", 0])
+        # 마스크가 없으면 노이즈 마스크 노드도 없어야 한다
+        g2, _ = BACKEND.build_img2img(spec, "init.png")
+        self.assertEqual(find(g2, "SetLatentNoiseMask"), [])
+
     def test_tome_patches_model_before_sampler(self):
         spec = RenderSpec(prompt="x", checkpoint=PERSON_CKPT, tome_ratio=0.45)
         g, _ = BACKEND.build_txt2img(spec)
